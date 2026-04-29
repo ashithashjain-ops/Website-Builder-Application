@@ -1,0 +1,1757 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html {
+  height: 100%;
+  /* Prevent horizontal rubber-band showing “empty” on iOS */
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* Plans (/planning): match static index — page bg fills viewport so default white body does not frame the layout */
+html:has(body > main.planning-page),
+body:has(> main.planning-page) {
+  background-color: #efefef;
+}
+
+/* Buy screen (/buyscreen): keep page background pure white */
+html:has(body > main.buyscreen-page),
+body:has(> main.buyscreen-page) {
+  background-color: #ffffff;
+}
+
+.buyscreen-shell {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.buyscreen-header > * {
+  min-width: 0;
+}
+.buyscreen-categories {
+  gap: 0.75rem;
+  scrollbar-width: thin;
+}
+.buyscreen-category-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  padding: 0.1rem 0.2rem;
+  opacity: 0.95;
+}
+.buyscreen-category-item--push {
+  margin-left: auto;
+}
+.buyscreen-products > * {
+  min-width: 0;
+}
+/* Product cards: text + badge safe at mobile & 100–200% zoom */
+.buyscreen-product-card {
+  min-width: 0;
+  height: 100%;
+  min-height: 16.75rem;
+}
+.buyscreen-product-meta {
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  min-height: 5rem;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.buyscreen-product-meta p {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.buyscreen-product-meta p:nth-last-child(2) {
+  min-height: 2.35em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.buyscreen-product-meta p:last-child {
+  margin-top: auto;
+}
+/* Featured products: single horizontal row; column count from JS via --buyscreen-carousel-slots (zoom-safe). */
+.buyscreen-products.buyscreen-products--carousel {
+  --buyscreen-gap: 1rem;
+  --buyscreen-carousel-slots: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: var(--buyscreen-gap);
+  min-width: 0;
+}
+@media (min-width: 640px) {
+  .buyscreen-products.buyscreen-products--carousel {
+    --buyscreen-gap: 1.5rem;
+  }
+}
+.buyscreen-products.buyscreen-products--carousel > * {
+  flex: 0 0
+    calc(
+      (100% - (var(--buyscreen-carousel-slots) - 1) * var(--buyscreen-gap)) / var(--buyscreen-carousel-slots)
+    );
+  min-width: 0;
+}
+.buyscreen-products-strip {
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.buyscreen-products-arrow {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #64748b;
+  border-radius: 9999px;
+  background: #ffffff;
+  color: #1e293b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+.buyscreen-products-arrow:hover {
+  background: #06224c;
+  border-color: #06224c;
+  color: #ffffff;
+}
+.buyscreen-products-arrow:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #93c5fd;
+}
+.buyscreen-category-item {
+  padding: 0.42rem 0.9rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.buyscreen-category-item:hover,
+.buyscreen-category-item:focus-visible {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  outline: none;
+}
+.buyscreen-all-categories-dropdown {
+  display: none;
+}
+.buyscreen-all-categories-dropdown--open {
+  display: block;
+}
+.buyscreen-all-categories-item {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid #e5e7eb;
+  background: transparent;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #1f2937;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.buyscreen-all-categories-item:last-child {
+  border-bottom: 0;
+}
+.buyscreen-all-categories-item:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+.buyscreen-all-categories-item:focus-visible {
+  outline: none;
+  background: #2563eb;
+  color: #ffffff;
+}
+/* Stronger than Tailwind preflight/utilities — cart + user must show hover fill */
+main.buyscreen-page button.buyscreen-cart-trigger,
+main.buyscreen-page button.buyscreen-user-trigger {
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+main.buyscreen-page button.buyscreen-cart-trigger:hover,
+main.buyscreen-page button.buyscreen-cart-trigger:focus-visible,
+main.buyscreen-page button.buyscreen-user-trigger:hover,
+main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
+  background-color: #cbd5e1 !important;
+  box-shadow: inset 0 0 0 1px #94a3b8 !important;
+  outline: none !important;
+}
+.buyscreen-user-menu-wrap {
+  position: relative;
+}
+.buyscreen-user-menu-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 50;
+  min-width: 140px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.14);
+  overflow: hidden;
+}
+.buyscreen-user-menu-dropdown--open {
+  display: block;
+}
+.buyscreen-user-menu-item {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0.65rem 1rem;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1f2937;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.buyscreen-user-menu-item:hover,
+.buyscreen-user-menu-item:focus-visible {
+  background: #f3f4f6;
+  outline: none;
+}
+.buyscreen-product-actions-mobile {
+  overflow: hidden;
+}
+.buyscreen-product-actions-mobile > button {
+  width: min(1.625rem, 100%) !important;
+  height: min(1.625rem, 100%) !important;
+}
+.buyscreen-product-actions-mobile > button svg {
+  width: 11px;
+  height: 11px;
+}
+.buyscreen-product-card:focus-visible {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: inset 0 0 0 2px #2563eb;
+}
+.buyscreen-product-card:focus-within .buyscreen-product-hover-actions {
+  pointer-events: auto;
+  opacity: 1;
+}
+@media (max-width: 480px) {
+  .buyscreen-products-row .buyscreen-products-arrow {
+    display: none !important;
+  }
+}
+/* Horizontal category bar only at lg+; do not set display:flex globally — it overrides Tailwind `hidden` on the mobile menu panel. */
+@media (min-width: 1024px) {
+  .buyscreen-categories-list {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    overflow: visible;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .buyscreen-all-categories-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    z-index: 40;
+    min-width: 240px;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(2, 6, 23, 0.18);
+    overflow: hidden;
+  }
+}
+.buyscreen-hero-content h1,
+.buyscreen-hero-content p {
+  overflow-wrap: anywhere;
+}
+.buyscreen-hero-overlay {
+  background: rgba(0, 22, 50, 0.45);
+}
+.buyscreen-hero-scroll-hint {
+  display: none;
+}
+.buyscreen-social-row {
+  /* default (desktop/tablet) keeps natural wrapping if needed */
+}
+
+@media (max-width: 640px) {
+  @media (min-resolution: 1.4dppx) {
+    .buyscreen-social-row {
+      flex-wrap: nowrap !important;
+      gap: 0.35rem !important;
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+    .buyscreen-social-row svg {
+      width: 14px;
+      height: 14px;
+    }
+    .buyscreen-social-row i {
+      font-size: 0.75rem;
+      line-height: 1;
+    }
+  }
+}
+.buyscreen-hero-scroll-note {
+  display: none;
+}
+.buyscreen-hero-scroll-note--show {
+  display: block;
+}
+@media (max-width: 640px) {
+  .buyscreen-hero-overlay {
+    background: rgba(0, 22, 50, 0.62) !important;
+  }
+  .buyscreen-hero-content h1,
+  .buyscreen-hero-content p {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  }
+  .buyscreen-hero-scroll-note {
+    margin-top: 0.35rem;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #475569;
+  }
+  .buyscreen-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    box-sizing: border-box;
+    padding-top: 0.2rem;
+    padding-bottom: 0.7rem;
+  }
+  .buyscreen-hero-content::-webkit-scrollbar {
+    display: none;
+  }
+  .buyscreen-page {
+    overflow-x: hidden;
+  }
+  .buyscreen-shell {
+    border-radius: 0.375rem;
+  }
+  .buyscreen-hero-content {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center !important;
+  }
+  .buyscreen-hero-content h1 {
+    font-size: clamp(1.15rem, 5.2vw, 1.5rem) !important;
+    line-height: 1.2 !important;
+  }
+  .buyscreen-hero-content p {
+    margin-top: 0.5rem !important;
+    font-size: clamp(0.78rem, 2.9vw, 0.95rem) !important;
+    line-height: 1.4 !important;
+    max-width: 28ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .buyscreen-hero-content button {
+    margin-top: 0.85rem !important;
+  }
+  .buyscreen-features {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .buyscreen-products.buyscreen-products--grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+@media (max-width: 420px) {
+  .buyscreen-hero-content h1 {
+    font-size: clamp(1.02rem, 5.6vw, 1.3rem) !important;
+  }
+  .buyscreen-hero-content p {
+    font-size: clamp(0.72rem, 3vw, 0.86rem) !important;
+    max-width: 26ch;
+  }
+}
+@media (hover: hover) and (pointer: fine) and (max-width: 900px) and (min-resolution: 1.4dppx) {
+  .buyscreen-hero {
+    padding: 0.65rem !important;
+  }
+  .buyscreen-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    box-sizing: border-box;
+    padding-top: 0.2rem;
+    padding-bottom: 0.7rem;
+    padding-left: 0.15rem !important;
+    padding-right: 0.15rem !important;
+  }
+  .buyscreen-hero-content::-webkit-scrollbar {
+    display: none;
+  }
+  .buyscreen-hero-content h1 {
+    font-size: clamp(0.86rem, 3.9vw, 1.04rem) !important;
+    line-height: 1.15 !important;
+  }
+  .buyscreen-hero-content p {
+    margin-top: 0.3rem !important;
+    font-size: clamp(0.62rem, 2.2vw, 0.74rem) !important;
+    line-height: 1.22 !important;
+    max-width: 22ch !important;
+  }
+  .buyscreen-hero-content button {
+    margin-top: 0.5rem !important;
+    padding: 0.34rem 0.78rem !important;
+    font-size: 0.62rem !important;
+  }
+}
+@media (min-width: 768px) {
+  .buyscreen-categories {
+    gap: 1.2rem;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+  .buyscreen-category-item {
+    padding: 0.42rem 0.9rem;
+    opacity: 1;
+  }
+}
+@media (max-width: 1023px) {
+  .buyscreen-shell,
+  .buyscreen-shell * {
+    box-sizing: border-box;
+    min-width: 0;
+  }
+  .buyscreen-header {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .buyscreen-header-actions {
+    width: 100% !important;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 0.5rem;
+    column-gap: 0.5rem;
+  }
+  .buyscreen-search {
+    order: 1;
+    flex: 1 1 100%;
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .buyscreen-header-trailing {
+    order: 2;
+    display: flex;
+    flex: 1 1 100%;
+    min-width: 0;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  .buyscreen-categories {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  /* Hamburger panel: hidden until Menu is used (beats Tailwind `hidden` vs `lg:flex` ordering on CDN). */
+  .buyscreen-categories-list:not(.buyscreen-categories-list--open) {
+    display: none !important;
+  }
+  .buyscreen-categories-list.buyscreen-categories-list--open {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
+  .buyscreen-categories-list {
+    width: 100%;
+    overflow-x: visible;
+  }
+  .buyscreen-all-categories-wrap {
+    width: 100%;
+  }
+  .buyscreen-all-categories-toggle {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .buyscreen-all-categories-dropdown {
+    margin-top: 0.4rem;
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .buyscreen-features {
+    gap: 0.9rem !important;
+  }
+  .buyscreen-products.buyscreen-products--grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .buyscreen-header-trailing {
+    gap: 0.35rem !important;
+  }
+  .buyscreen-cart-trigger,
+  .buyscreen-user-summary,
+  .buyscreen-user-trigger {
+    gap: 0.35rem !important;
+  }
+  .buyscreen-cart-secondary,
+  .buyscreen-user-secondary {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .buyscreen-header-trailing {
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+    row-gap: 0.35rem !important;
+    column-gap: 0.35rem !important;
+  }
+  .buyscreen-header-trailing > span[aria-hidden="true"] {
+    display: none !important;
+  }
+  .buyscreen-header-trailing .buyscreen-cart-trigger {
+    min-width: 2.1rem;
+    justify-content: center;
+    padding: 0.35rem !important;
+  }
+  .buyscreen-header-trailing .buyscreen-cart-trigger > span.min-w-0,
+  .buyscreen-header-trailing .buyscreen-user-summary > span.min-w-0 {
+    display: none !important;
+  }
+  .buyscreen-header-trailing .buyscreen-user-summary {
+    padding: 0.35rem !important;
+  }
+}
+
+/* Planning invoice mobile safety: prevent clipping/overlap at 100-200% zoom */
+.planning-invoice-row {
+  grid-template-columns: 96px 14px minmax(0, 1fr) !important;
+}
+.planning-invoice-value {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+/* Mobile/tablet safety at high zoom: always keep plan cards stacked */
+@media (max-width: 1023px) {
+  .planning-plans-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .planning-billing-toggle-wrap {
+    gap: 0.45rem !important;
+  }
+  .planning-billing-toggle-wrap .planning-billing-label {
+    min-width: 0;
+    font-size: 12px !important;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+}
+.planning-recommended-content-offset {
+  margin-top: 0.85rem;
+}
+.planning-billing-label .planning-billing-label-line {
+  display: inline;
+}
+.planning-billing-label .planning-billing-label-line + .planning-billing-label-line {
+  margin-top: 0;
+}
+/* Mobile + zoom safety: keep recommended badge clear of title */
+@media (max-width: 768px) {
+  .planning-recommended-card {
+    padding-top: 2rem !important;
+  }
+  .planning-recommended-content-offset {
+    margin-top: 0.95rem !important;
+  }
+}
+@media (max-width: 560px) {
+  .planning-billing-toggle-wrap {
+    justify-content: center !important;
+    gap: 0.4rem !important;
+  }
+  .planning-billing-toggle-wrap .planning-billing-label {
+    flex: 0 0 76px !important;
+    width: 76px !important;
+    max-width: 76px !important;
+    min-width: 76px !important;
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: normal !important;
+    line-height: 1.08 !important;
+    row-gap: 0.12rem !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+  .planning-billing-toggle-wrap .planning-billing-label .planning-billing-label-line {
+    display: block !important;
+    width: 100%;
+  }
+}
+@media (max-width: 420px) {
+  .planning-billing-toggle-wrap {
+    justify-content: center !important;
+    gap: 0.35rem !important;
+  }
+  .planning-billing-toggle-wrap .planning-billing-label {
+    flex: 0 0 74px !important;
+    width: 74px !important;
+    max-width: 74px !important;
+    min-width: 74px !important;
+    min-height: 2.2rem !important;
+    display: inline-flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    row-gap: 0.12rem !important;
+    font-size: 10px !important;
+    line-height: 1.02 !important;
+    white-space: normal !important;
+    text-align: center !important;
+    padding: 0 2px !important;
+  }
+  .planning-billing-toggle-wrap .planning-billing-label .planning-billing-label-line {
+    display: block !important;
+    width: 100%;
+  }
+  .planning-price-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.4rem !important;
+  }
+  .planning-price-oldsave {
+    width: 100%;
+    padding-right: 0 !important;
+  }
+  .planning-price-chip {
+    align-self: flex-end;
+    margin-right: 0 !important;
+    top: 0 !important;
+  }
+}
+
+/* Billing history: “This Year” select — custom chevron so the arrow shows on all mobile browsers
+   (native indicator is inconsistent; sm:pr-[10px] also clipped it at ≥640px viewports). */
+.planning-history-view .planning-history-filter select.planning-history-year-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem 1rem;
+  padding-right: 2.25rem;
+  box-sizing: border-box;
+}
+
+/* Payment / invoice / history readability safety up to 200% mobile zoom */
+@media (max-width: 640px) {
+  .planning-payment-view,
+  .planning-invoice-view,
+  .planning-history-view {
+    max-width: 100% !important;
+    border-radius: 6px !important;
+  }
+  .planning-payment-view input:not([type="radio"]):not([type="checkbox"]),
+  .planning-payment-view select {
+    font-size: 12px !important;
+  }
+  /* Same visual size for all payment method radios at high mobile zoom */
+  .planning-payment-view input[type="radio"].planning-pm-radio {
+    width: 1rem !important;
+    height: 1rem !important;
+    min-width: 1rem !important;
+    min-height: 1rem !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+  }
+  /* Card row + UPI: avoid placeholder clipping at 190–200% mobile zoom */
+  .planning-payment-view .planning-payment-card-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr) !important;
+    gap: 0.5rem !important;
+  }
+  .planning-payment-view .planning-payment-expiry,
+  .planning-payment-view .planning-payment-cvv,
+  .planning-payment-view .planning-payment-upi {
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .planning-payment-view .planning-payment-expiry::placeholder,
+  .planning-payment-view .planning-payment-cvv::placeholder {
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.03em !important;
+  }
+  .planning-payment-view .planning-payment-upi {
+    padding-left: 0.375rem !important;
+    padding-right: 0.375rem !important;
+  }
+  .planning-payment-view .planning-payment-upi::placeholder,
+  .planning-payment-view .planning-payment-upi::-webkit-input-placeholder {
+    font-size: 9px !important;
+    line-height: 1.3 !important;
+    letter-spacing: -0.04em !important;
+  }
+  .planning-invoice-view h2 {
+    font-size: 1.55rem !important;
+    line-height: 1.15 !important;
+  }
+  /* Stack label above value so text stays readable at 180–200% mobile zoom */
+  .planning-invoice-view .planning-invoice-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+  }
+  .planning-invoice-view .planning-invoice-row > span:nth-child(2) {
+    display: none !important;
+  }
+  .planning-invoice-view .planning-invoice-row > span:first-child {
+    font-weight: 600;
+  }
+  .planning-invoice-view .planning-invoice-row > span:first-child::after {
+    content: ':';
+  }
+  .planning-invoice-view .planning-invoice-value {
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    max-width: 100% !important;
+  }
+  .planning-invoice-view .planning-invoice-download {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .planning-invoice-view .planning-invoice-download button {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .planning-history-view .planning-history-track {
+    max-width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    gap: 0.75rem !important;
+  }
+  .planning-history-view .planning-history-filter {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+  }
+  .planning-history-view .planning-history-filter button {
+    min-width: 0 !important;
+  }
+  /* Stacked column + full-width select: show “This Year” at 185–200% mobile zoom */
+  .planning-history-view .planning-history-filter select.planning-history-year-select {
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+    padding-right: 2.25rem !important;
+  }
+  .planning-history-view .planning-history-table-wrap {
+    max-width: 100% !important;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .planning-history-view table {
+    min-width: 360px !important;
+    font-size: 10px !important;
+  }
+}
+@media (max-width: 380px) {
+  .planning-payment-view .planning-payment-card-row {
+    grid-template-columns: 1fr !important;
+  }
+  .planning-payment-view .planning-payment-upi::placeholder,
+  .planning-payment-view .planning-payment-upi::-webkit-input-placeholder {
+    font-size: 8.5px !important;
+    letter-spacing: -0.05em !important;
+  }
+}
+@media (max-width: 420px) {
+  .planning-history-view table {
+    min-width: 320px !important;
+  }
+}
+
+/* Extreme mobile zoom safety: keep "Monthly" fully inside its label box */
+@media (max-width: 360px) {
+  .planning-billing-toggle-wrap {
+    gap: 0.3rem !important;
+  }
+  .planning-billing-toggle-wrap .planning-billing-label {
+    flex-basis: 72px !important;
+    width: 72px !important;
+    max-width: 72px !important;
+    min-width: 72px !important;
+    min-height: 2.3rem !important;
+    font-size: 9.5px !important;
+    line-height: 1.08 !important;
+  }
+  .planning-billing-toggle-wrap .planning-billing-label .planning-billing-label-line {
+    overflow: visible;
+    text-overflow: unset;
+  }
+}
+
+/* Desktop zoom fallback (roughly 150-200%): show hamburger + compact menu for planning header */
+@media (hover: hover) and (pointer: fine) and (max-width: 1150px) and (min-resolution: 1.4dppx) {
+  .planning-zoom-show-hamburger {
+    display: inline-flex !important;
+  }
+  .planning-zoom-hide-primary-nav {
+    display: none !important;
+  }
+  .planning-zoom-show-mobile-menu:not(.hidden) {
+    display: block !important;
+  }
+  /* Prevent badge/title overlap on recommended card at desktop 150-200% zoom */
+  .planning-recommended-card {
+    padding-top: 1.85rem !important;
+  }
+}
+
+/* Stackly top header nav — match category-row hover (blue pill, white text) */
+main.buyscreen-page button.buyscreen-top-header-nav-item,
+#buyscreenPage button.buyscreen-top-header-nav-item {
+  padding: 0.42rem 0.9rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+main.buyscreen-page button.buyscreen-top-header-nav-item:hover,
+main.buyscreen-page button.buyscreen-top-header-nav-item:focus-visible,
+#buyscreenPage button.buyscreen-top-header-nav-item:hover,
+#buyscreenPage button.buyscreen-top-header-nav-item:focus-visible {
+  background: #ffffff !important;
+  color: #06224c !important;
+  outline: none;
+}
+main.buyscreen-page button.buyscreen-top-header-nav-item--active,
+#buyscreenPage button.buyscreen-top-header-nav-item--active {
+  background: #ffffff !important;
+  color: #06224c !important;
+}
+main.buyscreen-page button.buyscreen-top-header-nav-item--grid,
+#buyscreenPage button.buyscreen-top-header-nav-item--grid {
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+}
+
+/* Buy screen top bar: keep right icons from clipping at mobile/high zoom by wrapping to row 2 */
+@media (max-width: 640px) {
+  .buyscreen-top-header-row {
+    flex-wrap: wrap !important;
+    row-gap: 0.45rem;
+  }
+  .buyscreen-top-header-actions {
+    margin-left: auto;
+    justify-content: flex-end;
+    padding-top: 0.1rem;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (max-width: 1150px) and (min-resolution: 1.4dppx) {
+  .buyscreen-top-header-row {
+    flex-wrap: wrap !important;
+    row-gap: 0.45rem;
+  }
+  .buyscreen-top-header-actions {
+    margin-left: auto;
+    justify-content: flex-end;
+    padding-top: 0.1rem;
+  }
+}
+
+/* Buy screen: desktop zoom = show compact bar + hamburger, hide full evenly-spaced bar */
+@media (hover: hover) and (pointer: fine) and (max-width: 1150px) and (min-resolution: 1.4dppx) {
+  main.buyscreen-page .buyscreen-top-header-desktop-row,
+  #buyscreenPage .buyscreen-top-header-desktop-row {
+    display: none !important;
+  }
+  main.buyscreen-page .buyscreen-top-header-mobile-row,
+  #buyscreenPage .buyscreen-top-header-mobile-row {
+    display: flex !important;
+  }
+}
+
+/*
+ * iOS Safari: make 100% / min-height chain resolve to the *visible* viewport.
+ * Without this, auth pages can render too short, leave gaps, or flex children collapse.
+ */
+@supports (-webkit-touch-callout: none) {
+  html {
+    height: -webkit-fill-available;
+  }
+  body {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Hide browser's native password reveal (e.g. Edge) so only our single eye shows */
+input[type="password"]::-ms-reveal {
+  display: none !important;
+}
+
+/* Display font for WELCOME heading - generous letter spacing like design */
+.font-welcome-heading {
+  font-family: "Times New Roman", Georgia, serif;
+  letter-spacing: 0.35em;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Mobile: prevent overflow and keep layout intact at all zoom levels */
+.auth-page {
+  -webkit-overflow-scrolling: touch;
+}
+.auth-page .auth-layout,
+.auth-page .auth-layout > * {
+  min-width: 0;
+}
+.auth-form-card,
+.auth-form-card .auth-card-content,
+.auth-form-card .signup-card-content {
+  min-width: 0;
+}
+
+/* Signup: WELCOME + logo share one flex column — items-center aligns both to same vertical axis */
+@media (max-width: 1023px) {
+  .signup-card-content .signup-brand-stack {
+    align-items: center;
+    width: 100%;
+  }
+  .signup-card-content .signup-welcome-title {
+    display: inline-block;
+    width: auto;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    box-sizing: border-box;
+    padding-inline: 0;
+    /* Optical centering: wide letter spacing makes "WELCOME" appear slightly left. */
+    transform: translateX(0.14em);
+  }
+}
+
+@media (max-width: 400px) {
+  .font-welcome-heading {
+    text-align: center;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    display: block;
+    letter-spacing: 0.12em;
+  }
+  .signup-card-content .signup-welcome-title {
+    width: auto !important;
+    max-width: none !important;
+    padding-inline: 0;
+  }
+  .auth-card-content {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/*
+ * Login: Remember me (left) + Forgot password (right) — full-width row under password field.
+ * Grid keeps alignment at 100%–200% zoom; flex+column was stacking and looked misaligned.
+ */
+.login-page .login-remember-forgot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: clamp(0.5rem, 2.5vw, 0.875rem);
+  row-gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.login-page .login-remember-forgot > label {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.login-page .login-remember-forgot .forgot-password-link {
+  justify-self: end;
+  text-align: right;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.35;
+  font-size: clamp(10px, 3.4vw, 13px);
+}
+
+/* Error text - sufficient contrast on dark blue background */
+.auth-error-text {
+  font-size: 12px;
+  color: #ff6b6b;
+  font-weight: 500;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+/* Forgot Password link - visibility and accessibility (WB_009) */
+.forgot-password-link {
+  font-size: 16px;
+  color: #bfdbfe;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.forgot-password-link:hover {
+  color: #ffffff;
+}
+.forgot-password-link:focus-visible {
+  outline: 2px solid #f2b541;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Login page only: match index.html – white, 13px, no underline, thin underline on hover */
+.login-page .forgot-password-link {
+  color: #ffffff;
+  font-size: 13px;
+  text-decoration: none;
+}
+.login-page .forgot-password-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* Auth layout - responsive spacing (desktop can scroll inside card if needed) */
+.auth-card-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Mobile: keep layout natural (no clipping); outer page scroll handles overflow */
+@media (max-width: 1023px) {
+  .auth-card-content,
+  .auth-form-card .auth-card-content,
+  .auth-form-card .signup-card-content {
+    overflow: visible !important;
+  }
+}
+
+/* Prevent inputs from overflowing on narrow/zoomed viewports */
+.auth-card-content input {
+  min-width: 0;
+}
+
+/* Mobile: avoid clipping inside the card (professional behavior) */
+@media (max-width: 1023px) {
+  .signup-card .auth-card-content,
+  .signup-card-content,
+  .login-card .auth-card-content {
+    overflow: visible !important;
+  }
+}
+
+/* Auth pages: desktop = no scroll; mobile = outer scroll so all content visible */
+.auth-page {
+  box-sizing: border-box;
+}
+
+/* Auth pages: browser-normalization (scoped, keeps layout consistent) */
+.auth-page *,
+.auth-page *::before,
+.auth-page *::after {
+  box-sizing: border-box;
+}
+
+/* Ensure consistent form control rendering across browsers (esp. iOS Safari) */
+.auth-page input[type="text"],
+.auth-page input[type="email"],
+.auth-page input[type="password"],
+.auth-page input[type="tel"] {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  font: inherit;
+  line-height: 1.2;
+}
+
+.auth-page button {
+  font: inherit;
+}
+
+.auth-page .auth-image {
+  display: block;
+}
+
+/*
+ * Mobile/tablet: inner light strip = 78% of card (matches .auth-inner-panel in markup).
+ * Content must use the same width (78% of card = calc relative to padded content area)
+ * so fields/buttons never extend past the inner box. Previously only ≤500px was
+ * constrained, so viewports 501–1023px showed full-width content spilling past 78%.
+ */
+@media (max-width: 1023px) {
+  .auth-inner-panel {
+    width: 78% !important;
+  }
+  .login-card-inner,
+  .signup-card-content {
+    /* 78% of card; px-6 → 48px padding: 0.78×48 = 37.44 */
+    width: calc(78% + 37.44px);
+    max-width: calc(78% + 37.44px);
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 0;
+    /* Mobile zoom up to 200%: never clip; let page scroll */
+    overflow: visible !important;
+    box-sizing: border-box;
+  }
+  .login-card-inner form,
+  .signup-card-content form,
+  .login-card-inner button[type="submit"],
+  .signup-card-content button[type="submit"] {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .login-card-inner .flex,
+  .signup-card-content .flex {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Mobile: move content slightly down for a balanced look */
+  .login-card-inner {
+    padding-top: clamp(1.25rem, 4vh, 2.25rem) !important;
+    padding-bottom: clamp(1.25rem, 5.5vh, 2.75rem) !important;
+  }
+  .signup-card-content {
+    padding-top: clamp(1rem, 3.5vh, 2rem) !important;
+    padding-bottom: clamp(1.25rem, 5vh, 2.75rem) !important;
+  }
+}
+
+/* Narrow/zoomed mobile: give inputs more width so placeholder/value never clips */
+@media (max-width: 420px) {
+  .auth-inner-panel {
+    width: 86% !important;
+  }
+  /* 86% of card; px-6 → 48px padding: 0.86×48 = 41.28 */
+  .login-card-inner,
+  .signup-card-content {
+    width: calc(86% + 41.28px) !important;
+    max-width: 100% !important; /* prevent left-side clipping (looks like content shifts right) */
+  }
+  .login-card-inner input::placeholder,
+  .signup-card-content input::placeholder {
+    font-size: 12px;
+  }
+  .login-email-input::placeholder {
+    font-size: clamp(8px, 2.4vw, 12px);
+    letter-spacing: -0.03em;
+  }
+  .signup-confirm-input::placeholder {
+    font-size: clamp(8px, 2.4vw, 12px);
+    letter-spacing: -0.03em;
+  }
+  .font-welcome-heading {
+    /* Zoom-safe: avoid horizontal overflow / clipping */
+    letter-spacing: clamp(0.1em, 2.5vw, 0.22em);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+}
+
+/* Extreme zoom (≈188–200%): even narrower viewport needs more inner width */
+@media (max-width: 360px) {
+  .auth-inner-panel {
+    width: 100% !important;
+  }
+  /* 92% of card; px-6 → 48px padding: 0.92×48 = 44.16 */
+  .login-card-inner,
+  .signup-card-content {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  /* Long placeholders: scale with viewport so 100–200% zoom does not clip */
+  .login-email-input::placeholder {
+    font-size: clamp(6px, 2.6vw, 11px);
+    letter-spacing: -0.05em;
+  }
+  .signup-confirm-input::placeholder {
+    font-size: clamp(6px, 2.5vw, 11px);
+    letter-spacing: -0.06em;
+  }
+  .login-email-icon {
+    margin-right: 0.35rem !important;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .signup-confirm-icon {
+    margin-right: 0.65rem !important;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .signup-confirm-input {
+    padding-right: 1.75rem !important;
+  }
+  .auth-form-card {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .login-email-input {
+    padding-right: 0.125rem !important;
+    font-size: 16px !important; /* iOS: avoid focus zoom; placeholder scaled via ::placeholder */
+    min-width: 0;
+  }
+
+  .signup-confirm-input {
+    min-width: 0;
+  }
+  .font-welcome-heading {
+    font-size: clamp(0.95rem, 4.5vw, 1.15rem);
+    letter-spacing: clamp(0.08em, 1.8vw, 0.2em);
+    white-space: normal;
+  }
+
+  /* Signup: prevent WELCOME drift at 190–200% zoom */
+  .signup-card-content .font-welcome-heading {
+    display: inline-block;
+    width: auto !important;
+    max-width: none !important;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    letter-spacing: 0.18em !important;
+    padding-inline: 0;
+  }
+}
+
+/* Card uses sm:px-10 (80px) from 640px – match inner box width */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .login-card-inner,
+  .signup-card-content {
+    width: calc(78% + 62.4px);
+    max-width: calc(78% + 62.4px);
+  }
+}
+
+/* Desktop only: vertically center auth layout (768–1023px stays top-aligned like mobile — avoids white bands) */
+@media (min-width: 1024px) {
+  .auth-page {
+    justify-content: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-page .auth-layout {
+    max-height: 100%;
+  }
+}
+
+/* Mobile: edge-to-edge feel (no extra top/bottom bars); scroll only when content overflows */
+@media (max-width: 1023px) {
+  html:has(.auth-page),
+  body:has(.auth-page) {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    overflow: hidden !important;
+    overscroll-behavior-y: auto;
+    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+  }
+
+  .auth-page {
+    justify-content: flex-start;
+    align-items: stretch;
+    /* No top/bottom padding here — avoids strips (bg-white) on Android & iOS */
+    --auth-safe-top: env(safe-area-inset-top, 0px);
+    --auth-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --auth-safe-left: env(safe-area-inset-left, 0px);
+    --auth-safe-right: env(safe-area-inset-right, 0px);
+    position: fixed;
+    inset: 0;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    padding-top: 0;
+    padding-bottom: 0;
+    /* Remove white margins on left/right in mobile. */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+  }
+  .auth-page .auth-layout {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100%;
+    max-height: none;
+    gap: 0;
+    max-width: 100%;
+    /* Top-align so the card can fill the screen; avoids “floating” gaps */
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+  /* First column = auth card (image column is second in DOM) */
+  .auth-page .auth-layout > div:first-child {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100%;
+    align-items: stretch;
+  }
+  .auth-form-card {
+    width: 100%;
+    max-width: 100% !important;       /* edge-to-edge */
+    align-self: stretch;
+    height: 100%;
+    /* Safe area inside the card so content clears notch / home indicator */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    /* Full viewport; padding is inside (border-box) */
+    min-height: 100%;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    margin-top: 0;
+    margin-bottom: 0;
+  overflow: hidden;
+  }
+  .auth-form-card .auth-card-content,
+  .auth-form-card .signup-card-content {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start !important;
+    overflow: visible;
+  }
+
+  /* Mobile: remove bottom illustration entirely */
+  .auth-image-col {
+    display: none !important;
+  }
+}
+
+/*
+ * iOS Safari (mobile auth): use -webkit-fill-available ONLY as a plain min-height (no calc()).
+ * calc(-webkit-fill-available ± env()) is unreliable in WebKit and can break the whole layout.
+ */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 1023px) {
+    .auth-page {
+      height: -webkit-fill-available;
+      min-height: -webkit-fill-available;
+      max-height: -webkit-fill-available;
+    }
+    .auth-form-card {
+      height: 100%;
+      min-height: 100%;
+    }
+  }
+}
+
+/*
+ * Some phones render with wider CSS viewports (or desktop-site mode), which can bypass
+ * width breakpoints and reintroduce white bands. Force edge-to-edge auth layout on
+ * touch-first devices regardless of reported width.
+ */
+@media (hover: none) and (pointer: coarse) and (max-width: 1023px) {
+  html:has(.auth-page),
+  body:has(.auth-page) {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    overflow: hidden !important;
+    overscroll-behavior-y: auto;
+    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+  }
+  .auth-page {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    padding: 0 !important;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+  }
+  .auth-page .auth-layout {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    height: 100%;
+    min-height: 100%;
+  }
+  .auth-page .auth-layout > div:first-child {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+  }
+  .auth-form-card {
+    width: 100%;
+    max-width: 100% !important;
+    height: 100%;
+    min-height: 100%;
+    min-height: 100dvh;
+    height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
+/*
+ * Desktop zoom fallback:
+ * at 150-200% browser zoom, some desktops drop below 1024px and accidentally receive
+ * touch/mobile fixed-height rules. Reset those rules for mouse/trackpad devices.
+ */
+@media (max-width: 1023px) and (hover: hover) and (pointer: fine) {
+  html:has(.auth-page),
+  body:has(.auth-page) {
+    overflow: auto !important;
+    background: var(--background) !important;
+  }
+  .auth-page {
+    position: relative;
+    inset: auto;
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    background: transparent !important;
+  }
+  .auth-page .auth-layout {
+    height: auto;
+    min-height: 0;
+    gap: 0.75rem;
+  }
+  .auth-page .auth-layout > div:first-child {
+    height: auto;
+    min-height: 0;
+  }
+  .auth-form-card {
+    height: auto;
+    min-height: 580px;
+    max-height: none;
+    overflow: visible;
+    border-radius: 10px;
+  }
+  .auth-page .auth-image-col {
+    display: flex !important;
+  }
+}
+
+/* Desktop: consistent login/signup card size, no page scroll */
+@media (min-width: 1024px) {
+  .auth-form-card {
+    min-height: 580px;
+    max-height: min(680px, 82vh);
+    height: min(680px, 82vh);
+    display: flex;
+    flex-direction: column;
+  }
+  .auth-form-card .auth-card-content,
+  .auth-form-card .signup-card-content {
+    flex: 1;
+    min-height: 0;
+  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  /* Desktop signup: compact error blocks so Google button stays visible on empty submit */
+  .signup-card-content .auth-error-text {
+    margin-top: 0.125rem;
+    line-height: 1.15;
+  }
+}
+
+/* Desktop zoom safety: prevent overlap/clipping at 150-200% while preserving default desktop layout. */
+@media (min-width: 1024px) and (min-resolution: 1.25dppx) {
+  .auth-page {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .auth-form-card {
+    height: auto;
+    max-height: none;
+  }
+  .auth-form-card .auth-card-content,
+  .auth-form-card .signup-card-content {
+    overflow: visible;
+  }
+}
+
+.auth-layout {
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .auth-layout {
+    gap: 0.75rem;
+  }
+  .auth-card-content {
+    padding-bottom: 0.75rem;
+    padding-top: 0.75rem;
+  }
+  .auth-form-card .signup-card-content {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .auth-form-card .auth-card-content {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .auth-layout {
+    gap: 0.5rem;
+  }
+  .auth-card-content {
+    gap: 0.5rem;
+  }
+  /* 375px–425px: keep login content clearly inside inner card */
+  .login-card .auth-card-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Mobile + 150% zoom: prevent overlap (WB_012) */
+@media (max-width: 420px) {
+  .auth-layout {
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .auth-card-content {
+    gap: 0.75rem;
+  }
+  /* Login-only: slightly more inner padding so content stays visually inside card */
+  .login-card .auth-card-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .font-welcome-heading {
+    letter-spacing: 0.15em;
+  }
+}
+
+/* High zoom (e.g. 150%) or narrow viewport: tighter spacing so content fits */
+@media (max-width: 768px) and (min-resolution: 1.5dppx) {
+  .auth-card-content > * {
+    margin-bottom: 0.5rem;
+  }
+  .font-welcome-heading {
+    letter-spacing: 0.2em;
+  }
+}
+
+/* iOS Safari: match normal mobile layout and avoid overlaps (including 150% zoom) */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 500px) {
+    .login-page .login-card-inner {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .login-page .login-card-inner h1 {
+      margin-bottom: 0.5rem;
+    }
+    .login-page button[type="submit"] {
+      margin-top: 0.75rem;
+    }
+    .login-page .login-card-inner > p {
+      margin-top: 0.75rem;
+    }
+  }
+}
+
+/* Mobile zoom out (62–85%): narrow viewport – inner box only, no scrollbar, content fixed inside */
+@media (max-width: 340px) {
+  .auth-page {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .auth-form-card {
+    max-width: 100%;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  .auth-card-content,
+  .auth-form-card .signup-card-content,
+  .login-card .auth-card-content {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+  .auth-layout {
+    gap: 0.375rem;
+  }
+}
+
+/* Mobile high-zoom safety (180-200%): prevent clipping/overlap on small effective viewport widths. */
+@media (max-width: 420px) {
+  .auth-form-card {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: none;
+  }
+  .auth-form-card .auth-card-content,
+  .auth-form-card .signup-card-content {
+    overflow: visible !important;
+  }
+}
+
+/* Very small screens (320px–380px) and all zoom: compact layout */
+@media (max-width: 380px) {
+  .auth-page {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .auth-layout {
+    gap: 0.375rem;
+  }
+  .auth-image-col {
+    max-height: 22vh;
+    margin-top: 1.25rem; /* explicit gap between card and illustration */
+  }
+  /* Keep signup padding as before; only add extra for login */
+  .auth-card-content,
+  .auth-form-card .signup-card-content {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+  .login-card .auth-card-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .font-welcome-heading {
+    letter-spacing: 0.1em;
+    font-size: 1rem;
+  }
+}
+
+/* Ensure buttons and inputs work on mobile: touch targets, no iOS zoom on focus */
+@media (max-width: 1023px) {
+  .auth-form-card button[type="submit"] {
+    min-height: 44px;
+  }
+  .auth-card-content input {
+    font-size: 16px; /* prevents zoom on focus on iOS */
+  }
+}
+
+/* Auth illustration: scale inside container on mobile, no overflow */
+.auth-image-col {
+  min-width: 0;
+  max-width: 100%;
+}
+@media (max-width: 1023px) {
+  .auth-image-col {
+    overflow: hidden;
+  }
+}
+.auth-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Forgot password form - placeholder light grey to match design */
+.forgot-input::placeholder {
+  color: #cccccc;
+}
