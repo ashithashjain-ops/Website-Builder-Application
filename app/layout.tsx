@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stackly Auth",
-  description: "Signup and login UI for Stackly",
+  title: "Stackly | Drag and Drop Website Builder",
+  description: "Build responsive websites with Stackly templates and no-code tools.",
 };
 
 /** Edge-to-edge on notched devices; users can still zoom (accessibility). */

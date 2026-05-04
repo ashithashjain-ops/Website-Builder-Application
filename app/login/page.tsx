@@ -158,6 +158,7 @@ export default function LoginPage() {
 
       setForm(initialLoginState);
       setErrors((prev) => ({ ...prev, form: "Login successful!" }));
+      router.push("/landing");
     } catch (error) {
       const isNetworkError =
         error instanceof TypeError ||
