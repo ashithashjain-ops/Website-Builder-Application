@@ -1755,3 +1755,12 @@ input[type="password"]::-ms-reveal {
 .forgot-input::placeholder {
   color: #cccccc;
 }
+
+.legal-modal-body h4 {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #06224c;
+}

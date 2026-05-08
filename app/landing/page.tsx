@@ -2,7 +2,8 @@
 
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useMemo, useState } from "react";
 import {
   FaArrowRight,
   FaCartShopping,
@@ -12,12 +13,17 @@ import {
   FaPlay,
   FaPlus,
   FaStar,
+  FaXmark,
 } from "react-icons/fa6";
-import Footer from "@/components/landing/Footer";
-import LandingNav from "@/components/landing/LandingNav";
+import LandingNav from "@/components/navBar";
 import { assetPath } from "@/lib/paths";
 
 type TemplateCategory = "portfolio" | "blog" | "ecommerce" | "business";
+
+const Footer = dynamic(() => import("@/components/Footer"), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-[#0A1E3D]" />,
+});
 
 const popularSearches = [
   "Food",
@@ -37,34 +43,42 @@ const popularSearches = [
 ];
 
 const categories = [
-  { title: "Portfolio", image: "/port.webp", alt: "Portfolio website preview" },
-  { title: "E-Commerce Templates", image: "/ecommerce.webp", alt: "E-commerce website preview" },
-  { title: "Digital Marketing Templates", image: "/digital01.webp", alt: "Digital marketing website preview" },
-  { title: "Blogging", image: "/bloggg.webp", alt: "Blogging website preview" },
-  { title: "Construction Themes", image: "/construction02.webp", alt: "Construction website preview" },
-  { title: "Food Restaurant", image: "/foodd03.webp", alt: "Food restaurant website preview" },
+  { title: "Portfolio", image: "/landing-optimized/port.webp", alt: "Portfolio website preview" },
+  { title: "E-Commerce Templates", image: "/landing-optimized/ecommerce.webp", alt: "E-commerce website preview" },
+  { title: "Digital Marketing Templates", image: "/landing-optimized/digital01.webp", alt: "Digital marketing website preview" },
+  { title: "Blogging", image: "/landing-optimized/bloggg.webp", alt: "Blogging website preview" },
+  { title: "Construction Themes", image: "/landing-optimized/construction02.webp", alt: "Construction website preview" },
+  { title: "Food Restaurant", image: "/landing-optimized/foodd03.webp", alt: "Food restaurant website preview" },
 ];
 
 const topProducts = [
-  { title: "ShopNest", type: "E-commerce Website", price: 29, sales: "10.5K", image: "/shopnest.webp", alt: "ShopNest template preview" },
-  { title: "BuySphere", type: "Template Website", price: 10, sales: "3.4K", image: "/buysphere.webp", alt: "BuySphere template preview" },
-  { title: "TurboCart", type: "Template Website", price: 35, sales: "2.9K", image: "/turbocart.webp", alt: "TurboCart template preview" },
-  { title: "MegaBasket", type: "Template Website", price: 29, sales: "4.2K", image: "/megabasket.webp", alt: "MegaBasket template preview" },
-  { title: "NexaStore", type: "Template Website", price: 10, sales: "4.7K", image: "/nexastore1.webp", alt: "NexaStore template preview" },
-  { title: "SampleStore", type: "Template Website", price: 35, sales: "5.0K", image: "/samplestore.webp", alt: "SampleStore template preview" },
+  { title: "ShopNest", type: "E-commerce Website", price: 29, sales: "10.5K", image: "/landing-optimized/shopnest.webp", alt: "ShopNest template preview" },
+  { title: "BuySphere", type: "Template Website", price: 10, sales: "3.4K", image: "/landing-optimized/buysphere.webp", alt: "BuySphere template preview" },
+  { title: "TurboCart", type: "Template Website", price: 35, sales: "2.9K", image: "/landing-optimized/turbocart.webp", alt: "TurboCart template preview" },
+  { title: "MegaBasket", type: "Template Website", price: 29, sales: "4.2K", image: "/landing-optimized/megabasket.webp", alt: "MegaBasket template preview" },
+  { title: "NexaStore", type: "Template Website", price: 10, sales: "4.7K", image: "/landing-optimized/nexastore1.webp", alt: "NexaStore template preview" },
+  { title: "SampleStore", type: "Template Website", price: 35, sales: "5.0K", image: "/landing-optimized/samplestore.webp", alt: "SampleStore template preview" },
 ];
 
+type WishlistItem = {
+  title: string;
+  type: string;
+  price: number;
+  image: string;
+  alt: string;
+};
+
 const templates = [
-  { title: "Classic Portfolio", category: "portfolio", image: "/port.webp", alt: "Classic Portfolio template", description: "Perfect for individual creators.", badge: "Free" },
-  { title: "Agency Pro", category: "portfolio", image: "/portfolio03.webp", alt: "Agency Pro template", description: "A polished showcase for design teams.", price: 19, badge: "Premium" },
-  { title: "Minimal Studio", category: "portfolio", image: "/portfolio04.webp", alt: "Minimal Studio template", description: "Clean white-space focused layout.", badge: "Free" },
-  { title: "Personal Blog", category: "blog", image: "/blog1.webp", alt: "Personal Blog template", description: "Clean layout for storytellers.", badge: "Free" },
-  { title: "Tech Insights", category: "blog", image: "/blog2.webp", alt: "Tech Insights template", description: "Professional layout for tech news.", price: 15, badge: "Premium" },
-  { title: "Store", category: "ecommerce", image: "/store11.webp", alt: "Store template", description: "A product-first storefront layout.", price: 29, badge: "Premium" },
-  { title: "Fashion", category: "ecommerce", image: "/fashion06.webp", alt: "Fashion store template", description: "Editorial product grid for apparel.", price: 19, badge: "Premium" },
-  { title: "Jewelry", category: "ecommerce", image: "/jewellery07.webp", alt: "Jewelry store template", description: "Elegant catalog for premium items.", price: 19, badge: "Premium" },
-  { title: "Business", category: "business", image: "/business09.webp", alt: "Business template", description: "Executive layout for company sites.", price: 29, badge: "Premium" },
-  { title: "Construction", category: "business", image: "/constrctio10.webp", alt: "Construction template", description: "Strong service-site starter.", price: 25, badge: "Premium" },
+  { title: "Classic Portfolio", category: "portfolio", image: "/landing-optimized/port.webp", alt: "Classic Portfolio template", description: "Perfect for individual creators.", badge: "Free" },
+  { title: "Agency Pro", category: "portfolio", image: "/landing-optimized/portfolio03.webp", alt: "Agency Pro template", description: "A polished showcase for design teams.", price: 19, badge: "Premium" },
+  { title: "Minimal Studio", category: "portfolio", image: "/landing-optimized/portfolio04.webp", alt: "Minimal Studio template", description: "Clean white-space focused layout.", badge: "Free" },
+  { title: "Personal Blog", category: "blog", image: "/landing-optimized/blog1.webp", alt: "Personal Blog template", description: "Clean layout for storytellers.", badge: "Free" },
+  { title: "Tech Insights", category: "blog", image: "/landing-optimized/blog2.webp", alt: "Tech Insights template", description: "Professional layout for tech news.", price: 15, badge: "Premium" },
+  { title: "Store", category: "ecommerce", image: "/landing-optimized/store11.webp", alt: "Store template", description: "A product-first storefront layout.", price: 29, badge: "Premium" },
+  { title: "Fashion", category: "ecommerce", image: "/landing-optimized/fashion06.webp", alt: "Fashion store template", description: "Editorial product grid for apparel.", price: 19, badge: "Premium" },
+  { title: "Jewelry", category: "ecommerce", image: "/landing-optimized/jewellery07.webp", alt: "Jewelry store template", description: "Elegant catalog for premium items.", price: 19, badge: "Premium" },
+  { title: "Business", category: "business", image: "/landing-optimized/business09.webp", alt: "Business template", description: "Executive layout for company sites.", price: 29, badge: "Premium" },
+  { title: "Construction", category: "business", image: "/landing-optimized/constrctio10.webp", alt: "Construction template", description: "Strong service-site starter.", price: 25, badge: "Premium" },
 ] satisfies Array<{
   title: string;
   category: TemplateCategory;
@@ -79,19 +93,19 @@ const features = [
   {
     title: "Sections",
     description: "Design your website content using ready-made layout options with more than 100 professionally crafted designs.",
-    image: "/sections.webp",
+    image: "/landing-optimized/sections.webp",
     quote: "Present your work in a visually impressive and engaging way.",
   },
   {
     title: "Shapers",
     description: "Enhance your website with abstract-style layouts and unique shape-based designs.",
-    image: "/shapers.webp",
+    image: "/landing-optimized/shapers.webp",
     quote: "Shape-based layouts make your site feel creative, polished, and professional.",
   },
   {
     title: "Dynamic Views",
     description: "Deliver a more interactive browsing experience using fixed and scroll-based visual features.",
-    image: "/dynamic.webp",
+    image: "/landing-optimized/dynamic.webp",
     quote: "Interactive backgrounds create a stylish and captivating browsing experience.",
   },
 ];
@@ -149,6 +163,26 @@ export default function Home() {
   const [activeFilter, setActiveFilter] = useState<(typeof templateFilters)[number]["value"]>("all");
   const [activeFeature, setActiveFeature] = useState(0);
   const [openFaq, setOpenFaq] = useState(0);
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>(() => {
+    if (typeof window === "undefined") {
+      return [];
+    }
+
+    const storedWishlist = window.localStorage.getItem("wishlistItems");
+
+    if (!storedWishlist) {
+      return [];
+    }
+
+    try {
+      return JSON.parse(storedWishlist) as WishlistItem[];
+    } catch {
+      window.localStorage.removeItem("wishlistItems");
+      return [];
+    }
+  });
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [wishlistToast, setWishlistToast] = useState<string | null>(null);
 
   const visibleTemplates = useMemo(
     () => templates.filter((template) => activeFilter === "all" || template.category === activeFilter),
@@ -156,16 +190,44 @@ export default function Home() {
   );
   const selectedFeature = features[activeFeature];
 
+  useEffect(() => {
+    window.localStorage.setItem("wishlistItems", JSON.stringify(wishlistItems));
+  }, [wishlistItems]);
+
+  const showWishlistToast = (message: string) => {
+    setWishlistToast(message);
+    window.setTimeout(() => setWishlistToast(null), 2200);
+  };
+
+  const toggleWishlistItem = (product: WishlistItem) => {
+    setWishlistItems((currentItems) => {
+      const exists = currentItems.some((item) => item.title === product.title);
+
+      if (exists) {
+        showWishlistToast(`${product.title} removed from wishlist.`);
+        return currentItems.filter((item) => item.title !== product.title);
+      }
+
+      showWishlistToast(`${product.title} added to wishlist!`);
+      return [...currentItems, product];
+    });
+  };
+
+  const removeWishlistItem = (title: string) => {
+    setWishlistItems((currentItems) => currentItems.filter((item) => item.title !== title));
+    showWishlistToast(`${title} removed from wishlist.`);
+  };
+
   return (
     <main className="min-h-screen bg-[#fff1f2] text-gray-900">
-      <LandingNav />
+      <LandingNav wishlistCount={wishlistItems.length} onWishlistClick={() => setIsWishlistOpen(true)} />
 
       <section className="mx-auto w-full max-w-7xl px-4 pt-8 md:px-8">
         <div className="relative min-h-[480px] overflow-hidden rounded-[2rem] bg-[#fde2e4] md:min-h-[540px] md:rounded-[3rem]">
           <picture>
-            <source media="(max-width: 768px)" srcSet={assetPath("/landinmble3.webp")} />
+            <source media="(max-width: 768px)" srcSet={assetPath("/landing-optimized/landinmble3.webp")} />
             <img
-              src={assetPath("/landing22.webp")}
+              src={assetPath("/landing-optimized/landing22.webp")}
               alt="Stackly drag and drop website builder preview"
               className="absolute inset-0 h-full w-full object-cover object-center md:object-right"
               loading="eager"
@@ -223,7 +285,10 @@ export default function Home() {
       <section className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
         <SectionHeading>Top Selling This Week</SectionHeading>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {topProducts.map((product) => (
+          {topProducts.map((product) => {
+            const isWishlisted = wishlistItems.some((item) => item.title === product.title);
+
+            return (
             <article key={product.title} className="group flex flex-col rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm transition hover:shadow-2xl">
               <div className="mb-5 h-52 overflow-hidden rounded-[1.5rem] bg-gray-50">
                 <img src={assetPath(product.image)} alt={product.alt} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
@@ -231,7 +296,13 @@ export default function Home() {
               <div className="flex flex-1 flex-col px-2">
                 <div className="mb-1 flex items-start justify-between gap-2">
                   <h3 className="text-xl font-bold text-[#06224C]">{product.title}</h3>
-                  <button type="button" aria-label={`Add ${product.title} to wishlist`} className="p-1 text-gray-300 transition hover:text-red-500">
+                  <button
+                    type="button"
+                    onClick={() => toggleWishlistItem(product)}
+                    aria-label={`${isWishlisted ? "Remove" : "Add"} ${product.title} ${isWishlisted ? "from" : "to"} wishlist`}
+                    aria-pressed={isWishlisted}
+                    className={`p-1 transition hover:text-red-500 ${isWishlisted ? "text-red-500" : "text-gray-300"}`}
+                  >
                     <FaHeart className="text-xl" />
                   </button>
                 </div>
@@ -257,7 +328,8 @@ export default function Home() {
                 </div>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -410,7 +482,7 @@ export default function Home() {
         <SectionHeading>Drag & drop website builder FAQ</SectionHeading>
         <div className="flex flex-col items-center gap-10 rounded-[2rem] border-l-4 border-blue-500 bg-[#E6EFF1] p-6 shadow-sm lg:flex-row lg:items-start lg:gap-16 lg:rounded-[3rem] lg:p-14">
           <div className="flex w-full justify-center lg:w-2/5">
-            <img src={assetPath("/faqq.webp")} alt="FAQ illustration" className="w-full max-w-[280px] object-contain lg:max-w-md" loading="lazy" />
+            <img src={assetPath("/landing-optimized/faqq.webp")} alt="FAQ illustration" className="w-full max-w-[280px] object-contain lg:max-w-md" loading="lazy" />
           </div>
           <div className="flex w-full flex-col gap-4 lg:w-3/5">
             {faqs.map((faq, index) => {
@@ -449,6 +521,74 @@ export default function Home() {
       </section>
 
       <Footer />
+
+      {isWishlistOpen && (
+        <>
+          <button
+            type="button"
+            aria-label="Close wishlist"
+            onClick={() => setIsWishlistOpen(false)}
+            className="fixed inset-0 z-[9998] bg-black/50"
+          />
+          <aside className="fixed right-0 top-0 z-[9999] flex h-full w-full flex-col bg-white shadow-2xl sm:w-[400px]">
+            <div className="flex items-center justify-between border-b bg-white p-6 text-[#06224C]">
+              <h2 className="flex items-center gap-3 text-lg font-black uppercase tracking-widest">
+                <FaHeart className="text-red-500" />
+                My Wishlist
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsWishlistOpen(false)}
+                className="text-gray-400 transition hover:rotate-90 hover:text-red-500"
+                aria-label="Close wishlist"
+              >
+                <FaXmark className="text-2xl" />
+              </button>
+            </div>
+
+            <div className="flex-grow space-y-6 overflow-y-auto p-6">
+              {wishlistItems.length === 0 ? (
+                <div className="py-20 text-center">
+                  <FaHeart className="mx-auto mb-4 text-5xl text-gray-200" />
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Your wishlist is empty</p>
+                </div>
+              ) : (
+                wishlistItems.map((item) => (
+                  <div key={item.title} className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
+                    <img src={assetPath(item.image)} alt={item.alt} className="h-16 w-20 flex-shrink-0 rounded-xl object-cover" />
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-sm font-black text-[#06224C]">{item.title}</h3>
+                      <p className="text-xs italic text-gray-500">{item.type}</p>
+                      <p className="mt-1 text-sm font-black text-blue-600">$ {item.price}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeWishlistItem(item.title)}
+                      className="text-gray-300 transition hover:text-red-500"
+                      aria-label={`Remove ${item.title} from wishlist`}
+                    >
+                      <FaXmark />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="border-t bg-gray-50 p-6">
+              <p className="text-center text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                Items saved in wishlist are not reserved.
+              </p>
+            </div>
+          </aside>
+        </>
+      )}
+
+      {wishlistToast && (
+        <div className="fixed bottom-5 right-5 z-[20001] rounded-xl bg-[#06224C] px-5 py-3 text-sm font-bold text-white shadow-2xl">
+          {wishlistToast}
+        </div>
+      )}
     </main>
   );
 }
+

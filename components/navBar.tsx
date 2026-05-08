@@ -13,7 +13,6 @@ import {
   FaChartLine,
   FaChevronDown,
   FaGraduationCap,
-  FaHeart,
   FaHotel,
   FaMagnifyingGlass,
   FaNewspaper,
@@ -22,6 +21,7 @@ import {
   FaUser,
   FaXmark,
 } from "react-icons/fa6";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { assetPath } from "@/lib/paths";
 
 const products = ["Premium Templates", "UI Kits", "WordPress Themes", "Free Assets"];
@@ -79,7 +79,12 @@ const navCategories = [
   },
 ];
 
-export default function LandingNav() {
+type LandingNavProps = {
+  wishlistCount?: number;
+  onWishlistClick?: () => void;
+};
+
+export default function LandingNav({ wishlistCount = 0, onWishlistClick }: LandingNavProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -147,9 +152,19 @@ export default function LandingNav() {
           <a href="#templates" aria-label="Cart" className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#06224C] shadow-sm transition hover:bg-gray-100">
             <FaCartShopping className="text-sm" />
           </a>
-          <a href="#templates" aria-label="Wishlist" className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-red-500 shadow-sm transition hover:bg-gray-100">
-            <FaHeart className="text-sm" />
-          </a>
+          <button
+            type="button"
+            onClick={onWishlistClick}
+            aria-label="Open wishlist"
+            className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm transition hover:bg-gray-100 ${wishlistCount > 0 ? "text-red-500" : "text-[#06224C]"}`}
+          >
+            {wishlistCount > 0 ? <FaHeart className="text-sm" /> : <FaRegHeart className="text-sm" />}
+            {wishlistCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black text-white">
+                {wishlistCount}
+              </span>
+            )}
+          </button>
           <a href="#templates" aria-label="Search" className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#06224C] shadow-sm transition hover:bg-gray-100">
             <FaMagnifyingGlass className="text-sm" />
           </a>

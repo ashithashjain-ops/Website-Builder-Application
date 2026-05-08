@@ -1,0 +1,274 @@
+import React from 'react';
+import { ChevronDown, ChevronRight, ChevronLeft, Undo2, Redo2, Eye, Send, X, Play, Save, Menu, SlidersHorizontal, Image as ImageIcon } from 'lucide-react';
+import { BlockData } from '../types';
+
+interface CanvasProps {
+  blocks: BlockData[];
+  selectedBlockId: string | null;
+  onSelectBlock: (id: string | null) => void;
+  onRemoveBlock: (id: string) => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  onToggleLeft?: () => void;
+  onToggleRight?: () => void;
+}
+
+export default function Canvas({
+  blocks,
+  selectedBlockId,
+  onSelectBlock,
+  onRemoveBlock,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
+  onToggleLeft,
+  onToggleRight
+}: CanvasProps) {
+  const renderBlockContent = (block: BlockData) => {
+    switch (block.type) {
+      case 'button':
+        return (
+          <div className="w-full pb-2">
+            <h3 className="text-[#0f3b89] font-bold text-[15px] mb-4">Video Blocks</h3>
+            {/* BUTTONS SECTION */}
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-[18px] mx-auto w-full mb-10"
+              style={{ maxWidth: (block.props.width || '100%').replace(/\s+/g, ''), width: '100%' }}
+            >
+              <button
+                className="w-full bg-[#0f3b89] text-white py-3.5 font-bold hover:bg-[#0c2f6d] text-[15px] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg active:scale-[0.98]"
+                style={{ borderRadius: (block.props.borderRadius || '6px').replace(/\s+/g, '') }}
+              >
+                Click Me !
+              </button>
+              <button
+                className="w-full border border-gray-300 text-[#0f3b89] py-3.5 font-bold hover:bg-gray-50 text-[15px] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-md active:scale-[0.98]"
+                style={{ borderRadius: (block.props.borderRadius || '6px').replace(/\s+/g, '') }}
+              >
+                Secondary Button
+              </button>
+              <button
+                className="w-full border border-gray-300 text-[#0f3b89] py-3.5 font-bold hover:bg-gray-50 text-[15px] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-md active:scale-[0.98]"
+                style={{ borderRadius: (block.props.borderRadius || '6px').replace(/\s+/g, '') }}
+              >
+                Primary Button
+              </button>
+              <button
+                className="w-full border border-gray-300 text-[#0f3b89] py-3.5 font-bold hover:bg-gray-50 text-[15px] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-md active:scale-[0.98]"
+                style={{ borderRadius: (block.props.borderRadius || '6px').replace(/\s+/g, '') }}
+              >
+                Outline Button
+              </button>
+            </div>
+
+            {/* TEXT LINK & VIDEOS SECTION */}
+            <h3 className="text-[#0f3b89] font-bold text-[15px] mb-4">Text Link</h3>
+            <div className="w-full h-[1px] bg-gray-200 mb-6"></div>
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-[18px] w-full"
+              style={{ maxWidth: (block.props.width || '100%').replace(/\s+/g, ''), width: '100%' }}
+            >
+              {/* Upload Video Card */}
+              <div
+                className="border border-gray-200 bg-white flex flex-col overflow-hidden cursor-pointer group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative"
+                style={{ borderRadius: '4px' }}
+              >
+                <div className="relative h-[160px] w-full bg-slate-100 overflow-hidden">
+                  <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600&h=400" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="Mountain" />
+                  <div className="absolute inset-0 flex items-center justify-center transition-colors duration-300 group-hover:bg-black/10">
+                    <div className="w-[42px] h-[42px] rounded-full border-[1.5px] border-white flex items-center justify-center bg-transparent backdrop-blur-[1px] transition-transform duration-300 group-hover:scale-110">
+                      <Play className="w-[20px] h-[20px] text-white fill-white ml-[3px]" />
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4 pt-5 flex-1 transition-colors duration-300 group-hover:bg-blue-50/50">
+                  <h4 className="font-bold text-[#0B1D40] text-[17px] mb-2 transition-colors duration-300 group-hover:text-blue-700">Upload Video</h4>
+                  <p className="text-[13px] text-gray-500 font-medium">Headro custer mbee 1000%</p>
+                </div>
+              </div>
+
+              {/* Embed Video Card */}
+              <div
+                className="border border-gray-200 bg-white flex flex-col overflow-hidden cursor-pointer group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative"
+                style={{ borderRadius: '4px' }}
+              >
+                <div className="relative h-[160px] w-full border-b border-gray-100 flex flex-col bg-gray-50 transition-colors duration-300 group-hover:bg-gray-100 overflow-hidden">
+                  {/* Broken icon + Hiker top left text */}
+                  <div className="absolute top-2 left-2 flex items-center text-[14px] text-[#0B1D40] font-medium z-10 transition-transform duration-300 group-hover:translate-x-1">
+                    <span className="w-4 h-4 mr-1 flex items-center justify-center bg-white rounded-sm opacity-80" aria-hidden="true">
+                      <ImageIcon className="w-[14px] h-[14px] text-[#0B1D40]" />
+                    </span>
+                    Hiker
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-[48px] h-[48px] rounded-full bg-[#E2E2E2] flex items-center justify-center transition-all duration-300 group-hover:bg-blue-500 group-hover:scale-110 group-hover:shadow-md">
+                      <Play className="w-[20px] h-[20px] text-white fill-white ml-1 transition-colors duration-300" />
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4 pt-5 flex-1 transition-colors duration-300 group-hover:bg-blue-50/50">
+                  <h4 className="font-bold text-[#0B1D40] text-[17px] mb-2 transition-colors duration-300 group-hover:text-blue-700">Embed Video</h4>
+                  <p className="text-[13px] text-gray-500 font-medium">Paste YouTube , Vimeo or custom embed Code</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'video':
+        return (
+          <>
+            <h3 className="text-[#0f3b89] font-bold text-[17px] mb-5">Text Link</h3>
+            <div className="text-gray-400 py-6 flex flex-col items-center">
+              <div className="text-[17px] mb-2 font-bold capitalize">{block.type} Block</div>
+              <p className="text-sm">Properties and layout for {block.type} blocks will appear here.</p>
+            </div>
+          </>
+        );
+      default:
+        return (
+          <div className="text-gray-400 py-6 flex flex-col items-center">
+            <div className="text-[17px] mb-2 font-bold capitalize">{block.type} Block</div>
+            <p className="text-sm">Properties and layout for {block.type} blocks will appear here.</p>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <main
+      className="flex-1 flex flex-col bg-[#F0F2F5] relative overflow-hidden"
+      onClick={() => onSelectBlock(null)} // Click outside to deselect
+    >
+      {/* Mobile left sidebar toggle arrow */}
+      <button
+        className="lg:hidden absolute left-0 top-1/2 -translate-y-1/2 bg-[#0B1D40] text-white shadow-lg px-3 py-6 rounded-r-lg z-[40] border border-l-0 border-[#152B52] hover:bg-[#152B52] focus:outline-none transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center"
+        onClick={(e) => { e.stopPropagation(); onToggleLeft?.(); }}
+        aria-label="Open left sidebar"
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
+
+      {/* Top Actions Bar */}
+      <div
+        className="h-[70px] bg-[#F7F8FA] border-b border-gray-200 px-3 md:px-6 flex items-center justify-between flex-shrink-0 gap-4 overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-1 md:gap-2">
+          {/* Visible on all sizes */}
+          <button className="flex items-center gap-1 md:gap-2 text-[#0B1D40] font-bold text-[14px] md:text-[15px] hover:bg-gray-100 py-1.5 px-1.5 md:px-3 rounded transition-all duration-300 hover:-translate-y-[1px] active:scale-95 whitespace-nowrap">
+            My Website
+            <ChevronDown className="w-4 h-4 text-gray-600" />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Visible on all sizes */}
+          <div className="flex border border-gray-300 bg-white rounded-md overflow-hidden shadow-sm flex-shrink-0">
+            <button
+              className={`px-2.5 md:px-3.5 py-1.5 md:py-2 ${canUndo ? 'text-gray-600 hover:bg-gray-50 cursor-pointer hover:text-gray-900 transition-all duration-300 hover:scale-110 active:scale-95' : 'text-gray-300 cursor-not-allowed'} border-r border-gray-300`}
+              onClick={onUndo}
+              disabled={!canUndo}
+              title="Undo"
+            >
+              <Undo2 className="w-[16px] md:w-[18px] h-[16px] md:h-[18px]" strokeWidth={1.5} />
+            </button>
+            <button
+              className={`px-2.5 md:px-3.5 py-1.5 md:py-2 ${canRedo ? 'text-gray-600 hover:bg-gray-50 cursor-pointer hover:text-gray-900 transition-all duration-300 hover:scale-110 active:scale-95' : 'text-gray-300 cursor-not-allowed'}`}
+              onClick={onRedo}
+              disabled={!canRedo}
+              title="Redo"
+            >
+              <Redo2 className="w-[16px] md:w-[18px] h-[16px] md:h-[18px]" strokeWidth={1.5} />
+            </button>
+          </div>
+
+          {/* Visible on all sizes */}
+          <button
+            className="border border-gray-300 bg-white text-[13px] md:text-[14px] font-bold px-2.5 lg:px-4 py-1.5 md:py-2 rounded-md text-[#0B1D40] hover:bg-gray-50 flex items-center justify-center gap-2 shadow-sm whitespace-nowrap transition-all duration-300 active:scale-95 hover:-translate-y-[1px] hover:shadow-md"
+            onClick={() => alert("Draft saved locally!")}
+            title="Save Draft"
+          >
+            <Save className="w-[16px] h-[16px] text-gray-600 lg:hidden" strokeWidth={2} />
+            <span className="hidden lg:inline">Save Draft</span>
+          </button>
+          <button
+            className="border border-gray-300 bg-white text-[13px] md:text-[14px] font-bold px-2.5 lg:px-3 py-1.5 md:py-2 rounded-md text-[#0B1D40] hover:bg-gray-50 flex items-center justify-center gap-2 shadow-sm whitespace-nowrap transition-all duration-300 active:scale-95 hover:-translate-y-[1px] hover:shadow-md"
+            onClick={() => alert("Preview mode not yet implemented.")}
+            title="Preview"
+          >
+            <Eye className="w-[16px] h-[16px] text-gray-600" strokeWidth={2} />
+            <span className="hidden lg:inline">Preview</span>
+          </button>
+          <button
+            className="bg-[#0B1D40] text-[13px] md:text-[14px] font-bold px-2.5 lg:px-5 py-1.5 md:py-2 rounded-md text-white hover:bg-[#152B52] flex items-center justify-center gap-2 shadow-[0_2px_4px_rgba(11,29,64,0.3)] whitespace-nowrap transition-all duration-300 active:scale-95 hover:-translate-y-[1px] hover:shadow-lg"
+            onClick={() => alert("Publish sequence initiated!")}
+            title="Publish"
+          >
+            <span className="hidden lg:inline">Publish</span>
+            <Send className="w-[14px] h-[14px]" strokeWidth={2} />
+          </button>
+        </div>
+      </div>
+
+      {/* Canvas Fixed Area */}
+      <div className="flex-1 overflow-hidden pt-8 px-8 pb-[40px] flex flex-col items-center gap-6">
+        {blocks.length === 0 ? (
+          <div
+            className="w-full max-w-[850px] bg-white border border-gray-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-[5px] flex flex-col cursor-pointer hover:border-blue-300 max-h-full overflow-hidden"
+          >
+            {/* Canvas Header */}
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-white rounded-t-[5px]">
+              <h2 className="text-[#0B1D40] font-bold text-[18px] capitalize">Button Blocks</h2>
+              <button className="text-red-500 hover:bg-red-50 p-1.5 rounded opacity-50 cursor-not-allowed">
+                <X className="w-[18px] h-[18px]" strokeWidth={2.5} />
+              </button>
+            </div>
+
+            {/* Block Content Region */}
+            <div className="p-8 pb-10 flex flex-col items-start w-full relative flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              {renderBlockContent({ id: 'default', type: 'button', props: {} })}
+            </div>
+          </div>
+        ) : (
+          blocks.map(block => {
+            const isSelected = selectedBlockId === block.id;
+
+            return (
+              <div
+                key={block.id}
+                className={`w-full max-w-[850px] bg-white border border-gray-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-[5px] flex flex-col cursor-pointer ${isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'hover:border-blue-300'} max-h-full overflow-hidden`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectBlock(block.id);
+                }}
+              >
+                {/* Canvas Header */}
+                <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-white rounded-t-[5px]">
+                  <h2 className="text-[#0B1D40] font-bold text-[18px] capitalize">{block.type} Blocks</h2>
+                  <button
+                    className="text-red-500 hover:bg-red-50 p-1.5 rounded"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveBlock(block.id);
+                    }}
+                  >
+                    <X className="w-[18px] h-[18px]" strokeWidth={2.5} />
+                  </button>
+                </div>
+
+                {/* Block Content Region */}
+                <div className="p-8 pb-10 flex flex-col items-start w-full relative flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  {renderBlockContent(block)}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </main>
+  );
+}
+

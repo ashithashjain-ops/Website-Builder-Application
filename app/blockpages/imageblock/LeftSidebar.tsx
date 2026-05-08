@@ -8,6 +8,12 @@ import {
   Play, Download, ShoppingBag, FlipHorizontal, FlipVertical, RotateCcw, ArrowUpDown, SlidersHorizontal, Filter, Crop
 } from 'lucide-react';
 
+export type BlockPageType = 'image' | 'button';
+
+type LeftSidebarProps = {
+  activeBlockPage?: BlockPageType;
+  onSelectBlockPage?: (page: BlockPageType) => void;
+};
 
 const blockCategories = [
   {
@@ -36,7 +42,7 @@ const blockCategories = [
   }
 ];
 
-const LeftSidebar = () => {
+const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage }: LeftSidebarProps) => {
   const [activeTab, setActiveTab] = useState('Blocks');
   const [openCategories, setOpenCategories] = useState<number[]>([0, 1, 2]);
   const [subTab, setSubTab] = useState<'all' | 'next'>('all');
@@ -119,6 +125,16 @@ const LeftSidebar = () => {
   ];
 
   const addBlock = (type: string) => {
+    if (type === 'Image') {
+      onSelectBlockPage?.('image');
+      return;
+    }
+
+    if (type === 'Button') {
+      onSelectBlockPage?.('button');
+      return;
+    }
+
     console.log(`Add block: ${type}`);
   };
 
@@ -1045,16 +1061,22 @@ const LeftSidebar = () => {
                   {isOpen && (
                     <>
                       <div className="grid grid-cols-3 gap-2">
-                        {cat.blocks.map((block, bIdx) => (
+                        {cat.blocks.map((block, bIdx) => {
+                          const isActive =
+                            (block.name === 'Image' && activeBlockPage === 'image') ||
+                            (block.name === 'Button' && activeBlockPage === 'button');
+
+                          return (
                           <div
                             key={bIdx}
                             onClick={() => addBlock(block.name)}
-                            className="bg-[#FAF8ED] rounded-xl flex flex-col items-center justify-center pt-2 pb-1.5 cursor-pointer shadow-sm border border-[#E8E6DB] hover:ring-2 hover:ring-[#517AA5] hover:-translate-y-1 hover:shadow-md transition-all duration-300"
+                            className={`bg-[#FAF8ED] rounded-xl flex flex-col items-center justify-center pt-2 pb-1.5 cursor-pointer shadow-sm border hover:ring-2 hover:ring-[#517AA5] hover:-translate-y-1 hover:shadow-md transition-all duration-300 ${isActive ? 'ring-2 ring-[#517AA5] border-[#517AA5]' : 'border-[#E8E6DB]'}`}
                           >
                             {block.icon}
                             <span className="text-[10px] font-semibold text-[#517AA5]">{block.name}</span>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
 
                       {idx === 0 && (
