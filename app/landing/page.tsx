@@ -568,9 +568,9 @@ export default function Home() {
                     <Link href={template.category === "ecommerce" ? "/e-commerce" : "#features"} className="flex-1 rounded-xl border-2 border-dashed border-blue-400 py-2.5 text-center text-sm font-bold text-blue-500 transition hover:bg-blue-50">
                       Preview
                     </Link>
-                    <a href="/planning" className="flex-1 rounded-xl bg-[#06224C] py-2.5 text-center text-sm font-bold text-white transition hover:bg-blue-900">
+                    <Link href="/planning" className="flex-1 rounded-xl bg-[#06224C] py-2.5 text-center text-sm font-bold text-white transition hover:bg-blue-900">
                       {template.price ? "Buy" : "Edit"}
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </article>

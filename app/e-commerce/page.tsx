@@ -486,7 +486,7 @@ export default function ECommercePage() {
 
   const shareProduct = useCallback(
     async (product: BuyProduct) => {
-      const shareUrl = `${window.location.origin}/e-commerce?product=${encodeURIComponent(product.id)}`;
+      const shareUrl = `${window.location.origin}${assetPath(`/e-commerce/?product=${encodeURIComponent(product.id)}`)}`;
       try {
         if (navigator.share) {
           await navigator.share({
