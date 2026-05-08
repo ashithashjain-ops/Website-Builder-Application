@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import ButtonCanvas from "./buttonblock/components/Canvas";
-import ButtonRightSidebar from "./buttonblock/components/RightSidebar";
+import ButtonCanvas from "./buttonblock/Canvas";
+import ButtonRightSidebar from "./buttonblock/RightSidebar";
 import type { BlockData } from "./buttonblock/types";
 import { BuilderProvider } from "./imageblock/BuilderContext";
 import LeftSidebar, { type BlockPageType } from "./imageblock/LeftSidebar";
@@ -90,11 +90,13 @@ export default function BlockPagesClient() {
 
   return (
     <BuilderProvider>
-      <section className="flex min-h-[calc(100vh-64px)] flex-1 overflow-hidden bg-[#f0f2f5]">
-        <LeftSidebar activeBlockPage={activeBlockPage} onSelectBlockPage={setActiveBlockPage} />
+      <section className="flex min-h-[calc(100vh-64px)] flex-1 gap-4 overflow-hidden bg-[#e9eef6] p-4">
+        <div className="contents lg:block lg:overflow-hidden lg:rounded-xl lg:shadow-[0_18px_45px_rgba(11,29,64,0.12)]">
+          <LeftSidebar activeBlockPage={activeBlockPage} onSelectBlockPage={setActiveBlockPage} />
+        </div>
 
         {activeBlockPage === "button" ? (
-          <>
+          <div className="flex min-w-0 flex-1 gap-4">
             <ButtonCanvas
               blocks={buttonBlocks}
               selectedBlockId={selectedButtonBlockId}
@@ -105,13 +107,15 @@ export default function BlockPagesClient() {
               onUndo={undoButton}
               onRedo={redoButton}
             />
-            <ButtonRightSidebar selectedBlock={selectedButtonBlock} onUpdateBlock={updateButtonBlock} />
-          </>
+            <div className="hidden lg:block">
+              <ButtonRightSidebar selectedBlock={selectedButtonBlock} onUpdateBlock={updateButtonBlock} />
+            </div>
+          </div>
         ) : (
-          <>
+          <div className="flex min-w-0 flex-1 gap-4">
             <ImageMainCanvas />
             <ImageRightSidebar />
-          </>
+          </div>
         )}
       </section>
     </BuilderProvider>

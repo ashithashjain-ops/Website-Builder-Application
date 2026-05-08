@@ -79,6 +79,7 @@ const buyProducts: BuyProduct[] = [
 const buyProductById = new Map(buyProducts.map((product) => [product.id, product]));
 const BUYSCREEN_CART_STORAGE_KEY = "buyscreenCartItemsV1";
 const BUYSCREEN_FAVORITES_STORAGE_KEY = "buyscreenFavoriteIdsV1";
+const STORAGE_SYNC_EVENT = "stackly-storage-change";
 
 const bestSellerIds = new Set(["phone", "laptop", "television", "camera", "audio"]);
 const newArrivalIds = new Set(["watch", "speaker", "keyboard", "mouse", "tablet"]);
@@ -322,7 +323,7 @@ function BuyScreenStacklyFooter() {
             <button
               type="button"
               onClick={() => {
-                router.push("/buyscreen");
+                router.push("/e-commerce");
                 window.requestAnimationFrame(() => {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 });
@@ -393,7 +394,7 @@ function BuyScreenStacklyFooter() {
   );
 }
 
-export default function BuyScreenPage() {
+export default function ECommercePage() {
   const router = useRouter();
   const [activeProductStart, setActiveProductStart] = useState(0);
   const [showAllProducts, setShowAllProducts] = useState(false);
@@ -464,6 +465,7 @@ export default function BuyScreenPage() {
         qty: item.qty,
       }));
       window.localStorage.setItem(BUYSCREEN_CART_STORAGE_KEY, JSON.stringify(serializable));
+      window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
     } catch {
       // Ignore storage write failures.
     }
@@ -488,6 +490,7 @@ export default function BuyScreenPage() {
     if (!hasLoadedFavorites) return;
     try {
       window.localStorage.setItem(BUYSCREEN_FAVORITES_STORAGE_KEY, JSON.stringify(favoriteProductIds));
+      window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
     } catch {
       // Ignore storage write failures.
     }
@@ -585,7 +588,7 @@ export default function BuyScreenPage() {
 
   const shareProduct = useCallback(
     async (product: BuyProduct) => {
-      const shareUrl = `${window.location.origin}/buyscreen?product=${encodeURIComponent(product.id)}`;
+      const shareUrl = `${window.location.origin}/e-commerce?product=${encodeURIComponent(product.id)}`;
       try {
         if (navigator.share) {
           await navigator.share({
@@ -667,26 +670,6 @@ export default function BuyScreenPage() {
   }, [isUserMenuOpen]);
 
   useEffect(() => {
-    if (!isTopHeaderSearchOpen) return;
-    const onPointerDown = (event: MouseEvent) => {
-      const target = event.target as Node | null;
-      if (!target) return;
-      if (!topHeaderBarRef.current?.contains(target)) {
-        setIsTopHeaderSearchOpen(false);
-      }
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsTopHeaderSearchOpen(false);
-    };
-    window.addEventListener("mousedown", onPointerDown);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("mousedown", onPointerDown);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [isTopHeaderSearchOpen]);
-
-  useEffect(() => {
     const el = heroContentRef.current;
     if (!el) return;
     const check = () => {
@@ -701,34 +684,6 @@ export default function BuyScreenPage() {
       window.removeEventListener("resize", check);
     };
   }, []);
-
-  useEffect(() => {
-    if (!isTopHeaderProfileMenuOpen) return;
-    const onPointerDown = (event: MouseEvent) => {
-      const target = event.target as Element | null;
-      if (!target) return;
-      if (!target.closest("[data-top-header-profile-wrap]")) {
-        setIsTopHeaderProfileMenuOpen(false);
-      }
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsTopHeaderProfileMenuOpen(false);
-    };
-    window.addEventListener("mousedown", onPointerDown);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("mousedown", onPointerDown);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [isTopHeaderProfileMenuOpen]);
-
-  useEffect(() => {
-    if (!isTopHeaderSearchOpen) return;
-    const id = window.requestAnimationFrame(() => {
-      topHeaderSearchInputRef.current?.focus();
-    });
-    return () => window.cancelAnimationFrame(id);
-  }, [isTopHeaderSearchOpen]);
 
   useLayoutEffect(() => {
     if (!isCarouselMode) return;
@@ -782,22 +737,20 @@ export default function BuyScreenPage() {
   const handleTopHeaderItemClick = useCallback(
     (item: string) => {
       setActiveTopHeaderItem(item);
+      setIsTopHeaderMenuOpen(false);
+      setIsTopHeaderSearchOpen(false);
+      setIsTopHeaderProfileMenuOpen(false);
+
       if (item === "Home") {
-        setIsTopHeaderMenuOpen(false);
-        setIsTopHeaderSearchOpen(false);
-        setIsTopHeaderProfileMenuOpen(false);
         window.requestAnimationFrame(() => {
           contentStartRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         });
         return;
       }
-      if (item === "About Us" || item === "Contact" || item === "Our Products" || item === "Categories") {
-        router.push("/page-not-found");
-        return;
-      }
-      setIsTopHeaderMenuOpen(false);
+
+      router.push("/page-not-found");
     },
-    [router]
+    [router],
   );
 
   const handleProductsTouchStart = useCallback(
@@ -1059,7 +1012,7 @@ export default function BuyScreenPage() {
         </div>
       ) : null}
 
-      <section className="relative left-1/2 mb-4 w-screen -translate-x-1/2 overflow-visible bg-[#06224C]">
+      <section className="hidden">
         <div ref={topHeaderBarRef}>
         <div className="buyscreen-top-header-inner mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Mobile / tablet / desktop-zoom: hamburger + logo + actions (cart/search/profile stay right) */}

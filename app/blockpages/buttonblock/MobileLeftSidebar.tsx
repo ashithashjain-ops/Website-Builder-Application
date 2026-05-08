@@ -7,7 +7,7 @@ import {
   Ban, Pipette, AlignLeft, AlignCenter, AlignRight, 
   RotateCw, FlipVertical, FlipHorizontal, ArrowUpDown
 } from 'lucide-react';
-import { BlockType } from '../types';
+import { BlockType } from './types';
 
 interface MobileLeftSidebarProps {
   onAddBlock: (type: BlockType) => void;

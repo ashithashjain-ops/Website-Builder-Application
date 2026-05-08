@@ -1,6 +1,6 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, ChevronLeft, Undo2, Redo2, Eye, Send, X, Play, Save, Menu, SlidersHorizontal, Image as ImageIcon } from 'lucide-react';
-import { BlockData } from '../types';
+import { ChevronDown, Undo2, Redo2, Eye, Send, X, Play, Save, Image as ImageIcon } from 'lucide-react';
+import { BlockData } from './types';
 
 interface CanvasProps {
   blocks: BlockData[];
@@ -11,8 +11,6 @@ interface CanvasProps {
   canRedo?: boolean;
   onUndo?: () => void;
   onRedo?: () => void;
-  onToggleLeft?: () => void;
-  onToggleRight?: () => void;
 }
 
 export default function Canvas({
@@ -23,9 +21,7 @@ export default function Canvas({
   canUndo,
   canRedo,
   onUndo,
-  onRedo,
-  onToggleLeft,
-  onToggleRight
+  onRedo
 }: CanvasProps) {
   const renderBlockContent = (block: BlockData) => {
     switch (block.type) {
@@ -139,21 +135,12 @@ export default function Canvas({
 
   return (
     <main
-      className="flex-1 flex flex-col bg-[#F0F2F5] relative overflow-hidden"
+      className="relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-[#dbe3ef] bg-[#f7f9fc] shadow-sm"
       onClick={() => onSelectBlock(null)} // Click outside to deselect
     >
-      {/* Mobile left sidebar toggle arrow */}
-      <button
-        className="lg:hidden absolute left-0 top-1/2 -translate-y-1/2 bg-[#0B1D40] text-white shadow-lg px-3 py-6 rounded-r-lg z-[40] border border-l-0 border-[#152B52] hover:bg-[#152B52] focus:outline-none transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center"
-        onClick={(e) => { e.stopPropagation(); onToggleLeft?.(); }}
-        aria-label="Open left sidebar"
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
-
       {/* Top Actions Bar */}
       <div
-        className="h-[70px] bg-[#F7F8FA] border-b border-gray-200 px-3 md:px-6 flex items-center justify-between flex-shrink-0 gap-4 overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="flex h-[64px] flex-shrink-0 items-center justify-between gap-4 overflow-x-auto overflow-y-hidden border-b border-[#dbe3ef] bg-white px-3 shadow-[0_1px_0_rgba(15,23,42,0.03)] md:px-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-1 md:gap-2">
@@ -214,13 +201,13 @@ export default function Canvas({
       </div>
 
       {/* Canvas Fixed Area */}
-      <div className="flex-1 overflow-hidden pt-8 px-8 pb-[40px] flex flex-col items-center gap-6">
+      <div className="flex flex-1 flex-col items-center gap-6 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
         {blocks.length === 0 ? (
           <div
-            className="w-full max-w-[850px] bg-white border border-gray-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-[5px] flex flex-col cursor-pointer hover:border-blue-300 max-h-full overflow-hidden"
+            className="flex max-h-full w-full max-w-[900px] cursor-pointer flex-col overflow-hidden rounded-xl border border-[#dbe3ef] bg-white shadow-[0_18px_45px_rgba(15,35,75,0.08)] transition hover:border-blue-300"
           >
             {/* Canvas Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-white rounded-t-[5px]">
+            <div className="flex items-center justify-between border-b border-[#e6edf5] bg-white px-5 py-4 sm:px-6">
               <h2 className="text-[#0B1D40] font-bold text-[18px] capitalize">Button Blocks</h2>
               <button className="text-red-500 hover:bg-red-50 p-1.5 rounded opacity-50 cursor-not-allowed">
                 <X className="w-[18px] h-[18px]" strokeWidth={2.5} />
@@ -228,7 +215,7 @@ export default function Canvas({
             </div>
 
             {/* Block Content Region */}
-            <div className="p-8 pb-10 flex flex-col items-start w-full relative flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="relative flex w-full flex-1 flex-col items-start overflow-y-auto p-5 pb-8 sm:p-8 sm:pb-10 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {renderBlockContent({ id: 'default', type: 'button', props: {} })}
             </div>
           </div>
@@ -239,14 +226,14 @@ export default function Canvas({
             return (
               <div
                 key={block.id}
-                className={`w-full max-w-[850px] bg-white border border-gray-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] rounded-[5px] flex flex-col cursor-pointer ${isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'hover:border-blue-300'} max-h-full overflow-hidden`}
+                className={`flex max-h-full w-full max-w-[900px] cursor-pointer flex-col overflow-hidden rounded-xl border bg-white shadow-[0_18px_45px_rgba(15,35,75,0.08)] transition ${isSelected ? 'border-blue-500 ring-2 ring-blue-500' : 'border-[#dbe3ef] hover:border-blue-300'}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   onSelectBlock(block.id);
                 }}
               >
                 {/* Canvas Header */}
-                <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-white rounded-t-[5px]">
+                <div className="flex items-center justify-between border-b border-[#e6edf5] bg-white px-5 py-4 sm:px-6">
                   <h2 className="text-[#0B1D40] font-bold text-[18px] capitalize">{block.type} Blocks</h2>
                   <button
                     className="text-red-500 hover:bg-red-50 p-1.5 rounded"
@@ -260,7 +247,7 @@ export default function Canvas({
                 </div>
 
                 {/* Block Content Region */}
-                <div className="p-8 pb-10 flex flex-col items-start w-full relative flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div className="relative flex w-full flex-1 flex-col items-start overflow-y-auto p-5 pb-8 sm:p-8 sm:pb-10 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                   {renderBlockContent(block)}
                 </div>
               </div>
@@ -271,4 +258,3 @@ export default function Canvas({
     </main>
   );
 }
-

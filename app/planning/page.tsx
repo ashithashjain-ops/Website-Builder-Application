@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import Footer from "@/components/Footer";
-import NavBar from "@/components/navBar";
 
 /**
  * Shown in the header until session/API provides the real name.
@@ -380,8 +379,6 @@ export default function PlanningPage() {
 
   return (
     <main className="planning-page flex min-h-[100dvh] w-full flex-col overflow-x-hidden bg-[#efefef]">
-      <NavBar />
-
       <div className="w-full flex-1">
         <div className="w-full border border-[#dbe3ef] bg-white shadow-sm">
           <section

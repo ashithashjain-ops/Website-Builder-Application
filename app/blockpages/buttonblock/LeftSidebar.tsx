@@ -4,7 +4,7 @@ import {
   Video, MonitorPlay, Minus, LayoutTemplate, Columns, Heading,
   HelpCircle, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { BlockType } from '../types';
+import { BlockType } from './types';
 
 interface LeftSidebarProps {
   onAddBlock: (type: BlockType) => void;
@@ -28,9 +28,9 @@ export default function LeftSidebar({ onAddBlock }: LeftSidebarProps) {
   };
 
   return (
-    <aside className="w-[240px] h-full bg-[#0B1D40] flex flex-col flex-shrink-0 text-white border-r border-[#152B52]">
+    <aside className="flex h-full w-[248px] flex-shrink-0 flex-col overflow-hidden rounded-xl border border-[#183765] bg-[#0B1D40] text-white shadow-[0_18px_45px_rgba(11,29,64,0.18)]">
       {/* Tabs */}
-      <div className="flex px-6 pt-6 border-b border-[#1A315E]">
+      <div className="flex border-b border-[#1A315E] px-6 pt-5">
         <button
           className={`flex-1 pb-3 text-sm font-semibold border-b-2 transition-all duration-300 hover:-translate-y-[1px] ${activeTab === 'blocks' ? 'border-blue-500 text-white' : 'text-gray-400 hover:text-gray-200 border-transparent'}`}
           onClick={() => setActiveTab('blocks')}
@@ -46,7 +46,7 @@ export default function LeftSidebar({ onAddBlock }: LeftSidebarProps) {
         </button>
       </div>
 
-      <div className="p-5 flex-1 overflow-y-auto w-full">
+      <div className="w-full flex-1 overflow-y-auto p-5">
         {activeTab === 'blocks' ? (
           <>
             {/* Search */}
@@ -228,7 +228,7 @@ export default function LeftSidebar({ onAddBlock }: LeftSidebarProps) {
         )}
       </div>
 
-      <div className="p-6">
+      <div className="border-t border-[#1A315E] p-5">
         <button
           className="w-full bg-white text-gray-800 rounded py-2.5 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 hover:scale-105 active:scale-95 transition-all duration-300 shadow-sm"
           onClick={() => alert("Help Center Modal Opened.")}

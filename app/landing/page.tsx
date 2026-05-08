@@ -9,13 +9,13 @@ import {
   FaCartShopping,
   FaChevronDown,
   FaHeart,
+  FaMagnifyingGlass,
   FaMinus,
   FaPlay,
   FaPlus,
   FaStar,
   FaXmark,
 } from "react-icons/fa6";
-import LandingNav from "@/components/navBar";
 import { assetPath } from "@/lib/paths";
 
 type TemplateCategory = "portfolio" | "blog" | "ecommerce" | "business";
@@ -44,7 +44,7 @@ const popularSearches = [
 
 const categories = [
   { title: "Portfolio", image: "/landing-optimized/port.webp", alt: "Portfolio website preview" },
-  { title: "E-Commerce Templates", image: "/landing-optimized/ecommerce.webp", alt: "E-commerce website preview" },
+  { title: "E-Commerce Templates", image: "/landing-optimized/ecommerce.webp", alt: "E-commerce website preview", previewHref: "/e-commerce" },
   { title: "Digital Marketing Templates", image: "/landing-optimized/digital01.webp", alt: "Digital marketing website preview" },
   { title: "Blogging", image: "/landing-optimized/bloggg.webp", alt: "Blogging website preview" },
   { title: "Construction Themes", image: "/landing-optimized/construction02.webp", alt: "Construction website preview" },
@@ -67,6 +67,12 @@ type WishlistItem = {
   image: string;
   alt: string;
 };
+
+type CartItem = WishlistItem & {
+  quantity: number;
+};
+
+const STORAGE_SYNC_EVENT = "stackly-storage-change";
 
 const templates = [
   { title: "Classic Portfolio", category: "portfolio", image: "/landing-optimized/port.webp", alt: "Classic Portfolio template", description: "Perfect for individual creators.", badge: "Free" },
@@ -163,36 +169,127 @@ export default function Home() {
   const [activeFilter, setActiveFilter] = useState<(typeof templateFilters)[number]["value"]>("all");
   const [activeFeature, setActiveFeature] = useState(0);
   const [openFaq, setOpenFaq] = useState(0);
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>(() => {
-    if (typeof window === "undefined") {
-      return [];
-    }
-
-    const storedWishlist = window.localStorage.getItem("wishlistItems");
-
-    if (!storedWishlist) {
-      return [];
-    }
-
-    try {
-      return JSON.parse(storedWishlist) as WishlistItem[];
-    } catch {
-      window.localStorage.removeItem("wishlistItems");
-      return [];
-    }
-  });
-  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [submittedSearch, setSubmittedSearch] = useState("");
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+  const [hasLoadedWishlist, setHasLoadedWishlist] = useState(false);
   const [wishlistToast, setWishlistToast] = useState<string | null>(null);
 
+  const normalizedSearch = submittedSearch.trim().toLowerCase();
   const visibleTemplates = useMemo(
-    () => templates.filter((template) => activeFilter === "all" || template.category === activeFilter),
-    [activeFilter],
+    () => templates.filter((template) => {
+      const matchesFilter = activeFilter === "all" || template.category === activeFilter;
+      const matchesSearch = !normalizedSearch || [
+        template.title,
+        template.category,
+        template.description,
+        template.badge,
+      ].some((value) => value.toLowerCase().includes(normalizedSearch));
+
+      return matchesFilter && matchesSearch;
+    }),
+    [activeFilter, normalizedSearch],
+  );
+  const visibleCategories = useMemo(
+    () => categories.filter((category) => !normalizedSearch || [
+      category.title,
+      category.alt,
+    ].some((value) => value.toLowerCase().includes(normalizedSearch))),
+    [normalizedSearch],
+  );
+  const visibleTopProducts = useMemo(
+    () => topProducts.filter((product) => !normalizedSearch || [
+      product.title,
+      product.type,
+      product.alt,
+    ].some((value) => value.toLowerCase().includes(normalizedSearch))),
+    [normalizedSearch],
   );
   const selectedFeature = features[activeFeature];
 
   useEffect(() => {
+    if (!hasLoadedWishlist) {
+      return;
+    }
+
     window.localStorage.setItem("wishlistItems", JSON.stringify(wishlistItems));
-  }, [wishlistItems]);
+    window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
+  }, [hasLoadedWishlist, wishlistItems]);
+
+  useEffect(() => {
+    const syncWishlistFromStorage = () => {
+      const rawWishlist = window.localStorage.getItem("wishlistItems") || "[]";
+
+      try {
+        const parsedWishlist = JSON.parse(rawWishlist) as WishlistItem[];
+        setWishlistItems((currentItems) => (
+          JSON.stringify(currentItems) === rawWishlist ? currentItems : parsedWishlist
+        ));
+      } catch {
+        window.localStorage.removeItem("wishlistItems");
+        setWishlistItems([]);
+      }
+    };
+    const loadStoredWishlist = window.setTimeout(() => {
+      syncWishlistFromStorage();
+      setHasLoadedWishlist(true);
+    }, 0);
+
+    window.addEventListener("storage", syncWishlistFromStorage);
+    window.addEventListener(STORAGE_SYNC_EVENT, syncWishlistFromStorage);
+
+    return () => {
+      window.clearTimeout(loadStoredWishlist);
+      window.removeEventListener("storage", syncWishlistFromStorage);
+      window.removeEventListener(STORAGE_SYNC_EVENT, syncWishlistFromStorage);
+    };
+  }, []);
+
+  useEffect(() => {
+    const openSearch = () => {
+      setIsSearchOpen(true);
+      window.setTimeout(() => document.getElementById("landing-search-input")?.focus(), 0);
+    };
+
+    if (window.sessionStorage.getItem("stackly-open-search-on-landing") === "true") {
+      window.sessionStorage.removeItem("stackly-open-search-on-landing");
+      openSearch();
+    }
+
+    window.addEventListener("stackly-open-search", openSearch);
+
+    return () => {
+      window.removeEventListener("stackly-open-search", openSearch);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isSearchOpen) {
+      return;
+    }
+
+    const closeSearch = (event: MouseEvent) => {
+      const target = event.target as Element | null;
+
+      if (!target?.closest("[data-landing-search]")) {
+        setIsSearchOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSearchOpen(false);
+      }
+    };
+
+    window.addEventListener("mousedown", closeSearch);
+    window.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      window.removeEventListener("mousedown", closeSearch);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [isSearchOpen]);
 
   const showWishlistToast = (message: string) => {
     setWishlistToast(message);
@@ -213,14 +310,85 @@ export default function Home() {
     });
   };
 
-  const removeWishlistItem = (title: string) => {
-    setWishlistItems((currentItems) => currentItems.filter((item) => item.title !== title));
-    showWishlistToast(`${title} removed from wishlist.`);
+  const addToCart = (product: WishlistItem) => {
+    let currentCart: CartItem[] = [];
+
+    try {
+      const storedCart = window.localStorage.getItem("cartItems");
+      currentCart = storedCart ? JSON.parse(storedCart) as CartItem[] : [];
+    } catch {
+      currentCart = [];
+    }
+
+    const existingItem = currentCart.find((item) => item.title === product.title);
+    const nextCart = existingItem
+      ? currentCart.map((item) => (
+        item.title === product.title ? { ...item, quantity: (item.quantity || 1) + 1 } : item
+      ))
+      : [...currentCart, { ...product, quantity: 1 }];
+    const nextCartCount = nextCart.reduce((total, item) => total + (item.quantity || 1), 0);
+
+    window.localStorage.setItem("cartItems", JSON.stringify(nextCart));
+    window.localStorage.setItem("cartCount", String(nextCartCount));
+    window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
+    showWishlistToast(`${product.title} added to cart!`);
+  };
+
+  const submitSearch = (query: string) => {
+    const nextQuery = query.trim();
+
+    if (!nextQuery) {
+      setSubmittedSearch("");
+      setSearchQuery("");
+      setIsSearchOpen(false);
+      return;
+    }
+
+    setSearchQuery("");
+    setSubmittedSearch(nextQuery);
+    setIsSearchOpen(false);
+    setActiveFilter("all");
+    window.setTimeout(() => document.getElementById("categories")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   };
 
   return (
     <main className="min-h-screen bg-[#fff1f2] text-gray-900">
-      <LandingNav wishlistCount={wishlistItems.length} onWishlistClick={() => setIsWishlistOpen(true)} />
+      <div
+        className={`fixed left-0 top-[65px] z-40 w-full transition duration-200 ${isSearchOpen ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none -translate-y-2 opacity-0"}`}
+      >
+        <div data-landing-search className="mx-auto max-w-7xl px-4 py-2 md:px-8">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              submitSearch(searchQuery);
+            }}
+            className="flex items-center overflow-hidden rounded-lg border border-gray-300 bg-gray-50 shadow-xl ring-1 ring-black/5"
+          >
+            <input
+              id="landing-search-input"
+              type="text"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="What are you looking for?"
+              className="min-w-0 flex-grow bg-transparent py-3 pl-3 pr-1 text-[10px] text-gray-700 outline-none placeholder:text-gray-400 md:pl-5 md:text-sm"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setIsSearchOpen(false);
+              }}
+              className="px-3 py-3 text-gray-400 transition hover:text-gray-700"
+              aria-label="Close search"
+            >
+              <FaXmark />
+            </button>
+            <button type="submit" className="border-l border-gray-300 bg-gray-100 px-6 py-3 text-gray-600 transition hover:bg-gray-200" aria-label="Search websites">
+              <FaMagnifyingGlass />
+            </button>
+          </form>
+        </div>
+      </div>
 
       <section className="mx-auto w-full max-w-7xl px-4 pt-8 md:px-8">
         <div className="relative min-h-[480px] overflow-hidden rounded-[2rem] bg-[#fde2e4] md:min-h-[540px] md:rounded-[3rem]">
@@ -250,22 +418,40 @@ export default function Home() {
           <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-800">Popular Searches</p>
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
             {popularSearches.map((search) => (
-              <a
+              <button
                 key={search}
-                href="#templates"
+                type="button"
+                onClick={() => submitSearch(search)}
                 className="truncate rounded-full border border-gray-100 bg-white px-4 py-2 text-[11px] font-bold text-gray-600 shadow-sm transition hover:border-blue-400 hover:text-blue-600"
               >
                 {search}
-              </a>
+              </button>
             ))}
           </div>
+          {submittedSearch && (
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-gray-600">
+              <span>
+                Showing websites for <span className="text-blue-600">&quot;{submittedSearch}&quot;</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSubmittedSearch("");
+                  setSearchQuery("");
+                }}
+                className="rounded-full border border-gray-200 bg-white px-3 py-1 text-[10px] uppercase tracking-widest text-gray-500 transition hover:border-blue-400 hover:text-blue-600"
+              >
+                Clear
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
       <section id="categories" className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
         <SectionHeading>Categories</SectionHeading>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => (
+          {visibleCategories.map((category) => (
             <article key={category.title} className="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
               <div className="h-44 overflow-hidden md:h-52">
                 <img src={assetPath(category.image)} alt={category.alt} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
@@ -274,7 +460,7 @@ export default function Home() {
                 <h3 className="text-base font-bold uppercase tracking-tight text-gray-800 md:text-lg">{category.title}</h3>
                 <div className="mt-4 flex justify-center gap-6 text-[10px] font-black uppercase text-blue-600 underline">
                   <a href="#templates">Edit</a>
-                  <a href="#templates">Preview</a>
+                  <Link href={category.previewHref ?? "#templates"}>Preview</Link>
                 </div>
               </div>
             </article>
@@ -285,7 +471,7 @@ export default function Home() {
       <section className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
         <SectionHeading>Top Selling This Week</SectionHeading>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {topProducts.map((product) => {
+          {visibleTopProducts.map((product) => {
             const isWishlisted = wishlistItems.some((item) => item.title === product.title);
 
             return (
@@ -319,7 +505,12 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button type="button" aria-label={`Add ${product.title} to cart`} className="flex h-10 w-12 items-center justify-center rounded-xl border-2 border-dashed border-blue-400 text-blue-500 transition hover:bg-blue-50">
+                  <button
+                    type="button"
+                    onClick={() => addToCart(product)}
+                    aria-label={`Add ${product.title} to cart`}
+                    className="flex h-10 w-12 items-center justify-center rounded-xl border-2 border-dashed border-blue-400 text-blue-500 transition hover:bg-blue-50"
+                  >
                     <FaCartShopping />
                   </button>
                   <a href="#templates" className="flex h-10 flex-1 items-center justify-center rounded-xl border-2 border-dashed border-blue-400 text-sm font-bold text-blue-500 transition hover:bg-blue-50">
@@ -374,9 +565,9 @@ export default function Home() {
                   </div>
                   <p className="mt-2 text-sm leading-relaxed text-gray-500">{template.description}</p>
                   <div className="mt-4 flex gap-3">
-                    <a href="#features" className="flex-1 rounded-xl border-2 border-dashed border-blue-400 py-2.5 text-center text-sm font-bold text-blue-500 transition hover:bg-blue-50">
+                    <Link href={template.category === "ecommerce" ? "/e-commerce" : "#features"} className="flex-1 rounded-xl border-2 border-dashed border-blue-400 py-2.5 text-center text-sm font-bold text-blue-500 transition hover:bg-blue-50">
                       Preview
-                    </a>
+                    </Link>
                     <a href="/planning" className="flex-1 rounded-xl bg-[#06224C] py-2.5 text-center text-sm font-bold text-white transition hover:bg-blue-900">
                       {template.price ? "Buy" : "Edit"}
                     </a>
@@ -385,6 +576,12 @@ export default function Home() {
               </article>
             ))}
           </div>
+          {visibleTemplates.length === 0 && (
+            <div className="py-16 text-center">
+              <p className="text-sm font-black uppercase tracking-widest text-[#06224C]">No matching websites found</p>
+              <p className="mt-2 text-sm text-gray-500">Try searching for portfolio, blog, ecommerce, business, food, or dashboard.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -521,67 +718,6 @@ export default function Home() {
       </section>
 
       <Footer />
-
-      {isWishlistOpen && (
-        <>
-          <button
-            type="button"
-            aria-label="Close wishlist"
-            onClick={() => setIsWishlistOpen(false)}
-            className="fixed inset-0 z-[9998] bg-black/50"
-          />
-          <aside className="fixed right-0 top-0 z-[9999] flex h-full w-full flex-col bg-white shadow-2xl sm:w-[400px]">
-            <div className="flex items-center justify-between border-b bg-white p-6 text-[#06224C]">
-              <h2 className="flex items-center gap-3 text-lg font-black uppercase tracking-widest">
-                <FaHeart className="text-red-500" />
-                My Wishlist
-              </h2>
-              <button
-                type="button"
-                onClick={() => setIsWishlistOpen(false)}
-                className="text-gray-400 transition hover:rotate-90 hover:text-red-500"
-                aria-label="Close wishlist"
-              >
-                <FaXmark className="text-2xl" />
-              </button>
-            </div>
-
-            <div className="flex-grow space-y-6 overflow-y-auto p-6">
-              {wishlistItems.length === 0 ? (
-                <div className="py-20 text-center">
-                  <FaHeart className="mx-auto mb-4 text-5xl text-gray-200" />
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Your wishlist is empty</p>
-                </div>
-              ) : (
-                wishlistItems.map((item) => (
-                  <div key={item.title} className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
-                    <img src={assetPath(item.image)} alt={item.alt} className="h-16 w-20 flex-shrink-0 rounded-xl object-cover" />
-                    <div className="min-w-0 flex-1">
-                      <h3 className="truncate text-sm font-black text-[#06224C]">{item.title}</h3>
-                      <p className="text-xs italic text-gray-500">{item.type}</p>
-                      <p className="mt-1 text-sm font-black text-blue-600">$ {item.price}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeWishlistItem(item.title)}
-                      className="text-gray-300 transition hover:text-red-500"
-                      aria-label={`Remove ${item.title} from wishlist`}
-                    >
-                      <FaXmark />
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <div className="border-t bg-gray-50 p-6">
-              <p className="text-center text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                Items saved in wishlist are not reserved.
-              </p>
-            </div>
-          </aside>
-        </>
-      )}
 
       {wishlistToast && (
         <div className="fixed bottom-5 right-5 z-[20001] rounded-xl bg-[#06224C] px-5 py-3 text-sm font-bold text-white shadow-2xl">

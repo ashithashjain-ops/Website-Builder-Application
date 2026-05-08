@@ -43,7 +43,7 @@ export default function MainCanvas() {
   };
 
   return (
-    <main className="flex-1 bg-[#f0f2f5] flex flex-col h-full overflow-hidden relative">
+    <main className="relative flex h-full min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-[#dbe3ef] bg-[#f7f9fc] shadow-[0_18px_45px_rgba(15,35,75,0.08)]">
       {/* Hidden File Input */}
       <input 
         type="file" 
@@ -54,7 +54,7 @@ export default function MainCanvas() {
       />
 
       {/* Top Bar */}
-      <div className="h-[60px] sm:h-[68px] bg-white border-b border-slate-200 flex items-center justify-between px-3 sm:px-6 shrink-0 shadow-sm z-10 mx-2 sm:mx-4 mt-2 sm:mt-4 rounded-t-xl">
+      <div className="z-10 flex h-[64px] shrink-0 items-center justify-between border-b border-[#dbe3ef] bg-white px-3 shadow-sm sm:px-6">
         <div className="flex justify-between items-center w-full gap-2 sm:gap-0">
           {/* Left area */}
           <button 
@@ -102,11 +102,11 @@ export default function MainCanvas() {
       </div>
 
       {/* Canvas Area */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4 custom-scrollbar" onClick={() => setActiveElementId(null)}>
+      <div className="custom-scrollbar flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8" onClick={() => setActiveElementId(null)}>
         {/* Editor Container */}
-        <div className="bg-white rounded-b-xl shadow-sm border border-slate-200 border-t-0 p-8 min-h-[calc(100%-8px)]" onClick={(e) => e.stopPropagation()}>
+        <div className="min-h-full rounded-xl border border-[#dbe3ef] bg-white p-5 shadow-[0_18px_45px_rgba(15,35,75,0.08)] sm:p-8" onClick={(e) => e.stopPropagation()}>
           {/* Image Blocks Section */}
-          <div className="border border-slate-200 rounded-lg p-6 relative">
+          <div className="relative rounded-xl border border-[#e6edf5] p-5 sm:p-6">
             <h2 className="text-[#0c1b33] font-bold pb-4 border-b border-slate-100 text-[15px] mb-6 flex justify-between">
               Image Blocks
               <button className="text-slate-600 hover:text-slate-900 cursor-pointer" onClick={() => handleAction("Close Panel")}>

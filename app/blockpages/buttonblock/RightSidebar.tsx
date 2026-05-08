@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, Play, ChevronLeft, ChevronRight, LogOut, X } from 'lucide-react';
-import { BlockData } from '../types';
+import { BlockData } from './types';
 
 interface RightSidebarProps {
   selectedBlock: BlockData | null;
@@ -27,7 +27,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
   };
 
   return (
-    <aside className="w-[260px] h-full bg-[#FFF3F0] flex flex-col flex-shrink-0 border-l border-orange-100 relative">
+    <aside className="relative flex h-full w-[286px] flex-shrink-0 flex-col overflow-hidden rounded-xl border border-[#f4d8cc] bg-[#fff7f4] shadow-[0_18px_45px_rgba(113,63,18,0.10)]">
       {/* Mobile Close Button */}
       {onClose && (
         <button 
@@ -39,7 +39,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
       )}
 
       {/* Tabs */}
-      <div className="flex px-6 pt-6">
+      <div className="flex border-b border-[#f2d8cf] bg-white/45 px-6 pt-5">
         <button 
           className={`flex-1 pb-4 text-base font-bold border-b-[2px] transition-all duration-300 hover:-translate-y-[1px] ${activeTab === 'button' ? 'text-[#0B1D40] border-[#0B1D40]' : 'text-[#566583] border-gray-300 hover:bg-black/5'}`}
           onClick={() => setActiveTab('button')}
@@ -54,7 +54,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
         </button>
       </div>
 
-      <div className="px-6 pt-6 pb-[40px] space-y-4 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="flex-1 space-y-4 overflow-y-auto px-6 pb-8 pt-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {activeTab === 'button' ? (
           <>
             {/* Settings Accordion Header */}

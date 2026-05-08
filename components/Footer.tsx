@@ -214,12 +214,17 @@ export default function Footer() {
 
   return (
     <>
-      <footer id="contact" className="mt-auto w-full bg-[#0A1E3D] py-10 md:py-12">
-        <div className="mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-6 flex flex-col gap-6 border-b border-white/10 pb-6 md:flex-row md:items-start md:justify-between">
+      <footer id="contact" className="stackly-footer relative mt-auto w-full overflow-hidden bg-[#071936] py-10 md:py-12">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/70 to-transparent" />
+        <div className="pointer-events-none absolute -right-24 top-8 h-56 w-56 rounded-full bg-sky-400/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-20 bottom-8 h-56 w-56 rounded-full bg-emerald-300/10 blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl px-4 md:px-8">
+          <div className="mb-8 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.20)] backdrop-blur md:flex-row md:items-start md:justify-between md:p-7">
             <div className="w-full md:w-1/2">
-              <h3 className="mb-4 text-sm font-black uppercase tracking-wider text-white">Subscribe to our Updates</h3>
-              <form onSubmit={handleSubscribe} className="flex w-full max-w-md items-center overflow-hidden rounded-full bg-white p-1 shadow-md" aria-label="Subscribe to updates form" noValidate>
+              <h3 className="mb-2 text-sm font-black uppercase tracking-wider text-white">Subscribe to our Updates</h3>
+              <p className="mb-4 max-w-md text-sm leading-relaxed text-white/60">Get template drops, builder updates, and product notes in your inbox.</p>
+              <form onSubmit={handleSubscribe} className="flex w-full max-w-md items-center overflow-hidden rounded-full bg-white p-1 shadow-[0_18px_40px_rgba(0,0,0,0.18)] ring-1 ring-white/30 transition focus-within:ring-2 focus-within:ring-sky-300" aria-label="Subscribe to updates form" noValidate>
                 <label className="relative flex flex-grow items-center">
                   <span className="sr-only">Email address</span>
                   <FaEnvelope className="absolute left-4 text-gray-400" />
@@ -231,7 +236,7 @@ export default function Footer() {
                     className="w-full min-w-0 bg-transparent py-2.5 pl-11 pr-2 text-sm text-gray-800 focus:outline-none"
                   />
                 </label>
-                <button type="submit" aria-label="Subscribe with email" className="mr-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0A2357] text-white transition hover:bg-blue-600">
+                <button type="submit" aria-label="Subscribe with email" className="mr-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0A2357] text-white transition duration-300 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-lg active:scale-95">
                   <FaPaperPlane className="text-sm" />
                 </button>
               </form>
@@ -252,7 +257,7 @@ export default function Footer() {
                 <ul className="space-y-3 text-sm font-medium text-white/70">
                   {links.map(([label, key]) => (
                     <li key={key}>
-                      <button type="button" onClick={() => openFooterItem(key)} className="text-left transition hover:text-white focus:text-blue-300 focus:outline-none">
+                      <button type="button" onClick={() => openFooterItem(key)} className="stackly-footer-link text-left focus:text-blue-300 focus:outline-none">
                         {label}
                       </button>
                     </li>
@@ -262,7 +267,7 @@ export default function Footer() {
             ))}
 
             <div className="col-span-2 mt-2 flex flex-col items-start md:col-span-1 md:mt-0">
-              <Link href="/" className="mb-4 inline-flex aspect-[2/1] min-w-[90px] items-center justify-center rounded-[60%] bg-white px-4 py-3 shadow-md transition hover:scale-105">
+              <Link href="/" className="mb-4 inline-flex aspect-[2/1] min-w-[90px] items-center justify-center rounded-[60%] bg-white px-4 py-3 shadow-[0_14px_32px_rgba(255,255,255,0.16)] transition duration-300 hover:-translate-y-0.5 hover:scale-105">
                 <img src={assetPath("/stackly-logo.webp")} alt="Stackly Logo" className="h-5 w-auto object-contain" />
               </Link>
               <p className="mb-2 max-w-[215px] text-[11px] font-bold uppercase leading-relaxed tracking-tight text-white/70">
@@ -276,15 +281,15 @@ export default function Footer() {
             <div className="flex flex-col items-center gap-6 lg:flex-row lg:justify-between">
               <div className="flex w-full flex-wrap items-center justify-center gap-2 lg:w-auto lg:justify-start">
                 {socials.map(([label, Icon, href, hoverClass]) => (
-                  <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white text-[#0A1E3D] transition-all duration-300 hover:text-white md:h-8 md:w-8 ${hoverClass}`}>
+                  <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white text-[#0A1E3D] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:text-white hover:shadow-xl md:h-8 md:w-8 ${hoverClass}`}>
                     <Icon className="text-xs md:text-sm" />
                   </a>
                 ))}
               </div>
 
               <div className="flex w-full flex-col items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-white/50 lg:w-auto lg:flex-row lg:gap-6">
-                <button type="button" onClick={() => setActiveModal("terms")} className="whitespace-nowrap transition hover:text-white">Terms of Use</button>
-                <button type="button" onClick={() => setActiveModal("privacy")} className="whitespace-nowrap transition hover:text-white">Privacy Policy</button>
+                <button type="button" onClick={() => setActiveModal("terms")} className="stackly-footer-link whitespace-nowrap">Terms of Use</button>
+                <button type="button" onClick={() => setActiveModal("privacy")} className="stackly-footer-link whitespace-nowrap">Privacy Policy</button>
                 <span className="whitespace-nowrap text-center">Copyright 2018-2026 TheStackly.com INC</span>
               </div>
             </div>
@@ -295,7 +300,7 @@ export default function Footer() {
       {modal && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="legal-modal-title">
           <button type="button" aria-label="Close legal popup" onClick={() => setActiveModal(null)} className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-          <div className="relative z-10 flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl">
+          <div className="stackly-modal-pop relative z-10 flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl">
             <div className="flex flex-shrink-0 items-center justify-between border-b p-5 md:p-7">
               <h3 id="legal-modal-title" className="text-lg font-black uppercase tracking-widest text-[#06224C]">{modal.title}</h3>
             </div>
@@ -312,7 +317,7 @@ export default function Footer() {
       )}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[20001] rounded-xl bg-[#06224C] px-5 py-3 text-sm font-bold text-white shadow-2xl">
+        <div className="stackly-toast fixed bottom-5 right-5 z-[20001] rounded-xl bg-[#06224C] px-5 py-3 text-sm font-bold text-white shadow-2xl">
           {toast}
         </div>
       )}

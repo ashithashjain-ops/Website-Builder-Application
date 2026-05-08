@@ -1004,7 +1004,7 @@ const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage }: LeftSideb
       )}
 
       {/* Desktop Sidebar Container (Hidden on mobile) */}
-      <aside className={`hidden lg:flex relative z-50 h-full w-[185px] bg-[#1A2B4C] text-white flex-col shrink-0 shadow-[2px_0_10px_rgba(0,0,0,0.1)] rounded-tr-[2.5rem] mt-[-10px] pt-[10px]`}>
+      <aside className="relative z-50 hidden h-full w-[185px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#203b66] bg-[#1A2B4C] text-white shadow-[0_18px_45px_rgba(11,29,64,0.14)] lg:flex">
         
         <div className="flex flex-col h-full w-full pl-4 pr-4">
 

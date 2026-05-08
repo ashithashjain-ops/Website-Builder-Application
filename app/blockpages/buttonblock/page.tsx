@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
-import Header from '../components/Header';
-import LeftSidebar from '../components/LeftSidebar';
-import MobileLeftSidebar from '../components/MobileLeftSidebar';
-import RightSidebar from '../components/RightSidebar';
-import Canvas from '../components/Canvas';
-import Footer from '../components/Footer';
-import { BlockData, BlockType } from '../types';
+import Footer from '@/components/Footer';
+import LeftSidebar from './LeftSidebar';
+import MobileLeftSidebar from './MobileLeftSidebar';
+import RightSidebar from './RightSidebar';
+import Canvas from './Canvas';
+import { BlockData, BlockType } from './types';
+import { ChevronRight } from 'lucide-react';
 
 export default function Page() {
   const [blocks, setBlocks] = useState<BlockData[]>([]);
@@ -16,7 +15,6 @@ export default function Page() {
   
   // Mobile Responsiveness Sidebars
   const [isLeftOpen, setIsLeftOpen] = useState(false);
-  const [isRightOpen, setIsRightOpen] = useState(false);
   
   // History tracking
   const [pastStates, setPastStates] = useState<BlockData[][]>([]);
@@ -71,12 +69,18 @@ export default function Page() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen overflow-x-hidden bg-[#F0F2F5] font-sans">
-      <Header />
-      <div className="flex flex-1 h-[calc(100vh-80px)] flex-shrink-0 relative w-full overflow-hidden">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#e9eef6] font-sans">
+      <div className="relative flex min-h-[calc(100vh-64px)] w-full flex-1 flex-shrink-0 gap-4 overflow-hidden p-4">
+        <button
+          className="absolute left-0 top-5 z-40 flex h-11 w-8 items-center justify-center rounded-r-md border border-l-0 border-[#152B52] bg-[#0B1D40] text-white shadow-lg transition-all duration-300 hover:bg-[#152B52] active:scale-95 lg:hidden"
+          onClick={() => setIsLeftOpen(true)}
+          aria-label="Open left sidebar"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
         
         {/* Left Sidebar (Desktop Only) */}
-        <div className="hidden lg:flex lg:relative lg:translate-x-0 inset-y-0 left-0 bg-[#0B1D40]">
+        <div className="hidden lg:flex lg:relative lg:translate-x-0 inset-y-0 left-0">
           <LeftSidebar onAddBlock={(type) => { handleAddBlock(type); }} />
         </div>
 
@@ -97,29 +101,14 @@ export default function Page() {
           canRedo={futureStates.length > 0}
           onUndo={undo}
           onRedo={redo}
-          onToggleLeft={() => setIsLeftOpen(!isLeftOpen)}
-          onToggleRight={() => setIsRightOpen(!isRightOpen)}
         />
         
         {/* Right Sidebar (Desktop Only) */}
-        <div className="hidden xl:flex xl:relative xl:translate-x-0 inset-y-0 right-0 h-full bg-[#FFF3F0] transition-transform duration-300">
+        <div className="hidden xl:flex xl:relative xl:translate-x-0 inset-y-0 right-0 h-full transition-transform duration-300">
           <RightSidebar 
             selectedBlock={blocks.find(b => b.id === selectedBlockId) || null} 
             onUpdateBlock={handleUpdateBlock}
-            onClose={() => setIsRightOpen(false)}
           />
-        </div>
-
-        {/* Mobile Right Sidebar Overlay */}
-        <div className={`fixed inset-0 z-50 xl:hidden transition-opacity duration-300 ${isRightOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-          <div className="absolute inset-0 bg-black/50" onClick={() => setIsRightOpen(false)}></div>
-          <div className={`absolute top-0 right-0 h-full w-[300px] sm:w-[350px] bg-[#FFF3F0] transform transition-transform duration-300 ${isRightOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-            <RightSidebar 
-              selectedBlock={blocks.find(b => b.id === selectedBlockId) || null} 
-              onUpdateBlock={handleUpdateBlock}
-              onClose={() => setIsRightOpen(false)}
-            />
-          </div>
         </div>
         
       </div>

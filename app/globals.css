@@ -41,7 +41,7 @@ body:has(> main.planning-page) {
   background-color: #efefef;
 }
 
-/* Buy screen (/buyscreen): keep page background pure white */
+/* E-Commerce page (/e-commerce): keep page background pure white */
 html:has(body > main.buyscreen-page),
 body:has(> main.buyscreen-page) {
   background-color: #ffffff;
@@ -1763,4 +1763,345 @@ input[type="password"]::-ms-reveal {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #06224c;
+}
+
+.stackly-loader-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 30000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(125, 211, 252, 0.22), transparent 18rem),
+    radial-gradient(circle at 80% 70%, rgba(45, 212, 191, 0.18), transparent 20rem),
+    linear-gradient(135deg, rgba(3, 20, 49, 0.94), rgba(6, 34, 76, 0.92));
+  backdrop-filter: blur(10px);
+  animation: stackly-loader-fade 180ms ease both;
+}
+
+.stackly-loader-inline {
+  display: flex;
+  min-height: 18rem;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.stackly-loader-card {
+  position: relative;
+  width: min(100%, 22rem);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 80px rgba(2, 15, 38, 0.35);
+  color: #ffffff;
+  padding: 2rem;
+  text-align: center;
+}
+
+.stackly-loader-card::before {
+  content: "";
+  position: absolute;
+  inset: -40% auto auto -40%;
+  width: 80%;
+  height: 80%;
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: rotate(20deg);
+  animation: stackly-loader-sheen 2.4s ease-in-out infinite;
+}
+
+.stackly-loader-mark {
+  position: relative;
+  display: grid;
+  width: 6.25rem;
+  height: 6.25rem;
+  margin: 0 auto 1.25rem;
+  place-items: center;
+}
+
+.stackly-loader-bolt {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 3.8rem;
+  height: 3.8rem;
+  place-items: center;
+  border-radius: 1.35rem;
+  background: #ffffff;
+  color: #06224c;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.08em;
+  box-shadow: 0 16px 30px rgba(255, 255, 255, 0.18);
+  animation: stackly-loader-pulse 1.6s ease-in-out infinite;
+}
+
+.stackly-loader-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  border-top-color: #7dd3fc;
+  border-right-color: rgba(125, 211, 252, 0.45);
+}
+
+.stackly-loader-ring-one {
+  animation: stackly-loader-spin 1.1s linear infinite;
+}
+
+.stackly-loader-ring-two {
+  inset: 0.55rem;
+  border-top-color: #5eead4;
+  border-right-color: rgba(94, 234, 212, 0.35);
+  animation: stackly-loader-spin 1.7s linear infinite reverse;
+}
+
+.stackly-loader-brand {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.32em;
+}
+
+.stackly-loader-label {
+  margin: 0.45rem 0 1.25rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.stackly-loader-progress {
+  height: 0.38rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.stackly-loader-progress span {
+  display: block;
+  height: 100%;
+  width: 42%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #5eead4, #7dd3fc, #ffffff);
+  animation: stackly-loader-progress 1.25s ease-in-out infinite;
+}
+
+@keyframes stackly-loader-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes stackly-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes stackly-loader-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes stackly-loader-progress {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+@keyframes stackly-loader-sheen {
+  0%,
+  45% {
+    transform: translateX(-20%) rotate(20deg);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(220%) rotate(20deg);
+    opacity: 0;
+  }
+}
+
+.stackly-navbar {
+  animation: stackly-slide-down 0.42s ease both;
+}
+
+.stackly-nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: #ffffff;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.stackly-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.5rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7dd3fc, #ffffff);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.stackly-nav-link:hover,
+.stackly-nav-link:focus-visible {
+  color: #bfdbfe;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.stackly-nav-link:hover::after,
+.stackly-nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.stackly-icon-button {
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.stackly-icon-button:hover,
+.stackly-icon-button:focus-visible {
+  transform: translateY(-2px);
+  background-color: #f8fafc;
+  box-shadow: 0 14px 28px rgba(255, 255, 255, 0.16);
+  outline: none;
+}
+
+.stackly-icon-button:active {
+  transform: translateY(0) scale(0.96);
+}
+
+.stackly-mobile-menu {
+  animation: stackly-menu-drop 180ms ease both;
+}
+
+.stackly-footer {
+  background:
+    radial-gradient(circle at 85% 12%, rgba(56, 189, 248, 0.14), transparent 28rem),
+    radial-gradient(circle at 12% 82%, rgba(52, 211, 153, 0.12), transparent 24rem),
+    linear-gradient(135deg, #071936 0%, #0a1e3d 52%, #06142c 100%);
+}
+
+.stackly-footer-link {
+  position: relative;
+  display: inline-flex;
+  color: inherit;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.stackly-footer-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.2rem;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.75;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.stackly-footer-link:hover,
+.stackly-footer-link:focus-visible {
+  color: #ffffff;
+  transform: translateX(3px);
+  outline: none;
+}
+
+.stackly-footer-link:hover::after,
+.stackly-footer-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.stackly-modal-pop {
+  animation: stackly-pop-in 180ms ease both;
+}
+
+.stackly-toast {
+  animation: stackly-toast-in 180ms ease both;
+}
+
+@keyframes stackly-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes stackly-menu-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes stackly-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes stackly-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stackly-navbar,
+  .stackly-mobile-menu,
+  .stackly-modal-pop,
+  .stackly-toast,
+  .stackly-loader-screen,
+  .stackly-loader-card::before,
+  .stackly-loader-bolt,
+  .stackly-loader-ring,
+  .stackly-loader-progress span,
+  .stackly-nav-link,
+  .stackly-icon-button,
+  .stackly-footer-link {
+    animation: none !important;
+    transition: none !important;
+  }
 }

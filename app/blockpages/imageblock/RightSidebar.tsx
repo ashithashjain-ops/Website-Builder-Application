@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { ChevronDown, ChevronRight, ChevronLeft, Plus, Play, RectangleHorizontal, Video, AlignLeft, PaintBucket, FlipHorizontal, FlipVertical, Circle } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Play, RectangleHorizontal, Video, AlignLeft, PaintBucket, FlipHorizontal, FlipVertical, Circle } from "lucide-react";
 import { useBuilder, ElementStyle } from "./BuilderContext";
 
 export default function RightSidebar() {
@@ -40,19 +40,19 @@ export default function RightSidebar() {
 
   return (
     <>
-      <aside className="hidden lg:flex relative z-30 w-[240px] lg:w-[250px] bg-white h-full border-l border-slate-200 flex-col shrink-0 overflow-visible transition-transform duration-300">
-        <div className="flex flex-col h-full overflow-y-auto custom-scrollbar bg-white">
+      <aside className="relative z-30 hidden h-full w-[260px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#efd9ce] bg-[#fff7f4] shadow-[0_18px_45px_rgba(110,60,35,0.10)] transition-transform duration-300 lg:flex">
+        <div className="custom-scrollbar flex h-full flex-col overflow-y-auto bg-[#fff7f4]">
       {/* Tabs */}
-      <div className="flex px-5 pt-6 pb-4 border-b border-slate-200 items-center justify-between shrink-0">
+      <div className="flex shrink-0 items-center justify-between border-b border-[#efd9ce] bg-white/65 px-5 pb-4 pt-6">
         <button
-          className={`flex-1 pb-3 text-center font-semibold text-[15px] transition-colors relative ${activeTab === "Button" ? "text-[#0c1b33] border-b-2 border-[#0c1b33]" : "text-slate-500 border-b-2 border-slate-200 hover:text-[#0c1b33]"}`}
+          className={`relative flex-1 pb-3 text-center text-[15px] font-semibold transition-colors ${activeTab === "Button" ? "border-b-2 border-[#0c1b33] text-[#0c1b33]" : "border-b-2 border-[#efd9ce] text-slate-500 hover:text-[#0c1b33]"}`}
           onClick={() => setActiveTab("Button")}
         >
           Button
         </button>
-        <div className="w-[1px] h-6 bg-slate-300 mx-3" />
+        <div className="mx-3 h-6 w-[1px] bg-[#efd9ce]" />
         <button
-          className={`flex-1 pb-3 text-center font-semibold text-[15px] transition-colors relative ${activeTab === "Style" ? "text-[#0c1b33] border-b-2 border-[#0c1b33]" : "text-slate-500 border-b-2 border-slate-200 hover:text-[#0c1b33]"}`}
+          className={`relative flex-1 pb-3 text-center text-[15px] font-semibold transition-colors ${activeTab === "Style" ? "border-b-2 border-[#0c1b33] text-[#0c1b33]" : "border-b-2 border-[#efd9ce] text-slate-500 hover:text-[#0c1b33]"}`}
           onClick={() => setActiveTab("Style")}
         >
           Style
@@ -71,7 +71,7 @@ export default function RightSidebar() {
 
         {/* --- BUTTON TAB CONTENT --- */}
         {activeTab === "Button" && (
-          <div className="p-4 flex flex-col gap-5 border-b border-slate-200">
+          <div className="flex flex-col gap-5 border-b border-[#efd9ce] p-4">
             <div 
               className="flex items-center justify-between text-[15px] font-bold text-[#0c1b33] cursor-pointer hover:opacity-80"
               onClick={() => setIsSettingsOpen(!isSettingsOpen)}
@@ -113,7 +113,7 @@ export default function RightSidebar() {
         {activeTab === "Style" && (
           <>
             {/* Section: Style & Opacity */}
-            <div className="p-4 flex flex-col gap-5 border-b border-slate-200">
+            <div className="flex flex-col gap-5 border-b border-[#efd9ce] p-4">
               <div 
                 className="flex items-center justify-between text-[15px] font-bold text-[#0c1b33] cursor-pointer hover:opacity-80"
                 onClick={() => setIsStyleOpen(!isStyleOpen)}
