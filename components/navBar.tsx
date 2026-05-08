@@ -274,13 +274,16 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
           <button
             type="button"
             onClick={() => {
-              if (window.location.pathname.replace(/\/+$/, "") === "/landing") {
+              const currentPath = window.location.pathname.replace(/\/+$/, "");
+              const landingPath = assetPath("/landing").replace(/\/+$/, "");
+
+              if (currentPath === landingPath || currentPath === "/landing") {
                 window.dispatchEvent(new Event("stackly-open-search"));
                 return;
               }
 
               window.sessionStorage.setItem("stackly-open-search-on-landing", "true");
-              window.location.href = "/landing";
+              window.location.href = assetPath("/landing/");
             }}
             aria-label="Search"
             className="stackly-icon-button inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#06224C] shadow-sm"
