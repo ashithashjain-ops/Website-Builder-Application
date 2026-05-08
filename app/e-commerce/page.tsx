@@ -3,16 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import {
-  FaEnvelope,
-  FaFacebookF,
-  FaGlobe,
-  FaInstagram,
-  FaLinkedinIn,
-  FaPaperPlane,
-  FaYoutube,
-} from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
+import Footer from "@/components/Footer";
 import { assetPath } from "@/lib/paths";
 
 const buyCategories = [
@@ -77,6 +68,69 @@ const buyProducts: BuyProduct[] = [
   { id: "mouse", name: "Mouse", image: assetPath("/mouse.webp"), badge: "", price: "$29.00", unitPriceCents: 29_00 },
 ];
 const buyProductById = new Map(buyProducts.map((product) => [product.id, product]));
+
+const buyCategorySpotlights = [
+  {
+    title: "Smartphones",
+    subtitle: "Flagship cameras, all-day power, and smooth displays.",
+    image: assetPath("/phone.webp"),
+    subCategoryKey: "mobiles",
+    accent: "from-[#e0f2fe] to-[#f8fafc]",
+  },
+  {
+    title: "Workstations",
+    subtitle: "Fast laptops and tablets for hybrid work and study.",
+    image: assetPath("/laptop.webp"),
+    subCategoryKey: "laptops",
+    accent: "from-[#eef2ff] to-[#f8fafc]",
+  },
+  {
+    title: "Home Audio",
+    subtitle: "Portable speakers and headphones tuned for daily use.",
+    image: assetPath("/speaker.webp"),
+    subCategoryKey: "audio",
+    accent: "from-[#fff7ed] to-[#f8fafc]",
+  },
+];
+
+const buyDealHighlights = [
+  { label: "Delivery", value: "48h" },
+  { label: "Warranty", value: "1 year" },
+  { label: "Support", value: "24/7" },
+];
+
+type BuyShoppingStepIcon = "browse" | "cart" | "checkout";
+
+const buyShoppingSteps: Array<{ icon: BuyShoppingStepIcon; title: string; description: string }> = [
+  { icon: "browse", title: "Choose gear", description: "Filter by category, compare essentials, and save favorites for later." },
+  { icon: "cart", title: "Add license", description: "Pick quantity, review the cart, and keep every selected item synced locally." },
+  { icon: "checkout", title: "Checkout fast", description: "Move from product discovery to a focused purchase flow without page clutter." },
+];
+
+const buyTestimonials = [
+  {
+    quote: "The catalog feels premium and quick. I can compare accessories and checkout without losing my place.",
+    name: "Maya R.",
+    role: "Product lead",
+  },
+  {
+    quote: "Clean cards, clear pricing, and the wishlist flow make this storefront feel ready for real customers.",
+    name: "Arjun K.",
+    role: "Retail founder",
+  },
+  {
+    quote: "The mobile view is polished. Filters, cart, and product actions stay easy to reach.",
+    name: "Elena P.",
+    role: "UX consultant",
+  },
+];
+
+const buyBrandPartners = ["NovaTech", "PulseAudio", "SkyLens", "VoltWare", "PixelBay"];
+const buyUpdateProducts = [
+  { name: "Tablet", image: assetPath("/tablet.webp") },
+  { name: "Watch", image: assetPath("/watch.webp") },
+  { name: "Keyboard", image: assetPath("/keyboard.webp") },
+];
 const BUYSCREEN_CART_STORAGE_KEY = "buyscreenCartItemsV1";
 const BUYSCREEN_FAVORITES_STORAGE_KEY = "buyscreenFavoriteIdsV1";
 const STORAGE_SYNC_EVENT = "stackly-storage-change";
@@ -193,206 +247,50 @@ function CheckIcon() {
   );
 }
 
-function BuyScreenStacklyFooter() {
-  const router = useRouter();
-  const [footerEmail, setFooterEmail] = useState("");
-  const [footerToast, setFooterToast] = useState<string | null>(null);
-  const footerToastTimerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (footerToastTimerRef.current) {
-        window.clearTimeout(footerToastTimerRef.current);
-      }
-    };
-  }, []);
-
-  const handleFooterSend = useCallback(() => {
-    const trimmedEmail = footerEmail.trim();
-    if (!trimmedEmail) {
-      setFooterToast("Please enter your email.");
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      setFooterToast("Please enter a valid email address.");
-    } else {
-      setFooterEmail("");
-      setFooterToast("Mail sent successfully.");
-    }
-    if (footerToastTimerRef.current) {
-      window.clearTimeout(footerToastTimerRef.current);
-    }
-    footerToastTimerRef.current = window.setTimeout(() => {
-      setFooterToast(null);
-    }, 2200);
-  }, [footerEmail]);
-
+function BuyStepIcon({ type }: { type: BuyShoppingStepIcon }) {
+  if (type === "browse") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M8 9h8M8 13h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (type === "cart") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <path d="M4 5h2l1.4 8.4a1.2 1.2 0 0 0 1.2 1H18a1.2 1.2 0 0 0 1.2-1L20.5 8H7.1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="10" cy="19" r="1.5" fill="currentColor" />
+        <circle cx="17" cy="19" r="1.5" fill="currentColor" />
+      </svg>
+    );
+  }
   return (
-    <footer className="buyscreen-stackly-footer mt-3 w-full bg-[#001632] text-[#d1d5db] antialiased sm:mt-4">
-      <div className="mx-auto max-w-[1280px] px-4 py-12 sm:px-8 sm:py-14 lg:py-16">
-        <div className="grid gap-12 sm:gap-14 lg:grid-cols-5 lg:gap-8 xl:gap-12">
-          <div className="min-w-0 lg:col-span-1">
-            <form
-              className="flex max-w-[20rem] items-center gap-2.5"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleFooterSend();
-              }}
-            >
-              <div className="flex min-w-0 flex-1 items-center rounded-full bg-white px-3 py-1.5 shadow-sm">
-                <FaEnvelope className="h-4 w-4 shrink-0 text-[#4b5563]" aria-hidden />
-                <input
-                  type="email"
-                  name="footer-email"
-                  autoComplete="email"
-                  value={footerEmail}
-                  onChange={(e) => setFooterEmail(e.target.value)}
-                  placeholder="Your email"
-                  className="min-w-0 flex-1 bg-transparent px-2 text-sm text-[#374151] outline-none placeholder:text-[#6b7280]"
-                />
-              </div>
-              <button
-                type="submit"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10"
-                aria-label="Subscribe to newsletter"
-              >
-                <FaPaperPlane className="h-4 w-4" aria-hidden />
-              </button>
-            </form>
-            <h3 className="mt-8 text-sm font-bold text-white">Headquarters</h3>
-            <p className="mt-2 text-sm leading-relaxed text-[#d1d5db]">
-              MMR Complex, Salem,
-              <br />
-              Tamil Nadu 636008
-            </p>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-sm font-bold text-white">Product</h3>
-            <ul className="space-y-2.5 text-sm">
-              {[
-                { label: "Features", href: "/page-not-found" },
-                { label: "Templates", href: "/page-not-found" },
-                { label: "Pricing", href: "/page-not-found" },
-                { label: "Changelog", href: "/page-not-found" },
-              ].map((item) => (
-                <li key={item.label}>
-                  <a href={assetPath(item.href)} className="text-[#d1d5db] transition-colors hover:text-white">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-sm font-bold text-white">Resources</h3>
-            <ul className="space-y-2.5 text-sm">
-              {[
-                { label: "Documentation", href: "/page-not-found" },
-                { label: "API Reference", href: "/page-not-found" },
-                { label: "Blog", href: "/page-not-found" },
-                { label: "Status", href: "/page-not-found" },
-              ].map((item) => (
-                <li key={item.label}>
-                  <a href={assetPath(item.href)} className="text-[#d1d5db] transition-colors hover:text-white">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-sm font-bold text-white">Company</h3>
-            <ul className="space-y-2.5 text-sm">
-              {[
-                { label: "About", href: "/page-not-found" },
-                { label: "Privacy Policy", href: "/page-not-found" },
-                { label: "Terms of Service", href: "/page-not-found" },
-                { label: "Contact", href: "/page-not-found" },
-              ].map((item) => (
-                <li key={item.label}>
-                  <a href={assetPath(item.href)} className="text-[#d1d5db] transition-colors hover:text-white">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="min-w-0 lg:col-span-1">
-            <button
-              type="button"
-              onClick={() => {
-                router.push("/e-commerce");
-                window.requestAnimationFrame(() => {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                });
-              }}
-              className="inline-flex h-8 w-fit min-w-[92px] items-center justify-center overflow-hidden rounded-[50%] bg-white px-3 sm:h-9 sm:min-w-[104px]"
-              aria-label="Go to home page"
-            >
-              <Image
-                src={assetPath("/stackly-logo.webp")}
-                alt="Stackly logo"
-                width={160}
-                height={40}
-                className="h-[18px] w-auto sm:h-[20px]"
-                unoptimized
-              />
-            </button>
-            <p className="mt-5 text-sm leading-relaxed text-[#d1d5db]">
-              The <strong className="font-semibold text-white">NO-CODE</strong> website builder for everyone. Powered by AWS infrastructure,
-              built by The <strong className="font-semibold text-white">Stackly</strong> team.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-14 flex flex-col gap-8 border-t border-white/15 pt-10 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-          <div className="buyscreen-social-row inline-flex w-fit max-w-full flex-wrap items-center gap-4 rounded-full bg-white px-4 py-2.5 text-[#001632] shadow-sm sm:gap-5">
-            <a href="https://www.facebook.com/thestackly" target="_blank" rel="noreferrer" className="transition-colors hover:text-[#1877f2]" aria-label="Facebook">
-              <FaFacebookF className="h-4 w-4" />
-            </a>
-            <a href="https://www.youtube.com/@thestackly" target="_blank" rel="noreferrer" className="transition-colors hover:text-[#ff0000]" aria-label="YouTube">
-              <FaYoutube className="h-4 w-4" />
-            </a>
-            <a href="https://www.instagram.com/the_stackly" target="_blank" rel="noreferrer" className="transition-colors hover:text-[#e4405f]" aria-label="Instagram">
-              <FaInstagram className="h-4 w-4" />
-            </a>
-            <a href="https://X.com/the_stackly" target="_blank" rel="noreferrer" className="transition-colors hover:text-[#111827]" aria-label="X">
-              <FaXTwitter className="h-4 w-4" />
-            </a>
-            <a href="https://www.linkedin.com/company/the-stackly/" target="_blank" rel="noreferrer" className="transition-colors hover:text-[#0a66c2]" aria-label="LinkedIn">
-              <FaLinkedinIn className="h-4 w-4" />
-            </a>
-            <a href="https://thestackly.com" target="_blank" rel="noreferrer" className="transition-colors hover:text-[#18a3a4]" aria-label="Website">
-              <FaGlobe className="h-4 w-4" />
-            </a>
-          </div>
-          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#d1d5db] sm:justify-end">
-            <a href="https://thestackly.com/terms-of-service" target="_blank" rel="noreferrer" className="transition-colors hover:text-white">
-              Terms of Use
-            </a>
-            <span className="hidden text-white/25 sm:inline" aria-hidden>
-              |
-            </span>
-            <a href="https://thestackly.com/privacy-policy" target="_blank" rel="noreferrer" className="transition-colors hover:text-white">
-              Privacy Policy
-            </a>
-            <span className="hidden text-white/25 sm:inline" aria-hidden>
-              |
-            </span>
-            <span className="text-[#d1d5db]">© 2018-2026 thestackly.com, Inc.</span>
-          </div>
-        </div>
-      </div>
-      {footerToast ? (
-        <div className="pointer-events-none fixed bottom-5 left-1/2 z-[240] -translate-x-1/2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#06224C] shadow-lg">
-          {footerToast}
-        </div>
-      ) : null}
-    </footer>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="4" y="6" width="16" height="12" rx="3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M4 10h16M8 15h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="m15 15 1.3 1.3L19 13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
+
+function BuyQuoteIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M9.2 6.5c-2.4 1.5-3.6 3.6-3.6 6.3 0 2.2 1.2 3.7 3.2 3.7 1.5 0 2.6-1 2.6-2.5 0-1.4-1-2.4-2.5-2.4h-.4c.2-1.3 1-2.4 2.5-3.3L9.2 6.5Zm8 0c-2.4 1.5-3.6 3.6-3.6 6.3 0 2.2 1.2 3.7 3.2 3.7 1.5 0 2.6-1 2.6-2.5 0-1.4-1-2.4-2.5-2.4h-.4c.2-1.3 1-2.4 2.5-3.3L17.2 6.5Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function BuyMailIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="4" y="6" width="16" height="12" rx="3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="m6.5 9 5.5 4 5.5-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 
 export default function ECommercePage() {
   const router = useRouter();
@@ -839,7 +737,7 @@ export default function ECommercePage() {
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
 
   return (
-    <main className="buyscreen-page min-h-[100dvh] overflow-x-hidden bg-white text-[#111827]">
+    <main className="buyscreen-page min-h-[100dvh] overflow-x-hidden bg-[#f5f7fb] text-[#111827]">
       {licenseProduct ? (
         <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto overscroll-contain p-4 sm:items-center sm:p-6">
           <button
@@ -1262,26 +1160,33 @@ export default function ECommercePage() {
           ) : null}
       </section>
 
-      <div ref={contentStartRef} className="mx-auto w-full max-w-7xl px-4 pb-3 pt-0 sm:px-6 sm:pb-4 sm:pt-0 lg:px-8 lg:pb-6 lg:pt-0">
+      <div ref={contentStartRef} className="mx-auto w-full max-w-7xl px-4 pb-8 pt-5 sm:px-6 sm:pb-10 sm:pt-7 lg:px-8 lg:pb-12">
 
-        <div className="my-6 flex justify-end sm:my-8">
+        <div className="buyscreen-promo-strip mb-5 flex flex-col gap-3 rounded-2xl border border-white/70 bg-white/85 px-4 py-3 shadow-[0_18px_45px_rgba(15,35,75,0.08)] backdrop-blur sm:mb-7 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div className="min-w-0">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-[#2563eb]">Stackly marketplace preview</p>
+            <p className="mt-1 text-sm font-semibold text-[#334155]">Explore electronics with cart, favorites, search, and category filtering.</p>
+          </div>
           <button
             type="button"
-            className="rounded-md bg-[#171717] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#0f2f66] hover:text-white"
+            className="inline-flex w-full shrink-0 items-center justify-center rounded-full bg-[#06224C] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(6,34,76,0.24)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#0f3b89] sm:w-auto"
             onClick={() => router.push("/page-not-found")}
           >
             Buy Now
           </button>
         </div>
 
-        <section className="buyscreen-shell overflow-hidden rounded-lg border border-[#d9d9d9] bg-white shadow-sm">
-          <header className="buyscreen-header flex flex-col gap-4 border-b border-[#ededed] px-4 py-4 sm:px-8 sm:py-5 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:py-4">
+        <section className="buyscreen-shell overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_28px_90px_rgba(15,35,75,0.13)]">
+          <header className="buyscreen-header flex flex-col gap-4 border-b border-[#e7edf5] bg-white/95 px-4 py-4 sm:px-8 sm:py-5 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:py-4">
             <div className="flex shrink-0 items-center justify-between lg:justify-start">
-              <span className="text-base font-bold tracking-tight text-[#2b2b2b] sm:text-lg">e-shop.</span>
+              <span className="inline-flex items-center gap-2 text-base font-black tracking-tight text-[#06224C] sm:text-lg">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#22c55e] shadow-[0_0_0_5px_rgba(34,197,94,0.14)]" aria-hidden />
+                e-shop.
+              </span>
             </div>
 
             <div className="buyscreen-header-actions flex w-full min-w-0 items-center justify-end gap-2 text-[#4b5563] sm:gap-3 lg:w-auto">
-              <label className="buyscreen-search flex h-8 w-[150px] items-center rounded-md border-2 border-[#cbd5e1] px-2 text-[11px] text-[#4b5563] sm:h-9 sm:w-[180px] sm:text-xs">
+              <label className="buyscreen-search flex h-9 w-[150px] items-center rounded-full border border-[#dbe3ef] bg-[#f8fafc] px-3 text-[11px] text-[#4b5563] shadow-inner sm:h-10 sm:w-[210px] sm:text-xs">
                 <input
                   type="text"
                   value={searchQuery}
@@ -1381,7 +1286,7 @@ export default function ECommercePage() {
             </div>
           </header>
 
-          <nav className="buyscreen-categories border-b border-[#efefef] bg-[#06224C] px-4 py-2.5 text-[10px] font-semibold text-white sm:px-8 sm:text-xs">
+          <nav className="buyscreen-categories border-b border-[#e7edf5] bg-[#06224C] px-4 py-3 text-[10px] font-semibold text-white sm:px-8 sm:text-xs">
             <div className="flex items-center justify-end lg:hidden">
               <button
                 type="button"
@@ -1441,27 +1346,51 @@ export default function ECommercePage() {
             </div>
           </nav>
 
-          <div className="space-y-10 px-4 py-10 sm:space-y-12 sm:px-8 sm:py-12">
-            <section className="buyscreen-hero relative flex aspect-[4/5] items-center overflow-hidden rounded-xl border border-[#efefef] p-4 sm:aspect-[16/10] sm:p-8 lg:aspect-[16/9] lg:p-10">
+          <div className="space-y-10 px-4 py-8 sm:space-y-12 sm:px-8 sm:py-10 lg:py-12">
+            <section className="buyscreen-hero relative flex aspect-[4/5] items-center overflow-hidden rounded-[1.75rem] border border-[#dbe3ef] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] sm:aspect-[16/10] sm:p-8 lg:aspect-[16/8] lg:p-12">
               <picture className="absolute inset-0 block h-full w-full">
                 <source media="(max-width: 767px)" srcSet={MOBILE_HERO_IMAGE_URL} />
                 <img src={assetPath("/background.webp")} alt="Electronics hero background" className="h-full w-full object-cover object-center" />
               </picture>
-              <div className="buyscreen-hero-overlay absolute inset-0 z-[1] bg-[#001632]/45" aria-hidden />
-              <div ref={heroContentRef} className="buyscreen-hero-content relative z-10 w-full min-w-0 max-w-full px-1 text-center sm:max-w-xl sm:px-0 lg:text-left">
-                <h1 className="text-[clamp(1.05rem,5.1vw,1.75rem)] font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
+              <div className="buyscreen-hero-overlay absolute inset-0 z-[1]" aria-hidden />
+              <div ref={heroContentRef} className="buyscreen-hero-content relative z-10 w-full min-w-0 max-w-full px-1 text-center sm:max-w-2xl sm:px-0 lg:text-left">
+                <span className="inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white shadow-sm backdrop-blur">
+                  Daily electronics deals
+                </span>
+                <h1 className="mt-3 text-[clamp(1.5rem,5.4vw,2.4rem)] font-black leading-tight text-white sm:text-4xl lg:text-5xl">
                   Your One-Stop Electronic Market
                 </h1>
-                <p className="mx-auto mt-2 max-w-xl text-[clamp(0.7rem,2.9vw,0.95rem)] leading-relaxed text-white sm:mt-3 sm:text-base lg:mx-0">
-                  Welcome to e-shop, a place where you can buy everything about electronics. Sale every day.
+                <p className="mx-auto mt-3 max-w-xl text-[clamp(0.8rem,2.9vw,1rem)] leading-relaxed text-white/90 sm:mt-4 sm:text-base lg:mx-0">
+                  Curated phones, laptops, audio, cameras, and smart accessories with fast browsing, quick favorites, and clean checkout previews.
                 </p>
-                <button
-                  type="button"
-                  className="mt-4 rounded-md bg-white px-4 py-2 text-xs font-semibold text-[#06224C] shadow-sm transition-colors hover:bg-[#fef3c7] sm:mt-6 sm:px-5 sm:py-2.5 sm:text-sm"
-                  onClick={() => featuredProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                >
-                  Shop Now
-                </button>
+                <div className="mt-5 flex flex-col items-center gap-3 sm:mt-7 sm:flex-row lg:justify-start">
+                  <button
+                    type="button"
+                    className="inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#06224C] shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#fef3c7] sm:w-auto sm:px-6"
+                    onClick={() => featuredProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                  >
+                    Shop Now
+                  </button>
+                  <button
+                    type="button"
+                    className="inline-flex w-full items-center justify-center rounded-full border border-white/40 bg-white/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:bg-white/20 sm:w-auto sm:px-6"
+                    onClick={() => {
+                      setActiveCategoryLabel("Best Seller");
+                      setActiveSubCategoryKey(null);
+                      setShowAllProducts(true);
+                      featuredProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                  >
+                    Best Sellers
+                  </button>
+                </div>
+                <div className="mt-5 grid grid-cols-3 gap-2 text-left sm:mt-7 sm:max-w-md">
+                  {["10+ Products", "24/7 Support", "Fast Cart"].map((item) => (
+                    <span key={item} className="rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-center text-[10px] font-bold text-white/90 backdrop-blur">
+                      {item}
+                    </span>
+                  ))}
+                </div>
               </div>
             </section>
             {showHeroScrollNote ? (
@@ -1470,26 +1399,122 @@ export default function ECommercePage() {
               </p>
             ) : null}
 
-            <section className="buyscreen-features grid gap-6 border-b border-[#efefef] pb-10 text-sm text-[#4b5563] sm:grid-cols-2 sm:gap-8 lg:flex lg:items-start lg:justify-between">
+            <section className="buyscreen-features grid gap-4 border-b border-[#e7edf5] pb-10 text-sm text-[#4b5563] sm:grid-cols-2 lg:grid-cols-4">
               {buyFeatures.map((feature) => (
-                <div key={feature.title} className="flex items-start gap-4">
-                  <span aria-hidden className="mt-0.5 shrink-0 text-[#6b7280]">
+                <div key={feature.title} className="buyscreen-feature-card flex items-start gap-4 rounded-2xl border border-[#e7edf5] bg-[#f8fafc] p-4 transition duration-300">
+                  <span aria-hidden className="mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-[#0f3b89] shadow-sm">
                     <BuyFeatureIcon type={feature.icon} />
                   </span>
                   <div className="min-w-0">
-                    <p className="font-semibold text-[#111827]">{feature.title}</p>
+                    <p className="font-black text-[#111827]">{feature.title}</p>
                     <p className="mt-0.5 text-xs leading-relaxed text-[#6b7280] sm:text-sm">{feature.subtitle}</p>
                   </div>
                 </div>
               ))}
             </section>
 
+            <section className="buyscreen-section-reveal">
+              <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-[#2563eb]">Popular departments</p>
+                  <h2 className="mt-1 text-2xl font-black tracking-tight text-[#111827] sm:text-3xl">Shop By Category</h2>
+                </div>
+                <p className="max-w-md text-sm leading-relaxed text-[#64748b]">
+                  Jump into curated electronics collections with balanced product cards, practical copy, and smooth hover motion.
+                </p>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                {buyCategorySpotlights.map((category) => (
+                  <article
+                    key={category.title}
+                    className={`buyscreen-category-card group overflow-hidden rounded-2xl border border-[#e7edf5] bg-gradient-to-br ${category.accent} p-5 shadow-sm transition duration-300`}
+                  >
+                    <div className="flex min-h-[210px] flex-col justify-between gap-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="text-lg font-black text-[#111827]">{category.title}</p>
+                          <p className="mt-2 text-sm leading-relaxed text-[#64748b]">{category.subtitle}</p>
+                        </div>
+                        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#06224C] shadow-sm transition duration-300 group-hover:rotate-12 group-hover:bg-[#06224C] group-hover:text-white">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div className="flex items-end justify-between gap-4">
+                        <button
+                          type="button"
+                          className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#06224C] shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-[#06224C] hover:text-white"
+                          onClick={() => handleSubCategoryClick(category.subCategoryKey)}
+                        >
+                          Explore
+                        </button>
+                        <Image
+                          src={category.image}
+                          alt={`${category.title} category`}
+                          width={128}
+                          height={112}
+                          className="h-28 w-32 object-contain transition duration-500 group-hover:scale-110"
+                          loading="lazy"
+                          unoptimized
+                        />
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="buyscreen-deal-banner buyscreen-section-reveal overflow-hidden rounded-[1.75rem] border border-[#dbe3ef] bg-[#06224C] p-5 text-white shadow-[0_24px_70px_rgba(6,34,76,0.22)] sm:p-7 lg:p-8">
+              <div className="grid gap-7 lg:grid-cols-[minmax(0,1.15fr)_minmax(260px,0.85fr)] lg:items-center">
+                <div className="min-w-0">
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-[#93c5fd]">Weekend tech event</p>
+                  <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">Save up to 50% on audio, accessories, and daily carry tech.</h2>
+                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/75 sm:text-base">
+                    Promote seasonal offers with a confident retail banner, clear value props, and product actions that move shoppers back to the catalog.
+                  </p>
+                  <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                    <button
+                      type="button"
+                      className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#06224C] transition duration-300 hover:-translate-y-0.5 hover:bg-[#fef3c7]"
+                      onClick={() => {
+                        setActiveCategoryLabel("Limited Sale");
+                        setActiveSubCategoryKey(null);
+                        setShowAllProducts(true);
+                        featuredProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }}
+                    >
+                      View Sale
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex items-center justify-center rounded-full border border-white/30 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/10"
+                      onClick={() => openLicenseModal(buyProductById.get("audio") ?? buyProducts[0])}
+                    >
+                      Add Deal Item
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {buyDealHighlights.map((item) => (
+                    <div key={item.label} className="rounded-2xl border border-white/15 bg-white/10 p-4 text-center backdrop-blur">
+                      <p className="text-xl font-black sm:text-2xl">{item.value}</p>
+                      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-white/65">{item.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
             <section ref={featuredProductsRef}>
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-lg font-bold text-[#111827] sm:text-xl">Featured Products</h2>
+              <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-[#2563eb]">Curated collection</p>
+                  <h2 className="mt-1 text-2xl font-black tracking-tight text-[#111827] sm:text-3xl">Featured Products</h2>
+                </div>
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 text-sm font-semibold text-[#ff664f] hover:opacity-90"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#fecaca] bg-[#fff7ed] px-4 py-2 text-sm font-black text-[#ff664f] transition duration-300 hover:-translate-y-0.5 hover:bg-[#ff664f] hover:text-white"
                   onClick={() => setShowAllProducts(true)}
                 >
                   {showAllProducts ? "All Products" : "View All"}
@@ -1537,15 +1562,15 @@ export default function ECommercePage() {
                     <article
                       key={`${product.id}-${index}`}
                       tabIndex={0}
-                      className="buyscreen-product-card group relative flex min-w-0 flex-col rounded-lg border border-[#ececec] bg-white p-2 shadow-sm transition-[box-shadow,border-color] duration-200 hover:border-[#d4d4d4] hover:shadow-lg sm:p-3"
+                      className="buyscreen-product-card group relative flex min-w-0 flex-col rounded-2xl border border-[#e7edf5] bg-white p-2 shadow-sm transition duration-300 hover:border-[#bfdbfe] hover:shadow-[0_24px_55px_rgba(15,35,75,0.16)] sm:p-3"
                     >
                       <div
-                        className="buyscreen-product-image-wrap relative aspect-[4/3] w-full overflow-hidden rounded-md bg-white"
+                        className="buyscreen-product-image-wrap relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-[#f8fafc]"
                         role="img"
                         aria-label={`${product.name} product image`}
                       >
                         <div
-                          className="absolute inset-2 rounded-sm bg-white bg-contain bg-center bg-no-repeat"
+                          className="absolute inset-3 rounded-lg bg-[#f8fafc] bg-contain bg-center bg-no-repeat transition duration-500 group-hover:scale-105"
                           style={{
                             backgroundImage: `url('${product.image}')`,
                           }}
@@ -1575,7 +1600,7 @@ export default function ECommercePage() {
                           }}
                         />
                       </div>
-                      <div className="buyscreen-product-meta mt-2 min-w-0 px-0.5 sm:mt-3">
+                      <div className="buyscreen-product-meta mt-3 min-w-0 px-1 pb-1 sm:mt-4">
                         {product.badge ? (
                           <p className="mb-1 text-center">
                             <span className="inline-block rounded bg-[#ff664f] px-2 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm">{product.badge}</span>
@@ -1618,10 +1643,143 @@ export default function ECommercePage() {
                 </p>
               ) : null}
             </section>
+
+            <section className="buyscreen-section-reveal grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
+              <div className="relative overflow-hidden rounded-[1.75rem] border border-[#e7edf5] bg-[#f8fafc] p-5 sm:p-7">
+                <div className="relative z-10">
+                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#2563eb] shadow-sm">
+                    <BuyStepIcon type="checkout" />
+                  </span>
+                  <p className="mt-5 text-xs font-black uppercase tracking-[0.22em] text-[#2563eb]">Easy purchase flow</p>
+                  <h2 className="mt-2 text-2xl font-black tracking-tight text-[#111827] sm:text-3xl">From Browse To Checkout</h2>
+                  <p className="mt-3 text-sm leading-relaxed text-[#64748b]">
+                    A standard e-commerce layout should guide shoppers without noise. This flow highlights discovery, cart confidence, and checkout readiness.
+                  </p>
+                </div>
+                <div className="buyscreen-flow-art absolute bottom-4 right-4 hidden h-28 w-28 rounded-[1.5rem] bg-white p-4 shadow-[0_18px_40px_rgba(15,35,75,0.12)] sm:block" aria-hidden>
+                  <Image src={assetPath("/mouse.webp")} alt="" width={96} height={96} className="h-full w-full object-contain" unoptimized />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {buyShoppingSteps.map((step, index) => (
+                  <article key={step.title} className="buyscreen-step-card rounded-2xl border border-[#e7edf5] bg-white p-5 shadow-sm transition duration-300">
+                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eff6ff] text-[#2563eb]">
+                      <BuyStepIcon type={step.icon} />
+                    </span>
+                    <div className="mt-4 flex items-center gap-2">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#06224C] text-[11px] font-black text-white">{index + 1}</span>
+                      <h3 className="text-base font-black text-[#111827]">{step.title}</h3>
+                    </div>
+                    <p className="mt-2 text-sm leading-relaxed text-[#64748b]">{step.description}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="buyscreen-section-reveal">
+              <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-[#2563eb]">Customer proof</p>
+                  <h2 className="mt-1 text-2xl font-black tracking-tight text-[#111827] sm:text-3xl">Trusted By Modern Buyers</h2>
+                </div>
+                <div className="flex items-center gap-2 rounded-full border border-[#fde68a] bg-[#fffbeb] px-4 py-2 text-sm font-black text-[#92400e]">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#f59e0b] text-white" aria-hidden>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="m12 3 2.7 5.5 6 .9-4.4 4.2 1 6-5.3-2.8-5.3 2.8 1-6-4.4-4.2 6-.9L12 3Z" />
+                    </svg>
+                  </span>
+                  <span>4.9 average rating</span>
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                {buyTestimonials.map((testimonial, index) => (
+                  <article key={testimonial.name} className="buyscreen-testimonial-card rounded-2xl border border-[#e7edf5] bg-white p-5 shadow-sm transition duration-300">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#eff6ff] text-[#2563eb]">
+                        <BuyQuoteIcon />
+                      </span>
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#06224C] text-sm font-black text-white">
+                        {testimonial.name.charAt(0)}
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed text-[#475569]">&quot;{testimonial.quote}&quot;</p>
+                    <div className="mt-5 border-t border-[#e7edf5] pt-4">
+                      <p className="font-black text-[#111827]">{testimonial.name}</p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#94a3b8]">{testimonial.role}</p>
+                      <p className="mt-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#f59e0b]">Verified buyer {index + 1}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="buyscreen-section-reveal rounded-[1.75rem] border border-[#e7edf5] bg-[#f8fafc] p-5 sm:p-7">
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-[#2563eb]">Partner ecosystem</p>
+                  <h2 className="mt-2 text-2xl font-black tracking-tight text-[#111827] sm:text-3xl">Featured Tech Brands</h2>
+                </div>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                  {buyBrandPartners.map((brand, index) => (
+                    <div key={brand} className="buyscreen-brand-tile flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-[#e7edf5] bg-white px-3 text-center text-xs font-black uppercase tracking-[0.14em] text-[#64748b] shadow-sm transition duration-300">
+                      <span className="buyscreen-brand-mark inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#eff6ff] text-sm font-black text-[#2563eb]">
+                        {brand.slice(0, 1)}
+                      </span>
+                      <span>{brand}</span>
+                      <span className="sr-only">Brand partner {index + 1}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="buyscreen-section-reveal overflow-hidden rounded-[1.75rem] border border-[#bfdbfe] bg-white p-5 shadow-[0_20px_60px_rgba(37,99,235,0.12)] sm:p-7">
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.85fr)] lg:items-center">
+                <div className="min-w-0">
+                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eff6ff] text-[#2563eb]">
+                    <BuyMailIcon />
+                  </span>
+                  <p className="mt-5 text-xs font-black uppercase tracking-[0.22em] text-[#2563eb]">Stay updated</p>
+                  <h2 className="mt-2 text-2xl font-black tracking-tight text-[#111827] sm:text-3xl">Get launch deals and restock alerts.</h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#64748b]">
+                    A clean CTA section completes the storefront and gives customers one more high-intent action before the footer.
+                  </p>
+                  <form
+                    className="mt-5 flex w-full flex-col gap-3 sm:flex-row lg:max-w-md"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      showActionToast("Thanks for subscribing");
+                    }}
+                  >
+                    <input
+                      type="email"
+                      required
+                      placeholder="Email address"
+                      className="min-h-11 min-w-0 flex-1 rounded-full border border-[#dbe3ef] bg-[#f8fafc] px-4 text-sm font-semibold text-[#111827] outline-none transition focus:border-[#2563eb] focus:bg-white"
+                      aria-label="Email address"
+                    />
+                    <button
+                      type="submit"
+                      className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#06224C] px-5 text-xs font-black uppercase tracking-[0.14em] text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#0f3b89]"
+                    >
+                      Subscribe
+                    </button>
+                  </form>
+                </div>
+                <div className="buyscreen-update-art grid grid-cols-3 gap-3 rounded-[1.5rem] bg-[#f8fafc] p-4">
+                  {buyUpdateProducts.map((product, index) => (
+                    <div key={product.name} className={`buyscreen-update-product rounded-2xl border border-[#e7edf5] bg-white p-3 shadow-sm ${index === 1 ? "translate-y-5" : ""}`}>
+                      <Image src={product.image} alt={product.name} width={100} height={100} className="h-20 w-full object-contain" unoptimized />
+                      <p className="mt-2 text-center text-[10px] font-black uppercase tracking-[0.12em] text-[#64748b]">{product.name}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
           </div>
         </section>
       </div>
-      <BuyScreenStacklyFooter />
+      <Footer />
       {actionToast ? (
         <div className="pointer-events-none fixed bottom-4 right-4 z-[130] max-w-[260px] rounded-md bg-[#111827] px-3 py-2 text-xs font-medium text-white shadow-lg sm:text-sm">
           {actionToast}

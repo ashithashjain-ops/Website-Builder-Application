@@ -50,6 +50,7 @@ body:has(> main.buyscreen-page) {
 .buyscreen-shell {
   box-sizing: border-box;
   overflow: hidden;
+  animation: buyscreen-store-rise 0.55s ease both;
 }
 .buyscreen-header > * {
   min-width: 0;
@@ -77,6 +78,22 @@ body:has(> main.buyscreen-page) {
   min-width: 0;
   height: 100%;
   min-height: 16.75rem;
+  animation: buyscreen-card-in 0.5s ease both;
+}
+.buyscreen-product-card:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.buyscreen-product-card:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.buyscreen-product-card:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.buyscreen-product-card:nth-child(5) {
+  animation-delay: 0.16s;
+}
+.buyscreen-product-card:hover {
+  transform: translateY(-6px);
 }
 .buyscreen-product-meta {
   min-width: 0;
@@ -128,24 +145,27 @@ body:has(> main.buyscreen-page) {
   -webkit-overflow-scrolling: touch;
 }
 .buyscreen-products-arrow {
-  width: 20px;
-  height: 20px;
-  border: 1px solid #64748b;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid #cbd5e1;
   border-radius: 9999px;
   background: #ffffff;
-  color: #1e293b;
+  color: #06224c;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   padding: 0;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+  box-shadow: 0 12px 28px rgba(15, 35, 75, 0.12);
+  transition: transform 180ms ease, background-color 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 .buyscreen-products-arrow:hover {
+  transform: translateY(-2px);
   background: #06224c;
   border-color: #06224c;
   color: #ffffff;
+  box-shadow: 0 18px 36px rgba(6, 34, 76, 0.22);
 }
 .buyscreen-products-arrow:focus-visible {
   outline: none;
@@ -299,7 +319,152 @@ main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
   overflow-wrap: anywhere;
 }
 .buyscreen-hero-overlay {
-  background: rgba(0, 22, 50, 0.45);
+  background:
+    radial-gradient(circle at 85% 20%, rgba(125, 211, 252, 0.24), transparent 16rem),
+    linear-gradient(90deg, rgba(0, 22, 50, 0.82) 0%, rgba(0, 22, 50, 0.56) 48%, rgba(0, 22, 50, 0.28) 100%);
+}
+.buyscreen-hero img {
+  transform: scale(1.02);
+  transition: transform 700ms ease;
+}
+.buyscreen-hero:hover img {
+  transform: scale(1.06);
+}
+.buyscreen-promo-strip {
+  animation: buyscreen-card-in 0.45s ease both;
+}
+.buyscreen-feature-card:hover {
+  transform: translateY(-4px);
+  border-color: #bfdbfe;
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgba(15, 35, 75, 0.1);
+}
+.buyscreen-section-reveal {
+  animation: buyscreen-card-in 0.58s ease both;
+}
+.buyscreen-section-reveal:nth-of-type(2) {
+  animation-delay: 0.04s;
+}
+.buyscreen-section-reveal:nth-of-type(3) {
+  animation-delay: 0.08s;
+}
+.buyscreen-category-card,
+.buyscreen-step-card,
+.buyscreen-testimonial-card,
+.buyscreen-brand-tile {
+  will-change: transform;
+}
+.buyscreen-category-card:hover,
+.buyscreen-step-card:hover,
+.buyscreen-testimonial-card:hover,
+.buyscreen-brand-tile:hover {
+  transform: translateY(-5px);
+  border-color: #bfdbfe;
+  box-shadow: 0 22px 52px rgba(15, 35, 75, 0.12);
+}
+.buyscreen-deal-banner {
+  position: relative;
+  isolation: isolate;
+}
+.buyscreen-deal-banner::before {
+  content: "";
+  position: absolute;
+  inset: -40% auto auto 55%;
+  z-index: -1;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.34), transparent 62%);
+  animation: buyscreen-soft-pulse 4s ease-in-out infinite;
+}
+.buyscreen-deal-banner::after {
+  content: "";
+  position: absolute;
+  inset: auto -12% -45% auto;
+  z-index: -1;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(254, 243, 199, 0.18), transparent 64%);
+  animation: buyscreen-soft-pulse 5s ease-in-out infinite reverse;
+}
+.buyscreen-category-card img {
+  filter: drop-shadow(0 18px 24px rgba(15, 35, 75, 0.16));
+}
+.buyscreen-flow-art,
+.buyscreen-update-product {
+  transition: transform 300ms ease, box-shadow 200ms ease;
+}
+.buyscreen-flow-art {
+  transform: rotate(-4deg);
+}
+.buyscreen-section-reveal:hover .buyscreen-flow-art {
+  transform: rotate(0deg) translateY(-4px);
+}
+.buyscreen-brand-mark {
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.1);
+}
+.buyscreen-brand-tile:hover .buyscreen-brand-mark {
+  background: #06224c;
+  color: #ffffff;
+}
+.buyscreen-update-art {
+  background:
+    linear-gradient(135deg, rgba(239, 246, 255, 0.92), rgba(248, 250, 252, 0.92)),
+    radial-gradient(circle at 25% 20%, rgba(37, 99, 235, 0.16), transparent 9rem);
+}
+.buyscreen-update-product:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 42px rgba(15, 35, 75, 0.12);
+}
+.buyscreen-step-card:nth-child(2),
+.buyscreen-testimonial-card:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.buyscreen-step-card:nth-child(3),
+.buyscreen-testimonial-card:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.buyscreen-product-image-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 58%, rgba(6, 34, 76, 0.08));
+}
+
+@keyframes buyscreen-store-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes buyscreen-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes buyscreen-soft-pulse {
+  0%,
+  100% {
+    transform: scale(0.95);
+    opacity: 0.72;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
 }
 .buyscreen-hero-scroll-hint {
   display: none;
@@ -334,7 +499,7 @@ main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
 }
 @media (max-width: 640px) {
   .buyscreen-hero-overlay {
-    background: rgba(0, 22, 50, 0.62) !important;
+    background: linear-gradient(180deg, rgba(0, 22, 50, 0.72), rgba(0, 22, 50, 0.58)) !important;
   }
   .buyscreen-hero-content h1,
   .buyscreen-hero-content p {
@@ -398,6 +563,12 @@ main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
   }
   .buyscreen-products.buyscreen-products--grid {
     grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .buyscreen-update-art {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .buyscreen-update-product {
+    transform: none !important;
   }
 }
 @media (max-width: 420px) {

@@ -93,7 +93,6 @@ type StoredCommerceItem = {
   alt?: string;
   quantity?: number;
   qty?: number;
-  source?: "buyscreen-cart" | "buyscreen-favorites";
 };
 
 const STORAGE_SYNC_EVENT = "stackly-storage-change";
@@ -138,26 +137,13 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
   const refreshStoredCommerce = () => {
     const wishlist = readJsonArray("wishlistItems");
     const cart = readJsonArray("cartItems");
-    const buyscreenCartCount = readJsonArray("buyscreenCartItemsV1").reduce(
-      (total, item) => total + (item.qty || item.quantity || 1),
-      0,
-    );
-    const buyscreenFavoriteCount = readRawJsonArray("buyscreenFavoriteIdsV1").filter((item) => typeof item === "string").length;
     const cartCount = Number.parseInt(window.localStorage.getItem("cartCount") || "", 10);
 
-    setWishlistItems([
-      ...wishlist,
-      ...(buyscreenFavoriteCount > 0
-        ? [{ title: "Store favorites", type: "Products", quantity: buyscreenFavoriteCount, source: "buyscreen-favorites" as const }]
-        : []),
-    ]);
+    setWishlistItems(wishlist);
     setCartItems(
       [
         ...cart,
-        ...(buyscreenCartCount > 0
-          ? [{ title: "Store cart items", type: "Products", quantity: buyscreenCartCount, source: "buyscreen-cart" as const }]
-          : []),
-        ...(Number.isFinite(cartCount) && cartCount > 0 && cart.length === 0 && buyscreenCartCount === 0
+        ...(Number.isFinite(cartCount) && cartCount > 0 && cart.length === 0
           ? [{ title: "Cart item", quantity: cartCount }]
           : []),
       ],
@@ -183,29 +169,13 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
   const cartCount = cartItems.reduce((total, item) => total + (item.quantity || item.qty || 1), 0);
 
   const removeWishlistItem = (title: string) => {
-    const itemToRemove = wishlistItems.find((item) => (item.title || item.name) === title);
-
-    if (itemToRemove?.source === "buyscreen-favorites") {
-      window.localStorage.setItem("buyscreenFavoriteIdsV1", JSON.stringify([]));
-      window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
-      return;
-    }
-
-    const next = wishlistItems.filter((item) => !item.source && (item.title || item.name) !== title);
+    const next = wishlistItems.filter((item) => (item.title || item.name) !== title);
     window.localStorage.setItem("wishlistItems", JSON.stringify(next));
     window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
   };
 
   const removeCartItem = (title: string) => {
-    const itemToRemove = cartItems.find((item) => (item.title || item.name) === title);
-
-    if (itemToRemove?.source === "buyscreen-cart") {
-      window.localStorage.setItem("buyscreenCartItemsV1", JSON.stringify([]));
-      window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
-      return;
-    }
-
-    const next = cartItems.filter((item) => !item.source && (item.title || item.name) !== title);
+    const next = cartItems.filter((item) => (item.title || item.name) !== title);
     const nextCount = next.reduce((total, item) => total + (item.quantity || item.qty || 1), 0);
     window.localStorage.setItem("cartItems", JSON.stringify(next));
     window.localStorage.setItem("cartCount", String(nextCount));
