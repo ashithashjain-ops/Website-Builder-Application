@@ -462,7 +462,7 @@ export default function Home() {
                 <h3 className="text-base font-bold uppercase tracking-tight text-gray-800 md:text-lg">{category.title}</h3>
                 <div className="mt-4 flex justify-center gap-6 text-[10px] font-black uppercase text-blue-600 underline">
                   <a href="#templates">Edit</a>
-                  <Link href={category.previewHref ? assetPath(category.previewHref) : "#templates"}>Preview</Link>
+                  <Link href={category.previewHref ?? "#templates"}>Preview</Link>
                 </div>
               </div>
             </article>
@@ -568,7 +568,7 @@ export default function Home() {
                   <p className="mt-2 text-sm leading-relaxed text-gray-500">{template.description}</p>
                   <div className="mt-4 flex gap-3">
                     <Link
-                      href={template.category === "portfolio" ? assetPath("/portfolio") : template.category === "ecommerce" ? assetPath("/e-commerce") : "#features"}
+                      href={template.category === "portfolio" ? "/portfolio" : template.category === "ecommerce" ? "/e-commerce" : "#features"}
                       className="flex-1 rounded-xl border-2 border-dashed border-blue-400 py-2.5 text-center text-sm font-bold text-blue-500 transition hover:bg-blue-50"
                     >
                       Preview
