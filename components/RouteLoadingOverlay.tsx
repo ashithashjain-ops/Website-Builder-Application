@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import StacklyLoader from "./StacklyLoader";
 
 const SHOW_DELAY_MS = 140;
-const MIN_VISIBLE_MS = 220;
-const MAX_VISIBLE_MS = 1600;
+const MIN_VISIBLE_MS = 2000;
+const MAX_VISIBLE_MS = 3000;
 
 function isModifiedClick(event: globalThis.MouseEvent) {
   return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;

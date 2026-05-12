@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { forgotPassword, isApiConnectionError } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
 
 function ForgotPasswordContent() {
@@ -44,26 +45,20 @@ function ForgotPasswordContent() {
 
     try {
       setIsSubmitting(true);
-      const res = await fetch("http://localhost:5000/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: trimmed.toLowerCase() }),
+      const data = await forgotPassword({
+        input: isEmailContact ? trimmed.toLowerCase() : trimmed,
+        isChange: Boolean(changeFrom),
+        primaryUser: searchParams.get("primaryUser") || undefined,
       });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        setMessage(
-          (data as { message?: string }).message ||
-            "If an account exists, you will receive a reset link."
-        );
-        router.push(`${targetRoute}?contact=${encodedContact}`);
-      } else {
-        setMessage(
-          (data as { message?: string }).message ||
-            "Could not send reset link. Try again later."
-        );
+
+      setMessage(data.message || "OTP sent successfully.");
+      router.push(`${targetRoute}?contact=${encodedContact}`);
+    } catch (error) {
+      if (isApiConnectionError(error)) {
+        router.push("/backend-error");
+        return;
       }
-    } catch {
-      setMessage("Connection error. Please try again later.");
+      setMessage(error instanceof Error ? error.message : "Could not send OTP. Try again later.");
     } finally {
       setIsSubmitting(false);
     }

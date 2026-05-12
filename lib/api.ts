@@ -1,72 +1,126 @@
-export const BACKEND_BASE_URL = "http://localhost:5000";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
+
+type ApiErrorBody = {
+  message?: string;
+  errors?: string[];
+};
 
 export type LoginBody = {
-  email: string;
+  email?: string;
+  mobile?: string;
   password: string;
 };
 
 export type RegisterBody = {
   name: string;
   email: string;
+  mobile: string;
   password: string;
-  mobileNumber?: string;
+  confirmPassword: string;
 };
 
-export type VerifyOtpBody = {
-  contact: string;
-  code: string;
+export type ForgotPasswordBody = {
+  input: string;
+  isChange?: boolean;
+  primaryUser?: string;
 };
 
-/** POST /api/auth/verify-otp - Verify email or mobile OTP */
-export async function verifyOtp(body: VerifyOtpBody): Promise<unknown> {
-  const res = await fetch(`${BACKEND_BASE_URL}/api/auth/verify-otp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+export type VerifyEmailOtpBody = {
+  email: string;
+  otp?: string;
+  action?: "resend";
+};
+
+export type VerifyMobileOtpBody = {
+  mobile: string;
+  otp?: string;
+  action?: "resend";
+};
+
+export type ResetPasswordBody = {
+  newPassword: string;
+  confirmPassword: string;
+  token: string;
+};
+
+async function apiRequest<T>(path: string, init: RequestInit): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...init.headers,
+    },
   });
 
-  const data = await res.json().catch(() => ({}));
+  const data = (await response.json().catch(() => ({}))) as ApiErrorBody;
 
-  if (!res.ok) {
-    throw new Error(
-      (data as { message?: string }).message ?? "Invalid or expired code. Please try again."
-    );
+  if (!response.ok) {
+    throw new Error(data.message || data.errors?.join(", ") || "Request failed");
   }
 
-  return data;
+  return data as T;
 }
-/** POST /api/auth/login */
-export async function login(body: LoginBody): Promise<unknown> {
-  const res = await fetch(`${BACKEND_BASE_URL}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
 
-  const data = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    throw new Error((data as { message?: string }).message ?? "Login failed");
-  }
-
-  return data;
+export function isApiConnectionError(error: unknown) {
+  return (
+    error instanceof TypeError ||
+    (error instanceof Error &&
+      (error.message === "Failed to fetch" ||
+        error.message.includes("NetworkError") ||
+        error.message.includes("load failed")))
+  );
 }
 
 /** POST /api/auth/register */
 export async function register(body: RegisterBody): Promise<unknown> {
-  const res = await fetch(`${BACKEND_BASE_URL}/api/auth/register`, {
+  return apiRequest("/auth/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+}
 
-  const data = await res.json().catch(() => ({}));
+/** POST /api/auth/login */
+export async function login(body: LoginBody): Promise<{ token?: string; message?: string; userType?: string }> {
+  return apiRequest("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
 
-  if (!res.ok) {
-    throw new Error(
-      (data as { message?: string }).message ?? "Registration failed"
-    );
-  }
+/** POST /api/auth/forgot-password */
+export async function forgotPassword(body: ForgotPasswordBody): Promise<{ message?: string; otp?: string; moveToVerify?: boolean }> {
+  return apiRequest("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
 
-  return data;
+/** POST /api/auth/verify-email */
+export async function verifyEmailOtp(body: VerifyEmailOtpBody): Promise<{ token?: string; message?: string; otp?: string }> {
+  return apiRequest("/auth/verify-email", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+/** POST /api/auth/verify-mobile */
+export async function verifyMobileOtp(body: VerifyMobileOtpBody): Promise<{ token?: string; message?: string; otp?: string }> {
+  return apiRequest("/auth/verify-mobile", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+/** POST /api/auth/reset-password */
+export async function resetPassword(body: ResetPasswordBody): Promise<{ message?: string }> {
+  const { token, ...payload } = body;
+
+  return apiRequest("/auth/reset-password", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
 }

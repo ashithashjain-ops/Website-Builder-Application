@@ -1249,7 +1249,7 @@ input[type="password"]::-ms-reveal {
   border-radius: 6px;
 }
 
-/* Login page only: match index.html – white, 13px, no underline, thin underline on hover */
+/* Login page only: white, 13px, no underline, thin underline on hover */
 .login-page .forgot-password-link {
   color: #ffffff;
   font-size: 13px;

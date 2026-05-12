@@ -197,8 +197,8 @@ export default function Portfolioedit() {
                     <div className="flex flex-wrap items-center justify-between w-full gap-2">
 
                       {/* LEFT → Logo */}
-                      <a
-                        href="index.html"
+                      <Link
+                        href="/landing"
                         className="flex h-7 w-[64px] sm:h-8 sm:w-[80px] items-center justify-center overflow-hidden rounded-[50%] bg-white px-1 sm:px-2 shrink-0"
                       >
                         <Image
@@ -209,7 +209,7 @@ export default function Portfolioedit() {
                           className="h-[12px] sm:h-[14px] object-contain"
                           unoptimized
                         />
-                      </a>
+                      </Link>
 
                       {/* CENTER → Title */}
                       <span className="text-base sm:text-lg font-semibold text-white text-center flex-1 min-w-[100px]">
@@ -249,9 +249,9 @@ export default function Portfolioedit() {
                   <div className="hidden lg:flex w-full items-center justify-between">
 
                     <div className="flex shrink-0 justify-start">
-                      <a href="index.html" className="flex h-10 min-w-[92px] items-center justify-center rounded-[50%] bg-white px-3">
+                      <Link href="/landing" className="flex h-10 min-w-[92px] items-center justify-center rounded-[50%] bg-white px-3">
                         <Image src={assetPath("/stackly-logo.webp")} alt="Stackly logo" width={92} height={28} className="h-[18px] w-auto" unoptimized />
-                      </a>
+                      </Link>
                     </div>
 
                     <div className="flex flex-1 justify-center px-4">
@@ -819,7 +819,7 @@ export default function Portfolioedit() {
                       My <span className="bg-[#c4ff0b] text-gray-900 px-2 py-0.5 rounded-full text-sm font-extrabold ml-1 leading-none shadow-sm flex items-center h-6">Projects</span>
                     </h2>
                     <h3 className="text-3xl md:text-4xl lg:text-4xl font-extrabold text-gray-900 max-w-2xl leading-[1.15]">
-                      Showcase Your Talent with our <br className="hidden md:block" /> Latest Works
+                      Showcase Your Talent with Our <br className="hidden md:block" /> Latest Works
                     </h3>
                   </div> */}
                   <div className="text-center mb-16">
@@ -831,7 +831,7 @@ export default function Portfolioedit() {
                     {/* <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
 
                     <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
-                      Showcase Your Talent with our <br className="hidden md:block" /> Latest Works
+                      Showcase Your Talent with Our <br className="hidden md:block" /> Latest Works
                     </h3>
                   </div>
 
@@ -859,7 +859,7 @@ export default function Portfolioedit() {
                       },
                       {
                         tag: "Graphics Design",
-                        title: "HandCraft With Palm fan",
+                        title: "Handcraft With Palm Fan",
                         img: "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=500&h=500&fit=crop"
                       },
                       {

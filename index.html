@@ -19,42 +19,6 @@
 <link rel="preload" as="image" href="public/landinmble3.webp">
 
   <style>
-    /* Prevent words from breaking out of cards */
-h1, h2, h3, h4, p {
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  hyphens: auto;
-}
-
-/* Specifically for the product titles in the cards */
-.product-card-title {
-  word-break: break-word; /* Force break if name is too long */
-}
- /* Specifically targets the placeholder text to be smaller and handle overflow */
-/* Placeholder styling */
-#searchInput::placeholder {
-  color: #9ca3af;
-  opacity: 1;
-}
-
-/* Specific fix for high zoom (200%) on mobile */
-@media (max-width: 400px) {
-  #searchInput {
-    /* Shrinking font slightly more allows the full sentence to fit */
-    font-size: 9px !important; 
-    letter-spacing: -0.02em; /* Tightens letters slightly to fit more text */
-  }
-  
-  #searchInput::placeholder {
-    font-size: 9px !important;
-  }
-
-  /* Reduce the size of the search button slightly to gain more space for text */
-  #searchBarContainer button {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
-}
     /* High-visibility focus indicator for all buttons and tabs */
 button:focus-visible, 
 .filter-tab:focus-visible,
@@ -94,7 +58,7 @@ button:focus-visible,
   }
 
   .submenu-parent {
-    position: relative;
+    position: static;
   }
 
   .flyout-menu {
@@ -102,15 +66,14 @@ button:focus-visible,
     position: absolute;
     left: 100%;
     top: 0;
-    width: 220px;
+    width: 200px;
     background: #f8fafc;
-    border: 1px solid #f3f4f6;
+    border-left: 1px solid #f3f4f6;
     border-radius: 0 0.75rem 0.75rem 0;
-    box-shadow: 10px 0 30px  rgba(0, 0, 0, 0.1);
-    height: auto;
+    box-shadow: 15px 0 30px -3px rgba(0, 0, 0, 0.1);
+    height: 100%;
     min-height: 480px;
-    z-index: 120;
-    min-height: fit-content;
+    z-index: 110;
   }
 
   .submenu-parent:hover .flyout-menu {
@@ -150,11 +113,8 @@ button:focus-visible,
 
   #category-menu {
     width: auto !important;
-    display: none;
-    flex-direction: column; 
-    position: absolute;
-    top: 100%;
-    left: 0;
+    display: flex !important;
+    flex-direction: row !important;
     overflow: visible !important;
   }
 
@@ -169,15 +129,13 @@ button:focus-visible,
     width: 100%;
     margin: 0;
     padding: 0;
-    overflow-x: hidden;
-    position: relative;
   }
 
   body {
     font-family: Arial, Helvetica, sans-serif;
-    min-height: auto;
+    min-height: 100%;
     position: relative;
-    overflow-y: visible;
+    overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
     margin: 0;
@@ -262,8 +220,8 @@ button:focus-visible,
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
-    gap: 3rem;
+    flex-wrap: nowrap;
+    gap: 2rem;
   }
 
   .nav-primary-link,
@@ -317,20 +275,6 @@ button:focus-visible,
     opacity: 1 !important;
     visibility: visible !important;
     transform: translateY(0) !important;
-    pointer-events: auto;
-  }
-
-  body.search-overlay-open .dropdown-group:hover #category-menu,
-  body.search-overlay-open .dropdown-group:hover #products-menu,
-  body.search-overlay-open #category-dropdown-btn:focus + #category-menu,
-  body.search-overlay-open #products-dropdown-btn:focus + #products-menu,
-  body.search-overlay-open .dropdown-group:focus-within #category-menu,
-  body.search-overlay-open .dropdown-group:focus-within #products-menu {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transform: translateY(0.5rem) !important;
-    pointer-events: none !important;
   }
 
  #mobileMenu {
@@ -402,7 +346,6 @@ button:focus-visible,
     width: 100%;
     overflow-x: hidden;
     scroll-padding-top: 80px;
-    z-index: 1;
   }
 
   #homePage .w-full.max-w-7xl {
@@ -602,12 +545,10 @@ button:focus-visible,
 
   .product-card-title {
     min-height: 3.5rem;
-    height: auto;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    line-height: 1.2;
   }
 
   .category-card-title {
@@ -629,7 +570,6 @@ button:focus-visible,
 
   .price-rating-row {
     display: flex;
-    margin-top: auto;
     flex-wrap: wrap;
     gap: 0.5rem;
     align-items: center;
@@ -652,12 +592,6 @@ button:focus-visible,
     transition: all 0.3s ease;
     cursor: pointer;
     font-size: 1.25rem;
-    background: transparent;
-    border: none;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .wishlist-btn .fa-heart {
@@ -689,13 +623,6 @@ button:focus-visible,
   #wishlistSidebar,
   #cartSidebar {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  #cartSidebar.translate-x-full,
-  #wishlistSidebar.translate-x-full,
-  #privacySidebar.translate-x-full,
-  #termsSidebar.translate-x-full {
-    box-shadow: none !important;
   }
 
   #popular-searches .flex {
@@ -823,8 +750,6 @@ button:focus-visible,
     opacity: 0;
     transform: translateY(30px);
     transition: all 0.6s ease;
-    width: 100%; /* Force it to stay within bounds */
-    box-sizing: border-box;
   }
 
   .reveal.active {
@@ -1037,15 +962,7 @@ button:focus-visible,
   .faq-item {
     width: 100%;
     position: relative;
-    overflow: visible !important;
   }
-  .faq-item button:focus-visible {
-  outline: 3px solid #2563eb !important;
-  outline-offset: 2px;
-  border-radius: 1rem;
-  z-index: 10;
-  position: relative;
-}
 
   .faq-item button {
     display: flex !important;
@@ -1293,89 +1210,6 @@ button:focus-visible,
     background: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
   }
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track,
-  ::-webkit-scrollbar-track-piece,
-  ::-webkit-scrollbar-corner {
-    background: transparent !important;
-    box-shadow: none !important;
-    border: 0 !important;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #06224c;
-    border-radius: 10px;
-    box-shadow: none !important;
-    border: 0 !important;
-  }
-
-  html,
-  body {
-    scrollbar-width: thin;
-    scrollbar-color: #06224c transparent;
-  }
-  
-  @media (max-width: 480px) {
-  footer form {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  footer form input {
-    font-size: 12px !important;
-    padding-left: 2.5rem !important;
-    padding-right: 0.5rem !important;
-    min-width: 0 !important;
-  }
-
-  footer form .fa-envelope {
-    left: 0.6rem !important;
-    font-size: 11px !important;
-  }
-
-  footer form button[type="submit"] {
-    width: 2.25rem !important;
-    height: 2.25rem !important;
-    min-width: 2.25rem !important;
-    flex-shrink: 0 !important;
-  }
-}
-@media (max-width: 768px) {
-  footer .w-full.md\:w-1\/2 form {
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-
-  footer form {
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-
-  #footerEmailInput {
-    font-size: 12px !important;
-    padding-left: 2rem !important;
-    padding-right: 0.25rem !important;
-    min-width: 0 !important;
-    width: 100% !important;
-  }
-
-  footer form .fa-envelope {
-    left: 0.5rem !important;
-    font-size: 10px !important;
-  }
-
-  footer form button[type="submit"] {
-    width: 2rem !important;
-    height: 2rem !important;
-    min-width: 2rem !important;
-    flex-shrink: 0 !important;
-    margin-right: 0 !important;
-  }
-}
 </style>
 
 </head>
@@ -1407,7 +1241,7 @@ button:focus-visible,
                 Stackly is a powerful platform that streamlines workflow, enhances efficiency, and drives digital success.
             </p>
             <p class="text-sm leading-relaxed text-gray-600">
-                Founded in 2015, Stackly has grown into one of the leading and most trusted companies in the industry, with a team of over 120 talented professionals. We specialize in delivering cutting-edge technology solutions that drive business success.
+                Founded in 2015, Stackly has grown into one of the leading and most trusted companies in the industry. With a team of over 120 talented professionals, we specialize in delivering cutting-edge technology solutions that drive business success.
             </p>
         </div>
     </section>
@@ -1422,7 +1256,7 @@ button:focus-visible,
             <div class="bg-[#06224C] p-8 rounded-[2.5rem] shadow-lg group text-white">
                 <span class="text-5xl font-black text-blue-400/30 group-hover:text-blue-500 transition duration-500">01.</span>
                 <h3 class="text-2xl font-black uppercase tracking-tight mt-4 mb-4">Our Mission</h3>
-                <p class="text-xs text-blue-100/70 leading-relaxed mb-6">
+                <p class="text-xs text-gray-500 leading-relaxed mb-6">
                     Our mission is simple—create tools that solve real problems. We aim to enhance your experience through innovation and reliability.
                 </p>
                 <div class="rounded-2xl overflow-hidden h-40">
@@ -1433,7 +1267,7 @@ button:focus-visible,
             <div class="bg-[#06224C] p-8 rounded-[2.5rem] shadow-lg group text-white">
                 <span class="text-5xl font-black text-blue-400/30 group-hover:text-blue-500 transition duration-500">02.</span>
                 <h3 class="text-2xl font-black uppercase tracking-tight mt-4 mb-4">Our Vision</h3>
-                <p class="text-xs text-blue-100/70 leading-relaxed mb-6">
+                <p class="text-xs text-gray-500 leading-relaxed mb-6">
                     We envision a future where technology serves as an enabler for creativity. Stackly strives to be a leader in scalable tools.
                 </p>
                 <div class="rounded-2xl overflow-hidden h-40">
@@ -1470,26 +1304,26 @@ button:focus-visible,
               </a>
             </div>
 
-           <div class="hidden lg:flex nav-primary-links text-[13px] font-bold text-white uppercase tracking-wide items-center">
+           <div class="hidden lg:flex nav-primary-links text-[13px] font-bold text-white tracking-wide items-center">
 
               <a href="#home" class="nav-primary-link hover:text-blue-300 transition">Home</a>
-<a href="#404" class="nav-primary-link hover:text-blue-300 transition">About Us</a>
+<a href="portfolioframe-main/index.html" class="nav-primary-link hover:text-blue-300 transition">About</a>
 
 
               <div class="relative dropdown-group flex items-center">
-                <button type="button" id="products-dropdown-btn" aria-haspopup="true" aria-expanded="false" class="flex items-center gap-1.5 hover:text-blue-300 transition whitespace-nowrap text-[13px] font-bold text-white uppercase tracking-wide focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-md px-1">
+                <button type="button" id="products-dropdown-btn" aria-haspopup="true" aria-expanded="false" class="flex items-center gap-1.5 hover:text-blue-300 transition whitespace-nowrap text-[13px] font-bold text-white tracking-wide focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-md px-1">
                   Our Products <i class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
                 </button>
                 <div id="products-menu" role="menu" class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-2xl opacity-0 invisible transition-all duration-300 z-[100] py-3 border border-gray-100 translate-y-2">
-                  <a href="#404" role="menuitem" class="block px-5 py-2.5 text-gray-800 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600 border-b border-gray-50">PREMIUM TEMPLATES</a>
-                  <a href="#404" role="menuitem" class="block px-5 py-2.5 text-gray-800 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600 border-b border-gray-50">UI KITS</a>
-                  <a href="#404" role="menuitem" class="block px-5 py-2.5 text-gray-800 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600 border-b border-gray-50">WORDPRESS THEMES</a>
-                  <a href="#404" role="menuitem" class="block px-5 py-2.5 text-gray-800 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600">FREE ASSETS</a>
+                  <a href="portfolioframe-main/index.html" role="menuitem" class="block px-5 py-2.5 text-gray-800 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600 border-b border-gray-50">PREMIUM TEMPLATES</a>
+                  <a href="portfolioframe-main/index.html" role="menuitem" class="block px-5 py-2.5 text-gray-800 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600 border-b border-gray-50">UI KITS</a>
+                  <a href="portfolioframe-main/index.html" role="menuitem" class="block px-5 py-2.5 text-gray-800 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600 border-b border-gray-50">WORDPRESS THEMES</a>
+                  <a href="portfolioframe-main/index.html" role="menuitem" class="block px-5 py-2.5 text-gray-800 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600">FREE ASSETS</a>
                 </div>
               </div>
 
               <div class="relative dropdown-group flex items-center">
-                <button type="button" id="category-dropdown-btn" aria-haspopup="true" aria-expanded="false" class="flex items-center gap-1.5 hover:text-blue-300 transition whitespace-nowrap text-[13px] font-bold text-white uppercase tracking-wide focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-md px-1">
+                <button type="button" id="category-dropdown-btn" aria-haspopup="true" aria-expanded="false" class="flex items-center gap-1.5 hover:text-blue-300 transition whitespace-nowrap text-[13px] font-bold text-white tracking-wide focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-md px-1">
                   Categories <i class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
                 </button>
                 <div id="category-menu" role="menu" class="absolute left-0 top-full mt-2 bg-white rounded-xl shadow-2xl opacity-0 invisible transition-all duration-300 z-[100] border border-gray-100 translate-y-2 flex">
@@ -1497,195 +1331,195 @@ button:focus-visible,
     <div class="w-[200px] py-2">
         
         <div class="submenu-parent group/item">
-            <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+            <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
                 <span class="flex items-center gap-2"><i class="fa-solid fa-pager opacity-50"></i> LANDING PAGE</span>
                 <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
             </a>
             
             <div class="flyout-menu">
                 <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">TYPES</div>
-                <a href="#404" class="flyout-item">Lead Generating Page</a>
-                <a href="#404" class="flyout-item">Click-through Page</a>
-                <a href="#404" class="flyout-item">Sales Page</a>
-                <a href="#404" class="flyout-item">Product Page</a>
-                <a href="#404" class="flyout-item">App Page</a>
-                <a href="#404" class="flyout-item">Pre-launch Page</a>
-                <a href="#404" class="flyout-item">Event Page</a>
-                <a href="#404" class="flyout-item">Splash Page</a>
-                <a href="#404" class="flyout-item text-gray-400">Others...</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Lead Generating Page</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Click-through Page</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Sales Page</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Product Page</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">App Page</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Pre-launch Page</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Event Page</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Splash Page</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item text-gray-400">Others...</a>
             </div>
         </div>
 
         <div class="submenu-parent group/item">
-            <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+            <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
                 <span class="flex items-center gap-2"><i class="fa-solid fa-chart-line opacity-50"></i> DASHBOARD</span>
                 <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
             </a>
             <div class="flyout-menu">
                 <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">STYLES</div>
-                <a href="#404" class="flyout-item">Admin Analytics</a>
-                <a href="#404" class="flyout-item">Overview</a>
-                <a href="#404" class="flyout-item">User Profile</a>
-                <a href="#404" class="flyout-item">Sales</a>
-                <a href="#404" class="flyout-item">Marketing</a>
-                <a href="#404" class="flyout-item">Finance</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Admin Analytics</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Overview</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">User Profile</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Sales</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Marketing</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Finance</a>
             </div>
         </div>
 
         <div class="submenu-parent group/item">
-            <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+            <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
                 <span class="flex items-center gap-2"><i class="fa-solid fa-briefcase opacity-50"></i> PORTFOLIO</span>
                 <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
             </a>
             <div class="flyout-menu">
                 <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">CREATIVES</div>
-                <a href="#404" class="flyout-item">Designer</a>
-                <a href="#404" class="flyout-item">Developer</a>
-                <a href="#404" class="flyout-item">Agency</a>
-                <a href="#404" class="flyout-item">Minimal</a>
-                <a href="#404" class="flyout-item">Personal</a>
-                <a href="#404" class="flyout-item">Freelancer</a>
-                <a href="#404" class="flyout-item">Others</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Designer</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Developer</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Agency</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Minimal</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Personal</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Freelancer</a>
+                <a href="portfolioframe-main/index.html" class="flyout-item">Others</a>
             </div>
         </div>
         <div class="submenu-parent group/item">
-    <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+    <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
         <span class="flex items-center gap-2"><i class="fa-solid fa-utensils opacity-50 w-4"></i> FOOD</span>
         <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
     </a>
     <div class="flyout-menu">
         <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">RESTAURANTS</div>
-        <a href="#404" class="flyout-item">Burger House</a>
-        <a href="#404" class="flyout-item">Pizza Corner</a>
-        <a href="#404" class="flyout-item">Fresh & Natural</a>
-        <a href="#404" class="flyout-item">Food Stories</a>
-        <a href="#404" class="flyout-item">Others</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Burger House</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Pizza Corner</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Fresh & Natural</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Food Stories</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Others</a>
     </div>
 </div>
 
 <div class="submenu-parent group/item">
-    <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+    <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
         <span class="flex items-center gap-2"><i class="fa-solid fa-plane opacity-50 w-4"></i> TRAVEL</span>
         <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
     </a>
     <div class="flyout-menu">
         <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">DESTINATIONS</div>
-        <a href="#404" class="flyout-item">Adventure</a>
-        <a href="#404" class="flyout-item">Luxury</a>
-        <a href="#404" class="flyout-item">Leisure</a>
-        <a href="#404" class="flyout-item">Solo Trip</a>
-        <a href="#404" class="flyout-item">Family</a>
-        <a href="#404" class="flyout-item">Group</a>
-        <a href="#404" class="flyout-item">Others</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Adventure</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Luxury</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Leisure</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Solo Trip</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Family</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Group</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Others</a>
 
     </div>
 </div>
 
 <div class="submenu-parent group/item">
-    <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+    <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
         <span class="flex items-center gap-2"><i class="fa-solid fa-house-chimney opacity-50 w-4"></i> REAL ESTATE</span>
         <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
     </a>
     <div class="flyout-menu">
         <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">PROPERTIES</div>
-        <a href="#404" class="flyout-item">Luxury & Premium</a>
-        <a href="#404" class="flyout-item">General</a>
-        <a href="#404" class="flyout-item">Commercial</a>
-        <a href="#404" class="flyout-item">Residential</a>
-        <a href="#404" class="flyout-item">Vacation/Rental</a>
-        <a href="#404" class="flyout-item">Modern & Startup</a>
-        <a href="#404" class="flyout-item">Portal</a>
-        <a href="#404" class="flyout-item">Others</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Luxury & Premium</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">General</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Commercial</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Residential</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Vacation/Rental</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Modern & Startup</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Portal</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Others</a>
     </div>
 </div>
 
 <div class="submenu-parent group/item">
-    <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+    <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
         <span class="flex items-center gap-2"><i class="fa-solid fa-bed opacity-50 w-4"></i> HOTEL</span>
         <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
     </a>
     <div class="flyout-menu">
         <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">STAY</div>
-        <a href="#404" class="flyout-item">Resort & Vacation</a>
-        <a href="#404" class="flyout-item">Luxury & Premium Style</a>
-        <a href="#404" class="flyout-item">Nature & Eco</a>
-        <a href="#404" class="flyout-item">Modern & Business</a>
-        <a href="#404" class="flyout-item">Boutique & Unique</a>
-        <a href="#404" class="flyout-item">Budget & Simple</a>
-        <a href="#404" class="flyout-item">Others</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Resort & Vacation</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Luxury & Premium Style</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Nature & Eco</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Modern & Business</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Boutique & Unique</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Budget & Simple</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Others</a>
     </div>
 </div>
 
 <div class="submenu-parent group/item">
-    <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+    <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
         <span class="flex items-center gap-2"><i class="fa-solid fa-pen-nib opacity-50 w-4"></i> BLOG</span>
         <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
     </a>
     <div class="flyout-menu">
         <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">TOPICS</div>
-        <a href="#404" class="flyout-item">Corporate</a>
-        <a href="#404" class="flyout-item">Travel & Life</a>
-        <a href="#404" class="flyout-item">Food & Health</a>
-        <a href="#404" class="flyout-item">Modern News</a>
-        <a href="#404" class="flyout-item">Finance</a>
-        <a href="#404" class="flyout-item">Education</a>
-        <a href="#404" class="flyout-item">Portfolio</a>
-        <a href="#404" class="flyout-item">Mininmal</a>
-        <a href="#404" class="flyout-item">Others</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Corporate</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Travel & Life</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Food & Health</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Modern News</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Finance</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Education</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Portfolio</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Mininmal</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Others</a>
     </div>
 </div>
 
 <div class="submenu-parent group/item">
-    <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+    <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
         <span class="flex items-center gap-2"><i class="fa-solid fa-graduation-cap opacity-50 w-4"></i> EDUCATION</span>
         <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
     </a>
     <div class="flyout-menu">
         <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">LEARNING</div>
-        <a href="#404" class="flyout-item">EduSpark</a>
-        <a href="#404" class="flyout-item">LearnSphere</a>
-        <a href="#404" class="flyout-item">Bright Future</a>
-        <a href="#404" class="flyout-item">Skillbridge</a>
-        <a href="#404" class="flyout-item">NextGen</a>
-        <a href="#404" class="flyout-item">Others</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">EduSpark</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">LearnSphere</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Bright Future</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Skillbridge</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">NextGen</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Others</a>
     </div>
 </div>
 
 <div class="submenu-parent group/item">
-    <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+    <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
         <span class="flex items-center gap-2"><i class="fa-solid fa-newspaper opacity-50 w-4"></i> NEWSPAPER</span>
         <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
     </a>
     <div class="flyout-menu">
         <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">NEWS DESK</div>
-        <a href="#404" class="flyout-item">Daily Pulse</a>
-        <a href="#404" class="flyout-item">Global Times</a>
-        <a href="#404" class="flyout-item">NextWave</a>
-        <a href="#404" class="flyout-item">The Update Hub</a>
-        <a href="#404" class="flyout-item">Prime Report</a>
-        <a href="#404" class="flyout-item">Headline Express</a>
-        <a href="#404" class="flyout-item">Insight News</a>
-        <a href="#404" class="flyout-item">Others</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Daily Pulse</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Global Times</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">NextWave</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">The Update Hub</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Prime Report</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Headline Express</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Insight News</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Others</a>
     </div>
 </div>
 
 <div class="submenu-parent group/item">
-    <a href="#404" role="menuitem" tabindex="0" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
+    <a href="portfolioframe-main/index.html" role="menuitem" tabindex="-1" class="flex items-center justify-between px-5 py-2.5 text-gray-900 text-[11px] font-black hover:bg-blue-50 border-b border-gray-50 transition-colors">
         <span class="flex items-center gap-2"><i class="fa-solid fa-camera opacity-50 w-4"></i> PHOTOGRAPHY</span>
         <i class="fa-solid fa-chevron-right text-[8px] opacity-30 group-hover/item:opacity-100"></i>
     </a>
     <div class="flyout-menu">
         <div class="px-5 py-3 text-[11px] font-black text-blue-600 border-b border-gray-200 bg-white">GALLERY</div>
-        <a href="#404" class="flyout-item">Wedding</a>
-        <a href="#404" class="flyout-item">Baby & Kids</a>
-        <a href="#404" class="flyout-item">Fashion</a>
-        <a href="#404" class="flyout-item">Studio Personal</a>
-        <a href="#404" class="flyout-item">General/Portfolio</a>
-        <a href="#404" class="flyout-item">Travel</a>
-        <a href="#404" class="flyout-item">Event</a>
-        <a href="#404" class="flyout-item">Food</a>
-        <a href="#404" class="flyout-item">Studio/Personal</a>
-        <a href="#404" class="flyout-item">Others</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Wedding</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Baby & Kids</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Fashion</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Studio Personal</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">General/Portfolio</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Travel</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Event</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Food</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Studio/Personal</a>
+        <a href="portfolioframe-main/index.html" class="flyout-item">Others</a>
     </div>
 </div>
      </div>
@@ -1722,10 +1556,10 @@ button:focus-visible,
         <div class="px-4 py-2 border-b border-gray-50 mb-1">
             <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">User Menu</p>
         </div>
-        <a href="#404" class="flex items-center gap-3 px-4 py-2.5 text-gray-700 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600 transition-colors">
+        <a href="portfolioframe-main/index.html" class="flex items-center gap-3 px-4 py-2.5 text-gray-700 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600 transition-colors">
             <i class="fa-solid fa-circle-user opacity-50 w-4 text-center"></i> ACCOUNT
         </a>
-        <a href="#404" class="flex items-center gap-3 px-4 py-2.5 text-gray-700 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600 transition-colors">
+        <a href="portfolioframe-main/index.html" class="flex items-center gap-3 px-4 py-2.5 text-gray-700 text-[11px] font-black hover:bg-blue-50 hover:text-blue-600 transition-colors">
             <i class="fa-solid fa-gear opacity-50 w-4 text-center"></i> SETTINGS
         </a>
         <div class="border-t border-gray-50 mt-1">
@@ -1739,9 +1573,9 @@ button:focus-visible,
         </div>
       </nav>
 
-      <div id="mobileMenu" class="hidden lg:hidden bg-[#06224C] text-white w-full border-b border-white/10 py-4 flex flex-col uppercase font-bold text-[11px] tracking-widest z-[9999] overflow-y-auto">
+      <div id="mobileMenu" class="lg:hidden bg-[#06224C] text-white w-full border-b border-white/10 flex flex-col font-bold text-[11px] tracking-widest z-[9999] overflow-y-auto transition-all duration-300 ease-in-out max-h-0 opacity-0 overflow-hidden">
   <a href="#home" onclick="toggleMobileMenu()" class="px-6 py-4 border-b border-white/5">Home</a>
-  <a href="#404" onclick="toggleMobileMenu()" class="px-6 py-4 border-b border-white/5">About Us</a>
+  <a href="portfolioframe-main/index.html" onclick="toggleMobileMenu()" class="px-6 py-4 border-b border-white/5">About</a>
 
   <div class="mobile-accordion-item">
     <button onclick="toggleMobileSection('mob-products')" class="w-full flex justify-between items-center px-6 py-4 border-b border-white/5 bg-white/5" type="button">
@@ -1749,10 +1583,10 @@ button:focus-visible,
       <i class="fa-solid fa-plus text-[8px]" id="icon-mob-products" data-mobile-section-icon></i>
     </button>
     <div id="mob-products" class="hidden bg-[#051a3d] py-2 border-b border-white/5 mobile-menu-panel" data-mobile-section-panel>
-      <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Premium Templates</a>
-      <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">UI Kits</a>
-      <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">WordPress Themes</a>
-      <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Free Assets</a>
+      <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Premium Templates</a>
+      <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">UI Kits</a>
+      <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">WordPress Themes</a>
+      <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Free Assets</a>
     </div>
   </div>
 
@@ -1769,15 +1603,15 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-landing" data-mobile-sub-icon></i>
         </button>
         <div id="mob-landing" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Lead Generating</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Click-through Page</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Sales Page</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Product Page</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">App Page</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Pre-Launch Page</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Event Page</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Splash Page</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Lead Generating</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Click-through Page</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Sales Page</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Product Page</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">App Page</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Pre-Launch Page</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Event Page</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Splash Page</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
         </div>
       </div>
 
@@ -1787,12 +1621,12 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-dashboard" data-mobile-sub-icon></i>
         </button>
         <div id="mob-dashboard" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Admin Analytics</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Overview</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">User Profile</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Sales</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Marketing</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Finance</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Admin Analytics</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Overview</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">User Profile</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Sales</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Marketing</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Finance</a>
         </div>
       </div>
 
@@ -1802,12 +1636,12 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-portfolio" data-mobile-sub-icon></i>
         </button>
         <div id="mob-portfolio" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Designer</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Developer</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Agency</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Minimal</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Personal</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Freelancer</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Designer</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Developer</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Agency</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Minimal</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Personal</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Freelancer</a>
         </div>
       </div>
 
@@ -1817,11 +1651,11 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-food" data-mobile-sub-icon></i>
         </button>
         <div id="mob-food" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Burger House</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Pizza Corner</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Fresh & Natural</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Food Stories</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Burger House</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Pizza Corner</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Fresh & Natural</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Food Stories</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
         </div>
       </div>
 
@@ -1831,13 +1665,13 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-travel" data-mobile-sub-icon></i>
         </button>
         <div id="mob-travel" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Adventure</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Luxury</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Leisure</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Solo Trip</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Family</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Group</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Adventure</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Luxury</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Leisure</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Solo Trip</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Family</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Group</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
         </div>
       </div>
 
@@ -1847,14 +1681,14 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-realestate" data-mobile-sub-icon></i>
         </button>
         <div id="mob-realestate" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Luxury & Premium</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">General</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Commercial</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Residential</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Vacation/Rental</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Modern & Startup</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Portal</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Luxury & Premium</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">General</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Commercial</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Residential</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Vacation/Rental</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Modern & Startup</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Portal</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
         </div>
       </div>
 
@@ -1864,13 +1698,13 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-hotel" data-mobile-sub-icon></i>
         </button>
         <div id="mob-hotel" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Resort & Vacation</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Luxury & Premium Style</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Nature & Eco</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Modern & Business</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Boutique & Unique</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Budget & Simple</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Resort & Vacation</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Luxury & Premium Style</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Nature & Eco</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Modern & Business</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Boutique & Unique</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Budget & Simple</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
         </div>
       </div>
 
@@ -1880,15 +1714,15 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-blog" data-mobile-sub-icon></i>
         </button>
         <div id="mob-blog" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Corporate</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Travel & Life</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Food & Health</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Modern News</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Finance</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Education</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Portfolio</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Mininmal</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Corporate</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Travel & Life</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Food & Health</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Modern News</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Finance</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Education</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Portfolio</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Mininmal</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
         </div>
       </div>
 
@@ -1898,12 +1732,12 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-education" data-mobile-sub-icon></i>
         </button>
         <div id="mob-education" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">EduSpark</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Learn Sphere</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Bright Future</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Skill Bridge</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">NextGen</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">EduSpark</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Learn Sphere</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Bright Future</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Skill Bridge</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">NextGen</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
         </div>
       </div>
 
@@ -1913,15 +1747,15 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-news" data-mobile-sub-icon></i>
         </button>
         <div id="mob-news" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Daily Pulse</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Global Times</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">NextWave</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">The Update Hub</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Prime Report</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Headline Express</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Insight News</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Minimal</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Daily Pulse</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Global Times</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">NextWave</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">The Update Hub</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Prime Report</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Headline Express</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Insight News</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Minimal</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
         </div>
       </div>
 
@@ -1931,16 +1765,16 @@ button:focus-visible,
           <i class="fa-solid fa-plus text-[8px]" id="icon-mob-photo" data-mobile-sub-icon></i>
         </button>
         <div id="mob-photo" class="hidden bg-[#051a3d] py-2 border-b border-white/5" data-mobile-sub-panel>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Wedding</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Baby & Kids</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Fashion</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Studio Personal</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">General/Portfolio</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Travel</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Event</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Food</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Studio/Personal</a>
-          <a href="#404" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Wedding</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Baby & Kids</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Fashion</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Studio Personal</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">General/Portfolio</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Travel</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Event</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Food</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Studio/Personal</a>
+          <a href="portfolioframe-main/index.html" class="block px-14 py-3 text-[10px] text-gray-300">Others</a>
         </div>
       </div>
     </div>
@@ -1953,12 +1787,7 @@ button:focus-visible,
     <div id="searchBarContainer" class="invisible opacity-0 fixed left-0 w-full">
       <div class="max-w-7xl mx-auto px-4 md:px-8 py-2">
         <form onsubmit="handleSearch(event)" class="flex items-center border border-gray-300 rounded-lg bg-gray-50 overflow-hidden">
-         <input 
-  type="text" 
-  id="searchInput" 
-  placeholder="What are you looking for?" 
-  class="flex-grow min-w-0 pl-3 md:pl-5 pr-1 py-3 bg-transparent outline-none text-gray-700 text-[10px] md:text-sm"
->
+          <input type="text" id="searchInput" placeholder="What are you looking for?" class="flex-grow px-5 py-3 bg-transparent outline-none text-gray-700 text-sm">
           <button type="submit" class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 border-l border-gray-300 transition">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
@@ -1986,7 +1815,7 @@ button:focus-visible,
 
         <div class="relative z-20 w-full px-8 md:pl-20 pt-12 pb-4 md:pb-16 flex flex-col items-center md:items-start justify-end min-h-[400px] md:min-h-[500px]" tabindex="-1">
           <h1 class="text-4xl md:text-6xl font-black text-[#0A2357] leading-tight mb-auto" tabindex="-1"></h1>
-          <button onclick="location.hash='404'" class="mb-4 md:mb-0 bg-[#0A2357] text-white px-7 py-3 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-blue-900 shadow-lg w-fit transition active:scale-95" type="button">
+          <button onclick="window.location.href='portfolioframe-main/index.html'" class="mb-4 md:mb-0 bg-[#0A2357] text-white px-7 py-3 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-blue-900 shadow-lg w-fit transition active:scale-95" type="button">
             Get Started
             <span class="bg-white text-[#0A2357] rounded-full w-5 h-5 flex items-center justify-center text-[10px]" aria-hidden="true">
               <i class="fa-solid fa-play"></i>
@@ -2025,8 +1854,8 @@ button:focus-visible,
             <div class="p-6 text-center">
               <h3 class="font-bold text-base md:text-lg text-gray-800 uppercase tracking-tight">Portfolio</h3>
               <div class="mt-4 flex justify-center gap-6 text-[10px] font-black text-blue-600 uppercase underline">
-                <a href="#404">Edit</a>
-                <a href="#404">Preview</a>
+                <a href="portfolioframe-main/index.html">Edit</a>
+                <a href="portfolioframe-main/index.html">Preview</a>
               </div>
             </div>
           </div>
@@ -2038,8 +1867,8 @@ button:focus-visible,
             <div class="p-6 text-center">
               <h3 class="font-bold text-base md:text-lg text-gray-800 uppercase tracking-tight">E-Commerce Templates</h3>
               <div class="mt-4 flex justify-center gap-6 text-[10px] font-black text-blue-600 uppercase underline">
-                <a href="#404">Edit</a>
-                <a href="#404">Preview</a>
+                <a href="portfolioframe-main/index.html">Edit</a>
+                <a href="portfolioframe-main/index.html">Preview</a>
               </div>
             </div>
           </div>
@@ -2051,8 +1880,8 @@ button:focus-visible,
             <div class="p-6 text-center">
               <h3 class="font-bold text-base md:text-lg text-gray-800 uppercase tracking-tight">Digital Marketing Templates</h3>
               <div class="mt-4 flex justify-center gap-6 text-[10px] font-black text-blue-600 uppercase underline">
-                <a href="#404">Edit</a>
-                <a href="#404">Preview</a>
+                <a href="portfolioframe-main/index.html">Edit</a>
+                <a href="portfolioframe-main/index.html">Preview</a>
               </div>
             </div>
           </div>
@@ -2064,8 +1893,8 @@ button:focus-visible,
             <div class="p-6 text-center">
               <h3 class="font-bold text-base md:text-lg text-gray-800 uppercase tracking-tight">Blogging</h3>
               <div class="mt-4 flex justify-center gap-6 text-[10px] font-black text-blue-600 uppercase underline">
-                <a href="#404">Edit</a>
-                <a href="#404">Preview</a>
+                <a href="portfolioframe-main/index.html">Edit</a>
+                <a href="portfolioframe-main/index.html">Preview</a>
               </div>
             </div>
           </div>
@@ -2077,8 +1906,8 @@ button:focus-visible,
             <div class="p-6 text-center">
               <h3 class="category-card-title font-bold text-base md:text-lg text-gray-800 uppercase tracking-tight">Construction Themes</h3>
               <div class="mt-4 flex justify-center gap-6 text-[10px] font-black text-blue-600 uppercase underline">
-                <a href="#404">Edit</a>
-                <a href="#404">Preview</a>
+                <a href="portfolioframe-main/index.html">Edit</a>
+                <a href="portfolioframe-main/index.html">Preview</a>
               </div>
             </div>
           </div>
@@ -2091,7 +1920,7 @@ button:focus-visible,
               <h3 class="category-card-title font-bold text-base md:text-lg text-gray-800 uppercase tracking-tight">Food Restaurant</h3>
               <div class="mt-4 flex justify-center gap-6 text-[10px] font-black text-blue-600 uppercase underline">
                 <a href="#">Edit</a>
-                <a href="#404">Preview</a>
+                <a href="portfolioframe-main/index.html">Preview</a>
               </div>
             </div>
           </div>
@@ -2109,9 +1938,9 @@ button:focus-visible,
             <div class="px-2 flex-grow flex flex-col">
               <div class="flex justify-between items-start mb-1 gap-2">
                 <h4 class="product-card-title text-xl font-bold text-[#06224C]">ShopNest</h4>
-                <button type="button" onclick="toggleHeart(this, 'ShopNest', 29, 'public/shopnest.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0" aria-label="Add ShopNest to wishlist">
-    <i class="fa-regular fa-heart text-2xl"></i>
-</button>
+                <div onclick="toggleHeart(this, 'ShopNest', 29, 'public/shopnest.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0" role="button" aria-label="Add ShopNest to wishlist">
+                  <i class="fa-regular fa-heart text-2xl"></i>
+                </div>
               </div>
               <p class="text-xs italic text-gray-500 mb-4">E-commerce Website</p>
               <div class="price-rating-row mb-6 mt-auto">
@@ -2146,10 +1975,9 @@ button:focus-visible,
             <div class="px-2 flex-grow flex flex-col">
               <div class="flex justify-between items-start mb-1 gap-2">
                 <h4 class="product-card-title text-xl font-bold text-[#06224C]">BuySphere</h4>
-                <button type="button" onclick="toggleHeart(this, 'BuySphere', 10, 'public/buysphere.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0" aria-label="Add BuySphere to wishlist">
+                <div onclick="toggleHeart(this, 'BuySphere', 10, 'public/buysphere.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0" role="button" aria-label="Add BuySphere to wishlist">
                   <i class="fa-regular fa-heart text-2xl"></i>
-                </button>
-
+                </div>
               </div>
               <p class="text-xs italic text-gray-500 mb-4">Template Website</p>
               <div class="price-rating-row mb-6 mt-auto">
@@ -2184,9 +2012,9 @@ button:focus-visible,
             <div class="px-2 flex-grow flex flex-col">
               <div class="flex justify-between items-start mb-1 gap-2">
                 <h4 class="product-card-title text-xl font-bold text-[#06224C]">TurboCart</h4>
-                <button onclick="toggleHeart(this, 'TurboCart', 35, 'public/turbocart.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0" aria-label="Add TurboCart to wishlist">
+                <div onclick="toggleHeart(this, 'TurboCart', 35, 'public/turbocart.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0" role="button" aria-label="Add TurboCart to wishlist">
                   <i class="fa-regular fa-heart text-2xl"></i>
-                </button>
+                </div>
               </div>
               <p class="text-xs italic text-gray-500 mb-4">Template Website</p>
               <div class="price-rating-row mb-6 mt-auto">
@@ -2221,10 +2049,9 @@ button:focus-visible,
             <div class="px-2 flex-grow flex flex-col">
               <div class="flex justify-between items-start mb-1 gap-2">
                 <h4 class="product-card-title text-xl font-bold text-[#06224C]">MegaBasket</h4>
-                <button type="button" onclick="toggleHeart(this, 'MegaBasket', 29, 'public/megabasket.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0" aria-label="Add MegaBasket to wishlist">
+                <div onclick="toggleHeart(this, 'MegaBasket', 29, 'public/megabasket.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0" role="button" aria-label="Add MegaBasket to wishlist">
                   <i class="fa-regular fa-heart text-2xl"></i>
-                </button>
-
+                </div>
               </div>
               <p class="text-xs italic text-gray-500 mb-4">Template Website</p>
               <div class="price-rating-row mb-6 mt-auto">
@@ -2259,10 +2086,9 @@ button:focus-visible,
             <div class="px-2 flex-grow flex flex-col">
               <div class="flex justify-between items-start mb-1 gap-2">
                 <h4 class="product-card-title text-xl font-bold text-[#06224C]">NexaStore</h4>
-                <button type="button" onclick="toggleHeart(this, 'NexaStore', 10, 'public/nexastore1.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0"  aria-label="Add NexaStore to wishlist">
+                <div onclick="toggleHeart(this, 'NexaStore', 10, 'public/nexastore1.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0" role="button" aria-label="Add NexaStore to wishlist">
                   <i class="fa-regular fa-heart text-2xl"></i>
-                </button>
-
+                </div>
               </div>
               <p class="text-xs italic text-gray-500 mb-4">Template Website</p>
               <div class="price-rating-row mb-6 mt-auto">
@@ -2297,10 +2123,9 @@ button:focus-visible,
             <div class="px-2 flex-grow flex flex-col">
               <div class="flex justify-between items-start mb-1 gap-2">
                 <h4 class="product-card-title text-xl font-bold text-[#06224C]">SampleStore</h4>
-                <button type="button" onclick="toggleHeart(this, 'SampleStore', 35, 'public/samplestore.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0"  aria-label="Add SampleStore to wishlist">
+                <div onclick="toggleHeart(this, 'SampleStore', 35, 'public/samplestore.webp')" class="wishlist-btn p-1 cursor-pointer flex-shrink-0" role="button" aria-label="Add SampleStore to wishlist">
                   <i class="fa-regular fa-heart text-2xl"></i>
-                </button>
-
+                </div>
               </div>
               <p class="text-xs italic text-gray-500 mb-4">Template Website</p>
               <div class="price-rating-row mb-6 mt-auto">
@@ -2355,24 +2180,24 @@ button:focus-visible,
             <div id="template-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
               <div class="template-category-card group block" data-cat="portfolio" style="display: none;" inert>
     <div class="rounded-2xl overflow-hidden shadow-md mb-4 aspect-[4/3] bg-gray-50 relative">
-        <img src="public/port.webp" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Classic Portfolio Template Preview">
+        <img src="public/port.webp" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
         <div class="absolute top-4 left-4">
             <span class="bg-green-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">Free</span>
         </div>
     </div>
     <div class="px-1">
         <h3 class="text-xl font-black text-[#06224C]">Classic Portfolio</h3>
-        <p class="text-sm text-gray-500 mt-2">Perfect for beginners and individual creators.</p>
+        <p class="text-xs text-gray-500 mt-2">Perfect for beginners and individual creators.</p>
         <div class="flex gap-3 mt-4">
             <button onclick="openTemplatePreview('Classic Portfolio', 'public/port.webp')" class="flex-1 border-2 border-dashed border-blue-400 rounded-xl text-blue-500 text-sm font-bold py-2.5 hover:bg-blue-50 transition">View</button>
-            <button onclick="location.hash='404'" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-2.5 hover:bg-blue-900 transition">Edit</button>
+            <button onclick="window.location.href='portfolioframe-main/index.html'" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-2.5 hover:bg-blue-900 transition">Edit</button>
         </div>
     </div>
 </div>
 
 <div class="template-category-card group block" data-cat="portfolio" style="display: none;" inert>
     <div class="rounded-2xl overflow-hidden shadow-md mb-4 aspect-[4/3] bg-gray-50 relative">
-        <img src="public/portfolio03.webp" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Agency Pro Template Preview">
+        <img src="public/portfolio03.webp" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
         <div class="absolute top-4 left-4">
             <span class="bg-yellow-400 text-[#06224C] text-[10px] font-black px-3 py-1 rounded-full uppercase shadow-sm">Premium</span>
         </div>
@@ -2382,27 +2207,27 @@ button:focus-visible,
             <h3 class="text-xl font-black text-[#06224C]">Agency Pro</h3>
             <span class="text-sm font-bold text-blue-600">$19</span>
         </div>
-        <p class="text-sm text-gray-500 mt-2">A high-end showcase for design and tech teams.</p>
+        <p class="text-xs text-gray-500 mt-2">A high-end showcase for design and tech teams.</p>
         <div class="flex gap-3 mt-4">
-            <button onclick="openTemplatePreview('Agency Pro', 'public/portfolio03.webp')" class="flex-1 border-2 border-dashed border-blue-400 rounded-xl text-blue-500 text-sm font-bold py-2.5 hover:bg-blue-50 transition">Preview</button>
-            <button onclick="location.hash='404'" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-2.5 hover:bg-blue-900 transition">Buy</button>
+            <button onclick="openTemplatePreview('Agency Pro', 'public/portfolio03.webp')" class="flex-1 border-2 border-dashed border-blue-400 rounded-xl text-blue-500 text-sm font-bold py-2.5 hover:bg-blue-50 transition">PreView</button>
+            <button onclick="window.location.href='portfolioframe-main/index.html'" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-2.5 hover:bg-blue-900 transition">Buy</button>
         </div>
     </div>
 </div>
 
 <div class="template-category-card group block" data-cat="portfolio" style="display: none;" inert>
     <div class="rounded-2xl overflow-hidden shadow-md mb-4 aspect-[4/3] bg-gray-50 relative">
-        <img src="public/portfolio04.webp" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Minimal Studio Template Preview">
+        <img src="public/portfolio04.webp" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
         <div class="absolute top-4 left-4">
             <span class="bg-green-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">Free</span>
         </div>
     </div>
     <div class="px-1">
         <h3 class="text-xl font-black text-[#06224C]">Minimal Studio</h3>
-        <p class="text-sm text-gray-500 mt-2">Clean, white-space focused layout for artists.</p>
+        <p class="text-xs text-gray-500 mt-2">Clean, white-space focused layout for artists.</p>
         <div class="flex gap-3 mt-4">
             <button onclick="openTemplatePreview('Minimal Studio', 'public/portfolio04.webp')" class="flex-1 border-2 border-dashed border-blue-400 rounded-xl text-blue-500 text-sm font-bold py-2.5 hover:bg-blue-50 transition">View</button>
-            <button onclick="location.hash='404'" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-2.5 hover:bg-blue-900 transition">Edit</button>
+            <button onclick="window.location.href='portfolioframe-main/index.html'" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-2.5 hover:bg-blue-900 transition">Edit</button>
         </div>
     </div>
 </div>
@@ -2424,8 +2249,8 @@ button:focus-visible,
         Clean layout for storytellers and daily journals.
     </p>
     <div class="flex gap-3">
-        <a href="#404" class="flex-1 border-2 border-dashed border-blue-400 rounded-xl text-blue-500 text-sm font-bold py-3 hover:bg-blue-50 transition text-center">View</a>
-        <a href="#404" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-3 hover:bg-blue-900 transition text-center">Edit</a>
+        <a href="portfolioframe-main/index.html" class="flex-1 border-2 border-dashed border-blue-400 rounded-xl text-blue-500 text-sm font-bold py-3 hover:bg-blue-50 transition text-center">View</a>
+        <a href="portfolioframe-main/index.html" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-3 hover:bg-blue-900 transition text-center">Edit</a>
     </div>
 </div>
 </div>
@@ -2448,8 +2273,8 @@ button:focus-visible,
         Professional layout for tech news and reviews.
     </p>
     <div class="flex gap-3">
-        <a href="#404" class="flex-1 border-2 border-dashed border-blue-400 rounded-xl text-blue-500 text-sm font-bold py-3 hover:bg-blue-50 transition text-center">Preview</a>
-        <a href="#404" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-3 hover:bg-blue-900 transition text-center">Buy</a>
+        <a href="portfolioframe-main/index.html" class="flex-1 border-2 border-dashed border-blue-400 rounded-xl text-blue-500 text-sm font-bold py-3 hover:bg-blue-50 transition text-center">Preview</a>
+        <a href="portfolioframe-main/index.html" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-3 hover:bg-blue-900 transition text-center">Buy</a>
     </div>
 </div>
 </div>
@@ -2466,10 +2291,10 @@ button:focus-visible,
             <h3 class="text-xl font-black text-[#06224C]">Executive Plus</h3>
             <span class="text-sm font-bold text-blue-600">$29</span>
         </div>
-        <p class="text-sm text-gray-500 mt-2">Dark mode portfolio for executives and founders.</p>
+        <p class="text-xs text-gray-500 mt-2">Dark mode portfolio for executives and founders.</p>
         <div class="flex gap-3 mt-4">
             <button onclick="openTemplatePreview('Executive Plus', 'public/business09.webp')" class="flex-1 border-2 border-dashed border-blue-400 rounded-xl text-blue-500 text-sm font-bold py-2.5 hover:bg-blue-50 transition">Preview</button>
-            <button onclick="location.hash='404'" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-2.5 hover:bg-blue-900 transition">Buy</button>
+            <button onclick="window.location.href='portfolioframe-main/index.html'" class="flex-1 bg-[#06224C] text-white rounded-xl text-sm font-bold py-2.5 hover:bg-blue-900 transition">Buy</button>
         </div>
     </div>
 </div>
@@ -2569,11 +2394,10 @@ button:focus-visible,
         </div>
 
         <div class="w-full flex justify-center">
-            <button onclick="location.hash='404'" class=" bg-white text-[#005BC5] px-10 py-3.5 rounded-full font-black text-xs uppercase tracking-wider hover:bg-blue-50 transition shadow-xl active:scale-95" type="button">
+            <button onclick="window.location.href='portfolioframe-main/index.html'" class="w-full sm:w-auto bg-white text-[#005BC5] px-10 md:px-14 py-4 rounded-full font-black text-xs md:text-sm uppercase tracking-[0.2em] shadow-xl hover:bg-blue-50 transition active:scale-95 border border-white/20" type="button">
                 Get Started
             </button>
         </div>
-
         
     </div>
 </section>
@@ -2587,7 +2411,7 @@ button:focus-visible,
       <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-2">
         Create your site with our drag &amp; drop builder in 3 simple steps:
       </p>
-      <button onclick="location.hash='404'" class="mt-6 bg-[#2B2B2B] text-white px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-gray-800 transition shadow-lg active:scale-95" type="button">
+      <button onclick="window.location.href='portfolioframe-main/index.html'" class="mt-6 bg-[#2B2B2B] text-white px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-gray-800 transition shadow-lg active:scale-95" type="button">
         Get Started
       </button>
     </div>
@@ -2715,7 +2539,7 @@ button:focus-visible,
 </section>
 
         <section id="faq-section" class="mt-20 mb-20 px-4 max-w-7xl mx-auto reveal">
-  <h2 class="text-xs font-black text-[#0A2357] mb-10 uppercase tracking-[0.3em] border-l-4 border-blue-600 pl-3">
+  <h2 class="text-xs font-black text-[#0A2357] mb-10 uppercase tracking-[0.3em] border-l-8 border-blue-600 pl-3">
     Drag &amp; drop website builder FAQ
   </h2>
 
@@ -2755,7 +2579,7 @@ button:focus-visible,
 
       <div class="faq-item bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
         <button onclick="toggleFAQ(this)" class="w-full flex items-start justify-between p-5 md:p-6 text-left hover:bg-gray-50 transition-colors gap-4" type="button">
-          <h3 class="text-sm md:text-base font-bold text-[#06224C] pr-4 leading-snug">How much does Stackly drag &amp; drop Website Builder Cost?</h3>
+          <h3 class="text-sm md:text-base font-bold text-[#06224C] pr-4 leading-snug">How much does Stackly drag &amp; drop website Builder Cost?</h3>
           <i class="fa-solid fa-plus text-[#06224C] text-lg flex-shrink-0 transition-transform duration-300 mt-1"></i>
         </button>
         <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white">
@@ -2809,14 +2633,14 @@ button:focus-visible,
 
     
 <section class="my-8 md:my-12 px-2 sm:px-4 max-w-7xl mx-auto reveal">
-  <div class="w-full mx-auto bg-gradient-to-b bg-[#06224C] rounded-[2.5rem] md:rounded-[3.5rem] p-6 sm:p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
+  <div class="w-full mx-auto bg-gradient-to-b from-[#5B8FB9] to-[#A8D5E2] rounded-[2.5rem] md:rounded-[3.5rem] p-6 sm:p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
     <h2 class="text-2xl md:text-5xl font-black text-white leading-tight mb-3" style="font-family: Georgia, serif;">
       Drag &amp; drop your vision to life
     </h2>
     <p class="text-2xl md:text-4xl font-black text-white mb-8" style="font-family: Georgia, serif;">
       Your vision. Your goals. Your website.
     </p>
-    <button onclick="location.hash='404'" class="bg-white/100 text-[#06224C] px-10 py-3.5 rounded-full font-bold text-sm uppercase tracking-wider hover:bg-white transition shadow-xl active:scale-95" type="button">
+    <button onclick="window.location.href='portfolioframe-main/index.html'" class="bg-white/100 text-[#06224C] px-10 py-3.5 rounded-full font-bold text-sm uppercase tracking-wider hover:bg-white transition shadow-xl active:scale-95" type="button">
       Get Started
     </button>
     <div class="mt-12 flex items-center justify-center gap-2 text-sm text-white/100">
@@ -2828,106 +2652,84 @@ button:focus-visible,
 </section>
     
 
-   <footer class="bg-[#0A1E3D] py-10 md:py-12 w-full mt-auto">
+    <footer class="bg-[#0A1E3D] py-10 md:py-12 w-full mt-auto">
   <div class="max-w-7xl mx-auto px-4 md:px-8">
-
-    <!-- Top: Subscribe + HQ -->
     <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-6 border-b border-white/10 pb-6">
       <div class="w-full md:w-1/2">
         <h3 class="text-white font-black text-sm mb-4 uppercase tracking-wider">Subscribe to our Updates</h3>
-        <form class="w-full max-w-md md:max-w-md flex items-center bg-white rounded-full p-1 shadow-md overflow-hidden" aria-label="Subscribe to updates form" novalidate>
-  <div class="flex-grow relative flex items-center">
-    <label for="footerEmailInput" class="sr-only">Email address</label>
-    <!-- Icon inside input area -->
-    <i class="fa-solid fa-envelope absolute left-4 text-gray-400 pointer-events-none" aria-hidden="true"></i>
-    <input
-  type="email"
-  id="footerEmailInput"
-  name="email"
-  placeholder="Your email"
-  required
-  class="w-full pl-11 pr-2 py-2.5 bg-transparent text-gray-800 focus:outline-none min-w-0"
-  style="font-size: clamp(11px, 3vw, 14px);"
->
-  </div>
 
-  <!-- Button is now inside the white container -->
-  <button
-    type="submit"
-    aria-label="Subscribe with email"
-    class="bg-[#0A2357] text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-600 transition-all flex-shrink-0 mr-1 group"
-  >
-    <i class="fa-solid fa-paper-plane text-sm transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true"></i>
-  </button>
-</form>
+        <form class="max-w-md flex items-center gap-2" aria-label="Subscribe to updates form">
+          <div class="flex-grow relative">
+            <label for="footerEmailInput" class="sr-only">Email address</label>
+            <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true"></i>
+            <input
+              type="email"
+              id="footerEmailInput"
+              name="email"
+              placeholder="Your email"
+              aria-label="Email address"
+              autocomplete="email"
+              required
+              class="w-full pl-11 pr-4 py-3 rounded-full bg-white text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+          </div>
+
+          <button
+            type="submit"
+            aria-label="Subscribe with email"
+            class="text-white hover:text-blue-300 transition group"
+          >
+            <i class="fa-solid fa-paper-plane text-xl transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" aria-hidden="true"></i>
+          </button>
+        </form>
       </div>
 
       <div class="w-full md:w-auto md:text-right">
         <h3 class="text-white font-black text-sm mb-2 uppercase tracking-wider">Headquarters</h3>
         <p class="text-white/70 text-sm leading-relaxed">
-          MMR Complex, Salem,<br>Tamil Nadu 636008
+          MMR Complex, Salem,<br>
+          Tamil Nadu 636008
         </p>
       </div>
     </div>
 
-  
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+      <div>
+  <h4 class="text-white font-black text-sm mb-4 uppercase tracking-wider">Product</h4>
+  <ul class="space-y-2 text-sm text-white/70 font-medium">
+    <li><button type="button" onclick="openLegalModal('features')" class="hover:text-white transition focus:outline-none focus:text-blue-300">Features</button></li>
+    <li><button type="button" onclick="openLegalModal('templates')" class="hover:text-white transition focus:outline-none focus:text-blue-300">Templates</button></li>
+    <li><button type="button" onclick="openLegalModal('pricing')" class="hover:text-white transition focus:outline-none focus:text-blue-300">Pricing</button></li>
+    <li><button type="button" onclick="openLegalModal('changelog')" class="hover:text-white transition focus:outline-none focus:text-blue-300">Changelog</button></li>
+  </ul>
+</div>
 
       <div>
-        <h4 class="text-white font-black text-sm mb-4 uppercase tracking-wider">Product</h4>
-        <ul class="space-y-3 text-sm text-white/70 font-medium">
-          <li><button type="button" onclick="openLegalModal('features')" class="hover:text-white transition text-left focus:outline-none focus:text-blue-300 whitespace-nowrap">Features</button></li>
-          <li><button type="button" onclick="openLegalModal('templates')" class="hover:text-white transition text-left focus:outline-none focus:text-blue-300 whitespace-nowrap">Templates</button></li>
-          <li><button type="button" onclick="openLegalModal('pricing')" class="hover:text-white transition text-left focus:outline-none focus:text-blue-300 whitespace-nowrap">Pricing</button></li>
-          <li><button type="button" onclick="openLegalModal('changelog')" class="hover:text-white transition text-left focus:outline-none focus:text-blue-300 whitespace-nowrap">Changelog</button></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 class="text-white font-black text-sm mb-4 uppercase tracking-wider">Resources</h4>
-        <ul class="space-y-3 text-sm text-white/70 font-medium">
-          <li><button type="button" onclick="openLegalModal('documentation')" class="hover:text-white transition text-left focus:outline-none focus:text-blue-300 whitespace-nowrap">User Guide</button></li>
-          <!-- FIX: "API Reference" was wrapping. Use shorter label on mobile via two spans -->
-          <li>
-            <button type="button" onclick="openLegalModal('api')" class="hover:text-white transition text-left focus:outline-none focus:text-blue-300">
-              <span class="hidden sm:inline">API Reference</span>
-              <span class="sm:hidden">API Ref</span>
-            </button>
-          </li>
-          <li><button type="button" onclick="openLegalModal('blog')" class="hover:text-white transition text-left focus:outline-none focus:text-blue-300 whitespace-nowrap">Blog</button></li>
-          <li><button type="button" onclick="openLegalModal('status')" class="hover:text-white transition text-left focus:outline-none focus:text-blue-300 whitespace-nowrap">Status</button></li>
-        </ul>
-      </div>
+  <h4 class="text-white font-black text-sm mb-4 uppercase tracking-wider">Resources</h4>
+  <ul class="space-y-2 text-sm text-white/70 font-medium">
+    <li><button type="button" onclick="openLegalModal('documentation')" class="hover:text-white transition focus:outline-none focus:text-blue-300">Documentation</button></li>
+    <li><button type="button" onclick="openLegalModal('api')" class="hover:text-white transition focus:outline-none focus:text-blue-300">API Reference</button></li>
+    <li><button type="button" onclick="openLegalModal('blog')" class="hover:text-white transition focus:outline-none focus:text-blue-300">Blog</button></li>
+    <li><button type="button" onclick="openLegalModal('status')" class="hover:text-white transition focus:outline-none focus:text-blue-300">Status</button></li>
+  </ul>
+</div>
 
       <div>
         <h4 class="text-white font-black text-sm mb-4 uppercase tracking-wider">Company</h4>
-        <ul class="space-y-3 text-sm text-white/70 font-medium">
-          <li><a href="#about" class="hover:text-white transition whitespace-nowrap">About</a></li>
-          <!-- FIX: "Privacy Policy" and "Terms of Service" were wrapping on mobile -->
-          <li>
-            <button onclick="openLegalModal('privacy')" class="hover:text-white transition text-left" type="button">
-              <span class="hidden sm:inline">Privacy Policy</span>
-              <span class="sm:hidden">Privacy Policy</span>
-            </button>
-          </li>
-          <li>
-            <button onclick="openLegalModal('terms')" class="hover:text-white transition text-left" type="button">
-              <span class="hidden sm:inline">Terms of Service</span>
-              <span class="sm:hidden">Terms Of Service</span>
-            </button>
-          </li>
-          <li><a href="javascript:void(0)" onclick="openContactModal()" class="hover:text-white transition whitespace-nowrap">Contact</a></li>
+        <ul class="space-y-2 text-sm text-white/70 font-medium">
+          <li><a href="#about" class="hover:text-white transition">About</a></li>
+          <li><button onclick="openLegalModal('privacy')" class="hover:text-white transition text-left" type="button">Privacy Policy</button></li>
+          <li><button onclick="openLegalModal('terms')" class="hover:text-white transition text-left" type="button">Terms of Service</button></li>
+          <li><a href="javascript:void(0)" onclick="openContactModal()" class="hover:text-white transition">Contact</a></li>
         </ul>
       </div>
 
-      <!-- FIX: Logo column spans full width on mobile, 1 col on md -->
-      <div class="col-span-2 md:col-span-1 flex flex-col items-start md:items-start mt-2 md:mt-0">
-        <a href="#home" id="footerLogo" aria-label="Go to Stackly Home"
-           class="bg-white px-4 py-3 rounded-[60%] inline-flex items-center justify-center shadow-md transition hover:scale-105 min-w-[90px] aspect-[2/1] mb-4 cursor-pointer">
+      <div class="col-span-2 md:col-span-1">
+        <a href="#home" id="footerLogo" aria-label="Go to Stackly Home" class="bg-white px-4 py-3 rounded-[60%] inline-flex items-center justify-center shadow-md transition hover:scale-105 min-w-[90px] aspect-[2/1] mb-6 cursor-pointer">
           <img src="public/stackly-logo.webp" alt="Stackly Logo" class="h-5 w-auto object-contain" decoding="async">
         </a>
-        <p class="text-[11px] text-white/70 leading-relaxed uppercase font-bold tracking-tight mb-2 max-w-[215px]">
-          The <span class="text-blue-400">NO-CODE</span> website builder for everyone.Powered by AWS.
+        <p class="text-[11px] text-white/70 leading-relaxed uppercase font-bold tracking-tight mb-2">
+          The <span class="text-blue-400">NO-CODE</span> website builder for everyone. Powered by AWS.
         </p>
         <p class="text-[10px] text-white/40 uppercase font-medium">
           Infrastructure built by the Stackly team.
@@ -2935,49 +2737,40 @@ button:focus-visible,
       </div>
     </div>
 
-    <!-- Bottom: Social icons + Legal links -->
-    <div class="pt-5 border-t border-white/10">
-      <div class="flex flex-col items-center gap-6 lg:flex-row lg:justify-between">
-
-        <!-- FIX: Force all 6 icons into a single row on mobile using fixed small size -->
-        <div class="flex items-center justify-center gap-2 flex-wrap w-full lg:w-auto lg:justify-start">
-          <a href="https://www.facebook.com/thestackly/" target="_blank" rel="noreferrer" aria-label="Visit our Facebook page"
-             class="w-7 h-7 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all duration-300 flex-shrink-0">
-            <i class="fa-brands fa-facebook-f text-xs md:text-sm"></i>
-          </a>
-          <a href="https://www.youtube.com/@TheStackly" target="_blank" rel="noreferrer" aria-label="Visit our YouTube channel"
-             class="w-7 h-7 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center hover:bg-red-600 hover:text-white transition-all duration-300 flex-shrink-0">
-            <i class="fa-brands fa-youtube text-xs md:text-sm"></i>
-          </a>
-          <a href="https://www.instagram.com/the_stackly" target="_blank" rel="noreferrer" aria-label="Follow us on Instagram"
-             class="w-7 h-7 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center hover:bg-pink-500 hover:text-white transition-all duration-300 flex-shrink-0">
-            <i class="fa-brands fa-instagram text-xs md:text-sm"></i>
-          </a>
-          
-          <a href="https://x.com/The_Stackly" target="_blank" rel="noreferrer" aria-label="Follow us on X (formerly Twitter)"
-             class="w-7 h-7 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300 flex-shrink-0">
-            <i class="fa-brands fa-x-twitter text-xs md:text-sm"></i>
-          </a>
-          <a href="https://in.linkedin.com/company/the-stackly/" target="_blank" rel="noreferrer" aria-label="Visit our LinkedIn company page"
-             class="w-7 h-7 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center hover:bg-blue-700 hover:text-white transition-all duration-300 flex-shrink-0">
-            <i class="fa-brands fa-linkedin-in text-xs md:text-sm"></i>
-          </a>
-          <a href="https://www.thestackly.com/" target="_blank" rel="noreferrer" aria-label="Visit Official Website"
-     class="w-7 h-7 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all duration-300 flex-shrink-0">
-    <i class="fa-solid fa-globe text-xs md:text-sm text-[#0A1E3D] hover:text-white"></i>
-  </a>
+   <div class="pt-8 border-t border-white/10">
+    <!-- This container manages the horizontal split on desktop (lg:flex-row) -->
+    <div class="flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-8">
+        
+        <!-- Social Icons Group: Removed w-full to allow justify-between to work -->
+        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Visit our Facebook page" class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all duration-300">
+                <i class="fa-brands fa-facebook-f text-sm"></i>
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="Visit our YouTube channel" class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-red-600 hover:text-white transition-all duration-300">
+                <i class="fa-brands fa-youtube text-sm"></i>
+            </a>
+            <a href="https://www.instagram.com/thestackly" target="_blank" rel="noreferrer" aria-label="Follow us on Instagram" class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 hover:text-white transition-all duration-300">
+                <i class="fa-brands fa-instagram text-sm"></i>
+            </a>
+            <a href="https://pinterest.com" target="_blank" rel="noreferrer" aria-label="Follow us on Pinterest" class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-red-700 hover:text-white transition-all duration-300">
+                <i class="fa-brands fa-pinterest text-sm"></i>
+            </a>
+            <a href="https://x.com/The_Stackly" target="_blank" rel="noreferrer" aria-label="Follow us on X (formerly Twitter)" class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">
+                <i class="fa-brands fa-x-twitter text-sm"></i>
+            </a>
+            <a href="https://in.linkedin.com/company/the-stackly.com" target="_blank" rel="noreferrer" aria-label="Visit our LinkedIn company page" class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-blue-700 hover:text-white transition-all duration-300">
+                <i class="fa-brands fa-linkedin-in text-sm"></i>
+            </a>
         </div>
 
-        <!-- FIX: Terms/Privacy/Copyright stack neatly centered on mobile, right-aligned on desktop -->
-        <div class="flex flex-col items-center gap-3 lg:flex-row lg:gap-6 text-[10px] font-bold text-white/50 uppercase tracking-widest w-full lg:w-auto">
-          <button onclick="openLegalModal('terms')" class="hover:text-white transition whitespace-nowrap" type="button">Terms of Use</button>
-          <button onclick="openLegalModal('privacy')" class="hover:text-white transition whitespace-nowrap" type="button">Privacy Policy</button>
-          <span class="whitespace-nowrap text-center">© 2018-2026 TheStackly.com INC</span>
+        <!-- Links Group: Will now sit to the right of icons on desktop -->
+        <div class="flex flex-wrap justify-center items-center gap-6 text-[10px] font-bold text-white/50 uppercase tracking-widest">
+            <button onclick="openLegalModal('terms')" class="hover:text-white transition text-left" type="button">Terms of Use</button>
+            <button onclick="openLegalModal('privacy')" class="hover:text-white transition text-left" type="button">Privacy Policy</button>
+            <span class="whitespace-nowrap">© 2018-2026 TheStackly.com INC</span>
         </div>
-
-      </div>
     </div>
-
+</div>
   </div>
 </footer>
 
@@ -3011,7 +2804,7 @@ button:focus-visible,
         <span class="text-gray-500 font-bold uppercase text-xs tracking-widest">Subtotal</span>
         <span id="cartTotal" class="text-xl font-black text-[#06224C]">$0.00</span>
       </div>
-      <button onclick="location.hash='404'" class="w-full bg-[#0A2357] text-white py-4 rounded-xl font-black uppercase text-xs tracking-[0.2em] hover:bg-blue-900 transition shadow-lg active:scale-95" type="button">
+      <button onclick="window.location.href='portfolioframe-main/index.html'" class="w-full bg-[#0A2357] text-white py-4 rounded-xl font-black uppercase text-xs tracking-[0.2em] hover:bg-blue-900 transition shadow-lg active:scale-95" type="button">
         Checkout Now
       </button>
     </div>
@@ -3038,7 +2831,7 @@ button:focus-visible,
 
   <div id="cartBackdrop" onclick="closePanels()" class="fixed inset-0 bg-black/50 opacity-0 invisible z-[9998] transition-opacity duration-300"></div>
 
-  
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[20000] flex flex-col gap-3"></div>
   <div id="rating-live-region" aria-live="assertive" aria-atomic="true" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;"></div>
 
   <div id="portfolioModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 md:p-10">
@@ -3076,31 +2869,31 @@ button:focus-visible,
           <div class="flex flex-col gap-8">
             <h3 class="text-xs font-black text-blue-600 uppercase tracking-[0.2em]">Available Downloads</h3>
 
-            <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 p-4 sm:p-5 border-2 border-dashed border-gray-100 rounded-[1.5rem] hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
-    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 shadow-sm flex-shrink-0">
-        <i class="fa-solid fa-file-pdf text-xl sm:text-2xl"></i>
-    </div>
-    <div class="flex-grow text-center sm:text-left min-w-0">
-        <p class="font-black text-[#06224C] text-sm sm:text-base break-words truncate sm:whitespace-normal">Project_Case_Study.pdf</p>
-        <p class="text-[9px] sm:text-[10px] text-gray-400 font-bold uppercase">Size: 4.8 MB • PDF Format</p>
-    </div>
-    <a href="public/docs/case-study.pdf" download class="w-full sm:w-auto bg-[#06224C] text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase hover:scale-105 transition active:scale-95 shadow-md text-center">
-        Download
-    </a>
-</div>
+            <div class="flex items-center gap-5 p-5 border-2 border-dashed border-gray-100 rounded-[1.5rem] hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
+              <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 shadow-sm">
+                <i class="fa-solid fa-file-pdf text-2xl"></i>
+              </div>
+              <div class="flex-grow">
+                <p class="font-black text-[#06224C]">Project_Case_Study.pdf</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase">Size: 4.8 MB • PDF Format</p>
+              </div>
+              <a href="public/docs/case-study.pdf" download class="bg-[#06224C] text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase hover:scale-105 transition active:scale-95 shadow-md">
+                Download
+              </a>
+            </div>
 
-<div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 p-4 sm:p-5 border-2 border-dashed border-gray-100 rounded-[1.5rem] hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
-    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 shadow-sm flex-shrink-0">
-        <i class="fa-solid fa-file-invoice text-xl sm:text-2xl"></i>
-    </div>
-    <div class="flex-grow text-center sm:text-left min-w-0">
-        <p class="font-black text-[#06224C] text-sm sm:text-base break-words truncate sm:whitespace-normal">Design_Asset_Guide.pdf</p>
-        <p class="text-[9px] sm:text-[10px] text-gray-400 font-bold uppercase">Size: 1.2 MB • PDF Format</p>
-    </div>
-    <a href="public/docs/assets-guide.pdf" download class="w-full sm:w-auto bg-[#06224C] text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase hover:scale-105 transition active:scale-95 shadow-md text-center">
-        Download
-    </a>
-</div>
+            <div class="flex items-center gap-5 p-5 border-2 border-dashed border-gray-100 rounded-[1.5rem] hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
+              <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 shadow-sm">
+                <i class="fa-solid fa-file-invoice text-2xl"></i>
+              </div>
+              <div class="flex-grow">
+                <p class="font-black text-[#06224C]">Design_Assets_Guide.pdf</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase">Size: 1.2 MB • PDF Format</p>
+              </div>
+              <a href="public/docs/assets-guide.pdf" download class="bg-[#06224C] text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase hover:scale-105 transition active:scale-95 shadow-md">
+                Download
+              </a>
+            </div>
 
             <div class="mt-4 p-6 bg-blue-600 rounded-[1.5rem] text-white shadow-xl flex items-center justify-between group cursor-pointer" onclick="window.open('https://behance.net', '_blank')">
               <div>
@@ -3115,9 +2908,9 @@ button:focus-visible,
     </div>
   </div>
 
-  <div id="templatePreviewModal" class="fixed inset-0 z-[10000] hidden flex items-center  justify-center p-4">
+  <div id="templatePreviewModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4">
     <div onclick="closeTemplatePreview()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-    <div class="bg-white w-full  max-w-5xl max-h-[90vh] rounded-3xl relative z-10 overflow-y-auto shadow-2xl">
+    <div class="bg-white w-full max-w-5xl max-h-[90vh] rounded-3xl relative z-10 overflow-hidden shadow-2xl">
       <div class="p-6 border-b flex justify-between items-center bg-gray-50">
         <h3 id="previewTitle" class="text-xl font-black text-[#06224C]">Template Preview</h3>
         <button onclick="closeTemplatePreview()" class="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center hover:bg-red-500 hover:text-white transition-all" type="button">
@@ -3139,76 +2932,41 @@ button:focus-visible,
     </div>
   </div>
 
-  <div id="contactModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-3 sm:p-4">
-  <div onclick="closeContactModal()" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-  
-  <div class="relative z-10 bg-white w-full max-w-xl rounded-[2rem] shadow-2xl flex flex-col"
-       style="max-height: 90vh; max-height: 90dvh;">
-
-    <!-- Header: fixed, never scrolls -->
-    <div class="p-4 sm:p-6 md:p-8 border-b flex items-start justify-between gap-3 flex-shrink-0">
-      <div class="min-w-0 flex-1">
-        <h3 class="text-base sm:text-xl font-black text-[#06224C] uppercase tracking-widest leading-tight">
-          Contact Stackly
-        </h3>
-        <p class="text-[10px] sm:text-xs text-gray-500 font-bold uppercase tracking-wide mt-1 leading-snug">
-          We'd love to hear from you
-        </p>
+  <div id="contactModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4">
+    <div onclick="closeContactModal()" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative z-10 bg-white w-full max-w-xl rounded-[2rem] shadow-2xl overflow-hidden">
+      <div class="p-6 md:p-8 border-b flex items-center justify-between">
+        <div>
+          <h3 class="text-xl font-black text-[#06224C] uppercase tracking-widest">Contact Stackly</h3>
+          <p class="text-xs text-gray-500 font-bold uppercase tracking-wide mt-1">Same look preserved, now without console errors</p>
+        </div>
+        <button onclick="closeContactModal()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center" type="button">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
-      <button
-        onclick="closeContactModal()"
-        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center flex-shrink-0 mt-0.5"
-        type="button"
-        aria-label="Close contact modal"
-      >
-        <i class="fa-solid fa-xmark text-sm"></i>
-      </button>
+      <div class="p-6 md:p-8 space-y-5">
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-[#06224C] mb-2">Name</label>
+          <input type="text" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-400" placeholder="Your name">
+        </div>
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-[#06224C] mb-2">Email</label>
+  <input type="email" id="contactEmailInput" class="w-full border border-gray-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-400" placeholder="Your email">
+        </div>
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-[#06224C] mb-2">Message</label>
+          <textarea class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-400 min-h-[120px]" placeholder="How can we help?"></textarea>
+        </div>
+        <button onclick="closeContactModal(); window.location.hash = '404';" class="w-full bg-[#06224C] text-white py-3 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-blue-900 transition" type="button">
+          Send Message
+        </button>
+      </div>
     </div>
+  </div>
 
-   <div class="overflow-y-auto flex-grow p-4 sm:p-6 md:p-8 space-y-4">
-  <div>
-    <label class="block text-xs font-black uppercase tracking-widest text-[#06224C] mb-2">Name</label>
-    <input
-      type="text"
-      id="contactNameInput"
-      class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-400 text-sm"
-      placeholder="Your name"
-    >
-  </div>
-  <div>
-    <label class="block text-xs font-black uppercase tracking-widest text-[#06224C] mb-2">Email</label>
-    <input
-      type="email"
-      id="contactEmailInput"
-      class="w-full border border-gray-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-400 text-sm"
-      placeholder="Your email"
-    >
-  </div>
-  <div>
-    <label class="block text-xs font-black uppercase tracking-widest text-[#06224C] mb-2">Message</label>
-    <textarea
-      id="contactMessageInput"
-      class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-400 min-h-[100px] sm:min-h-[120px] text-sm"
-      placeholder="How can we help?"
-    ></textarea>
-  </div>
-</div>
-    <!-- Footer: Send button fixed at bottom, always visible -->
-    <div class="p-4 sm:p-6 border-t border-gray-100 flex-shrink-0 bg-white rounded-b-[2rem]">
-      <button
-        id="contactSendBtn"
-        class="w-full bg-[#06224C] text-white py-3 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-blue-900 transition active:scale-95"
-        type="button"
-      >
-        Send Message
-      </button>
-    </div>
-
-  </div>
-</div>
-<button id="backToTop" onclick="scrollToTop()" aria-label="Back to top" type="button">
-  <i class="fa-solid fa-arrow-up"></i>
-</button>
+  <button id="backToTop" onclick="scrollToTop()" aria-label="Back to top" type="button">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
   <!-- Privacy Policy Sidebar -->
 <div id="privacySidebar" class="fixed top-0 right-0 h-full w-full sm:w-[500px] bg-white shadow-2xl z-[10001] transform translate-x-full flex flex-col transition-transform duration-300">
   <div class="p-6 border-b flex justify-between items-center bg-[#0A1E3D] text-white">
@@ -3396,7 +3154,7 @@ button:focus-visible,
     }
 
     if (!found) {
-      location.hash = "404";
+      location.hash = "home";
     }
 
     toggleSearchBar(false);
@@ -3459,40 +3217,32 @@ button:focus-visible,
     const mobileMenu = document.getElementById("mobileMenu");
     const input = document.getElementById("searchInput");
 
-    // NEW: Get dropdown elements to close them
-    const pBtn = document.getElementById("products-dropdown-btn");
-    const pMenu = document.getElementById("products-menu");
-    const cBtn = document.getElementById("category-dropdown-btn");
-    const cMenu = document.getElementById("category-menu");
-
     if (!searchBar) return;
 
     const shouldOpen = typeof forceState === "boolean" ? forceState : searchBar.classList.contains("invisible");
 
-    if (shouldOpen) {
-        // CLOSE dropdowns if we are opening search
-        if(pMenu) pMenu.classList.remove("opacity-100", "visible", "translate-y-0");
-        if(cMenu) cMenu.classList.remove("opacity-100", "visible", "translate-y-0");
-        if(pBtn) pBtn.setAttribute("aria-expanded", "false");
-        if(cBtn) cBtn.setAttribute("aria-expanded", "false");
-        
-        document.body.classList.add("search-overlay-open");
-        searchBar.classList.remove("invisible", "opacity-0");
-        searchBar.classList.add("opacity-100");
-        setTimeout(() => { if (input) input.focus(); }, 200);
-    } else {
-        document.body.classList.remove("search-overlay-open");
-        searchBar.classList.add("invisible", "opacity-0");
-        searchBar.classList.remove("opacity-100");
+    if (shouldOpen && mobileMenu && !mobileMenu.classList.contains("hidden")) {
+      toggleMobileMenu(false);
     }
-}
+
+    if (shouldOpen) {
+      searchBar.classList.remove("invisible", "opacity-0");
+      searchBar.classList.add("opacity-100");
+      setTimeout(() => {
+        if (input) input.focus();
+      }, 200);
+    } else {
+      searchBar.classList.add("invisible", "opacity-0");
+      searchBar.classList.remove("opacity-100");
+    }
+  }
 
   function toggleMobileMenu(forceState) {
     const menu = document.getElementById("mobileMenu");
     const searchBar = document.getElementById("searchBarContainer");
     if (!menu) return;
 
-    const shouldOpen = typeof forceState === "boolean" ? forceState : menu.classList.contains("hidden");
+    const shouldOpen = typeof forceState === "boolean" ? forceState : menu.classList.contains("max-h-0");
 
     if (shouldOpen && searchBar && !searchBar.classList.contains("invisible")) {
       toggleSearchBar(false);
@@ -3502,17 +3252,22 @@ button:focus-visible,
       resetMobileAccordion();
     }
 
-    menu.classList.toggle("hidden", !shouldOpen);
+    if (shouldOpen) {
+      menu.classList.remove("max-h-0", "opacity-0");
+      menu.classList.add("max-h-[1500px]", "opacity-100");
+    } else {
+      menu.classList.add("max-h-0", "opacity-0");
+      menu.classList.remove("max-h-[1500px]", "opacity-100");
+    }
     updateSearchBarTop();
   }
 
- function showNotification(message, label = "Notice") {
+  function showNotification(message, label = "Notice") {
     const container = document.getElementById("toast-container");
     if (!container) return;
 
     const toast = document.createElement("div");
-    // Added z-[20001] and fixed/right-5 to ensure it stays on top of the contact modal
-    toast.className = "toast-slide-in bg-[#06224C] text-white border-l-4 border-blue-500 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 min-w-[300px] z-[20001] relative";
+    toast.className = "toast-slide-in bg-[#06224C] text-white border-l-4 border-blue-500 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 min-w-[300px]";
     toast.innerHTML = `
       <div class="bg-blue-500/20 p-2 rounded-lg">
         <i class="fa-solid fa-circle-check text-blue-400"></i>
@@ -3529,6 +3284,7 @@ button:focus-visible,
       setTimeout(() => toast.remove(), 500);
     }, 2600);
   }
+
   function updateCartBadge() {
     const badge = document.getElementById("cartBadge");
     if (!badge) return;
@@ -3775,67 +3531,41 @@ button:focus-visible,
     renderWishlist();
   }
 
- function submitRating(productId, rating, isInitialLoad = false) {
-  const container = document.getElementById("rating-container-" + productId);
-  if (!container) return;
+  function submitRating(productId, rating, isInitialLoad = false) {
+    const container = document.getElementById("rating-container-" + productId);
+    if (!container) return;
 
-  const stars = container.querySelectorAll("i");
-  const ratingText = document.getElementById("user-rating-val-" + productId);
-  const liveRegion = document.getElementById("rating-live-region");
+    const stars = container.querySelectorAll("i");
+    const ratingText = document.getElementById("user-rating-val-" + productId);
+    const liveRegion = document.getElementById("rating-live-region");
 
-  // Get the previously saved rating
-  const savedRating = localStorage.getItem("rating-" + productId);
-  const previousUserRating = savedRating ? parseFloat(savedRating) : null;
+    stars.forEach((star, index) => {
+      const starLevel = index + 1;
+      star.classList.remove("fa-solid", "fa-regular", "fa-star-half-stroke");
 
-  let effectiveRating = rating;
+      if (rating >= starLevel) {
+        star.classList.add("fa-solid", "fa-star");
+      } else if (rating > index && rating < starLevel) {
+        star.classList.add("fa-solid", "fa-star-half-stroke");
+      } else {
+        star.classList.add("fa-regular", "fa-star");
+      }
+    });
 
-  // Toggle Logic: If user clicks the exact same star they already saved, clear it
-  if (!isInitialLoad && previousUserRating === rating) {
-    effectiveRating = defaultRatings[productId] || 0;
-    localStorage.removeItem("rating-" + productId);
-    if (liveRegion) liveRegion.textContent = productId + " rating cleared";
-    showNotification(productId + " rating cleared.", "Rating");
-  } else if (!isInitialLoad) {
-    // Save new rating
-    localStorage.setItem("rating-" + productId, String(rating));
-    if (liveRegion) liveRegion.textContent = productId + " rated " + rating + " stars";
-    showNotification("You rated " + productId + " " + rating + " stars!", "Rating");
-  }
+    container.setAttribute("aria-label", "Rating: " + parseFloat(rating).toFixed(1) + " out of 5 stars");
 
-  // Use the saved value if it exists and we are in Initial Load
-  if (isInitialLoad && previousUserRating !== null) {
-    effectiveRating = previousUserRating;
-  }
-
-  // Render stars
-  stars.forEach((star, index) => {
-    const starLevel = index + 1;
-    star.classList.remove("fa-solid", "fa-regular", "fa-star-half-stroke");
-
-    if (effectiveRating >= starLevel) {
-      star.classList.add("fa-solid", "fa-star");
-    } else if (effectiveRating > index && effectiveRating < starLevel) {
-      star.classList.add("fa-solid", "fa-star-half-stroke");
-    } else {
-      star.classList.add("fa-regular", "fa-star");
+    if (ratingText) {
+      ratingText.innerText = "(" + parseFloat(rating).toFixed(1) + ")";
+      ratingText.classList.replace("text-gray-400", "text-blue-600");
     }
-  });
 
-  container.setAttribute("aria-label", "Rating: " + parseFloat(effectiveRating).toFixed(1) + " out of 5 stars");
-
-  if (ratingText) {
-    ratingText.innerText = "(" + parseFloat(effectiveRating).toFixed(1) + ")";
-    const hasActiveRating = localStorage.getItem("rating-" + productId) !== null;
-    
-    if (hasActiveRating) {
-      ratingText.classList.remove("text-gray-400");
-      ratingText.classList.add("text-blue-600");
-    } else {
-      ratingText.classList.remove("text-blue-600");
-      ratingText.classList.add("text-gray-400");
+    if (!isInitialLoad) {
+      localStorage.setItem("rating-" + productId, String(rating));
+      if (liveRegion) liveRegion.textContent = productId + " rated " + parseFloat(rating).toFixed(1) + " stars";
+      showNotification("You rated " + productId + " " + parseFloat(rating).toFixed(1) + " stars!", "Rating");
     }
   }
-}
+
   function validateEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
@@ -3910,16 +3640,7 @@ function setupFilterButtonKeyboard() {
   }
 
   function openTemplatePreview(name, image) {
-    const modal = document.getElementById("templatePreviewModal");
-    const title = document.getElementById("previewTitle");
-    const img = document.getElementById("previewImage");
-    if (!modal || !title || !img) return;
-
-    title.innerText = name + " - Template Preview";
-    img.src = image;
-    modal.classList.remove("hidden");
-    modal.style.display = "flex";
-    document.body.style.overflow = "hidden";
+    window.location.href = "portfolioframe-main/index.html";
   }
 
   function closeTemplatePreview() {
@@ -4028,43 +3749,42 @@ function setupFilterButtonKeyboard() {
     if (!productsBtn || !productsMenu || !categoryBtn || !categoryMenu) return;
 
     const openMenu = (menu, btn) => {
-        menu.classList.add("opacity-100", "visible", "translate-y-0");
-        btn.setAttribute("aria-expanded", "true");
+      menu.classList.add("opacity-100", "visible", "translate-y-0");
+      btn.setAttribute("aria-expanded", "true");
     };
 
     const closeMenu = (menu, btn) => {
-        menu.classList.remove("opacity-100", "visible", "translate-y-0");
-        btn.setAttribute("aria-expanded", "false");
+      menu.classList.remove("opacity-100", "visible", "translate-y-0");
+      btn.setAttribute("aria-expanded", "false");
     };
 
-    // New Helper: Closes everything including the search bar
-    const closeEverything = () => {
-        closeMenu(productsMenu, productsBtn);
-        closeMenu(categoryMenu, categoryBtn);
-        toggleSearchBar(false); // Force close search bar
+    const closeAllMenus = () => {
+      closeMenu(productsMenu, productsBtn);
+      closeMenu(categoryMenu, categoryBtn);
     };
 
-    document.querySelectorAll(".dropdown-group").forEach((group) => {
-      group.addEventListener("mouseenter", () => {
-        const searchBar = document.getElementById("searchBarContainer");
-        if (searchBar && !searchBar.classList.contains("invisible")) {
-          toggleSearchBar(false);
-        }
-      });
-    });
+    const isMenuOpen = (menu) => menu.classList.contains("opacity-100");
 
     productsBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const isOpen = productsMenu.classList.contains("opacity-100");
-        closeEverything(); // Close others first
-        if (!isOpen) openMenu(productsMenu, productsBtn);
+      e.stopPropagation();
+
+      if (isMenuOpen(productsMenu)) {
+        closeMenu(productsMenu, productsBtn);
+      } else {
+        closeMenu(categoryMenu, categoryBtn);
+        openMenu(productsMenu, productsBtn);
+      }
     });
 
     categoryBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const isOpen = categoryMenu.classList.contains("opacity-100");
-        closeEverything(); // Close others first
-        if (!isOpen) openMenu(categoryMenu, categoryBtn);
+      e.stopPropagation();
+
+      if (isMenuOpen(categoryMenu)) {
+        closeMenu(categoryMenu, categoryBtn);
+      } else {
+        closeMenu(productsMenu, productsBtn);
+        openMenu(categoryMenu, categoryBtn);
+      }
     });
 
    [productsBtn, categoryBtn].forEach((button) => {
@@ -4116,7 +3836,7 @@ function setupFilterButtonKeyboard() {
     const isInFlyout = active.closest && active.closest(".flyout-menu");
     if (isInFlyout) return;
 
-   const items = Array.from(menu.querySelectorAll("a[role='menuitem'], .submenu-parent > a[role='menuitem']"));
+    const items = Array.from(menu.querySelectorAll("a[role='menuitem']"));
     const currentIndex = items.indexOf(active);
 
     if (e.key === "ArrowDown") {
@@ -4138,28 +3858,9 @@ function setupFilterButtonKeyboard() {
       if (menu === categoryMenu) categoryBtn.focus();
     }
 
-   if (e.key === "Tab") {
-      if (menu === categoryMenu) {
-        const isLast = currentIndex === items.length - 1;
-        const isFirst = currentIndex === 0;
-
-        if (!e.shiftKey && isLast) {
-          // On last item + Tab → close menu and move to Contact naturally
-          closeAllMenus();
-        } else if (e.shiftKey && isFirst) {
-          // On first item + Shift+Tab → close menu and move back naturally
-          closeAllMenus();
-        } else {
-          // In between → cycle through items
-          e.preventDefault();
-          const next = e.shiftKey
-            ? items[currentIndex - 1]
-            : items[currentIndex + 1];
-          if (next) next.focus();
-        }
-      } else {
-        closeAllMenus();
-      }
+    if (e.key === "Tab") {
+      // Close menu and let Tab move naturally — do NOT preventDefault
+      closeAllMenus();
     }
   });
 });
@@ -4439,39 +4140,36 @@ document.querySelectorAll(".flyout-menu").forEach((flyout) => {
     `
   },
   pricing: {
-  title: "Pricing Plans",
-  body: `
-    <div class="space-y-6">
-      <div class="flex flex-col gap-4">
-        <!-- Starter Plan -->
-        <div class="p-5 border-2 border-blue-100 rounded-2xl bg-blue-50/30">
-          <div class="flex flex-col mb-3"> <!-- Changed to flex-col for 200% zoom safety -->
-            <span class="font-black text-[#06224C] uppercase tracking-widest text-xs mb-1">Starter Plan</span>
-            <span class="text-lg font-black text-blue-600">Free</span>
+    title: "Pricing Plans",
+    body: `
+      <div class="space-y-6">
+        <div class="flex flex-col gap-4">
+          <div class="p-5 border-2 border-blue-100 rounded-2xl bg-blue-50/30">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-black text-[#06224C] uppercase tracking-widest text-xs">Starter Plan</span>
+              <span class="text-lg font-black text-blue-600">Free</span>
+            </div>
+            <p class="text-xs text-gray-500">Perfect for personal projects and learning. Includes 3 projects and Stackly subdomain.</p>
           </div>
-          <p class="text-xs text-gray-500">Perfect for personal projects and learning. Includes 3 projects and Stackly subdomain.</p>
-        </div>
-
-        <!-- Professional Plan -->
-        <div class="p-5 border-2 border-blue-600 rounded-2xl bg-white shadow-lg relative overflow-hidden">
-          <div class="absolute top-0 right-0 bg-blue-600 text-white text-[8px] font-black px-3 py-1 uppercase">Popular</div>
-          <div class="flex flex-col mb-3"> <!-- Changed to flex-col to fix overlapping -->
-            <span class="font-black text-[#06224C] uppercase tracking-widest text-xs mb-1">Professional</span>
-            <span class="text-lg font-black text-blue-600">$150<small class="text-[10px] text-gray-400">/mo</small></span>
+          <div class="p-5 border-2 border-blue-600 rounded-2xl bg-white shadow-lg relative overflow-hidden">
+             <div class="absolute top-0 right-0 bg-blue-600 text-white text-[8px] font-black px-3 py-1 uppercase">Popular</div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-black text-[#06224C] uppercase tracking-widest text-xs">Professional</span>
+              <span class="text-lg font-black text-blue-600">$150<small class="text-[10px] text-gray-400">/mo</small></span>
+            </div>
+            <p class="text-xs text-gray-500">For serious creators and startups. Unlimited projects, custom domains, and AWS-powered priority hosting.</p>
           </div>
-          <p class="text-xs text-gray-500">For serious creators and startups. Unlimited projects, custom domains, and AWS-powered priority hosting.</p>
         </div>
+        <p class="text-[10px] text-gray-400 italic">Enterprise custom solutions available upon request. All plans include 24/7 technical support and access to our API.</p>
       </div>
-      <p class="text-[10px] text-gray-400 italic">Enterprise custom solutions available upon request. All plans include 24/7 technical support and access to our API.</p>
-    </div>
-  `
-},
+    `
+  },
   changelog: {
     title: "Product Changelog",
     body: `
       <div class="space-y-8">
         <div class="border-l-2 border-blue-500 pl-6 relative">
-          
+          <div class="absolute w-3 h-3 bg-blue-500 rounded-full -left-[7.5px] top-1"></div>
           <span class="text-[10px] font-black text-blue-500 uppercase">May 2026</span>
           <h4 class="font-bold text-md text-[#06224C]">Version 2.5.0 - The Accessibility Update</h4>
           <ul class="list-disc text-xs space-y-2 mt-2 ml-4">
@@ -4480,8 +4178,8 @@ document.querySelectorAll(".flyout-menu").forEach((flyout) => {
             <li>Added "Inert" attribute support for hidden template cards.</li>
           </ul>
         </div>
-        <div class="border-l-2 border-blue-500 pl-6 relative">
-          
+        <div class="border-l-2 border-gray-200 pl-6 relative">
+          <div class="absolute w-3 h-3 bg-gray-200 rounded-full -left-[7.5px] top-1"></div>
           <span class="text-[10px] font-black text-gray-400 uppercase">April 2026</span>
           <h4 class="font-bold text-md text-[#06224C]">Version 2.4.2 - Performance Patch</h4>
           <p class="text-xs mt-1">Optimized image delivery via Global CDN, reducing template preview load times by 40%.</p>
@@ -4543,24 +4241,14 @@ document.querySelectorAll(".filter-tab").forEach((tab) => {
     });
     document.querySelectorAll(".template-category-card").forEach((card) => {
   if (card.style.display === "none") {
-    card.setAttribute('inert', '');
-  } else {
-    card.removeAttribute('inert');
+    card.inert = true;
   }
 });
 
-   Object.keys(defaultRatings).forEach((productId) => {
-  const savedRating = localStorage.getItem("rating-" + productId);
-
-  if (savedRating) {
-    // User has rated — restore their rating and show it in blue
-    submitRating(productId, parseFloat(savedRating), true);
-   
-  } else {
-    // No user rating — show default rating in gray
-    submitRating(productId, defaultRatings[productId], true);
-  }
-});
+    Object.keys(defaultRatings).forEach((productId) => {
+      const savedRating = localStorage.getItem("rating-" + productId);
+      submitRating(productId, savedRating ? parseFloat(savedRating) : defaultRatings[productId], true);
+    });
 
     const footerForm = document.querySelector("footer form");
     if (footerForm) {
@@ -4594,46 +4282,31 @@ document.querySelectorAll(".filter-tab").forEach((tab) => {
       });
     }
 
-   // Place this inside your initializePage() function
-const contactSendButton = document.getElementById("contactSendBtn");
+    const contactSendButton = document.querySelector('#contactModal button[onclick*="showNotification"]');
+    if (contactSendButton) {
+      contactSendButton.onclick = function () {
+        const emailInput = document.getElementById("contactEmailInput");
+        const emailValue = emailInput.value.trim();
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-if (contactSendButton) {
-    contactSendButton.onclick = function() {
-        const nameEl = document.getElementById("contactNameInput");
-        const emailEl = document.getElementById("contactEmailInput");
-        const messageEl = document.getElementById("contactMessageInput");
-
-        if (nameEl && emailEl && messageEl) {
-            const nameVal = nameEl.value.trim();
-            const emailVal = emailEl.value.trim();
-            const messageVal = messageEl.value.trim();
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-            // 1. Check if ANY field is empty
-            if (!nameVal || !emailVal || !messageVal) {
-                showNotification("Please fill in all mandatory fields.", "Error");
-                return;
-            }
-
-            // 2. Check if email format is valid
-            if (!emailPattern.test(emailVal)) {
-                showNotification("Please enter a valid email address.", "Invalid Email");
-                return;
-            }
-
-            // 3. Success
-            showNotification("Message sent successfully!", "Success");
-            
-            // Clear inputs
-            nameEl.value = "";
-            emailEl.value = "";
-            messageEl.value = "";
-            
-            closeContactModal();
+        if (!emailValue) {
+          showNotification("Please enter your email.", "Error");
+          return;
         }
-    };
-}  setTimeout(updateSearchBarTop, 300);
-}
+
+        if (!emailPattern.test(emailValue)) {
+          showNotification("Please enter a valid email address (e.g. name@gmail.com).", "Invalid Format");
+          return;
+        }
+
+        showNotification("Message sent successfully.", "Contact");
+        emailInput.value = "";
+        closeContactModal();
+      };
+    }
+
+    setTimeout(updateSearchBarTop, 300);
+  }
 
   window.addEventListener("hashchange", router, { passive: true });
   window.addEventListener("resize", updateSearchBarTop, { passive: true });
@@ -4683,7 +4356,9 @@ if (contactSendButton) {
     
     <div class="p-5 md:p-7 border-b flex items-center justify-between flex-shrink-0">
       <h3 id="legalModalTitle" class="text-lg font-black text-[#06224C] uppercase tracking-widest"></h3>
-      
+      <button onclick="closeLegalModal()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center flex-shrink-0 ml-4" type="button" aria-label="Close modal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
     <div id="legalModalBody" class="overflow-y-auto p-5 md:p-8 text-sm text-gray-700 leading-relaxed space-y-5 flex-grow">
@@ -4696,6 +4371,5 @@ if (contactSendButton) {
     </div>
   </div>
 </div>
-<div id="toast-container" class="fixed bottom-5 right-5 z-[20001] flex flex-col gap-3"></div>
 </body>
 </html>
