@@ -414,9 +414,9 @@ export default function ECommercePage() {
   const visibleProductCount = isCarouselMode ? carouselCols : Number.POSITIVE_INFINITY;
   const visibleBuyProducts = totalProducts
     ? Array.from({ length: Math.min(visibleProductCount, totalProducts) }, (_, offset) => {
-        const index = (activeProductStart + offset) % totalProducts;
-        return searchFilteredProducts[index];
-      })
+      const index = (activeProductStart + offset) % totalProducts;
+      return searchFilteredProducts[index];
+    })
     : [];
   const displayedProducts = isSearching || showAllProducts ? searchFilteredProducts : visibleBuyProducts;
   const favoriteProducts = favoriteProductIds
@@ -753,52 +753,52 @@ export default function ECommercePage() {
           >
             <div className="shrink-0 border-b border-[#eef2f7] p-6 pb-4 sm:p-8 sm:pb-4">
               <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2 id="buyscreen-license-title" className="text-base font-semibold sm:text-lg" style={{ color: NAVY }}>
-                  Regular license
-                </h2>
-                <p className="mt-1 text-xs text-[#6b7280]">
-                  {licenseProduct.name} · {licenseProduct.price} each
+                <div>
+                  <h2 id="buyscreen-license-title" className="text-base font-semibold sm:text-lg" style={{ color: NAVY }}>
+                    Regular license
+                  </h2>
+                  <p className="mt-1 text-xs text-[#6b7280]">
+                    {licenseProduct.name} · {licenseProduct.price} each
+                  </p>
+                </div>
+                <p className="whitespace-nowrap text-lg font-bold tabular-nums sm:text-xl" style={{ color: NAVY }}>
+                  {formatUsd(lineTotalCents)}
                 </p>
-              </div>
-              <p className="whitespace-nowrap text-lg font-bold tabular-nums sm:text-xl" style={{ color: NAVY }}>
-                {formatUsd(lineTotalCents)}
-              </p>
               </div>
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-6 pt-5 sm:px-8 sm:pb-8">
               <ul className="space-y-3 text-sm text-[#374151]">
-              {licenseBullets.map((line) => (
-                <li key={line} className="flex gap-2">
-                  <CheckIcon />
-                  <span className="leading-snug">{line}</span>
-                </li>
-              ))}
+                {licenseBullets.map((line) => (
+                  <li key={line} className="flex gap-2">
+                    <CheckIcon />
+                    <span className="leading-snug">{line}</span>
+                  </li>
+                ))}
               </ul>
 
               <div className="mt-6 grid grid-cols-3 items-center gap-2 rounded-full border-2 p-2 sm:px-3" style={{ borderColor: NAVY }}>
-              <button
-                type="button"
-                className="justify-self-start flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white transition-opacity hover:opacity-90 disabled:opacity-40 sm:h-9 sm:w-9"
-                style={{ backgroundColor: NAVY }}
-                aria-label="Decrease quantity"
-                disabled={licenseQty <= 1}
-                onClick={() => setLicenseQty((q) => Math.max(1, q - 1))}
-              >
-                <span className="text-lg font-light leading-none">−</span>
-              </button>
-              <div className="min-w-0 w-full rounded-md border border-dashed border-[#cbd5e1] bg-[#f8fafc] px-2 py-1.5 text-center text-lg font-semibold tabular-nums text-[#0f172a]">
-                {licenseQty}
-              </div>
-              <button
-                type="button"
-                className="justify-self-end flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white transition-opacity hover:opacity-90 sm:h-9 sm:w-9"
-                style={{ backgroundColor: NAVY }}
-                aria-label="Increase quantity"
-                onClick={() => setLicenseQty((q) => q + 1)}
-              >
-                <span className="text-lg font-light leading-none">+</span>
-              </button>
+                <button
+                  type="button"
+                  className="justify-self-start flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white transition-opacity hover:opacity-90 disabled:opacity-40 sm:h-9 sm:w-9"
+                  style={{ backgroundColor: NAVY }}
+                  aria-label="Decrease quantity"
+                  disabled={licenseQty <= 1}
+                  onClick={() => setLicenseQty((q) => Math.max(1, q - 1))}
+                >
+                  <span className="text-lg font-light leading-none">−</span>
+                </button>
+                <div className="min-w-0 w-full rounded-md border border-dashed border-[#cbd5e1] bg-[#f8fafc] px-2 py-1.5 text-center text-lg font-semibold tabular-nums text-[#0f172a]">
+                  {licenseQty}
+                </div>
+                <button
+                  type="button"
+                  className="justify-self-end flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white transition-opacity hover:opacity-90 sm:h-9 sm:w-9"
+                  style={{ backgroundColor: NAVY }}
+                  aria-label="Increase quantity"
+                  onClick={() => setLicenseQty((q) => q + 1)}
+                >
+                  <span className="text-lg font-light leading-none">+</span>
+                </button>
               </div>
 
               <button
@@ -911,237 +911,237 @@ export default function ECommercePage() {
 
       <section className="hidden">
         <div ref={topHeaderBarRef}>
-        <div className="buyscreen-top-header-inner mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Mobile / tablet / desktop-zoom: hamburger + logo + actions (cart/search/profile stay right) */}
-        <div className="buyscreen-top-header-row buyscreen-top-header-mobile-row flex min-w-0 flex-wrap items-center justify-between gap-2 py-2.5 lg:hidden">
-          <div className="flex min-w-0 shrink-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setIsTopHeaderMenuOpen((v) => !v)}
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/25 text-white transition-colors hover:bg-white/15 planning-zoom-show-hamburger"
-            aria-label="Toggle top navigation menu"
-            aria-expanded={isTopHeaderMenuOpen}
-          >
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
-              <path d="M3 5.5H17M3 10H17M3 14.5H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </button>
-          <div className="flex h-8 min-w-[82px] shrink-0 items-center justify-center overflow-hidden rounded-[50%] bg-white px-2.5 sm:h-9 sm:min-w-[92px] sm:px-3">
-            <Image src={assetPath("/stackly-logo.webp")} alt="Stackly logo" width={160} height={40} className="h-[18px] w-auto sm:h-[20px]" unoptimized />
-          </div>
-          </div>
-
-          <div className="buyscreen-top-header-actions flex shrink-0 items-center gap-1.5 sm:gap-2">
-            <button
-              type="button"
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/80 text-white transition-colors hover:bg-white/15 hover:text-[#fef3c7] sm:h-8 sm:w-8"
-              aria-label="Cart"
-              onClick={() => router.push("/page-not-found")}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path d="M3 4h2l1.6 9.2a1 1 0 0 0 1 .8H18a1 1 0 0 0 1-.8L20.6 7H7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="10" cy="19" r="1.4" fill="currentColor" />
-                <circle cx="17" cy="19" r="1.4" fill="currentColor" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-[#06224C] transition-colors hover:bg-[#fef3c7] hover:text-[#06224C] sm:h-8 sm:w-8"
-              aria-label="Search"
-              aria-expanded={isTopHeaderSearchOpen}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsTopHeaderSearchOpen((v) => !v);
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
-                <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-              </svg>
-            </button>
-            <div data-top-header-profile-wrap className="buyscreen-user-menu-wrap relative shrink-0">
-              <button
-                type="button"
-                className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/40 transition-colors hover:border-[#fef3c7] hover:bg-white/10 sm:h-8 sm:w-8"
-                aria-label="Profile"
-                aria-expanded={isTopHeaderProfileMenuOpen}
-                aria-haspopup="menu"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsTopHeaderProfileMenuOpen((prev) => !prev);
-                }}
-              >
-                <Image src={assetPath("/photo.webp")} alt="Profile" width={36} height={36} className="block h-full w-full object-cover" unoptimized />
-              </button>
-              <div
-                className={`buyscreen-user-menu-dropdown ${isTopHeaderProfileMenuOpen ? "buyscreen-user-menu-dropdown--open" : ""}`}
-                role="menu"
-                aria-hidden={!isTopHeaderProfileMenuOpen}
-              >
+          <div className="buyscreen-top-header-inner mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            {/* Mobile / tablet / desktop-zoom: hamburger + logo + actions (cart/search/profile stay right) */}
+            <div className="buyscreen-top-header-row buyscreen-top-header-mobile-row flex min-w-0 flex-wrap items-center justify-between gap-2 py-2.5 lg:hidden">
+              <div className="flex min-w-0 shrink-0 flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  role="menuitem"
-                  className="buyscreen-user-menu-item"
-                  onClick={() => {
-                    setIsTopHeaderProfileMenuOpen(false);
-                    router.push("/login");
-                  }}
+                  onClick={() => setIsTopHeaderMenuOpen((v) => !v)}
+                  className="inline-flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-md border border-white/25 text-white transition-colors hover:bg-white/15 planning-zoom-show-hamburger"
+                  aria-label="Toggle top navigation menu"
+                  aria-expanded={isTopHeaderMenuOpen}
                 >
-                  Logout
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
+                    <path d="M3 5.5H17M3 10H17M3 14.5H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
                 </button>
+                <div className="flex h-7 min-w-[70px] sm:h-9 sm:min-w-[92px] shrink-0 items-center justify-center overflow-hidden rounded-[50%] bg-white px-2 sm:px-3">
+                  <Image src={assetPath("/stackly-logo.webp")} alt="Stackly logo" width={160} height={40} className="h-[14px] w-auto sm:h-[20px]" unoptimized />
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Desktop: equal space between each segment — logo … nav links … actions (cart stays right with inner icon gaps) */}
-        <div className="buyscreen-top-header-row buyscreen-top-header-desktop-row hidden w-full min-w-0 items-center py-3 lg:flex">
-          <nav
-            className="flex w-full min-w-0 flex-nowrap items-center justify-between gap-0 text-[13px] font-semibold text-white"
-            aria-label="Main"
-          >
-            <div className="flex h-9 min-w-[104px] shrink-0 items-center justify-center overflow-hidden rounded-[50%] bg-white px-3">
-              <Image src={assetPath("/stackly-logo.webp")} alt="Stackly logo" width={160} height={40} className="h-[20px] w-auto" unoptimized />
-            </div>
-            <button
-              type="button"
-              className={`buyscreen-top-header-nav-item shrink-0 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Home" ? " buyscreen-top-header-nav-item--active" : ""}`}
-              onClick={() => handleTopHeaderItemClick("Home")}
-            >
-              Home
-            </button>
-            <button
-              type="button"
-              className={`buyscreen-top-header-nav-item shrink-0 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "About Us" ? " buyscreen-top-header-nav-item--active" : ""}`}
-              onClick={() => handleTopHeaderItemClick("About Us")}
-            >
-              About Us
-            </button>
-            <button
-              type="button"
-              className={`buyscreen-top-header-nav-item inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Our Products" ? " buyscreen-top-header-nav-item--active" : ""}`}
-              onClick={() => handleTopHeaderItemClick("Our Products")}
-            >
-              Our Products
-              <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden className="shrink-0">
-                <path d="m5.5 7.5 4.5 5 4.5-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className={`buyscreen-top-header-nav-item inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Categories" ? " buyscreen-top-header-nav-item--active" : ""}`}
-              onClick={() => handleTopHeaderItemClick("Categories")}
-            >
-              Categories
-              <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden className="shrink-0">
-                <path d="m5.5 7.5 4.5 5 4.5-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className={`buyscreen-top-header-nav-item shrink-0 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Contact" ? " buyscreen-top-header-nav-item--active" : ""}`}
-              onClick={() => handleTopHeaderItemClick("Contact")}
-            >
-              Contact
-            </button>
-            <div className="buyscreen-top-header-actions flex shrink-0 items-center gap-3 sm:gap-4">
-              <button
-                type="button"
-                className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/90 px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-white/15 hover:text-[#fef3c7]"
-                aria-label="Cart"
-                onClick={() => router.push("/page-not-found")}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <path d="M3 4h2l1.6 9.2a1 1 0 0 0 1 .8H18a1 1 0 0 0 1-.8L20.6 7H7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="10" cy="19" r="1.4" fill="currentColor" />
-                  <circle cx="17" cy="19" r="1.4" fill="currentColor" />
-                </svg>
-                Cart
-              </button>
-              <button
-                type="button"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#06224C] transition-colors hover:bg-[#fef3c7] hover:text-[#06224C]"
-                aria-label="Search"
-                aria-expanded={isTopHeaderSearchOpen}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsTopHeaderSearchOpen((v) => !v);
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
-                  <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-                </svg>
-              </button>
-              <div data-top-header-profile-wrap className="buyscreen-user-menu-wrap relative shrink-0">
+              <div className="buyscreen-top-header-actions flex shrink-0 items-center gap-1.5 sm:gap-2">
                 <button
                   type="button"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/40 transition-colors hover:border-[#fef3c7] hover:bg-white/10"
-                  aria-label="Profile"
-                  aria-expanded={isTopHeaderProfileMenuOpen}
-                  aria-haspopup="menu"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/80 text-white transition-colors hover:bg-white/15 hover:text-[#fef3c7] sm:h-8 sm:w-8"
+                  aria-label="Cart"
+                  onClick={() => router.push("/page-not-found")}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <path d="M3 4h2l1.6 9.2a1 1 0 0 0 1 .8H18a1 1 0 0 0 1-.8L20.6 7H7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="10" cy="19" r="1.4" fill="currentColor" />
+                    <circle cx="17" cy="19" r="1.4" fill="currentColor" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-[#06224C] transition-colors hover:bg-[#fef3c7] hover:text-[#06224C] sm:h-8 sm:w-8"
+                  aria-label="Search"
+                  aria-expanded={isTopHeaderSearchOpen}
                   onClick={(e) => {
                     e.stopPropagation();
-                    setIsTopHeaderProfileMenuOpen((prev) => !prev);
+                    setIsTopHeaderSearchOpen((v) => !v);
                   }}
                 >
-                  <Image src={assetPath("/photo.webp")} alt="Profile" width={36} height={36} className="block h-full w-full object-cover" unoptimized />
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
+                    <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                  </svg>
                 </button>
-                <div
-                  className={`buyscreen-user-menu-dropdown ${isTopHeaderProfileMenuOpen ? "buyscreen-user-menu-dropdown--open" : ""}`}
-                  role="menu"
-                  aria-hidden={!isTopHeaderProfileMenuOpen}
-                >
+                <div data-top-header-profile-wrap className="buyscreen-user-menu-wrap relative shrink-0">
                   <button
                     type="button"
-                    role="menuitem"
-                    className="buyscreen-user-menu-item"
-                    onClick={() => {
-                      setIsTopHeaderProfileMenuOpen(false);
-                      router.push("/login");
+                    className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/40 transition-colors hover:border-[#fef3c7] hover:bg-white/10 sm:h-8 sm:w-8"
+                    aria-label="Profile"
+                    aria-expanded={isTopHeaderProfileMenuOpen}
+                    aria-haspopup="menu"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsTopHeaderProfileMenuOpen((prev) => !prev);
                     }}
                   >
-                    Logout
+                    <Image src={assetPath("/photo.webp")} alt="Profile" width={36} height={36} className="block h-full w-full object-cover" unoptimized />
                   </button>
+                  <div
+                    className={`buyscreen-user-menu-dropdown ${isTopHeaderProfileMenuOpen ? "buyscreen-user-menu-dropdown--open" : ""}`}
+                    role="menu"
+                    aria-hidden={!isTopHeaderProfileMenuOpen}
+                  >
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="buyscreen-user-menu-item"
+                      onClick={() => {
+                        setIsTopHeaderProfileMenuOpen(false);
+                        router.push("/login");
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </nav>
-        </div>
-        </div>
-        {isTopHeaderSearchOpen ? (
-          <div className="border-t border-white/20">
-            <div className="mx-auto w-full max-w-7xl px-4 pb-3 pt-2 sm:px-6 lg:px-8">
-              <label className="flex h-10 w-full items-center gap-2 rounded-md border-2 border-[#cbd5e1] bg-white px-3 text-sm text-[#4b5563]">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#374151]" aria-hidden>
-                  <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
-                  <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-                </svg>
-                <input
-                  ref={topHeaderSearchInputRef}
-                  type="search"
-                  value={topHeaderSearchQuery}
-                  onChange={(e) => {
-                    setTopHeaderSearchQuery(e.target.value);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key !== "Enter") return;
-                    e.preventDefault();
-                    setIsTopHeaderSearchOpen(false);
-                    router.push("/page-not-found");
-                  }}
-                  placeholder="Search..."
-                  className="min-w-0 flex-1 bg-transparent text-[#4b5563] outline-none placeholder:text-[#4b5563] placeholder:opacity-100"
-                  aria-label="Search products"
-                />
-              </label>
+
+            {/* Desktop: equal space between each segment — logo … nav links … actions (cart stays right with inner icon gaps) */}
+            <div className="buyscreen-top-header-row buyscreen-top-header-desktop-row hidden w-full min-w-0 items-center py-3 lg:flex">
+              <nav
+                className="flex w-full min-w-0 flex-nowrap items-center justify-between gap-0 text-[13px] font-semibold text-white"
+                aria-label="Main"
+              >
+                <div className="flex h-9 min-w-[104px] shrink-0 items-center justify-center overflow-hidden rounded-[50%] bg-white px-3">
+                  <Image src={assetPath("/stackly-logo.webp")} alt="Stackly logo" width={160} height={40} className="h-[20px] w-auto" unoptimized />
+                </div>
+                <button
+                  type="button"
+                  className={`buyscreen-top-header-nav-item shrink-0 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Home" ? " buyscreen-top-header-nav-item--active" : ""}`}
+                  onClick={() => handleTopHeaderItemClick("Home")}
+                >
+                  Home
+                </button>
+                <button
+                  type="button"
+                  className={`buyscreen-top-header-nav-item shrink-0 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "About Us" ? " buyscreen-top-header-nav-item--active" : ""}`}
+                  onClick={() => handleTopHeaderItemClick("About Us")}
+                >
+                  About Us
+                </button>
+                <button
+                  type="button"
+                  className={`buyscreen-top-header-nav-item inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Our Products" ? " buyscreen-top-header-nav-item--active" : ""}`}
+                  onClick={() => handleTopHeaderItemClick("Our Products")}
+                >
+                  Our Products
+                  <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden className="shrink-0">
+                    <path d="m5.5 7.5 4.5 5 4.5-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  className={`buyscreen-top-header-nav-item inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Categories" ? " buyscreen-top-header-nav-item--active" : ""}`}
+                  onClick={() => handleTopHeaderItemClick("Categories")}
+                >
+                  Categories
+                  <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden className="shrink-0">
+                    <path d="m5.5 7.5 4.5 5 4.5-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  className={`buyscreen-top-header-nav-item shrink-0 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Contact" ? " buyscreen-top-header-nav-item--active" : ""}`}
+                  onClick={() => handleTopHeaderItemClick("Contact")}
+                >
+                  Contact
+                </button>
+                <div className="buyscreen-top-header-actions flex shrink-0 items-center gap-3 sm:gap-4">
+                  <button
+                    type="button"
+                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/90 px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-white/15 hover:text-[#fef3c7]"
+                    aria-label="Cart"
+                    onClick={() => router.push("/page-not-found")}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <path d="M3 4h2l1.6 9.2a1 1 0 0 0 1 .8H18a1 1 0 0 0 1-.8L20.6 7H7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="10" cy="19" r="1.4" fill="currentColor" />
+                      <circle cx="17" cy="19" r="1.4" fill="currentColor" />
+                    </svg>
+                    Cart
+                  </button>
+                  <button
+                    type="button"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#06224C] transition-colors hover:bg-[#fef3c7] hover:text-[#06224C]"
+                    aria-label="Search"
+                    aria-expanded={isTopHeaderSearchOpen}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsTopHeaderSearchOpen((v) => !v);
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
+                      <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                  <div data-top-header-profile-wrap className="buyscreen-user-menu-wrap relative shrink-0">
+                    <button
+                      type="button"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/40 transition-colors hover:border-[#fef3c7] hover:bg-white/10"
+                      aria-label="Profile"
+                      aria-expanded={isTopHeaderProfileMenuOpen}
+                      aria-haspopup="menu"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsTopHeaderProfileMenuOpen((prev) => !prev);
+                      }}
+                    >
+                      <Image src={assetPath("/photo.webp")} alt="Profile" width={36} height={36} className="block h-full w-full object-cover" unoptimized />
+                    </button>
+                    <div
+                      className={`buyscreen-user-menu-dropdown ${isTopHeaderProfileMenuOpen ? "buyscreen-user-menu-dropdown--open" : ""}`}
+                      role="menu"
+                      aria-hidden={!isTopHeaderProfileMenuOpen}
+                    >
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="buyscreen-user-menu-item"
+                        onClick={() => {
+                          setIsTopHeaderProfileMenuOpen(false);
+                          router.push("/login");
+                        }}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </nav>
             </div>
           </div>
-        ) : null}
-        </div>
-          {isTopHeaderMenuOpen ? (
-            <div className="border-t border-white/20 lg:hidden planning-zoom-show-mobile-menu">
+          {isTopHeaderSearchOpen ? (
+            <div className="border-t border-white/20">
               <div className="mx-auto w-full max-w-7xl px-4 pb-3 pt-2 sm:px-6 lg:px-8">
+                <label className="flex h-10 w-full items-center gap-2 rounded-md border-2 border-[#cbd5e1] bg-white px-3 text-sm text-[#4b5563]">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#374151]" aria-hidden>
+                    <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
+                    <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                  </svg>
+                  <input
+                    ref={topHeaderSearchInputRef}
+                    type="search"
+                    value={topHeaderSearchQuery}
+                    onChange={(e) => {
+                      setTopHeaderSearchQuery(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key !== "Enter") return;
+                      e.preventDefault();
+                      setIsTopHeaderSearchOpen(false);
+                      router.push("/page-not-found");
+                    }}
+                    placeholder="Search..."
+                    className="min-w-0 flex-1 bg-transparent text-[#4b5563] outline-none placeholder:text-[#4b5563] placeholder:opacity-100"
+                    aria-label="Search products"
+                  />
+                </label>
+              </div>
+            </div>
+          ) : null}
+        </div>
+        {isTopHeaderMenuOpen ? (
+          <div className="border-t border-white/20 lg:hidden planning-zoom-show-mobile-menu">
+            <div className="mx-auto w-full max-w-7xl px-4 pb-3 pt-2 sm:px-6 lg:px-8">
               <div className="grid grid-cols-2 gap-2">
                 {["Home", "About Us", "Our Products", "Categories", "Contact"].map((item) => (
                   <button
@@ -1154,9 +1154,9 @@ export default function ECommercePage() {
                   </button>
                 ))}
               </div>
-              </div>
             </div>
-          ) : null}
+          </div>
+        ) : null}
       </section>
 
       <div ref={contentStartRef} className="mx-auto w-full max-w-7xl px-4 pb-8 pt-5 sm:px-6 sm:pb-10 sm:pt-7 lg:px-8 lg:pb-12">
@@ -1306,11 +1306,22 @@ export default function ECommercePage() {
             >
               {buyCategories.map((item) => (
                 item.label === "All Categories" ? (
-                  <div key={item.label} ref={allCategoriesWrapRef} className="buyscreen-all-categories-wrap relative shrink-0">
+                  <div
+                    key={item.label}
+                    ref={allCategoriesWrapRef}
+                    className="buyscreen-all-categories-wrap relative shrink-0"
+                    onBlur={(e) => {
+                      if (!e.currentTarget.contains(e.relatedTarget)) {
+                        setIsAllCategoriesDropdownOpen(false);
+                      }
+                    }}
+                  >
                     <button
                       type="button"
                       aria-expanded={isAllCategoriesDropdownOpen}
-                      className="buyscreen-all-categories-toggle inline-flex items-center gap-1 rounded-md px-2 py-1 text-left text-[10px] font-semibold transition-colors duration-150 hover:bg-white hover:text-[#06224C] sm:text-xs"
+                      aria-controls="buyscreen-all-categories-menu"
+                      aria-haspopup="menu"
+                      className="buyscreen-all-categories-toggle inline-flex items-center gap-1 rounded-md px-2 py-1 text-left text-[10px] font-semibold transition-colors duration-150 hover:bg-white hover:text-[#06224C] focus-visible:outline-none focus-visible:bg-white focus-visible:text-[#06224C] focus-visible:ring-2 focus-visible:ring-blue-300 sm:text-xs"
                       onClick={() => setIsAllCategoriesDropdownOpen((prev) => !prev)}
                     >
                       All Categories
@@ -1318,12 +1329,18 @@ export default function ECommercePage() {
                         <path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </button>
-                    <div className={`buyscreen-all-categories-dropdown ${isAllCategoriesDropdownOpen ? "buyscreen-all-categories-dropdown--open" : ""}`}>
+                    <div
+                      id="buyscreen-all-categories-menu"
+                      role="menu"
+                      className={`buyscreen-all-categories-dropdown ${isAllCategoriesDropdownOpen ? "buyscreen-all-categories-dropdown--open" : ""}`}
+                    >
                       {buyAllSubCategories.map((subCategory) => (
                         <button
                           key={subCategory.key}
                           type="button"
-                          className="buyscreen-all-categories-item"
+                          role="menuitem"
+                          tabIndex={isAllCategoriesDropdownOpen ? 0 : -1}
+                          className="buyscreen-all-categories-item focus-visible:outline-none focus-visible:bg-[#f1f5f9] focus-visible:text-[#06224C]"
                           onClick={() => handleSubCategoryClick(subCategory.key)}
                         >
                           {subCategory.label}
@@ -1346,20 +1363,18 @@ export default function ECommercePage() {
           </nav>
 
           <div className="space-y-10 px-4 py-8 sm:space-y-12 sm:px-8 sm:py-10 lg:py-12">
-            <section className="buyscreen-hero relative flex aspect-[4/5] items-center overflow-hidden rounded-[1.75rem] border border-[#dbe3ef] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] sm:aspect-[16/10] sm:p-8 lg:aspect-[16/8] lg:p-12">
+            <section className="buyscreen-hero relative flex min-h-[400px] sm:min-h-[500px] lg:min-h-0 lg:aspect-[16/8] items-center overflow-hidden rounded-[1.75rem] border border-[#dbe3ef] py-12 px-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] sm:p-8 lg:p-12">
               <picture className="absolute inset-0 block h-full w-full">
                 <source media="(max-width: 767px)" srcSet={assetPath("/mobilebackground.png")} />
                 <img src={assetPath("/background.webp")} alt="Electronics hero background" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" decoding="async" />
               </picture>
               <div className="buyscreen-hero-overlay absolute inset-0 z-[1]" aria-hidden />
               <div ref={heroContentRef} className="buyscreen-hero-content relative z-10 w-full min-w-0 max-w-full px-1 text-center sm:max-w-2xl sm:px-0 lg:text-left">
-                <span className="inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white shadow-sm backdrop-blur">
-                  Daily electronics deals
-                </span>
-                <h1 className="mt-3 text-[clamp(1.5rem,5.4vw,2.4rem)] font-black leading-tight text-white sm:text-4xl lg:text-5xl">
+
+                <h1 className="mt-3 break-words [overflow-wrap:anywhere] text-[clamp(1.5rem,5.4vw,2.4rem)] font-black leading-tight text-white sm:text-4xl lg:text-5xl">
                   Your One-Stop Electronic Market
                 </h1>
-                <p className="mx-auto mt-3 max-w-xl text-[clamp(0.8rem,2.9vw,1rem)] leading-relaxed text-white/90 sm:mt-4 sm:text-base lg:mx-0">
+                <p className="mx-auto mt-3 max-w-xl break-words [overflow-wrap:anywhere] text-[clamp(0.8rem,2.9vw,1rem)] leading-relaxed text-white/90 sm:mt-4 sm:text-base lg:mx-0">
                   Curated phones, laptops, audio, cameras, and smart accessories with fast browsing, quick favorites, and clean checkout previews.
                 </p>
                 <div className="mt-5 flex flex-col items-center gap-3 sm:mt-7 sm:flex-row lg:justify-start">
@@ -1370,26 +1385,9 @@ export default function ECommercePage() {
                   >
                     Shop Now
                   </button>
-                  <button
-                    type="button"
-                    className="inline-flex w-full items-center justify-center rounded-full border border-white/40 bg-white/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:bg-white/20 sm:w-auto sm:px-6"
-                    onClick={() => {
-                      setActiveCategoryLabel("Best Seller");
-                      setActiveSubCategoryKey(null);
-                      setShowAllProducts(true);
-                      featuredProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }}
-                  >
-                    Best Sellers
-                  </button>
+
                 </div>
-                <div className="mt-5 grid grid-cols-3 gap-2 text-left sm:mt-7 sm:max-w-md">
-                  {["10+ Products", "24/7 Support", "Fast Cart"].map((item) => (
-                    <span key={item} className="rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-center text-[10px] font-bold text-white/90 backdrop-blur">
-                      {item}
-                    </span>
-                  ))}
-                </div>
+
               </div>
             </section>
             {showHeroScrollNote ? (
@@ -1405,8 +1403,8 @@ export default function ECommercePage() {
                     <BuyFeatureIcon type={feature.icon} />
                   </span>
                   <div className="min-w-0">
-                    <p className="font-black text-[#111827]">{feature.title}</p>
-                    <p className="mt-0.5 text-xs leading-relaxed text-[#6b7280] sm:text-sm">{feature.subtitle}</p>
+                    <p className="font-black break-words [overflow-wrap:anywhere] text-[#111827]">{feature.title}</p>
+                    <p className="mt-0.5 break-words [overflow-wrap:anywhere] text-xs leading-relaxed text-[#6b7280] sm:text-sm">{feature.subtitle}</p>
                   </div>
                 </div>
               ))}
@@ -1426,13 +1424,13 @@ export default function ECommercePage() {
                 {buyCategorySpotlights.map((category) => (
                   <article
                     key={category.title}
-                    className={`buyscreen-category-card group overflow-hidden rounded-2xl border border-[#e7edf5] bg-gradient-to-br ${category.accent} p-5 shadow-sm transition duration-300`}
+                    className="buyscreen-category-card group overflow-hidden rounded-2xl border border-[#e7edf5] bg-[#f8fafc] hover:bg-white hover:border-[#bfdbfe] hover:shadow-md p-5 shadow-sm transition duration-300"
                   >
                     <div className="flex min-h-[210px] flex-col justify-between gap-5">
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-wrap sm:flex-nowrap items-start justify-between gap-4">
                         <div className="min-w-0">
-                          <p className="text-lg font-black text-[#111827]">{category.title}</p>
-                          <p className="mt-2 text-sm leading-relaxed text-[#64748b]">{category.subtitle}</p>
+                          <p className="text-lg break-words [overflow-wrap:anywhere] font-black text-[#111827]">{category.title}</p>
+                          <p className="mt-2 text-sm break-words [overflow-wrap:anywhere] leading-relaxed text-[#64748b]">{category.subtitle}</p>
                         </div>
                         <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#06224C] shadow-sm transition duration-300 group-hover:rotate-12 group-hover:bg-[#06224C] group-hover:text-white">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -1440,7 +1438,7 @@ export default function ECommercePage() {
                           </svg>
                         </span>
                       </div>
-                      <div className="flex items-end justify-between gap-4">
+                      <div className="flex flex-wrap-reverse sm:flex-nowrap items-end justify-between gap-4">
                         <button
                           type="button"
                           className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#06224C] shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-[#06224C] hover:text-white"
@@ -1453,7 +1451,7 @@ export default function ECommercePage() {
                           alt={`${category.title} category`}
                           width={128}
                           height={112}
-                          className="h-28 w-32 object-contain transition duration-500 group-hover:scale-110"
+                          className="h-20 w-24 sm:h-28 sm:w-32 shrink-0 max-w-full object-contain transition duration-500 group-hover:scale-110"
                           loading="lazy"
                           unoptimized
                         />
@@ -1494,11 +1492,11 @@ export default function ECommercePage() {
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
                   {buyDealHighlights.map((item) => (
-                    <div key={item.label} className="rounded-2xl border border-white/15 bg-white/10 p-4 text-center backdrop-blur">
-                      <p className="text-xl font-black sm:text-2xl">{item.value}</p>
-                      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-white/65">{item.label}</p>
+                    <div key={item.label} className="flex-1 min-w-[70px] sm:min-w-[90px] rounded-2xl border border-white/15 bg-white/10 p-3 sm:p-4 text-center backdrop-blur">
+                      <p className="text-xl break-words [overflow-wrap:anywhere] font-black sm:text-2xl">{item.value}</p>
+                      <p className="mt-1 break-words [overflow-wrap:anywhere] text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.16em] text-white/65">{item.label}</p>
                     </div>
                   ))}
                 </div>
@@ -1552,71 +1550,71 @@ export default function ECommercePage() {
                     style={
                       isCarouselMode
                         ? ({
-                            ["--buyscreen-carousel-slots" as string]: String(carouselSlots),
-                          } as React.CSSProperties)
+                          ["--buyscreen-carousel-slots" as string]: String(carouselSlots),
+                        } as React.CSSProperties)
                         : undefined
                     }
                   >
-                  {displayedProducts.map((product, index) => (
-                    <article
-                      key={`${product.id}-${index}`}
-                      tabIndex={0}
-                      className="buyscreen-product-card group relative flex min-w-0 flex-col rounded-2xl border border-[#e7edf5] bg-white p-2 shadow-sm transition duration-300 hover:border-[#bfdbfe] hover:shadow-[0_24px_55px_rgba(15,35,75,0.16)] sm:p-3"
-                    >
-                      <div
-                        className="buyscreen-product-image-wrap relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-[#f8fafc]"
-                        role="img"
-                        aria-label={`${product.name} product image`}
+                    {displayedProducts.map((product, index) => (
+                      <article
+                        key={`${product.id}-${index}`}
+                        tabIndex={0}
+                        className="buyscreen-product-card group relative flex min-w-0 flex-col rounded-2xl border border-[#e7edf5] bg-white p-2 shadow-sm transition duration-300 hover:border-[#bfdbfe] hover:shadow-[0_24px_55px_rgba(15,35,75,0.16)] sm:p-3"
                       >
                         <div
-                          className="absolute inset-3 rounded-lg bg-[#f8fafc] bg-contain bg-center bg-no-repeat transition duration-500 group-hover:scale-105"
-                          style={{
-                            backgroundImage: `url('${product.image}')`,
-                          }}
-                        />
-                        <div className="buyscreen-product-hover-actions pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden justify-center px-1 pb-2 pt-6 opacity-0 transition-opacity duration-200 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 lg:flex">
-                          <div className="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
-                            <BuyProductActionButtons
-                              compact={false}
-                              isFavorite={favoriteProductIds.includes(product.id)}
-                              onCartClick={() => openLicenseModal(product)}
-                              onFavoriteClick={() => toggleFavorite(product)}
-                              onShareClick={() => {
-                                void shareProduct(product);
-                              }}
-                            />
+                          className="buyscreen-product-image-wrap relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-[#f8fafc]"
+                          role="img"
+                          aria-label={`${product.name} product image`}
+                        >
+                          <div
+                            className="absolute inset-3 rounded-lg bg-[#f8fafc] bg-contain bg-center bg-no-repeat transition duration-500 group-hover:scale-105"
+                            style={{
+                              backgroundImage: `url('${product.image}')`,
+                            }}
+                          />
+                          <div className="buyscreen-product-hover-actions pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden justify-center px-1 pb-2 pt-6 opacity-0 transition-opacity duration-200 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 lg:flex">
+                            <div className="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
+                              <BuyProductActionButtons
+                                compact={false}
+                                isFavorite={favoriteProductIds.includes(product.id)}
+                                onCartClick={() => openLicenseModal(product)}
+                                onFavoriteClick={() => toggleFavorite(product)}
+                                onShareClick={() => {
+                                  void shareProduct(product);
+                                }}
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="buyscreen-product-actions-mobile grid grid-cols-3 place-items-center gap-1 border-t border-[#f3f4f6] px-1 py-1 lg:hidden">
-                        <BuyProductActionButtons
-                          compact
-                          isFavorite={favoriteProductIds.includes(product.id)}
-                          onCartClick={() => openLicenseModal(product)}
-                          onFavoriteClick={() => toggleFavorite(product)}
-                          onShareClick={() => {
-                            void shareProduct(product);
-                          }}
-                        />
-                      </div>
-                      <div className="buyscreen-product-meta mt-3 min-w-0 px-1 pb-1 sm:mt-4">
-                        {product.badge ? (
-                          <p className="mb-1 text-center">
-                            <span className="inline-block rounded bg-[#ff664f] px-2 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm">{product.badge}</span>
+                        <div className="buyscreen-product-actions-mobile grid grid-cols-3 place-items-center gap-1 border-t border-[#f3f4f6] px-1 py-1 lg:hidden">
+                          <BuyProductActionButtons
+                            compact
+                            isFavorite={favoriteProductIds.includes(product.id)}
+                            onCartClick={() => openLicenseModal(product)}
+                            onFavoriteClick={() => toggleFavorite(product)}
+                            onShareClick={() => {
+                              void shareProduct(product);
+                            }}
+                          />
+                        </div>
+                        <div className="buyscreen-product-meta flex flex-1 flex-col mt-3 min-w-0 px-1 pb-1 sm:mt-4">
+                          <p className="text-center text-[10px] font-semibold uppercase leading-snug tracking-tight text-[#6b7280] [overflow-wrap:anywhere] sm:text-xs sm:leading-normal sm:tracking-[0.06em] md:tracking-[0.08em]">
+                            {product.name}
                           </p>
-                        ) : null}
-                        <p className="text-center text-[10px] font-semibold uppercase leading-snug tracking-tight text-[#6b7280] [overflow-wrap:anywhere] sm:text-xs sm:leading-normal sm:tracking-[0.06em] md:tracking-[0.08em]">
-                          {product.name}
-                        </p>
-                        <p className="mt-1 text-center text-xs font-bold leading-snug tracking-tight text-[#171717] [overflow-wrap:anywhere] tabular-nums sm:text-sm">
-                          {product.originalPrice ? (
-                            <span className="mr-1.5 text-[10px] font-semibold text-[#9ca3af] line-through sm:text-xs">{product.originalPrice}</span>
-                          ) : null}
-                          {product.price}
-                        </p>
-                      </div>
-                    </article>
-                  ))}
+                          <p className="mt-1 text-center text-xs font-bold leading-snug tracking-tight text-[#171717] [overflow-wrap:anywhere] tabular-nums sm:text-sm">
+                            {product.originalPrice ? (
+                              <span className="mr-1.5 text-[10px] font-semibold text-[#9ca3af] line-through sm:text-xs">{product.originalPrice}</span>
+                            ) : null}
+                            {product.price}
+                          </p>
+                          <div className="mt-auto pt-2 flex justify-center">
+                            {product.badge ? (
+                              <span className="inline-block rounded bg-[#ff664f] px-2 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm">{product.badge}</span>
+                            ) : null}
+                          </div>
+                        </div>
+                      </article>
+                    ))}
                   </div>
                 </div>
                 {!showAllProducts && !isSearching ? (
@@ -1654,9 +1652,6 @@ export default function ECommercePage() {
                   <p className="mt-3 text-sm leading-relaxed text-[#64748b]">
                     A standard e-commerce layout should guide shoppers without noise. This flow highlights discovery, cart confidence, and checkout readiness.
                   </p>
-                </div>
-                <div className="buyscreen-flow-art absolute bottom-4 right-4 hidden h-28 w-28 rounded-[1.5rem] bg-white p-4 shadow-[0_18px_40px_rgba(15,35,75,0.12)] sm:block" aria-hidden>
-                  <Image src={assetPath("/mouse.webp")} alt="" width={96} height={96} className="h-full w-full object-contain" unoptimized />
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
@@ -1718,13 +1713,13 @@ export default function ECommercePage() {
                   <p className="text-xs font-black uppercase tracking-[0.22em] text-[#2563eb]">Partner ecosystem</p>
                   <h2 className="mt-2 text-2xl font-black tracking-tight text-[#111827] sm:text-3xl">Featured Tech Brands</h2>
                 </div>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3 sm:grid-cols-5">
                   {buyBrandPartners.map((brand, index) => (
                     <div key={brand} className="buyscreen-brand-tile flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-[#e7edf5] bg-white px-3 text-center text-xs font-black uppercase tracking-[0.14em] text-[#64748b] shadow-sm transition duration-300">
-                      <span className="buyscreen-brand-mark inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#eff6ff] text-sm font-black text-[#2563eb]">
+                      <span className="buyscreen-brand-mark shrink-0 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#eff6ff] text-sm font-black text-[#2563eb]">
                         {brand.slice(0, 1)}
                       </span>
-                      <span>{brand}</span>
+                      <span className="break-words [overflow-wrap:anywhere]">{brand}</span>
                       <span className="sr-only">Brand partner {index + 1}</span>
                     </div>
                   ))}
@@ -1765,11 +1760,11 @@ export default function ECommercePage() {
                     </button>
                   </form>
                 </div>
-                <div className="buyscreen-update-art grid grid-cols-3 gap-3 rounded-[1.5rem] bg-[#f8fafc] p-4">
-                  {buyUpdateProducts.map((product, index) => (
-                    <div key={product.name} className={`buyscreen-update-product rounded-2xl border border-[#e7edf5] bg-white p-3 shadow-sm ${index === 1 ? "translate-y-5" : ""}`}>
-                      <Image src={product.image} alt={product.name} width={100} height={100} className="h-20 w-full object-contain" unoptimized />
-                      <p className="mt-2 text-center text-[10px] font-black uppercase tracking-[0.12em] text-[#64748b]">{product.name}</p>
+                <div className="buyscreen-update-art grid grid-cols-3 gap-2 sm:gap-3 items-stretch rounded-[1.5rem] bg-[#f8fafc] p-3 sm:p-4">
+                  {buyUpdateProducts.map((product) => (
+                    <div key={product.name} className="buyscreen-update-product flex flex-col items-center justify-between rounded-2xl border border-[#e7edf5] bg-white p-2 sm:p-3 shadow-sm h-full w-full">
+                      <Image src={product.image} alt={product.name} width={100} height={100} className="h-16 sm:h-20 w-full object-contain shrink-0" unoptimized />
+                      <p className="mt-2 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-[0.12em] text-[#64748b]">{product.name}</p>
                     </div>
                   ))}
                 </div>

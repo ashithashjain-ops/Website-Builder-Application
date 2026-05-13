@@ -38,7 +38,123 @@ body {
 /* Plans (/planning): match static index — page bg fills viewport so default white body does not frame the layout */
 html:has(body > main.planning-page),
 body:has(> main.planning-page) {
-  background-color: #efefef;
+  background-color: #f1f5f9;
+}
+
+.planning-sale-strip {
+  animation: planning-slide-down 0.45s ease both;
+}
+
+.planning-hero-panel {
+  animation: planning-panel-in 0.55s ease both;
+}
+
+.planning-fade-up {
+  animation: planning-fade-up 0.58s ease both;
+}
+
+.planning-fade-up:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.planning-fade-up:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.planning-fade-up:nth-child(4) {
+  animation-delay: 0.15s;
+}
+
+.planning-fade-up:nth-child(5) {
+  animation-delay: 0.2s;
+}
+
+.planning-plan-card {
+  animation: planning-card-in 0.5s ease both;
+  will-change: transform;
+}
+
+.planning-plan-card:nth-child(2) {
+  animation-delay: 0.07s;
+}
+
+.planning-plan-card:nth-child(3) {
+  animation-delay: 0.14s;
+}
+
+.planning-view-panel {
+  animation: planning-panel-in 0.42s ease both;
+}
+
+.planning-payment-option:has(input:checked) {
+  border-color: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 16px 34px rgba(2, 15, 38, 0.16);
+}
+
+.planning-payment-form-card,
+.planning-invoice-row,
+.planning-history-table tbody tr {
+  animation: planning-card-in 0.42s ease both;
+}
+
+.planning-history-table tbody tr:nth-child(2),
+.planning-invoice-row:nth-child(2) {
+  animation-delay: 0.04s;
+}
+
+.planning-history-table tbody tr:nth-child(3),
+.planning-invoice-row:nth-child(3) {
+  animation-delay: 0.08s;
+}
+
+.planning-history-table tbody tr:nth-child(4),
+.planning-invoice-row:nth-child(4) {
+  animation-delay: 0.12s;
+}
+
+@keyframes planning-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes planning-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes planning-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes planning-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* E-Commerce page (/e-commerce): keep page background pure white */
@@ -878,11 +994,18 @@ main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
   .planning-invoice-view,
   .planning-history-view {
     max-width: 100% !important;
-    border-radius: 6px !important;
+    border-radius: 10px !important;
+  }
+  .planning-payment-view {
+    box-shadow: 0 18px 38px rgba(2, 15, 38, 0.2) !important;
+  }
+  .planning-payment-option {
+    min-height: 2.75rem;
   }
   .planning-payment-view input:not([type="radio"]):not([type="checkbox"]),
   .planning-payment-view select {
-    font-size: 12px !important;
+    min-height: 2.65rem;
+    font-size: 13px !important;
   }
   /* Same visual size for all payment method radios at high mobile zoom */
   .planning-payment-view input[type="radio"].planning-pm-radio {
@@ -989,6 +1112,73 @@ main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
   .planning-history-view table {
     min-width: 360px !important;
     font-size: 10px !important;
+  }
+}
+@media (max-width: 520px) {
+  .planning-history-view {
+    padding: 0.85rem !important;
+  }
+  .planning-history-view .planning-history-table-wrap {
+    overflow-x: visible !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .planning-history-view .planning-history-table {
+    display: block !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    border-collapse: separate !important;
+  }
+  .planning-history-view .planning-history-table thead {
+    display: none !important;
+  }
+  .planning-history-view .planning-history-table tbody {
+    display: grid !important;
+    gap: 0.75rem !important;
+  }
+  .planning-history-view .planning-history-table tr {
+    display: block !important;
+    border: 1px solid rgba(226, 232, 240, 0.95) !important;
+    border-radius: 0.85rem !important;
+    background: #ffffff !important;
+    box-shadow: 0 16px 34px rgba(2, 15, 38, 0.16) !important;
+    overflow: hidden !important;
+  }
+  .planning-history-view .planning-history-table td {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding: 0.75rem 0.85rem !important;
+    text-align: right !important;
+    overflow-wrap: anywhere !important;
+  }
+  .planning-history-view .planning-history-table td:first-child {
+    border-top: 0 !important;
+  }
+  .planning-history-view .planning-history-table td::before {
+    flex: 0 0 auto;
+    color: #475569;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .planning-history-view .planning-history-table td:nth-child(1)::before {
+    content: "Date";
+  }
+  .planning-history-view .planning-history-table td:nth-child(2)::before {
+    content: "Invoice ID";
+  }
+  .planning-history-view .planning-history-table td:nth-child(3)::before {
+    content: "Amount";
+  }
+  .planning-history-view .planning-history-table td:nth-child(4)::before {
+    content: "Status";
+  }
+  .planning-history-view .planning-history-table td:nth-child(5)::before {
+    content: "Download";
   }
 }
 @media (max-width: 380px) {
@@ -2264,6 +2454,11 @@ input[type="password"]::-ms-reveal {
   .stackly-mobile-menu,
   .stackly-modal-pop,
   .stackly-toast,
+  .planning-sale-strip,
+  .planning-hero-panel,
+  .planning-fade-up,
+  .planning-plan-card,
+  .planning-view-panel,
   .stackly-loader-screen,
   .stackly-loader-card::before,
   .stackly-loader-bolt,

@@ -378,32 +378,32 @@ export default function PlanningPage() {
   }
 
   return (
-    <main className="planning-page flex min-h-[100dvh] w-full flex-col overflow-x-hidden bg-[#efefef]">
+    <main className="planning-page flex min-h-[100dvh] w-full flex-col overflow-x-hidden bg-slate-100">
       <div className="w-full flex-1">
-        <div className="w-full border border-[#dbe3ef] bg-white shadow-sm">
+        <div className="w-full border border-slate-200 bg-white shadow-sm">
           <section
             id="planning-billing-content"
             className="scroll-mt-4 px-3 py-5 sm:px-8 sm:py-8"
           >
-            <div className="mb-4 w-full rounded-sm bg-gradient-to-r from-[#06224C] to-[#1A5BBC] px-4 py-2 text-center text-[11px] font-semibold text-white sm:text-xs">
+            <div className="planning-sale-strip mb-4 w-full rounded-md bg-gradient-to-r from-slate-950 via-blue-900 to-blue-600 px-4 py-2 text-center text-[11px] font-semibold text-white shadow-lg shadow-blue-950/10 sm:text-xs">
               Upgrade Now: Get - 50% Off on Selected Plans
             </div>
 
             {planningView === "plans" && (
-            <div className="rounded bg-[#edf3fb] px-5 py-8 sm:px-8 sm:py-10 md:px-10">
+            <div className="planning-hero-panel rounded-lg bg-gradient-to-br from-slate-50 via-blue-50 to-white px-5 py-8 shadow-sm ring-1 ring-slate-200/80 sm:px-8 sm:py-10 md:px-10">
               <div className="mx-auto w-full max-w-5xl">
-            <h1 className="text-center text-3xl font-bold text-[#0b3268] sm:text-[44px] sm:leading-tight">
+            <h1 className="planning-fade-up text-center text-3xl font-bold text-slate-950 sm:text-[44px] sm:leading-tight">
               Choose the Best Plan for You
             </h1>
-              <p className="mx-auto mt-4 max-w-2xl text-center text-[13px] font-medium leading-relaxed text-[#0f172a] sm:text-sm md:text-base">
+              <p className="planning-fade-up mx-auto mt-4 max-w-2xl text-center text-[13px] font-medium leading-relaxed text-slate-700 sm:text-sm md:text-base">
                 Create your website for free and upgrade when you’re ready
               </p>
 
-              <div className="mt-5 flex justify-center sm:mt-6">
+              <div className="planning-fade-up mt-5 flex justify-center sm:mt-6">
                 <button
                   type="button"
                   onClick={() => handlePurchasePlan(plans[0], true)}
-                  className="inline-flex items-center gap-2 rounded-full border-0 bg-gradient-to-r from-[#06224C] to-[#1A5BBC] px-5 py-2.5 text-[11px] font-semibold text-white no-underline shadow-md transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#06224C]/45 hover:ring-2 hover:ring-white/55 active:translate-y-0 active:shadow-md sm:text-xs"
+                  className="inline-flex items-center gap-2 rounded-full border-0 bg-gradient-to-r from-slate-950 to-blue-700 px-5 py-2.5 text-[11px] font-semibold text-white no-underline shadow-lg shadow-blue-950/20 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-900/30 hover:ring-2 hover:ring-white/70 active:translate-y-0 active:scale-100 sm:text-xs"
                 >
                   <span>Start Your Free Plan</span>
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center" aria-hidden>
@@ -435,28 +435,28 @@ export default function PlanningPage() {
                 </button>
             </div>
 
-              <div className="mt-8 w-full pl-0 sm:pl-5 md:pl-8 lg:pl-10">
+              <div className="planning-fade-up mt-8 w-full pl-0 sm:pl-5 md:pl-8 lg:pl-10">
                 <div className="grid w-full min-w-0 grid-cols-1 gap-y-3 md:grid-cols-4 md:items-center md:gap-x-4 lg:gap-x-6">
-                  <p className="min-w-0 text-center text-sm font-bold leading-snug text-[#0c1e36] md:text-left">
+                  <p className="min-w-0 text-center text-sm font-bold leading-snug text-slate-900 md:text-left">
               What you get with every plan:
             </p>
-                  <span className="min-w-0 text-center text-sm font-medium text-[#0f172a] sm:text-center">
+                  <span className="min-w-0 rounded-full bg-white px-3 py-2 text-center text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-200 sm:text-center">
                     Custom Domain
                   </span>
-                  <span className="min-w-0 text-center text-sm font-medium text-[#0f172a] sm:text-center">
+                  <span className="min-w-0 rounded-full bg-white px-3 py-2 text-center text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-200 sm:text-center">
                     Reliable web hosting
                   </span>
-                  <span className="min-w-0 text-center text-sm font-medium text-[#0f172a] sm:text-center">
+                  <span className="min-w-0 rounded-full bg-white px-3 py-2 text-center text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-200 sm:text-center">
                     24/7 customer care
                   </span>
                 </div>
             </div>
 
-              <div className="mt-8 flex w-full justify-center px-3 sm:px-4">
+              <div className="planning-fade-up mt-8 flex w-full justify-center px-3 sm:px-4">
                 <div className="planning-billing-toggle-wrap flex w-full max-w-xl items-center gap-3 sm:gap-5">
                   <span
                     className={`planning-billing-label inline-flex min-h-9 min-w-0 flex-1 select-none items-center justify-end gap-1 py-1.5 pl-2 pr-1 text-right text-sm leading-tight sm:pr-2 ${
-                      !billingYearly ? "font-bold text-[#0c1e36]" : "font-medium text-[#3d4f63]"
+                      !billingYearly ? "font-bold text-slate-950" : "font-medium text-slate-500"
                     }`}
                   >
                     <span className="planning-billing-label-line">Bill</span>
@@ -468,17 +468,17 @@ export default function PlanningPage() {
                     aria-checked={billingYearly}
                     aria-label="Toggle monthly or yearly billing"
                     onClick={() => setBillingYearly((v) => !v)}
-                    className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center self-center rounded-full border border-[#94a3b8] bg-white px-0.5 align-middle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06224C]/40 focus-visible:ring-offset-2"
+                    className="relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center self-center rounded-full border border-slate-300 bg-white px-0.5 align-middle shadow-inner transition-colors duration-300 hover:border-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700/40 focus-visible:ring-offset-2"
                   >
                     <span
-                      className={`pointer-events-none absolute left-0.5 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#06224C] shadow-sm transition-transform duration-200 ${
+                      className={`pointer-events-none absolute left-0.5 top-1/2 h-5 w-5 -translate-y-1/2 rounded-full bg-blue-700 shadow-sm transition-transform duration-300 ${
                         billingYearly ? "translate-x-6" : "translate-x-0"
                       }`}
                     />
                   </button>
                   <span
                     className={`planning-billing-label inline-flex min-h-9 min-w-0 flex-1 select-none items-center justify-start gap-1 py-1.5 pl-1 pr-2 text-left text-sm leading-tight sm:pl-2 ${
-                      billingYearly ? "font-bold text-[#0c1e36]" : "font-medium text-[#3d4f63]"
+                      billingYearly ? "font-bold text-slate-950" : "font-medium text-slate-500"
                     }`}
                   >
                     <span className="planning-billing-label-line">Bill</span>
@@ -488,23 +488,23 @@ export default function PlanningPage() {
               </div>
             </div>
 
-              <div className="planning-plans-grid mx-auto mt-8 grid w-full max-w-5xl grid-cols-1 gap-5 md:grid-cols-3 md:gap-6 md:items-stretch">
+              <div className="planning-plans-grid mx-auto mt-8 grid w-full max-w-5xl grid-cols-1 gap-5 md:grid-cols-3 md:items-stretch md:gap-6">
               {plans.map((plan) => (
                 <article
                   key={plan.name}
-                    className={`group relative flex h-full min-h-0 flex-col rounded border border-[#d8e1ec] bg-white p-4 text-[#0f172a] shadow-sm transition-all duration-200 hover:border-transparent hover:bg-gradient-to-b hover:from-[#06224C] hover:to-[#1A5BBC] hover:text-white hover:shadow-md sm:p-4 ${
+                    className={`planning-plan-card group relative flex h-full min-h-0 flex-col rounded-lg border border-slate-200 bg-white p-4 text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/20 hover:bg-gradient-to-b hover:from-slate-950 hover:to-blue-700 hover:text-white hover:shadow-xl hover:shadow-blue-950/20 sm:p-4 ${
                       plan.isRecommended ? "planning-recommended-card" : ""
                     }`}
                 >
                   {plan.isRecommended && (
-                      <div className="planning-recommended-badge absolute right-0 top-0 z-10 rounded-bl-md border border-white/10 bg-[#1A5BBC] px-3 py-1.5 text-[9px] font-extrabold leading-none tracking-wide text-white shadow-[0_2px_6px_rgba(0,0,0,0.12)] transition-colors group-hover:border-[#06224C]/40 group-hover:bg-white group-hover:text-[#06224C] hover:border-[#06224C]/40 hover:bg-white hover:text-[#06224C]">
+                      <div className="planning-recommended-badge absolute right-0 top-0 z-10 rounded-bl-md rounded-tr-lg border border-white/10 bg-blue-600 px-3 py-1.5 text-[9px] font-extrabold leading-none tracking-wide text-white shadow-sm transition-colors group-hover:border-slate-900/40 group-hover:bg-white group-hover:text-slate-950 hover:border-slate-900/40 hover:bg-white hover:text-slate-950">
                       RECOMMENDED
                     </div>
                   )}
                     <div className={`mb-1.5 flex items-center justify-between gap-2 ${plan.isRecommended ? "planning-recommended-content-offset" : ""}`}>
                     <div>
                         <h2 className="text-base font-bold leading-tight transition-colors group-hover:text-white">{plan.name}</h2>
-                        <p className="mt-0.5 text-xs leading-tight text-[#1e3a5c] transition-colors group-hover:text-white">
+                        <p className="mt-0.5 text-xs leading-tight text-blue-900 transition-colors group-hover:text-white/85">
                           {billingYearly ? "Per year" : "Per month"}
                         </p>
                       </div>
@@ -512,23 +512,23 @@ export default function PlanningPage() {
 
                     <div className="planning-price-row mb-1.5 flex items-start justify-between gap-2 lg:items-end">
                       <div className="planning-price-oldsave flex min-w-0 flex-wrap items-end gap-x-1.5 gap-y-0.5 pr-1">
-                        <div className="text-sm font-bold text-[#0f172a] line-through transition-colors group-hover:text-white">
+                        <div className="text-sm font-bold text-slate-900 line-through transition-colors group-hover:text-white">
                           {billingYearly ? plan.yearlyOldPrice : plan.oldPrice}
                         </div>
-                        <div className="text-[10px] font-semibold leading-tight text-[#2d4a6e] transition-colors group-hover:text-white">
+                        <div className="text-[10px] font-semibold leading-tight text-slate-500 transition-colors group-hover:text-white/85">
                           {billingYearly ? plan.yearlySaveText : plan.saveText}
                         </div>
                       </div>
-                      <div className="planning-price-chip relative top-0 mr-1 shrink-0 rounded border border-[#94b4e0] bg-[#e8f0fc] px-2 py-1 text-base font-bold leading-none text-[#082a5c] transition-colors lg:-top-2 lg:mr-3 lg:px-3.5 lg:py-1.5 lg:text-xl group-hover:border-white/30 group-hover:bg-white group-hover:text-[#0f3e87]">
+                      <div className="planning-price-chip relative top-0 mr-1 shrink-0 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-base font-bold leading-none text-blue-950 transition-colors lg:-top-2 lg:mr-3 lg:px-3.5 lg:py-1.5 lg:text-xl group-hover:border-white/30 group-hover:bg-white group-hover:text-blue-700">
                         {billingYearly ? plan.yearlyNewPrice : plan.newPrice}
                   </div>
                     </div>
-                    <div className="mb-2 h-px w-full bg-[#dbe3ef] transition-colors group-hover:bg-white/30" />
+                    <div className="mb-2 h-px w-full bg-slate-200 transition-colors group-hover:bg-white/30" />
 
-                    <ul className="space-y-1 text-xs leading-snug text-[#0f172a] transition-colors group-hover:text-white sm:text-sm sm:leading-snug">
+                    <ul className="space-y-1 text-xs leading-snug text-slate-700 transition-colors group-hover:text-white sm:text-sm sm:leading-snug">
                     {plan.features.map((feature) => (
                         <li key={feature} className="flex items-start gap-1.5">
-                          <FaCheckCircle className="mt-px shrink-0 text-[10px] text-[#0b3268] transition-colors group-hover:text-white" aria-hidden={true} />
+                          <FaCheckCircle className="mt-px shrink-0 text-[10px] text-blue-700 transition-colors group-hover:text-white" aria-hidden={true} />
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -539,7 +539,7 @@ export default function PlanningPage() {
                     <button
                       type="button"
                       onClick={() => handlePurchasePlan(plan)}
-                      className="block w-full shrink-0 rounded-full bg-gradient-to-r from-[#06224C] to-[#1A5BBC] py-2 text-center text-sm font-semibold text-white shadow-sm transition-colors transition-opacity duration-200 group-hover:bg-none group-hover:bg-white group-hover:text-[#154fa2] group-hover:opacity-100 hover:bg-none hover:bg-white hover:text-[#154fa2]"
+                      className="block w-full shrink-0 rounded-full bg-gradient-to-r from-slate-950 to-blue-700 py-2 text-center text-sm font-semibold text-white shadow-sm transition-all duration-300 group-hover:bg-none group-hover:bg-white group-hover:text-blue-700 group-hover:opacity-100 hover:bg-none hover:bg-white hover:text-blue-700 hover:shadow-md active:scale-[0.98]"
                   >
                     Purchase Plan
                     </button>
@@ -551,16 +551,13 @@ export default function PlanningPage() {
 
             {planningView === "payment" && selectedPlan && (
               <div
-                className="planning-payment-view mx-auto w-full text-white"
+                className="planning-payment-view planning-view-panel mx-auto w-full overflow-hidden rounded-xl border border-white/20 text-white shadow-2xl shadow-blue-950/25"
                 style={{
-                  maxWidth: 740,
-                  borderRadius: 8,
-                  overflow: "hidden",
+                  maxWidth: 780,
                   background: "linear-gradient(180deg, #2b66be 0%, #0a2a5f 100%)",
-                  boxShadow: "0 2px 0 rgba(0,0,0,0.2)",
                 }}
               >
-                <div className="border-b border-white/20 px-4 pb-6 pt-4 sm:px-6 sm:pb-8 sm:pt-6">
+                <div className="border-b border-white/20 bg-white/5 px-4 pb-6 pt-4 backdrop-blur sm:px-6 sm:pb-8 sm:pt-6">
                   <div className="mb-4 text-left">
                     <button
                       type="button"
@@ -576,9 +573,9 @@ export default function PlanningPage() {
                     <p className="mt-2 text-xs text-white/85 sm:text-sm">{paymentSubtitle()}</p>
                   </div>
                 </div>
-                <div className="mx-auto w-full px-4 py-6 sm:px-6 sm:py-8" style={{ maxWidth: 430 }}>
-                  <div className="space-y-3 text-xs sm:space-y-4 sm:text-sm">
-                    <label className="flex cursor-pointer items-start gap-2">
+                <div className="mx-auto w-full px-4 py-6 sm:px-6 sm:py-8" style={{ maxWidth: 500 }}>
+                  <div className="grid gap-3 text-xs sm:grid-cols-2 sm:text-sm">
+                    <label className="planning-payment-option flex cursor-pointer items-start gap-2 rounded-lg border border-white/15 bg-white/10 p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/15">
                       <input
                         type="radio"
                         name="pm"
@@ -588,7 +585,7 @@ export default function PlanningPage() {
                       />
                       <span className="min-w-0 flex-1 leading-snug">Paypal</span>
                     </label>
-                    <label className="flex cursor-pointer items-start gap-2">
+                    <label className="planning-payment-option flex cursor-pointer items-start gap-2 rounded-lg border border-white/15 bg-white/10 p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/15">
                       <input
                         type="radio"
                         name="pm"
@@ -598,7 +595,7 @@ export default function PlanningPage() {
                       />
                       <span className="min-w-0 flex-1 leading-snug">Credit / Debit Card</span>
                     </label>
-                    <label className="flex cursor-pointer items-start gap-2">
+                    <label className="planning-payment-option flex cursor-pointer items-start gap-2 rounded-lg border border-white/15 bg-white/10 p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/15">
                       <input
                         type="radio"
                         name="pm"
@@ -608,7 +605,7 @@ export default function PlanningPage() {
                       />
                       <span className="min-w-0 flex-1 leading-snug">Net Banking</span>
                     </label>
-                    <label className="flex cursor-pointer items-start gap-2">
+                    <label className="planning-payment-option flex cursor-pointer items-start gap-2 rounded-lg border border-white/15 bg-white/10 p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/15">
                       <input
                         type="radio"
                         name="pm"
@@ -620,7 +617,7 @@ export default function PlanningPage() {
                     </label>
                   </div>
 
-                  <div className="mt-5 border-t border-white/15 pt-5 text-xs sm:text-sm">
+                  <div className="planning-payment-form-card mt-5 rounded-xl border border-white/15 bg-white/10 p-4 text-xs shadow-lg shadow-blue-950/10 backdrop-blur sm:p-5 sm:text-sm">
                     {paymentMethod === "paypal" && (
                       <div className="space-y-3">
                         <p className="text-white/80">You will be redirected to PayPal to log in and approve this payment.</p>
@@ -631,7 +628,7 @@ export default function PlanningPage() {
                           inputMode="email"
                           autoComplete="email"
                           placeholder="PayPal email"
-                          className="block w-full rounded border border-white/40 bg-transparent px-3 py-2 text-xs text-white placeholder:text-white/70 focus:outline-none sm:text-sm"
+                          className="block w-full rounded-lg border border-white/30 bg-white/10 px-3 py-2.5 text-xs text-white shadow-inner placeholder:text-white/70 focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:text-sm"
                           style={{ width: "100%" }}
                         />
                       </div>
@@ -647,7 +644,7 @@ export default function PlanningPage() {
                           pattern="[0-9]*"
                           autoComplete="cc-number"
                           placeholder="Card Number"
-                          className="mb-4 block w-full rounded border border-white/40 bg-transparent px-3 py-2 text-xs text-white placeholder:text-white/70 focus:outline-none sm:text-sm"
+                          className="mb-4 block w-full rounded-lg border border-white/30 bg-white/10 px-3 py-2.5 text-xs text-white shadow-inner placeholder:text-white/70 focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:text-sm"
                           style={{ width: "100%" }}
                         />
                         <div
@@ -662,7 +659,7 @@ export default function PlanningPage() {
                             pattern="[0-9/]*"
                             autoComplete="cc-exp"
                             placeholder="MM/YY"
-                            className="planning-payment-expiry min-w-0 rounded border border-white/40 bg-transparent px-2 py-2 text-xs text-white placeholder:text-white/70 focus:outline-none sm:px-3 sm:text-sm"
+                            className="planning-payment-expiry min-w-0 rounded-lg border border-white/30 bg-white/10 px-2 py-2.5 text-xs text-white shadow-inner placeholder:text-white/70 focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:px-3 sm:text-sm"
                           />
                           <input
                             type="text"
@@ -672,7 +669,7 @@ export default function PlanningPage() {
                             pattern="[0-9]*"
                             autoComplete="cc-csc"
                             placeholder="Cvv"
-                            className="planning-payment-cvv min-w-0 rounded border border-white/40 bg-transparent px-2 py-2 text-xs text-white placeholder:text-white/70 focus:outline-none sm:px-3 sm:text-sm"
+                            className="planning-payment-cvv min-w-0 rounded-lg border border-white/30 bg-white/10 px-2 py-2.5 text-xs text-white shadow-inner placeholder:text-white/70 focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:px-3 sm:text-sm"
                           />
                         </div>
                       </div>
@@ -684,7 +681,7 @@ export default function PlanningPage() {
                         <select
                           value={netBank}
                           onChange={(e) => setNetBank(e.target.value)}
-                          className="w-full rounded border border-white/40 bg-[#0a2a5f]/80 px-3 py-2 text-xs text-white focus:outline-none sm:text-sm"
+                          className="w-full rounded-lg border border-white/30 bg-[#0a2a5f]/80 px-3 py-2.5 text-xs text-white shadow-inner focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:text-sm"
                         >
                           <option value="">Choose bank…</option>
                           <option value="hdfc">HDFC Bank</option>
@@ -731,7 +728,7 @@ export default function PlanningPage() {
                             onChange={(e) => setUpiId(e.target.value)}
                             placeholder="name@upi"
                             autoComplete="off"
-                            className="planning-payment-upi block min-w-0 w-full rounded border border-white/40 bg-transparent px-2 py-2 text-xs text-white placeholder:text-white/70 focus:outline-none sm:px-3 sm:text-sm"
+                            className="planning-payment-upi block min-w-0 w-full rounded-lg border border-white/30 bg-white/10 px-2 py-2.5 text-xs text-white shadow-inner placeholder:text-white/70 focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:px-3 sm:text-sm"
                             style={{ width: "100%" }}
                           />
                           <p className="mt-2 text-[11px] leading-snug text-white/75">
@@ -744,7 +741,7 @@ export default function PlanningPage() {
                     )}
                   </div>
                 </div>
-                <div className="border-t border-white/20 px-4 py-5 text-center sm:px-6 sm:py-6">
+                <div className="border-t border-white/20 bg-white/5 px-4 py-5 text-center sm:px-6 sm:py-6">
                   {paymentError ? (
                     <p className="mb-3 text-center text-xs font-medium text-red-200 sm:text-sm" role="alert">
                       {paymentError}
@@ -754,7 +751,7 @@ export default function PlanningPage() {
                     type="button"
                     onClick={handleCompletePayment}
                     disabled={paymentLoading}
-                    className="inline-flex min-w-[160px] items-center justify-center rounded bg-white px-5 py-2 text-xs font-semibold text-[#1f2937] disabled:opacity-70 sm:min-w-[180px] sm:px-6 sm:text-sm"
+                    className="inline-flex min-h-10 min-w-[160px] items-center justify-center rounded-lg bg-white px-5 py-2 text-xs font-semibold text-slate-900 shadow-lg shadow-blue-950/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl disabled:translate-y-0 disabled:opacity-70 sm:min-w-[180px] sm:px-6 sm:text-sm"
                   >
                     {paymentLoading ? "Processing payment..." : "Complete Payment"}
                   </button>
@@ -764,16 +761,13 @@ export default function PlanningPage() {
 
             {planningView === "invoice" && invoiceData && (
               <div
-                className="planning-invoice-view mx-auto w-full min-w-0 text-white"
+                className="planning-invoice-view planning-view-panel mx-auto w-full min-w-0 overflow-hidden rounded-xl border border-white/20 text-white shadow-2xl shadow-blue-950/25"
                 style={{
                   maxWidth: 900,
-                  borderRadius: 8,
-                  overflow: "hidden",
                   background: "linear-gradient(180deg, #2a66be 0%, #0b2a5c 100%)",
-                  boxShadow: "0 2px 0 rgba(0,0,0,0.25)",
                 }}
               >
-                <div className="px-4 py-5 sm:px-8 sm:py-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.15)" }}>
+                <div className="border-b border-white/15 bg-white/5 px-4 py-5 backdrop-blur sm:px-8 sm:py-6">
                   <div className="mb-4 text-left">
                     <button
                       type="button"
@@ -790,18 +784,18 @@ export default function PlanningPage() {
                 </div>
                 <div className="min-w-0 space-y-6 px-4 py-6 sm:space-y-8 sm:px-8 sm:py-7">
                   <div className="mx-auto w-full min-w-0 max-w-2xl space-y-3 text-xs sm:space-y-4 sm:text-[15px]">
-                    <div className="planning-invoice-row" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Invoice ID</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.invoiceId}</span></div>
-                    <div className="planning-invoice-row" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Date</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.date}</span></div>
-                    <div className="planning-invoice-row" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Plan</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.planName}</span></div>
-                    <div className="planning-invoice-row" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Amount</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.amount}</span></div>
+                    <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Invoice ID</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.invoiceId}</span></div>
+                    <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Date</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.date}</span></div>
+                    <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Plan</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.planName}</span></div>
+                    <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Amount</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.amount}</span></div>
                   </div>
                   <div className="min-w-0 pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
                     <h3 className="mx-auto mb-4 w-full min-w-0 max-w-2xl text-xl font-semibold sm:mb-5 sm:text-[30px]">Billing Information</h3>
                     <div className="mx-auto w-full min-w-0 max-w-2xl space-y-3 text-xs sm:space-y-4 sm:text-[15px]">
-                      <div className="planning-invoice-row" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Name</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.name}</span></div>
-                      <div className="planning-invoice-row" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Email</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.email}</span></div>
-                      <div className="planning-invoice-row" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Contact No</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.contactNo}</span></div>
-                      <div className="planning-invoice-row" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Address</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.address}</span></div>
+                      <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Name</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.name}</span></div>
+                      <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Email</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.email}</span></div>
+                      <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Contact No</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.contactNo}</span></div>
+                      <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Address</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.address}</span></div>
                     </div>
                   </div>
                 </div>
@@ -812,7 +806,7 @@ export default function PlanningPage() {
                   <button
                     type="button"
                     onClick={() => setPlanningView("history")}
-                    className="inline-flex w-full max-w-full min-w-0 flex-wrap items-center justify-center gap-2 rounded-md bg-white px-4 py-2.5 text-xs font-semibold leading-snug text-[#1f2937] sm:inline-flex sm:w-auto sm:max-w-none sm:px-6 sm:text-[15px]"
+                    className="inline-flex w-full max-w-full min-w-0 flex-wrap items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-xs font-semibold leading-snug text-slate-900 shadow-lg shadow-blue-950/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl sm:inline-flex sm:w-auto sm:max-w-none sm:px-6 sm:text-[15px]"
                   >
                     <span aria-hidden>↓</span>
                     Download Invoice
@@ -823,16 +817,13 @@ export default function PlanningPage() {
 
             {planningView === "history" && (
               <div
-                className="planning-history-view mx-auto my-4 w-full p-3 text-white sm:my-6 sm:p-4"
+                className="planning-history-view planning-view-panel mx-auto my-4 w-full rounded-xl border border-white/25 p-3 text-white shadow-2xl shadow-blue-950/25 sm:my-6 sm:p-4"
                 style={{
-                  maxWidth: 560,
-                  borderRadius: 8,
+                  maxWidth: 640,
                   background: "linear-gradient(180deg, #2f6dca 0%, #0a2a5f 100%)",
-                  boxShadow: "0 2px 0 rgba(0,0,0,0.28)",
-                  border: "2px solid #8aa0c1",
                 }}
               >
-                <div className="mx-auto mb-3 w-full max-w-[470px] text-left">
+                <div className="mx-auto mb-3 w-full max-w-[560px] text-left">
                   <button
                     type="button"
                     onClick={handleBackToPlans}
@@ -842,7 +833,7 @@ export default function PlanningPage() {
                     ← Back to plans
                   </button>
                 </div>
-                <div className="planning-history-track mx-auto mb-3 flex w-full max-w-[470px] flex-col gap-3 pb-3 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:pb-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.17)" }}>
+                <div className="planning-history-track mx-auto mb-3 flex w-full max-w-[560px] flex-col gap-3 pb-3 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:pb-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.17)" }}>
                   <h2 className="shrink-0 text-xl font-bold leading-tight tracking-[0.2px] sm:text-[34px]">Billing History</h2>
                   <div
                     className="planning-history-filter flex min-h-0 w-full min-w-0 flex-col items-stretch overflow-visible rounded-md bg-white sm:w-auto sm:max-w-none sm:flex-row sm:flex-nowrap sm:shrink-0"
@@ -877,8 +868,8 @@ export default function PlanningPage() {
                     </select>
                   </div>
                 </div>
-                <div className="planning-history-table-wrap mx-auto w-full max-w-[470px] overflow-x-auto rounded-md bg-white" style={{ boxShadow: "inset 0 0 0 1px rgba(15,23,42,0.08)", WebkitOverflowScrolling: "touch" as const }}>
-                  <table className="w-full min-w-[470px] text-left" style={{ fontSize: 10.5, color: "#0f172a" }}>
+                <div className="planning-history-table-wrap mx-auto w-full max-w-[560px] overflow-x-auto rounded-xl bg-white shadow-xl shadow-blue-950/15" style={{ WebkitOverflowScrolling: "touch" as const }}>
+                  <table className="planning-history-table w-full min-w-[470px] text-left" style={{ fontSize: 10.5, color: "#0f172a" }}>
                     <thead className="bg-[#f3f4f6] text-[11px] font-semibold text-[#1f2937]" style={{ borderBottom: "2px solid #d1d5db" }}>
                       <tr>
                         <th className="px-3 py-3.5">Date</th>
@@ -890,7 +881,7 @@ export default function PlanningPage() {
                     </thead>
                     <tbody>
                       {filteredBillingHistory.map((entry, index) => (
-                        <tr key={`${entry.invoiceId}-${entry.date}-${index}`} style={{ borderTop: "1px solid #e2e8f0" }}>
+                        <tr key={`${entry.invoiceId}-${entry.date}-${index}`} className="transition-colors hover:bg-blue-50" style={{ borderTop: "1px solid #e2e8f0" }}>
                           <td className="px-3 py-3.5">{entry.date}</td>
                           <td className="px-3 py-3.5">{entry.invoiceId}</td>
                           <td className="px-3 py-3.5">{entry.amount}</td>
