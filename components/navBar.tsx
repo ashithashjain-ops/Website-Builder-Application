@@ -224,12 +224,12 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
           </Link>
 
           <div className="hidden items-center gap-7 text-[13px] font-bold uppercase tracking-wide text-white lg:flex">
-            <Link href="/landing" className="stackly-nav-link">Home</Link>
-            <Link href="/landing#features" onClick={(event) => scrollLandingSection(event, "features")} className="stackly-nav-link">About Us</Link>
+            <Link href="/landing" className="stackly-nav-link">HOME</Link>
+            <Link href="/landing#features" onClick={(event) => scrollLandingSection(event, "features")} className="stackly-nav-link">ABOUT US</Link>
 
             <div className="group relative">
               <button type="button" className="stackly-nav-link inline-flex items-center gap-1.5">
-                Our Products <FaChevronDown className="text-[10px] transition group-hover:rotate-180" />
+                OUR PRODUCTS <FaChevronDown className="text-[10px] transition group-hover:rotate-180" />
               </button>
               <div className="invisible absolute left-0 top-full w-56 translate-y-3 rounded-2xl border border-white/70 bg-white/95 py-3 opacity-0 shadow-[0_22px_55px_rgba(2,15,38,0.20)] backdrop-blur transition duration-200 group-hover:visible group-hover:translate-y-2 group-hover:opacity-100">
                 {products.map((product) => (
@@ -242,7 +242,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
 
             <div className="group relative">
               <button type="button" className="stackly-nav-link inline-flex items-center gap-1.5">
-                Categories <FaChevronDown className="text-[10px] transition group-hover:rotate-180" />
+                CATEGORIES <FaChevronDown className="text-[10px] transition group-hover:rotate-180" />
               </button>
               <div className="invisible absolute left-0 top-full grid w-[590px] translate-y-3 grid-cols-2 gap-1 rounded-2xl border border-white/70 bg-white/95 p-3 opacity-0 shadow-[0_22px_55px_rgba(2,15,38,0.20)] backdrop-blur transition duration-200 group-hover:visible group-hover:translate-y-2 group-hover:opacity-100">
                 {navCategories.map(({ title, icon: Icon, items }) => (
@@ -259,7 +259,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               </div>
             </div>
 
-            <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact")} className="stackly-nav-link">Contact</Link>
+            <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact")} className="stackly-nav-link">CONTACT</Link>
           </div>
         </div>
 
