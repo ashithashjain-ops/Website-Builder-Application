@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { verifyOtp } from "@/lib/api";
+import { isApiConnectionError, verifyMobileOtp } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
 
 function VerifyMobileContent() {
@@ -39,21 +39,20 @@ function VerifyMobileContent() {
     }
     setIsSubmitting(true);
     try {
-      await verifyOtp({
-        contact: contact,
-        code: code.join(""),
+      const result = await verifyMobileOtp({
+        mobile: contact,
+        otp: code.join(""),
       });
-      router.push("/verified");
+      if (result.token) {
+        window.sessionStorage.setItem("stackly-reset-token", result.token);
+      }
+      router.push(`/verified?contact=${encodeURIComponent(contact)}`);
     } catch (err) {
-      const isNetworkError =
-        err instanceof TypeError ||
-        (err instanceof Error &&
-          (err.message === "Failed to fetch" ||
-            err.message.includes("NetworkError") ||
-            err.message.includes("load failed")));
-      const message = isNetworkError
-        ? "Connection error. Please try again."
-        : err instanceof Error
+      if (isApiConnectionError(err)) {
+        router.push("/backend-error");
+        return;
+      }
+      const message = err instanceof Error
           ? err.message
           : "Verification failed. Please try again.";
       setError(message);
@@ -152,9 +151,20 @@ function VerifyMobileContent() {
 
             <button
               type="button"
-              onClick={() =>
-                setInfo("Code resent. (Hook up backend mobile resend here.)")
-              }
+              onClick={async () => {
+                setInfo("");
+                setError("");
+                try {
+                  const result = await verifyMobileOtp({ mobile: contact, action: "resend" });
+                  setInfo(result.message || "Code resent successfully.");
+                } catch (err) {
+                  if (isApiConnectionError(err)) {
+                    router.push("/backend-error");
+                    return;
+                  }
+                  setError(err instanceof Error ? err.message : "Could not resend code.");
+                }
+              }}
               className="text-[12px] sm:text-[13px] underline font-semibold"
               style={{ color: "#FFFFFF" }}
             >

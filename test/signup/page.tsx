@@ -1,13 +1,14 @@
 "use client";
-
+ 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaUser, FaEnvelope, FaPhone, FaLock } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter } from "next/navigation";
-import { isApiConnectionError, register as registerApi } from "@/lib/api";
+import { register as registerApi } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
-
+import '../login.css';
+ 
 type SignupFormState = {
   name: string;
   email: string;
@@ -15,7 +16,7 @@ type SignupFormState = {
   password: string;
   confirmPassword: string;
 };
-
+ 
 type SignupFormErrors = {
   name?: string;
   email?: string;
@@ -24,7 +25,7 @@ type SignupFormErrors = {
   confirmPassword?: string;
   form?: string;
 };
-
+ 
 const initialSignupState: SignupFormState = {
   name: "",
   email: "",
@@ -32,7 +33,9 @@ const initialSignupState: SignupFormState = {
   password: "",
   confirmPassword: "",
 };
-
+ 
+const allowedEmailDomains = ["gmail.com", "yahoo.in", "outlook.com", "thestackly.com"];
+ 
 export default function SignupPage() {
   const router = useRouter();
   const [form, setForm] = useState<SignupFormState>(initialSignupState);
@@ -40,7 +43,7 @@ export default function SignupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+ 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
     const setOverflow = () => {
@@ -54,7 +57,7 @@ export default function SignupPage() {
       document.body.style.overflow = "";
     };
   }, []);
-
+ 
   // Mobile outer-scroll lock should apply only to login/signup screens.
   useEffect(() => {
     document.documentElement.classList.add("auth-visible");
@@ -64,23 +67,23 @@ export default function SignupPage() {
       document.body.classList.remove("auth-visible");
     };
   }, []);
-
+ 
   useEffect(() => {
     const page = document.querySelector(".auth-page") as HTMLElement | null;
     if (!page) return;
-
+ 
     let startY = 0;
     let canPull = false;
     let triggered = false;
     const threshold = 88;
-
+ 
     const onTouchStart = (event: TouchEvent) => {
       if (window.innerWidth >= 1024 || event.touches.length !== 1) return;
       startY = event.touches[0].clientY;
       canPull = page.scrollTop <= 0;
       triggered = false;
     };
-
+ 
     const onTouchMove = (event: TouchEvent) => {
       if (!canPull || triggered || window.innerWidth >= 1024) return;
       const deltaY = event.touches[0].clientY - startY;
@@ -91,17 +94,17 @@ export default function SignupPage() {
         canPull = false;
       }
     };
-
+ 
     const onTouchEnd = () => {
       canPull = false;
       triggered = false;
     };
-
+ 
     page.addEventListener("touchstart", onTouchStart, { passive: true });
     page.addEventListener("touchmove", onTouchMove, { passive: true });
     page.addEventListener("touchend", onTouchEnd);
     page.addEventListener("touchcancel", onTouchEnd);
-
+ 
     return () => {
       page.removeEventListener("touchstart", onTouchStart);
       page.removeEventListener("touchmove", onTouchMove);
@@ -109,11 +112,11 @@ export default function SignupPage() {
       page.removeEventListener("touchcancel", onTouchEnd);
     };
   }, []);
-
-
+ 
+ 
   const validate = (values: SignupFormState): SignupFormErrors => {
     const newErrors: SignupFormErrors = {};
-
+ 
     if (!values.name.trim()) {
       newErrors.name = "Name is required.";
     } else if (values.name.trim().length < 2) {
@@ -121,21 +124,27 @@ export default function SignupPage() {
     } else if (!/^[a-zA-Z\s]+$/.test(values.name.trim())) {
       newErrors.name = "Name must contain only letters.";
     }
-
-    if (!values.email.trim()) {
+ 
+    const email = values.email.trim().toLowerCase();
+    const emailDomain = email.split("@")[1];
+ 
+    if (!email) {
       newErrors.email = "Email is required.";
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim().toLowerCase())
-    ) {
-      newErrors.email = "Please enter a valid email address.";
+    } else if (!/^[^\s@]+@[^\s@]+\.(com|in)$/.test(email)) {
+      newErrors.email = "Enter valid email.";
+    } else if (!allowedEmailDomains.includes(emailDomain)) {
+      newErrors.email = "Only Gmail, Yahoo, Outlook, Stackly emails are allowed.";
     }
-
-    if (!values.mobileNumber.trim()) {
+ 
+    const mobileNumber = values.mobileNumber.trim();
+    if (!mobileNumber) {
       newErrors.mobileNumber = "Mobile number is required.";
-    } else if (!/^[0-9]{10}$/.test(values.mobileNumber.trim())) {
-      newErrors.mobileNumber = "Mobile number must be exactly 10 digits.";
+    } else if (!/^[1-9][0-9]{9}$/.test(mobileNumber)) {
+      newErrors.mobileNumber = "Invalid mobile number.";
+    } else if (/^(\d)\1{9}$/.test(mobileNumber)) {
+      newErrors.mobileNumber = "Invalid number.";
     }
-
+ 
     if (!values.password) {
       newErrors.password = "Password is required.";
     } else if (values.password.length < 8) {
@@ -155,16 +164,16 @@ export default function SignupPage() {
         newErrors.password = "Password must include a special character (!@#$%^&* etc.).";
       }
     }
-
+ 
     if (!values.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password.";
     } else if (values.password !== values.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match.";
     }
-
+ 
     return newErrors;
   };
-
+ 
   const handleChange =
     (field: keyof SignupFormState) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -176,20 +185,20 @@ export default function SignupPage() {
       setForm((prev) => ({ ...prev, [field]: value }));
       setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
     };
-
+ 
   const handleSignup = async (event: React.FormEvent) => {
     event.preventDefault();
-
+ 
     const validationErrors = validate(form);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-
+ 
     try {
       setIsSubmitting(true);
       setErrors((prev) => ({ ...prev, form: undefined }));
-
+ 
       await registerApi({
         name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
@@ -197,12 +206,20 @@ export default function SignupPage() {
         password: form.password,
         confirmPassword: form.confirmPassword,
       });
-
+ 
       setForm(initialSignupState);
       setErrors((prev) => ({ ...prev, form: "Signup successful!" }));
-      router.push("/login");
+      window.setTimeout(() => {
+        router.push("/login");
+      }, 800);
     } catch (error) {
-      if (isApiConnectionError(error)) {
+      const isNetworkError =
+        error instanceof TypeError ||
+        (error instanceof Error &&
+          (error.message === "Failed to fetch" ||
+            error.message.includes("NetworkError") ||
+            error.message.includes("load failed")));
+      if (isNetworkError) {
         router.push("/backend-error");
         return;
       }
@@ -213,7 +230,7 @@ export default function SignupPage() {
       setIsSubmitting(false);
     }
   };
-
+ 
   return (
     <div className="auth-page min-h-[100dvh] lg:min-h-screen bg-white flex flex-col px-3 sm:px-6 py-0 lg:py-4 overflow-y-auto">
       <div className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-6 sm:gap-6 lg:gap-8 auth-layout">
@@ -225,7 +242,7 @@ export default function SignupPage() {
             <div className="auth-inner-panel pointer-events-none absolute inset-y-0 left-1/2 w-[78%] -translate-x-1/2 bg-gradient-to-b from-white/10 via-black/10 to-black/35" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_20px_0_45px_rgba(0,0,0,0.55),inset_-20px_0_45px_rgba(0,0,0,0.55)]" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)]" />
-
+ 
             <div className="relative z-10 flex flex-col flex-1 min-h-0 min-w-0 px-4 sm:px-6 pt-2.5 sm:pt-4 pb-2 sm:pb-3 lg:pt-7 lg:pb-4 text-white signup-card-content text-left justify-start lg:justify-between">
               {/* Single column: centers WELCOME and logo on the same axis (mobile + desktop) */}
               <div className="signup-brand-stack flex w-full min-w-0 flex-col items-center flex-shrink-0 mb-3 sm:mb-2.5 lg:mb-4">
@@ -236,7 +253,7 @@ export default function SignupPage() {
                   <img src={assetPath("/stackly-logo.webp")} alt="Stackly Logo" className="h-3.5 sm:h-4 lg:h-7 object-contain" />
                 </div>
               </div>
-
+ 
               <form onSubmit={handleSignup} noValidate>
                 <div className="space-y-3 sm:space-y-2.5 lg:space-y-2.5 flex-shrink-0">
                   <div className="flex flex-col">
@@ -258,7 +275,7 @@ export default function SignupPage() {
                       </p>
                     )}
                   </div>
-
+ 
                   <div className="flex flex-col">
                     <div className="flex items-center border-b border-white/80 pb-2">
                       <FaEnvelope className="mr-3 text-sm text-white/90" />
@@ -278,7 +295,7 @@ export default function SignupPage() {
                       </p>
                     )}
                   </div>
-
+ 
                   <div className="flex flex-col">
                     <div className="flex items-center border-b border-white/80 pb-2">
                       <FaPhone className="mr-3 text-sm text-white/90" />
@@ -300,7 +317,7 @@ export default function SignupPage() {
                       </p>
                     )}
                   </div>
-
+ 
                   <div className="flex flex-col">
                     <div className="flex items-center border-b border-white/80 pb-2 relative">
                       <FaLock className="mr-3 text-sm text-white/90 flex-shrink-0" />
@@ -332,7 +349,7 @@ export default function SignupPage() {
                       </p>
                     )}
                   </div>
-
+ 
                   <div className="flex flex-col">
                     <div className="flex items-center border-b border-white/80 pb-2 relative">
                       <FaLock className="signup-confirm-icon mr-3 text-sm text-white/90 flex-shrink-0" />
@@ -365,7 +382,7 @@ export default function SignupPage() {
                     )}
                   </div>
                 </div>
-
+ 
                 {errors.form && (
                   <p
                     className={`mt-1.5 text-[11px] sm:text-xs font-medium ${errors.form === "Signup successful!" ? "text-green-300" : "auth-error-text"}`}
@@ -373,7 +390,7 @@ export default function SignupPage() {
                     {errors.form}
                   </p>
                 )}
-
+ 
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -382,7 +399,7 @@ export default function SignupPage() {
                   {isSubmitting ? "Checking..." : "Sign Up"}
                 </button>
               </form>
-
+ 
               <div className="flex-shrink-0 mt-1 lg:mt-0.5">
                 <p className="text-center text-xs mt-1 lg:mt-0.5 mb-1.5 lg:mb-2 text-white/80">
                   Already have an account?{" "}
@@ -390,9 +407,9 @@ export default function SignupPage() {
                     Login
                   </Link>
                 </p>
-
+ 
                 <div className="mt-1.5 mb-1 lg:mt-1 lg:mb-0.5 border-t border-white/50" />
-
+ 
                 <div className="pt-0.5 pb-1 sm:pt-1 sm:pb-3 lg:pb-2">
                   <a
                     href={
@@ -414,7 +431,7 @@ export default function SignupPage() {
             </div>
           </div>
         </div>
-
+ 
         {/* Illustration below on mobile, left on desktop */}
         <div className="auth-image-col w-full lg:w-1/2 flex justify-center order-2 lg:order-1 mt-6 sm:mt-8 lg:mt-0">
           <img
@@ -427,3 +444,4 @@ export default function SignupPage() {
     </div>
   );
 }
+ 

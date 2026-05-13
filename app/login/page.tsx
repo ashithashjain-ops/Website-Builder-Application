@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaAddressBook, FaLock } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { login as loginApi } from "@/lib/api";
+import { isApiConnectionError, login as loginApi } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
 
 type LoginFormState = {
@@ -151,22 +151,21 @@ export default function LoginPage() {
 
       const contact = form.email.trim();
 
-      await loginApi({
-        email: contact.toLowerCase(),
+      const isMobileContact = isMobile(contact);
+      const result = await loginApi({
+        ...(isMobileContact ? { mobile: contact } : { email: contact.toLowerCase() }),
         password: form.password,
       });
+
+      if (result.token) {
+        window.localStorage.setItem("stackly-auth-token", result.token);
+      }
 
       setForm(initialLoginState);
       setErrors((prev) => ({ ...prev, form: "Login successful!" }));
       router.push("/landing");
     } catch (error) {
-      const isNetworkError =
-        error instanceof TypeError ||
-        (error instanceof Error &&
-          (error.message === "Failed to fetch" ||
-            error.message.includes("NetworkError") ||
-            error.message.includes("load failed")));
-      if (isNetworkError) {
+      if (isApiConnectionError(error)) {
         router.push("/backend-error");
         return;
       }

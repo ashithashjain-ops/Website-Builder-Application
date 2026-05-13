@@ -1,23 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter } from "next/navigation";
+import { isApiConnectionError, resetPassword } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
 
-export default function CreateNewPasswordPage() {
+function CreateNewPasswordContent() {
   const router = useRouter();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const requirementText =
-    "Password Must be 8-60 characters and include at least two of the Following: Uppercase, Lowercase, number, or symbol.";
+    "Password must be 8-60 characters and include uppercase, lowercase, number, and symbol.";
 
-  const handleUpdatePassword = (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setMessage("");
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -30,13 +34,36 @@ export default function CreateNewPasswordPage() {
     const hasLower = /[a-z]/.test(newPassword);
     const hasNumber = /[0-9]/.test(newPassword);
     const hasSymbol = /[^A-Za-z0-9]/.test(newPassword);
-    const count = [hasUpper, hasLower, hasNumber, hasSymbol].filter(Boolean).length;
-    if (count < 2) {
+    if (!hasUpper || !hasLower || !hasNumber || !hasSymbol) {
       setError(requirementText);
       return;
     }
-    // TODO: call API to update password, then redirect to login
-    router.push("/login");
+
+    const token = window.sessionStorage.getItem("stackly-reset-token");
+    if (!token) {
+      setError("Verification session expired. Please verify OTP again.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const result = await resetPassword({
+        newPassword,
+        confirmPassword,
+        token,
+      });
+      window.sessionStorage.removeItem("stackly-reset-token");
+      setMessage(result.message || "Password reset successfully.");
+      router.push("/login");
+    } catch (err) {
+      if (isApiConnectionError(err)) {
+        router.push("/backend-error");
+        return;
+      }
+      setError(err instanceof Error ? err.message : "Could not update password.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -161,8 +188,14 @@ export default function CreateNewPasswordPage() {
                   {error}
                 </p>
               )}
+              {message && (
+                <p className="text-[12px]" style={{ color: "#FFFFFF" }}>
+                  {message}
+                </p>
+              )}
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full max-w-[240px] mx-auto rounded-lg text-[12px] sm:text-[13px] font-bold uppercase shadow-md hover:opacity-95 transition flex items-center justify-center"
                 style={{
                   height: "36px",
@@ -170,12 +203,20 @@ export default function CreateNewPasswordPage() {
                   color: "#FFFFFF",
                 }}
               >
-                UPDATE PASSWORD
+                {isSubmitting ? "UPDATING..." : "UPDATE PASSWORD"}
               </button>
             </form>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CreateNewPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <CreateNewPasswordContent />
+    </Suspense>
   );
 }

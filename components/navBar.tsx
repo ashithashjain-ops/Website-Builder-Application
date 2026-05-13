@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import {
   FaBars,
   FaBookOpen,
@@ -134,6 +134,25 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
   const [cartItems, setCartItems] = useState<StoredCommerceItem[]>([]);
   const [activePanel, setActivePanel] = useState<"wishlist" | "cart" | null>(null);
 
+  const scrollLandingSection = (event: MouseEvent<HTMLAnchorElement>, sectionId: string, closeMobile = false) => {
+    const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
+
+    if (currentPath !== "/landing") {
+      if (closeMobile) {
+        setMobileOpen(false);
+      }
+      return;
+    }
+
+    event.preventDefault();
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.history.pushState(null, "", `/landing#${sectionId}`);
+
+    if (closeMobile) {
+      setMobileOpen(false);
+    }
+  };
+
   const refreshStoredCommerce = () => {
     const wishlist = readJsonArray("wishlistItems");
     const cart = readJsonArray("cartItems");
@@ -206,7 +225,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
 
           <div className="hidden items-center gap-7 text-[13px] font-bold uppercase tracking-wide text-white lg:flex">
             <Link href="/landing" className="stackly-nav-link">Home</Link>
-            <Link href="/landing#features" className="stackly-nav-link">About Us</Link>
+            <Link href="/landing#features" onClick={(event) => scrollLandingSection(event, "features")} className="stackly-nav-link">About Us</Link>
 
             <div className="group relative">
               <button type="button" className="stackly-nav-link inline-flex items-center gap-1.5">
@@ -214,7 +233,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               </button>
               <div className="invisible absolute left-0 top-full w-56 translate-y-3 rounded-2xl border border-white/70 bg-white/95 py-3 opacity-0 shadow-[0_22px_55px_rgba(2,15,38,0.20)] backdrop-blur transition duration-200 group-hover:visible group-hover:translate-y-2 group-hover:opacity-100">
                 {products.map((product) => (
-                  <Link key={product} href="/landing#templates" className="block border-b border-gray-50 px-5 py-2.5 text-[11px] font-black text-gray-800 transition last:border-0 hover:bg-blue-50 hover:pl-6 hover:text-blue-600">
+                  <Link key={product} href="/landing#templates" onClick={(event) => scrollLandingSection(event, "templates")} className="block border-b border-gray-50 px-5 py-2.5 text-[11px] font-black text-gray-800 transition last:border-0 hover:bg-blue-50 hover:pl-6 hover:text-blue-600">
                     {product}
                   </Link>
                 ))}
@@ -227,7 +246,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               </button>
               <div className="invisible absolute left-0 top-full grid w-[590px] translate-y-3 grid-cols-2 gap-1 rounded-2xl border border-white/70 bg-white/95 p-3 opacity-0 shadow-[0_22px_55px_rgba(2,15,38,0.20)] backdrop-blur transition duration-200 group-hover:visible group-hover:translate-y-2 group-hover:opacity-100">
                 {navCategories.map(({ title, icon: Icon, items }) => (
-                  <Link key={title} href="/landing#categories" className="group/item rounded-xl px-3 py-2 transition hover:-translate-y-0.5 hover:bg-blue-50">
+                  <Link key={title} href="/landing#categories" onClick={(event) => scrollLandingSection(event, "categories")} className="group/item rounded-xl px-3 py-2 transition hover:-translate-y-0.5 hover:bg-blue-50">
                     <span className="flex items-center gap-2 text-[11px] font-black text-gray-900">
                       <Icon className="text-gray-400 group-hover/item:text-blue-600" />
                       {title}
@@ -240,7 +259,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               </div>
             </div>
 
-            <Link href="/landing#contact" className="stackly-nav-link">Contact</Link>
+            <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact")} className="stackly-nav-link">Contact</Link>
           </div>
         </div>
 
@@ -300,10 +319,10 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
         <div className="stackly-mobile-menu border-t border-white/10 bg-[#06224C]/98 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-white shadow-inner lg:hidden">
           <div className="flex flex-col">
             <Link href="/landing" onClick={() => setMobileOpen(false)} className="border-b border-white/10 py-3 transition hover:pl-2 hover:text-blue-200">Home</Link>
-            <Link href="/landing#features" onClick={() => setMobileOpen(false)} className="border-b border-white/10 py-3 transition hover:pl-2 hover:text-blue-200">About Us</Link>
-            <Link href="/landing#templates" onClick={() => setMobileOpen(false)} className="border-b border-white/10 py-3 transition hover:pl-2 hover:text-blue-200">Our Products</Link>
-            <Link href="/landing#categories" onClick={() => setMobileOpen(false)} className="border-b border-white/10 py-3 transition hover:pl-2 hover:text-blue-200">Categories</Link>
-            <Link href="/landing#contact" onClick={() => setMobileOpen(false)} className="py-3 transition hover:pl-2 hover:text-blue-200">Contact</Link>
+            <Link href="/landing#features" onClick={(event) => scrollLandingSection(event, "features", true)} className="border-b border-white/10 py-3 transition hover:pl-2 hover:text-blue-200">About Us</Link>
+            <Link href="/landing#templates" onClick={(event) => scrollLandingSection(event, "templates", true)} className="border-b border-white/10 py-3 transition hover:pl-2 hover:text-blue-200">Our Products</Link>
+            <Link href="/landing#categories" onClick={(event) => scrollLandingSection(event, "categories", true)} className="border-b border-white/10 py-3 transition hover:pl-2 hover:text-blue-200">Categories</Link>
+            <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact", true)} className="py-3 transition hover:pl-2 hover:text-blue-200">Contact</Link>
           </div>
         </div>
       )}

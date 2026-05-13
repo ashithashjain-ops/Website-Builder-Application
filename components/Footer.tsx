@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, ReactNode, useState } from "react";
 import {
   FaEnvelope,
@@ -169,6 +170,7 @@ const socials = [
 ] as const;
 
 export default function Footer() {
+  const router = useRouter();
   const [activeModal, setActiveModal] = useState<ModalKey | null>(null);
   const [email, setEmail] = useState("");
   const [toast, setToast] = useState<string | null>(null);
@@ -198,12 +200,20 @@ export default function Footer() {
 
   const openFooterItem = (key: string) => {
     if (key === "about") {
-      document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+      const featuresSection = document.getElementById("features");
+
+      if (featuresSection) {
+        featuresSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.history.pushState(null, "", "/landing#features");
+        return;
+      }
+
+      router.push("/landing#features");
       return;
     }
 
     if (key === "contact") {
-      document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+      router.push("/backend-error");
       return;
     }
 
@@ -220,7 +230,7 @@ export default function Footer() {
         <div className="pointer-events-none absolute -left-20 bottom-8 h-56 w-56 rounded-full bg-emerald-300/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-8 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.20)] backdrop-blur md:flex-row md:items-start md:justify-between md:p-7">
+          <div className="mb-8 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.20)] backdrop-blur md:flex-row md:items-center md:justify-between md:p-7">
             <div className="w-full md:w-1/2">
               <h3 className="mb-2 text-sm font-black uppercase tracking-wider text-white">Subscribe to our Updates</h3>
               <p className="mb-4 max-w-md text-sm leading-relaxed text-white/60">Get template drops, builder updates, and product notes in your inbox.</p>
@@ -242,7 +252,7 @@ export default function Footer() {
               </form>
             </div>
 
-            <div className="w-full md:w-auto md:text-right">
+            <div className="flex w-full flex-col justify-center md:w-auto md:self-stretch md:text-right">
               <h3 className="mb-2 text-sm font-black uppercase tracking-wider text-white">Headquarters</h3>
               <p className="text-sm leading-relaxed text-white/70">
                 MMR Complex, Salem,<br />Tamil Nadu 636008
@@ -267,7 +277,7 @@ export default function Footer() {
             ))}
 
             <div className="col-span-2 mt-2 flex flex-col items-start md:col-span-1 md:mt-0">
-              <Link href="/" className="mb-4 inline-flex aspect-[2/1] min-w-[90px] items-center justify-center rounded-[60%] bg-white px-4 py-3 shadow-[0_14px_32px_rgba(255,255,255,0.16)] transition duration-300 hover:-translate-y-0.5 hover:scale-105">
+              <Link href="../landing" className="mb-4 inline-flex aspect-[2/1] min-w-[90px] items-center justify-center rounded-[60%] bg-white px-4 py-3 shadow-[0_14px_32px_rgba(255,255,255,0.16)] transition duration-300 hover:-translate-y-0.5 hover:scale-105">
                 <img src={assetPath("/stackly-logo.webp")} alt="Stackly Logo" className="h-5 w-auto object-contain" />
               </Link>
               <p className="mb-2 max-w-[215px] text-[11px] font-bold uppercase leading-relaxed tracking-tight text-white/70">
