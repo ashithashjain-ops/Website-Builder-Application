@@ -784,9 +784,58 @@ export default function ECommercePage() {
             .buyscreen-page .flex-row {
               flex-wrap: wrap !important;
             }
+
             /* Protect icons/buttons from shrinking or wrapping unreadably */
             .buyscreen-page button, .buyscreen-page .shrink-0 {
               flex-shrink: 0 !important;
+            }
+
+            /* 6. Hero Banner Overlay Fix (Responsive) */
+            .buyscreen-page .buyscreen-hero {
+              position: relative !important;
+              overflow: hidden !important;
+              border-radius: 1.75rem !important;
+              display: flex !important;
+              flex-direction: column !important;
+              align-items: center !important;
+              justify-content: center !important;
+              padding: 3rem 1.5rem !important;
+              min-height: min-content !important;
+              height: auto !important;
+              width: 100% !important;
+            }
+            .buyscreen-page .buyscreen-hero > picture {
+              position: absolute !important;
+              top: 0 !important;
+              left: 0 !important;
+              width: 100% !important;
+              height: 100% !important;
+              flex-shrink: unset !important;
+            }
+            .buyscreen-page .buyscreen-hero > picture img {
+              position: absolute !important;
+              top: 0 !important;
+              left: 0 !important;
+              width: 100% !important;
+              height: 100% !important;
+              object-fit: cover !important;
+              object-position: center !important;
+              max-height: none !important;
+            }
+            .buyscreen-page .buyscreen-hero-overlay {
+              display: block !important;
+              position: absolute !important;
+              inset: 0 !important;
+              z-index: 1 !important;
+            }
+            .buyscreen-page .buyscreen-hero-content {
+              position: relative !important;
+              z-index: 10 !important;
+              text-align: center !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              min-width: 0 !important;
+              padding: 0 !important;
             }
           }
 
@@ -1371,6 +1420,9 @@ export default function ECommercePage() {
                     key={item.label}
                     ref={allCategoriesWrapRef}
                     className="buyscreen-all-categories-wrap relative shrink-0"
+                    onMouseEnter={() => setIsAllCategoriesDropdownOpen(true)}
+                    onMouseLeave={() => setIsAllCategoriesDropdownOpen(false)}
+                    onFocus={() => setIsAllCategoriesDropdownOpen(true)}
                     onBlur={(e) => {
                       if (!e.currentTarget.contains(e.relatedTarget)) {
                         setIsAllCategoriesDropdownOpen(false);
@@ -1382,7 +1434,7 @@ export default function ECommercePage() {
                       aria-expanded={isAllCategoriesDropdownOpen}
                       aria-controls="buyscreen-all-categories-menu"
                       aria-haspopup="menu"
-                      className="buyscreen-all-categories-toggle inline-flex items-center gap-1 rounded-md px-2 py-1 text-left text-[10px] font-semibold transition-colors duration-150 hover:bg-white hover:text-[#06224C] focus-visible:outline-none focus-visible:bg-white focus-visible:text-[#06224C] focus-visible:ring-2 focus-visible:ring-blue-300 sm:text-xs"
+                      className="buyscreen-all-categories-toggle inline-flex items-center gap-1 rounded-md px-2 py-1 text-left text-[10px] font-semibold transition-colors duration-150 bg-transparent text-white hover:bg-transparent hover:!text-white focus:bg-transparent focus:!text-white active:bg-transparent active:!text-white focus-visible:outline-none focus-visible:bg-transparent focus-visible:!text-white focus-visible:ring-2 focus-visible:ring-white/50 sm:text-xs"
                       onClick={() => setIsAllCategoriesDropdownOpen((prev) => !prev)}
                     >
                       All Categories
@@ -1413,7 +1465,7 @@ export default function ECommercePage() {
                   <button
                     key={item.label}
                     type="button"
-                    className={`buyscreen-category-item shrink-0 rounded-md text-left transition-colors duration-150 hover:bg-white hover:text-[#06224C] ${item.label === "Limited Sale" ? "lg:ml-auto" : ""}`}
+                    className={`buyscreen-category-item shrink-0 rounded-md px-2 py-1 text-left transition-colors duration-150 bg-transparent text-white hover:bg-transparent hover:!text-white focus:bg-transparent focus:!text-white active:bg-transparent active:!text-white focus-visible:outline-none focus-visible:bg-transparent focus-visible:!text-white focus-visible:ring-2 focus-visible:ring-white/50 ${item.label === "Limited Sale" ? "lg:ml-auto" : ""} ${item.label === "Best Seller" ? "!bg-transparent !border-0 !shadow-none !ring-0" : ""}`}
                     onClick={() => handleCategoryClick(item.label)}
                   >
                     {item.label}
