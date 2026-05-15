@@ -271,12 +271,12 @@ export default function SignupPage() {
     getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry();
 
   return (
-    <div className="auth-page min-h-[100dvh] lg:min-h-screen bg-white flex flex-col px-3 sm:px-6 py-0 lg:py-4 overflow-y-auto">
-      <div className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-6 sm:gap-6 lg:gap-8 auth-layout">
+    <div className="auth-page min-h-[100dvh] lg:min-h-screen flex flex-col max-lg:bg-transparent bg-white px-0 py-0 lg:px-6 lg:py-4 overflow-y-auto">
+      <div className="w-full max-lg:max-w-none max-w-6xl mx-auto flex flex-1 flex-col lg:flex-none lg:flex-row gap-0 lg:gap-8 auth-layout">
         {/* Card first on mobile (top), right on desktop */}
-        <div className="w-full lg:w-1/2 flex justify-center order-1 lg:order-2">
+        <div className="flex w-full flex-1 flex-col items-stretch justify-center order-1 lg:order-2 lg:w-1/2 lg:flex-none">
           <div
-            className="relative overflow-x-hidden overflow-y-visible w-full max-w-[520px] bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] rounded-none lg:rounded-[10px] px-6 sm:px-10 flex flex-col signup-card auth-form-card"
+            className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-x-hidden overflow-y-visible self-center bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] px-6 sm:px-10 max-lg:max-w-none max-lg:min-h-[100dvh] max-lg:min-h-[100svh] lg:flex-none lg:rounded-[10px] signup-card auth-form-card"
           >
             <div className="auth-inner-panel pointer-events-none absolute inset-y-0 left-1/2 w-[78%] -translate-x-1/2 bg-gradient-to-b from-white/10 via-black/10 to-black/35" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_20px_0_45px_rgba(0,0,0,0.55),inset_-20px_0_45px_rgba(0,0,0,0.55)]" />

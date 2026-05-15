@@ -3,6 +3,12 @@
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { assetPath } from "@/lib/paths";
+import ResetFlowBackButton from "@/components/ResetFlowBackButton";
+
+const resetFlowCardStyle = {
+  background: "linear-gradient(180deg, #234E70 0%, #282738 100%)",
+  boxShadow: "4px 4px 4px 0 rgba(0,0,0,0.25)",
+} as const;
 
 function VerifiedContent() {
   const router = useRouter();
@@ -13,22 +19,12 @@ function VerifiedContent() {
     : "/create-new-password";
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 sm:px-6 py-6">
-      <button
-        type="button"
-        onClick={() => router.push("/forgot-password")}
-        className="absolute left-4 top-4 text-2xl text-black"
-        aria-label="Go back"
-      >
-        ←
-      </button>
-      <div className="w-full max-w-[480px]">
+    <div className="reset-flow-page relative min-h-[100dvh] flex flex-col justify-start lg:justify-center items-stretch overflow-y-auto px-0 py-0 lg:px-6 lg:py-6 max-lg:bg-transparent bg-white">
+      <ResetFlowBackButton onClick={() => router.push("/forgot-password")} />
+      <div className="flex w-full flex-1 flex-col items-stretch justify-center max-lg:max-w-none max-w-[480px] lg:mx-auto min-h-0">
         <div
-          className="relative overflow-hidden w-full rounded-xl px-8 sm:px-10 py-8 sm:py-10 text-center"
-          style={{
-            background: "linear-gradient(180deg, #234E70 0%, #282738 100%)",
-            boxShadow: "4px 4px 4px 0 rgba(0,0,0,0.25)",
-          }}
+          className="reset-flow-card relative flex w-full flex-1 flex-col justify-center overflow-hidden px-6 py-8 sm:px-10 sm:py-10 text-center lg:flex-none lg:min-h-0 lg:rounded-xl"
+          style={resetFlowCardStyle}
         >
           <div className="flex justify-center mb-4 sm:mb-6">
             <img

@@ -65,7 +65,7 @@ function ForgotPasswordContent() {
   };
 
   return (
-    <div className="forgot-password-page min-h-[100dvh] bg-white flex flex-col justify-start lg:justify-center items-stretch lg:items-center overflow-y-auto px-0 py-0 lg:px-6 lg:py-6">
+    <div className="reset-flow-page forgot-password-page min-h-[100dvh] bg-white flex flex-col justify-start lg:justify-center items-stretch lg:items-center overflow-y-auto px-0 py-0 lg:px-6 lg:py-6">
       <div className="w-full max-w-6xl mx-auto flex flex-1 flex-col lg:flex-none lg:flex-row items-stretch lg:items-center justify-start lg:justify-center gap-0 lg:gap-12 auth-layout">
         {/* LEFT: Illustration */}
         <div className="auth-image-col hidden lg:flex w-full lg:w-1/2 items-center justify-center order-2 lg:order-1">
@@ -78,7 +78,7 @@ function ForgotPasswordContent() {
         {/* RIGHT: Forgot password form card */}
         <div className="flex w-full flex-1 flex-col items-stretch justify-center order-1 lg:order-2 lg:w-1/2 lg:flex-none min-h-0">
           <div
-            className="forgot-password-card relative flex w-full max-w-[420px] flex-1 flex-col justify-center self-center overflow-hidden px-6 py-8 sm:px-10 sm:py-10 lg:flex-none lg:min-h-0 lg:rounded-xl"
+            className="reset-flow-card forgot-password-card relative flex w-full max-w-[420px] flex-1 flex-col justify-center self-center overflow-hidden px-6 py-8 sm:px-10 sm:py-10 lg:flex-none lg:min-h-0 lg:rounded-xl"
             style={{
               background: "linear-gradient(180deg, #234E70 0%, #282738 100%)",
               boxShadow: "4px 4px 4px 0 rgba(0,0,0,0.25)",

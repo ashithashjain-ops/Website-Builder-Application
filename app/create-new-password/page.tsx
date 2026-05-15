@@ -4,6 +4,12 @@ import { Suspense, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isApiConnectionError, resetPassword } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
+import ResetFlowBackButton from "@/components/ResetFlowBackButton";
+
+const resetFlowCardStyle = {
+  background: "linear-gradient(180deg, #234E70 0%, #282738 100%)",
+  boxShadow: "4px 4px 4px 0 rgba(0,0,0,0.25)",
+} as const;
 
 function CreateNewPasswordContent() {
   const router = useRouter();
@@ -67,18 +73,10 @@ function CreateNewPasswordContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 sm:px-6 py-6">
-      <button
-        type="button"
-        onClick={() => router.push("/verified")}
-        className="absolute left-4 top-4 text-2xl text-black z-10"
-        aria-label="Go back"
-      >
-        ←
-      </button>
-      <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-4 sm:gap-6 lg:gap-12">
-        {/* Left: Illustration (optional, matches new.webp layout) */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center order-2 lg:order-1">
+    <div className="reset-flow-page relative min-h-[100dvh] flex flex-col justify-start lg:justify-center items-stretch overflow-y-auto px-0 py-0 lg:px-6 lg:py-6 max-lg:bg-transparent bg-white">
+      <ResetFlowBackButton onClick={() => router.push("/verified")} />
+      <div className="w-full max-w-6xl mx-auto flex flex-1 flex-col lg:flex-none lg:flex-row items-stretch lg:items-center justify-start lg:justify-center gap-0 lg:gap-12 auth-layout">
+        <div className="reset-flow-illustration hidden lg:flex w-full lg:w-1/2 items-center justify-center order-2 lg:order-1">
           <img
             src={assetPath("/new.webp")}
             alt="Create new password"
@@ -86,13 +84,10 @@ function CreateNewPasswordContent() {
           />
         </div>
         {/* Right: Create New Password form card */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center order-1 lg:order-2">
+        <div className="flex w-full flex-1 flex-col items-stretch justify-center order-1 lg:order-2 lg:w-1/2 lg:flex-none min-h-0">
           <div
-            className="relative overflow-hidden w-full max-w-[420px] rounded-xl px-8 sm:px-10 py-8 sm:py-10"
-            style={{
-              background: "linear-gradient(180deg, #234E70 0%, #282738 100%)",
-              boxShadow: "4px 4px 4px 0 rgba(0,0,0,0.25)",
-            }}
+            className="reset-flow-card relative flex w-full max-w-[420px] flex-1 flex-col justify-center self-center overflow-hidden px-6 py-8 sm:px-10 sm:py-10 max-lg:max-w-none lg:flex-none lg:min-h-0 lg:rounded-xl"
+            style={resetFlowCardStyle}
           >
             <h1
               className="text-[20px] sm:text-[24px] font-bold text-center mb-6"
