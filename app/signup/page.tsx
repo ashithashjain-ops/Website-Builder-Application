@@ -1,16 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { FaUser, FaEnvelope, FaPhone, FaLock } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter } from "next/navigation";
 import { isApiConnectionError, register as registerApi } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
+import {
+  DEFAULT_SIGNUP_PHONE_COUNTRY_ID,
+  SIGNUP_PHONE_COUNTRIES,
+  getDefaultSignupPhoneCountry,
+  getSignupPhoneCountry,
+  validateSignupNationalDigits,
+  toE164Mobile,
+} from "@/lib/signupPhoneCountries";
 
 type SignupFormState = {
   name: string;
   email: string;
+  phoneCountryId: string;
   mobileNumber: string;
   password: string;
   confirmPassword: string;
@@ -28,6 +37,7 @@ type SignupFormErrors = {
 const initialSignupState: SignupFormState = {
   name: "",
   email: "",
+  phoneCountryId: DEFAULT_SIGNUP_PHONE_COUNTRY_ID,
   mobileNumber: "",
   password: "",
   confirmPassword: "",
@@ -40,6 +50,27 @@ export default function SignupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!countryDropdownOpen) return;
+    const onDocMouseDown = (e: MouseEvent) => {
+      const el = countryDropdownRef.current;
+      if (el && !el.contains(e.target as Node)) {
+        setCountryDropdownOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setCountryDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", onDocMouseDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onDocMouseDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [countryDropdownOpen]);
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
@@ -130,10 +161,15 @@ export default function SignupPage() {
       newErrors.email = "Please enter a valid email address.";
     }
 
+    const phoneCountry =
+      getSignupPhoneCountry(values.phoneCountryId) ?? getDefaultSignupPhoneCountry();
     if (!values.mobileNumber.trim()) {
       newErrors.mobileNumber = "Mobile number is required.";
-    } else if (!/^[0-9]{10}$/.test(values.mobileNumber.trim())) {
-      newErrors.mobileNumber = "Mobile number must be exactly 10 digits.";
+    } else {
+      const mobileErr = validateSignupNationalDigits(values.mobileNumber.trim(), phoneCountry);
+      if (mobileErr) {
+        newErrors.mobileNumber = mobileErr;
+      }
     }
 
     if (!values.password) {
@@ -168,14 +204,29 @@ export default function SignupPage() {
   const handleChange =
     (field: keyof SignupFormState) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      let value = event.target.value;
-      // Keep mobile number numeric only at input-level (no alphabets).
+      const raw = event.target.value;
       if (field === "mobileNumber") {
-        value = value.replace(/\D/g, "").slice(0, 10);
+        setForm((prev) => {
+          const country = getSignupPhoneCountry(prev.phoneCountryId) ?? getDefaultSignupPhoneCountry();
+          const digits = raw.replace(/\D/g, "").slice(0, country.maxDigits);
+          return { ...prev, mobileNumber: digits };
+        });
+      } else {
+        setForm((prev) => ({ ...prev, [field]: raw }));
       }
-      setForm((prev) => ({ ...prev, [field]: value }));
       setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
     };
+
+  const selectPhoneCountry = (id: string) => {
+    const country = getSignupPhoneCountry(id) ?? getDefaultSignupPhoneCountry();
+    setForm((prev) => ({
+      ...prev,
+      phoneCountryId: id,
+      mobileNumber: prev.mobileNumber.replace(/\D/g, "").slice(0, country.maxDigits),
+    }));
+    setErrors((prev) => ({ ...prev, mobileNumber: undefined, form: undefined }));
+    setCountryDropdownOpen(false);
+  };
 
   const handleSignup = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -190,10 +241,12 @@ export default function SignupPage() {
       setIsSubmitting(true);
       setErrors((prev) => ({ ...prev, form: undefined }));
 
+      const phoneCountry =
+        getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry();
       await registerApi({
         name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
-        mobile: form.mobileNumber.trim(),
+        mobile: toE164Mobile(phoneCountry, form.mobileNumber.trim()),
         password: form.password,
         confirmPassword: form.confirmPassword,
       });
@@ -214,13 +267,16 @@ export default function SignupPage() {
     }
   };
 
+  const selectedPhoneCountry =
+    getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry();
+
   return (
     <div className="auth-page min-h-[100dvh] lg:min-h-screen bg-white flex flex-col px-3 sm:px-6 py-0 lg:py-4 overflow-y-auto">
       <div className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-6 sm:gap-6 lg:gap-8 auth-layout">
         {/* Card first on mobile (top), right on desktop */}
         <div className="w-full lg:w-1/2 flex justify-center order-1 lg:order-2">
           <div
-            className="relative overflow-hidden w-full max-w-[520px] bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] rounded-none lg:rounded-[10px] px-6 sm:px-10 flex flex-col signup-card auth-form-card"
+            className="relative overflow-x-hidden overflow-y-visible w-full max-w-[520px] bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] rounded-none lg:rounded-[10px] px-6 sm:px-10 flex flex-col signup-card auth-form-card"
           >
             <div className="auth-inner-panel pointer-events-none absolute inset-y-0 left-1/2 w-[78%] -translate-x-1/2 bg-gradient-to-b from-white/10 via-black/10 to-black/35" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_20px_0_45px_rgba(0,0,0,0.55),inset_-20px_0_45px_rgba(0,0,0,0.55)]" />
@@ -280,16 +336,72 @@ export default function SignupPage() {
                   </div>
 
                   <div className="flex flex-col">
-                    <div className="flex items-center border-b border-white/80 pb-2">
-                      <FaPhone className="mr-3 text-sm text-white/90" />
+                    <div className="flex items-center border-b border-white/80 pb-2 min-w-0">
+                      <FaPhone className="mr-3 shrink-0 text-sm text-white/90" />
+                      <div className="relative z-20 mr-2 min-h-5 shrink-0 max-w-[46%] sm:max-w-[200px] min-w-0 self-center" ref={countryDropdownRef}>
+                        <button
+                          type="button"
+                          id="country-select-trigger"
+                          aria-label="Country calling code"
+                          aria-haspopup="listbox"
+                          aria-expanded={countryDropdownOpen}
+                          onClick={() => setCountryDropdownOpen((o) => !o)}
+                          className="flex w-full min-w-0 items-center justify-between gap-1 rounded-md border border-white/80 bg-transparent px-2 py-0 text-left text-sm leading-5 text-white outline-none hover:border-white"
+                        >
+                          <span className="min-w-0 truncate">
+                            {selectedPhoneCountry.name} (+{selectedPhoneCountry.dialCode})
+                          </span>
+                          <span
+                            className={`shrink-0 text-white/90 transition-transform ${countryDropdownOpen ? "rotate-180" : ""}`}
+                            aria-hidden
+                          >
+                            <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                              <path
+                                fillRule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </span>
+                        </button>
+                        {countryDropdownOpen && (
+                          <ul
+                            role="listbox"
+                            aria-labelledby="country-select-trigger"
+                            className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg [scrollbar-color:#94a3b8_#f1f5f9]"
+                          >
+                            {SIGNUP_PHONE_COUNTRIES.map((c) => {
+                              const selected = form.phoneCountryId === c.id;
+                              return (
+                                <li key={c.id} className="px-0 py-0">
+                                  <button
+                                    type="button"
+                                    role="option"
+                                    aria-selected={selected}
+                                    className={`w-full cursor-pointer px-3 py-2 text-left text-gray-900 hover:bg-[#1A73E8] hover:text-white ${
+                                      selected ? "bg-[#1A73E8] text-white" : "bg-white"
+                                    }`}
+                                    onClick={() => selectPhoneCountry(c.id)}
+                                  >
+                                    {c.name} (+{c.dialCode})
+                                  </button>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        )}
+                      </div>
                       <input
                         type="tel"
                         inputMode="numeric"
-                        maxLength={10}
-                        placeholder="Mobile number"
+                        maxLength={
+                          (getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry())
+                            .maxDigits
+                        }
+                        placeholder="Phone number"
                         value={form.mobileNumber}
                         onChange={handleChange("mobileNumber")}
-                        className="bg-transparent outline-none w-full placeholder-white/90 text-sm text-white min-w-0"
+                        className="min-h-5 flex-1 min-w-0 self-center border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none placeholder-white/90"
                         aria-invalid={!!errors.mobileNumber}
                         aria-describedby={errors.mobileNumber ? "mobile-error" : undefined}
                       />

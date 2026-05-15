@@ -1381,13 +1381,14 @@ input[type="password"]::-ms-reveal {
 }
 
 /*
- * Login: Remember me (left) + Forgot password (right) — full-width row under password field.
- * Grid keeps alignment at 100%–200% zoom; flex+column was stacking and looked misaligned.
+ * Login: Remember me (left) + Forgot password (right).
+ * Flex + wrap avoids a crushed second column at 150–200% zoom (no mid-word breaks).
  */
 .login-page .login-remember-forgot {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   column-gap: clamp(0.5rem, 2.5vw, 0.875rem);
   row-gap: 0.5rem;
   width: 100%;
@@ -1396,22 +1397,33 @@ input[type="password"]::-ms-reveal {
 }
 
 .login-page .login-remember-forgot > label {
-  justify-self: start;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  flex: 0 1 auto;
   min-width: 0;
 }
 
 .login-page .login-remember-forgot .forgot-password-link {
-  justify-self: end;
+  flex: 0 0 auto;
+  margin-left: auto;
   text-align: right;
-  min-width: 0;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
   line-height: 1.35;
   font-size: clamp(10px, 3.4vw, 13px);
+  max-width: 100%;
+}
+
+/* Mobile / high zoom: Forgot password on its own row, right-aligned, one line */
+@media (max-width: 1023px) {
+  .login-page .login-remember-forgot .forgot-password-link {
+    flex: 1 1 100%;
+    margin-left: 0;
+    text-align: right;
+    white-space: nowrap;
+  }
 }
 
 /* Error text - sufficient contrast on dark blue background */
@@ -1717,10 +1729,10 @@ input[type="password"]::-ms-reveal {
     background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
   }
   .auth-page .auth-layout {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: auto;
     min-height: 100%;
     max-height: none;
     gap: 0;
@@ -1731,34 +1743,34 @@ input[type="password"]::-ms-reveal {
   }
   /* First column = auth card (image column is second in DOM) */
   .auth-page .auth-layout > div:first-child {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    min-height: 100%;
+    height: auto;
+    min-height: 0;
     align-items: stretch;
   }
   .auth-form-card {
     width: 100%;
     max-width: 100% !important;       /* edge-to-edge */
     align-self: stretch;
-    height: 100%;
+    height: auto;
     /* Safe area inside the card so content clears notch / home indicator */
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    /* Full viewport; padding is inside (border-box) */
+    /* At least full viewport; grows when zoomed so .auth-page can scroll */
     min-height: 100%;
     max-height: none;
     display: flex;
     flex-direction: column;
     margin-top: 0;
     margin-bottom: 0;
-  overflow: hidden;
+    overflow: visible;
   }
   .auth-form-card .auth-card-content,
   .auth-form-card .signup-card-content {
-    flex: 1;
-    min-height: 0;
+    flex: 0 1 auto;
+    min-height: auto;
     min-width: 0;
     display: flex;
     flex-direction: column;
@@ -1779,13 +1791,13 @@ input[type="password"]::-ms-reveal {
 @supports (-webkit-touch-callout: none) {
   @media (max-width: 1023px) {
     .auth-page {
-      height: -webkit-fill-available;
       min-height: -webkit-fill-available;
-      max-height: -webkit-fill-available;
+      height: auto;
+      max-height: none;
     }
     .auth-form-card {
-      height: 100%;
-      min-height: 100%;
+      height: auto;
+      min-height: -webkit-fill-available;
     }
   }
 }
@@ -1828,23 +1840,22 @@ input[type="password"]::-ms-reveal {
     max-width: 100% !important;
     margin: 0 !important;
     gap: 0 !important;
-    height: 100%;
+    height: auto;
     min-height: 100%;
   }
   .auth-page .auth-layout > div:first-child {
     width: 100%;
-    height: 100%;
-    min-height: 100%;
+    height: auto;
+    min-height: 0;
   }
   .auth-form-card {
     width: 100%;
     max-width: 100% !important;
-    height: 100%;
-    min-height: 100%;
+    height: auto;
     min-height: 100dvh;
-    height: 100dvh;
     margin: 0;
     border-radius: 0;
+    overflow: visible;
   }
 }
 
@@ -2038,11 +2049,28 @@ input[type="password"]::-ms-reveal {
   }
 }
 
-/* Mobile high-zoom safety (180-200%): prevent clipping/overlap on small effective viewport widths. */
-@media (max-width: 420px) {
-  .auth-form-card {
+/* Mobile high-zoom safety (150–200%): let the page scroll; do not clip inside the card. */
+@media (max-width: 1023px) {
+  .auth-page.login-page,
+  .auth-page:has(.login-card) {
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+  }
+  .login-card.auth-form-card,
+  .login-card.auth-form-card .auth-card-content,
+  .login-card.auth-form-card .login-card-inner {
+    overflow: visible !important;
+    min-height: auto !important;
+    max-height: none !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .auth-form-card {
+    overflow: visible !important;
     max-height: none;
   }
   .auth-form-card .auth-card-content,
@@ -2115,6 +2143,37 @@ input[type="password"]::-ms-reveal {
 /* Forgot password form - placeholder light grey to match design */
 .forgot-input::placeholder {
   color: #cccccc;
+}
+
+/* Forgot password: mobile — full-height card, no white top/bottom bands */
+@media (max-width: 1023px) {
+  .forgot-password-page {
+    min-height: 100dvh;
+    background: linear-gradient(180deg, #234e70 0%, #282738 100%);
+  }
+
+  .forgot-password-page .auth-layout {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100dvh;
+    gap: 0;
+  }
+
+  .forgot-password-page .forgot-password-card {
+    width: 100%;
+    max-width: none;
+    min-height: 100dvh;
+    flex: 1 1 auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .forgot-password-page {
+    background: #ffffff;
+  }
 }
 
 .legal-modal-body h4 {

@@ -183,13 +183,13 @@ export default function LoginPage() {
       <div className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-6 sm:gap-6 lg:gap-8 auth-layout">
         {/* Card first on mobile (top), right on desktop */}
         <div className="w-full lg:w-1/2 flex justify-center order-1 lg:order-2">
-          <div className="relative overflow-hidden w-full max-w-[520px] bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] rounded-none lg:rounded-[10px] px-6 sm:px-10 flex flex-col login-card auth-form-card">
+          <div className="relative overflow-x-hidden overflow-y-visible w-full max-w-[520px] bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] rounded-none lg:rounded-[10px] px-6 sm:px-10 flex flex-col login-card auth-form-card">
             <div className="auth-inner-panel pointer-events-none absolute inset-y-0 left-1/2 w-[78%] -translate-x-1/2 bg-gradient-to-b from-white/10 via-black/10 to-black/35" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_20px_0_45px_rgba(0,0,0,0.55),inset_-20px_0_45px_rgba(0,0,0,0.55)]" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)]" />
 
-            <div className="relative z-10 flex flex-col flex-1 min-h-0 min-w-0 auth-card-content login-card-inner px-4 sm:px-6 pt-4 sm:pt-8 pb-2 sm:pb-6 lg:pt-14 lg:pb-10 text-white text-left justify-start lg:justify-center">
-              <div className="min-h-0">
+            <div className="relative z-10 flex flex-col flex-1 min-w-0 auth-card-content login-card-inner px-4 sm:px-6 pt-4 sm:pt-8 pb-4 sm:pb-8 lg:pt-14 lg:pb-10 text-white text-left justify-start lg:justify-center lg:min-h-0">
+              <div>
                 <div className="w-full flex justify-center flex-shrink-0 min-w-0">
                   <h1 className="font-welcome-heading text-lg sm:text-xl md:text-2xl lg:text-3xl text-center font-semibold mb-1 sm:mb-4 lg:mb-7 break-words tracking-widest">
                     WELCOME
@@ -303,8 +303,8 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <div className="login-remember-forgot flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mt-5 sm:mt-4 text-xs opacity-90 flex-shrink-0 min-w-0">
-                  <label className="flex items-center gap-2 cursor-pointer flex-shrink-0">
+                <div className="login-remember-forgot mt-5 sm:mt-4 text-xs opacity-90 w-full min-w-0">
+                  <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={form.rememberMe}
@@ -315,7 +315,7 @@ export default function LoginPage() {
                   </label>
                   <Link
                     href="/forgot-password"
-                    className="forgot-password-link text-white no-underline hover:text-white hover:underline decoration-1 underline-offset-4 text-[13px] flex-shrink-0 min-w-0"
+                    className="forgot-password-link text-white no-underline hover:text-white hover:underline decoration-1 underline-offset-4 text-[13px]"
                   >
                     Forgot Password?
                   </Link>
