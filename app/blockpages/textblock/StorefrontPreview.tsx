@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import Footer from "@/components/Footer";
 import { assetPath } from "@/lib/paths";
 
 const buyCategories = [
@@ -291,7 +290,7 @@ function BuyMailIcon() {
 }
 
 
-export default function ECommercePage() {
+export default function StorefrontPreview() {
   const router = useRouter();
   const [activeProductStart, setActiveProductStart] = useState(0);
   const [showAllProducts, setShowAllProducts] = useState(false);
@@ -784,7 +783,7 @@ export default function ECommercePage() {
             .buyscreen-page .flex-row {
               flex-wrap: wrap !important;
             }
-
+            
             /* Protect icons/buttons from shrinking or wrapping unreadably */
             .buyscreen-page button, .buyscreen-page .shrink-0 {
               flex-shrink: 0 !important;
@@ -1886,7 +1885,6 @@ export default function ECommercePage() {
           </div>
         </section>
       </div>
-      <Footer />
       {actionToast ? (
         <div className="pointer-events-none fixed bottom-4 right-4 z-[130] max-w-[260px] rounded-md bg-[#111827] px-3 py-2 text-xs font-medium text-white shadow-lg sm:text-sm">
           {actionToast}
@@ -1895,3 +1893,4 @@ export default function ECommercePage() {
     </main>
   );
 }
+

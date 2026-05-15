@@ -40,22 +40,21 @@ export default function RightSidebar() {
 
   return (
     <>
-      <aside className="relative z-30 hidden h-full w-[260px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#efd9ce] bg-[#fff7f4] shadow-[0_18px_45px_rgba(110,60,35,0.10)] transition-transform duration-300 lg:flex">
+      <aside className="relative z-30 hidden h-full w-[286px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#efd9ce] bg-[#fff7f4] shadow-[0_18px_45px_rgba(110,60,35,0.10)] transition-transform duration-300 lg:flex">
         <div className="custom-scrollbar flex h-full flex-col overflow-y-auto bg-[#fff7f4]">
       {/* Tabs */}
-      <div className="flex shrink-0 items-center justify-between border-b border-[#efd9ce] bg-white/65 px-5 pb-4 pt-6">
+      <div className="flex shrink-0 border-b border-[#f2d8cf] bg-white/45 px-6 pt-5">
         <button
-          className={`relative flex-1 pb-3 text-center text-[15px] font-semibold transition-colors ${activeTab === "Button" ? "border-b-2 border-[#0c1b33] text-[#0c1b33]" : "border-b-2 border-[#efd9ce] text-slate-500 hover:text-[#0c1b33]"}`}
+          className={`flex-1 border-b-[2px] pb-4 text-base font-bold transition-colors ${activeTab === "Button" ? "border-[#0B1D40] text-[#0B1D40]" : "border-gray-300 text-[#566583] hover:text-[#0B1D40]"}`}
           onClick={() => setActiveTab("Button")}
         >
           Button
         </button>
-        <div className="mx-3 h-6 w-[1px] bg-[#efd9ce]" />
         <button
-          className={`relative flex-1 pb-3 text-center text-[15px] font-semibold transition-colors ${activeTab === "Style" ? "border-b-2 border-[#0c1b33] text-[#0c1b33]" : "border-b-2 border-[#efd9ce] text-slate-500 hover:text-[#0c1b33]"}`}
+          className={`flex-1 border-b-[2px] pb-4 text-base font-bold transition-colors ${activeTab === "Style" ? "border-[#0B1D40] text-[#0B1D40]" : "border-gray-300 text-[#566583] hover:text-[#0B1D40]"}`}
           onClick={() => setActiveTab("Style")}
         >
-          Style
+          Styles
         </button>
       </div>
 
@@ -118,7 +117,7 @@ export default function RightSidebar() {
                 className="flex items-center justify-between text-[15px] font-bold text-[#0c1b33] cursor-pointer hover:opacity-80"
                 onClick={() => setIsStyleOpen(!isStyleOpen)}
               >
-                <span>Style</span>
+                <span>Styles</span>
                 {isStyleOpen ? <ChevronDown size={18} className="text-[#0c1b33]" /> : <ChevronRight size={18} className="text-[#0c1b33]" />}
               </div>
 

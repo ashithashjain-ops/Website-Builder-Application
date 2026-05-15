@@ -54,50 +54,47 @@ export default function MainCanvas() {
       />
 
       {/* Top Bar */}
-      <div className="z-10 flex h-[64px] shrink-0 items-center justify-between border-b border-[#dbe3ef] bg-white px-3 shadow-sm sm:px-6">
-        <div className="flex justify-between items-center w-full gap-2 sm:gap-0">
-          {/* Left area */}
-          <button 
-            onClick={() => handleAction("Switch Website")}
-            className="flex items-center gap-1 sm:gap-2 text-slate-800 font-bold hover:text-blue-600 transition-colors cursor-pointer shrink-0"
-          >
-            <span className="text-[13px] sm:text-[15px] border-b-2 border-[#0c1b33] pb-0.5 whitespace-nowrap">My Website</span>
-            <ChevronDown size={18} className="text-slate-500 mb-0.5 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
-          </button>
+      <div className="z-10 flex h-[64px] shrink-0 items-center justify-between gap-4 overflow-x-auto border-b border-[#dbe3ef] bg-white px-3 shadow-sm md:px-5">
+        <button
+          onClick={() => handleAction("Switch Website")}
+          className="flex items-center gap-2 whitespace-nowrap rounded px-2 py-1.5 text-[14px] font-bold text-[#0B1D40] transition-colors hover:bg-gray-100 md:text-[15px]"
+        >
+          My Website
+          <ChevronDown className="h-4 w-4 text-gray-600" />
+        </button>
 
-          {/* Middle area - Undo/Redo */}
-          <div className="flex items-center border border-slate-300 rounded-md overflow-hidden shrink-0">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex flex-shrink-0 items-center overflow-hidden rounded-md border border-gray-300 bg-white shadow-sm">
             <button 
               onClick={undo}
               disabled={historyStack.length <= 1}
-              className={`px-2 sm:px-3 py-1.5 transition-colors border-r border-slate-300 ${historyStack.length > 1 ? 'text-slate-700 hover:bg-slate-100 cursor-pointer' : 'text-slate-300 cursor-not-allowed'}`}
+              className={`border-r border-gray-300 px-3 py-2 transition-colors ${historyStack.length > 1 ? 'text-gray-600 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-not-allowed'}`}
+              title="Undo"
             >
-              <Undo2 size={18} className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+              <Undo2 className="h-[18px] w-[18px]" strokeWidth={1.5} />
             </button>
             <button 
               onClick={redo}
               disabled={futureStack.length === 0}
-              className={`px-2 sm:px-3 py-1.5 transition-colors ${futureStack.length > 0 ? 'text-slate-700 hover:bg-slate-100 cursor-pointer' : 'text-slate-300 cursor-not-allowed'}`}
+              className={`px-3 py-2 transition-colors ${futureStack.length > 0 ? 'text-gray-600 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-not-allowed'}`}
+              title="Redo"
             >
-              <Redo2 size={18} className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+              <Redo2 className="h-[18px] w-[18px]" strokeWidth={1.5} />
             </button>
           </div>
 
-          {/* Right area - Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 shrink-0">
-            <button onClick={() => handleAction("Save Draft")} className="px-2 sm:px-2.5 lg:px-4 py-1.5 text-[14px] font-semibold text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50 transition-colors flex items-center gap-2 cursor-pointer" title="Save Draft">
-              <Save size={16} className="lg:hidden" />
-              <span className="hidden lg:inline">Save Draft</span>
-            </button>
-            <button onClick={() => handleAction("Preview")} className="px-2 sm:px-2.5 lg:px-4 py-1.5 text-[14px] font-semibold text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50 transition-colors flex items-center gap-2 cursor-pointer" title="Preview">
-              <Eye size={16} />
-              <span className="hidden lg:inline">Preview</span>
-            </button>
-            <button onClick={() => handleAction("Publish")} className="px-2 sm:px-2.5 lg:px-4 py-1.5 text-[14px] font-semibold text-white bg-[#0c1b33] rounded-md hover:bg-blue-900 transition-colors flex items-center gap-2 cursor-pointer" title="Publish">
-              <span className="hidden lg:inline">Publish</span>
-              <Send size={15} className="-mt-0.5" />
-            </button>
-          </div>
+          <button onClick={() => handleAction("Save Draft")} className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 py-2 text-[13px] font-bold text-[#0B1D40] shadow-sm transition-colors hover:bg-gray-50" title="Save Draft">
+            <Save className="h-4 w-4 text-gray-600 lg:hidden" />
+            <span className="hidden lg:inline">Save Draft</span>
+          </button>
+          <button onClick={() => handleAction("Preview")} className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 py-2 text-[13px] font-bold text-[#0B1D40] shadow-sm transition-colors hover:bg-gray-50" title="Preview">
+            <Eye className="h-4 w-4" />
+            <span className="hidden lg:inline">Preview</span>
+          </button>
+          <button onClick={() => handleAction("Publish")} className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#0B1D40] px-3 py-2 text-[13px] font-bold text-white shadow-[0_2px_4px_rgba(11,29,64,0.3)] transition-colors hover:bg-[#152B52]" title="Publish">
+            <span className="hidden lg:inline">Publish</span>
+            <Send className="h-[14px] w-[14px]" />
+          </button>
         </div>
       </div>
 
