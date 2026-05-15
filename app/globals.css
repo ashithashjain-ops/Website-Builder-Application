@@ -1834,6 +1834,18 @@ body.auth-visible {
     touch-action: pan-y;
     position: relative;
     z-index: 10;
+    /* Scroll works; hide the visible scrollbar line (iOS Safari, Chrome, Firefox) */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .auth-form-card.login-card .login-card-inner::-webkit-scrollbar,
+  .auth-form-card.login-card .auth-card-content::-webkit-scrollbar,
+  .auth-form-card.signup-card .signup-card-content::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+    background: transparent;
   }
 
   .auth-image-col {
