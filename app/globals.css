@@ -1326,7 +1326,26 @@ input[type="password"]::-ms-reveal {
   text-align: center;
 }
 
-/* Mobile: prevent overflow and keep layout intact at all zoom levels */
+/* Login/signup surface — one gradient everywhere (avoids top/bottom colour bands on mobile) */
+:root {
+  --auth-surface-gradient: linear-gradient(180deg, #5f82e8 0%, #3f66c9 50%, #021a46 100%);
+}
+
+/* Auth screens: fill viewport; stop iOS rubber-band showing white/other colours */
+html.auth-visible,
+body.auth-visible {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100dvh !important;
+  min-height: 100svh !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  background: var(--auth-surface-gradient) !important;
+  background-color: #3f66c9 !important;
+}
+
 .auth-page {
   -webkit-overflow-scrolling: touch;
 }
@@ -1690,61 +1709,71 @@ input[type="password"]::-ms-reveal {
   }
 }
 
-/*
- * Mobile login/signup: full-page gradient, content top-aligned (no light bands from vertical centering).
- */
+/* Mobile: full-screen auth gradient — no white/light bands; scroll inside page when zoomed */
 @media (max-width: 1023px) {
-  html:has(.auth-page),
   html.auth-visible,
-  body:has(.auth-page),
-  body.auth-visible {
-    margin: 0 !important;
-    padding: 0 !important;
+  body.auth-visible,
+  html:has(.auth-page),
+  body:has(.auth-page) {
+    position: fixed;
+    inset: 0;
     width: 100% !important;
-    height: auto !important;
-    min-height: 100% !important;
-    overflow-x: hidden !important;
-    overflow-y: scroll !important;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: auto;
+    height: 100% !important;
+    min-height: 100dvh !important;
+    min-height: 100svh !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    background: var(--auth-surface-gradient) !important;
     background-color: #3f66c9 !important;
-    background-image: none !important;
   }
 
   .auth-page {
-    --auth-gradient: linear-gradient(
-      180deg,
-      #3f66c9 0%,
-      #2f56b8 42%,
-      #021a46 100%
-    );
-    position: relative;
-    width: 100%;
-    min-height: 100lvh;
-    min-height: 100dvh;
-    min-height: 100svh;
-    height: auto;
-    margin: 0;
-    padding: 0 !important;
-    box-sizing: border-box;
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
-    overflow: visible;
-    background: var(--auth-gradient) !important;
-    background-repeat: no-repeat !important;
-    background-size: 100% 100% !important;
-    background-attachment: scroll !important;
+    width: 100%;
+    min-height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0 !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    background: transparent !important;
+  }
+
+  /* Fixed backdrop: same gradient while scrolling / rubber-banding on iOS */
+  .auth-page::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: var(--auth-surface-gradient);
+    background-color: #3f66c9;
+    pointer-events: none;
+  }
+
+  .auth-page > * {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
   }
 
   .auth-page .auth-layout {
-    flex: 0 1 auto;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 0;
+    min-height: 100dvh;
+    min-height: 100svh;
     height: auto;
     margin: 0 !important;
     gap: 0 !important;
@@ -1753,54 +1782,45 @@ input[type="password"]::-ms-reveal {
   }
 
   .auth-page .auth-layout > div:first-child {
-    flex: 0 1 auto;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-height: 0;
+    min-height: 100dvh;
+    min-height: 100svh;
     height: auto;
     align-items: stretch;
-    justify-content: flex-start;
   }
 
   .auth-form-card.login-card,
   .auth-form-card.signup-card {
-    flex: 0 1 auto !important;
+    flex: 1 1 auto;
     width: 100% !important;
-    max-width: none !important;
-    min-height: auto !important;
-    height: auto !important;
-    margin: 0 !important;
+    max-width: 100% !important;
+    min-height: 100dvh !important;
+    min-height: 100svh !important;
+    height: auto;
+    margin: 0;
+    padding: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+    overflow: visible !important;
     background: transparent !important;
     background-image: none !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
   }
 
-  .auth-form-card .auth-card-content,
-  .auth-form-card .signup-card-content,
-  .auth-form-card .login-card-inner {
+  .auth-form-card.login-card .auth-card-content,
+  .auth-form-card.login-card .login-card-inner,
+  .auth-form-card.signup-card .signup-card-content {
     flex: 1 1 auto;
-    min-height: auto !important;
+    min-height: auto;
     min-width: 0;
     display: flex;
     flex-direction: column;
     justify-content: flex-start !important;
-    overflow: visible;
-  }
-
-  .signup-card-content {
-    min-height: auto !important;
-  }
-
-  .auth-form-card .login-card-inner,
-  .auth-form-card .signup-card-content {
-    padding-top: max(1rem, env(safe-area-inset-top, 0px)) !important;
-    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)) !important;
+    overflow: visible !important;
+    padding-top: max(1rem, env(safe-area-inset-top, 0px));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
   }
 
   .auth-image-col {
@@ -1808,41 +1828,39 @@ input[type="password"]::-ms-reveal {
   }
 }
 
-/* Auth pages: never clip inner content on mobile (zoom / long forms) */
-@media (max-width: 1023px) {
-  .auth-card-content,
-  .auth-form-card .auth-card-content,
-  .auth-form-card .signup-card-content,
-  .login-card .auth-card-content {
-    overflow: visible !important;
-    max-height: none !important;
-  }
-}
-
+/*
+ * iOS Safari (mobile auth): use -webkit-fill-available ONLY as a plain min-height (no calc()).
+ * calc(-webkit-fill-available ± env()) is unreliable in WebKit and can break the whole layout.
+ */
 @supports (-webkit-touch-callout: none) {
   @media (max-width: 1023px) {
     .auth-page {
       min-height: -webkit-fill-available;
+      min-height: 100dvh;
+      min-height: 100svh;
+    }
+    .auth-form-card.login-card,
+    .auth-form-card.signup-card {
+      min-height: -webkit-fill-available;
+      min-height: 100dvh;
+      min-height: 100svh;
     }
   }
 }
 
+/*
+ * Some phones render with wider CSS viewports (or desktop-site mode), which can bypass
+ * width breakpoints and reintroduce white bands. Force edge-to-edge auth layout on
+ * touch-first devices regardless of reported width.
+ */
 @media (hover: none) and (pointer: coarse) and (max-width: 1023px) {
-  html:has(.auth-page),
   html.auth-visible,
-  body:has(.auth-page),
-  body.auth-visible {
-    overflow-y: scroll !important;
-    overscroll-behavior-y: auto;
+  body.auth-visible,
+  html:has(.auth-page),
+  body:has(.auth-page) {
+    overscroll-behavior: none !important;
+    background: var(--auth-surface-gradient) !important;
     background-color: #3f66c9 !important;
-  }
-
-  .auth-page {
-    background: var(
-      --auth-gradient,
-      linear-gradient(180deg, #3f66c9 0%, #2f56b8 42%, #021a46 100%)
-    ) !important;
-    background-size: 100% 100% !important;
   }
 }
 
@@ -1852,8 +1870,12 @@ input[type="password"]::-ms-reveal {
  * touch/mobile fixed-height rules. Reset those rules for mouse/trackpad devices.
  */
 @media (max-width: 1023px) and (hover: hover) and (pointer: fine) {
+  html.auth-visible,
+  body.auth-visible,
   html:has(.auth-page),
   body:has(.auth-page) {
+    position: relative;
+    inset: auto;
     overflow: auto !important;
     background: var(--background) !important;
   }
@@ -1864,7 +1886,9 @@ input[type="password"]::-ms-reveal {
     min-height: 100dvh;
     max-height: none;
     background: transparent !important;
-    background-image: none !important;
+  }
+  .auth-page::before {
+    display: none;
   }
   .auth-page .auth-layout {
     height: auto;
@@ -2021,7 +2045,8 @@ input[type="password"]::-ms-reveal {
   }
   .auth-form-card {
     max-width: 100%;
-    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
   .auth-card-content,
   .auth-form-card .signup-card-content,
@@ -2035,6 +2060,7 @@ input[type="password"]::-ms-reveal {
     gap: 0.375rem;
   }
 }
+
 
 @media (max-width: 420px) {
   .auth-form-card {
