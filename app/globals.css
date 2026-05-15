@@ -1690,157 +1690,97 @@ input[type="password"]::-ms-reveal {
   }
 }
 
-/* Mobile: edge-to-edge feel (no extra top/bottom bars); scroll only when content overflows */
+/* Mobile auth: one full-screen gradient — no second colour when scrolling (iOS rubber-band) */
 @media (max-width: 1023px) {
   html:has(.auth-page),
-  body:has(.auth-page) {
+  html.auth-visible,
+  body:has(.auth-page),
+  body.auth-visible {
     margin: 0 !important;
     padding: 0 !important;
     width: 100% !important;
     height: 100% !important;
     min-height: 100% !important;
     overflow: hidden !important;
-    overscroll-behavior-y: auto;
-    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+    overscroll-behavior: none !important;
+    background-color: #021a46 !important;
+    background-image: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+    background-attachment: fixed !important;
   }
 
-  .auth-page:not(.login-page):not(.signup-page) {
-    justify-content: flex-start;
-    align-items: stretch;
-    /* No top/bottom padding here — avoids strips (bg-white) on Android & iOS */
+  .auth-page {
     --auth-safe-top: env(safe-area-inset-top, 0px);
     --auth-safe-bottom: env(safe-area-inset-bottom, 0px);
-    --auth-safe-left: env(safe-area-inset-left, 0px);
-    --auth-safe-right: env(safe-area-inset-right, 0px);
     position: fixed;
     inset: 0;
-    height: 100dvh;
-    min-height: 100dvh;
-    max-height: 100dvh;
-    padding-top: 0;
-    padding-bottom: 0;
-    /* Remove white margins on left/right in mobile. */
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior-y: auto;
-    -webkit-overflow-scrolling: touch;
-    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
-  }
-
-  /* Login/signup: same full-bleed flow as forgot-password (relative page, not fixed) */
-  html:has(.login-page),
-  html:has(.signup-page),
-  body:has(.login-page),
-  body:has(.signup-page) {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    min-height: 100dvh !important;
-    min-height: 100svh !important;
-    height: auto !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    overscroll-behavior: none;
-    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
-  }
-
-  .auth-page.login-page,
-  .auth-page.signup-page {
-    position: relative !important;
-    inset: auto !important;
-    width: 100% !important;
-    min-height: 100dvh !important;
-    min-height: 100svh !important;
-    max-height: none !important;
-    height: auto !important;
-    padding: 0 !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
-    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
-  }
-
-  .auth-page.login-page .auth-layout,
-  .auth-page.signup-page .auth-layout {
-    flex: 1 1 auto;
     width: 100%;
-    max-width: 100%;
+    height: 100%;
     min-height: 100dvh;
     min-height: 100svh;
-    gap: 0;
+    max-height: none;
     margin: 0;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    background-color: #021a46 !important;
+    background-image: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+    background-attachment: fixed !important;
+  }
+
+  .auth-page .auth-layout {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100%;
+    height: auto;
+    margin: 0 !important;
+    gap: 0 !important;
     justify-content: flex-start;
     align-items: stretch;
   }
 
-  .auth-page.login-page .auth-layout > div:first-child,
-  .auth-page.signup-page .auth-layout > div:first-child {
+  .auth-page .auth-layout > div:first-child {
     flex: 1 1 auto;
-    min-height: 100dvh;
-    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    min-height: 100%;
+    height: auto;
+    align-items: stretch;
   }
 
-  .login-page .login-card.reset-flow-card,
-  .signup-page .signup-card.reset-flow-card {
+  /* Card is transparent on mobile — only the page gradient shows (no double layer / bands) */
+  .auth-form-card.login-card,
+  .auth-form-card.signup-card {
+    flex: 1 1 auto !important;
     width: 100% !important;
     max-width: none !important;
-    min-height: 100dvh !important;
-    min-height: 100svh !important;
-    flex: 1 1 auto;
+    min-height: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
     border-radius: 0 !important;
-    padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
-    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
-    overflow: hidden !important;
-  }
-
-  .auth-page:not(.login-page):not(.signup-page) .auth-layout {
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    height: auto;
-    min-height: 100%;
-    max-height: none;
-    gap: 0;
-    max-width: 100%;
-    /* Top-align so the card can fill the screen; avoids “floating” gaps */
-    justify-content: flex-start;
-    align-items: stretch;
-  }
-  /* First column = auth card (image column is second in DOM) */
-  .auth-page:not(.login-page):not(.signup-page) .auth-layout > div:first-child {
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    height: auto;
-    min-height: 0;
-    align-items: stretch;
-  }
-  .auth-page:not(.login-page):not(.signup-page) .auth-form-card {
-    width: 100%;
-    max-width: 100% !important;       /* edge-to-edge */
-    align-self: stretch;
-    height: auto;
-    /* Safe area inside the card so content clears notch / home indicator */
+    box-shadow: none !important;
+    background: transparent !important;
+    background-image: none !important;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    /* Full viewport on mobile — same gradient as page (no top/bottom colour bands) */
-    min-height: 100dvh;
-    min-height: 100svh;
-    max-height: none;
-    display: flex;
-    flex-direction: column;
-    margin-top: 0;
-    margin-bottom: 0;
-    overflow: visible;
-    border-radius: 0;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
   }
+
   .auth-form-card .auth-card-content,
-  .auth-form-card .signup-card-content {
-    flex: 0 1 auto;
+  .auth-form-card .signup-card-content,
+  .auth-form-card .login-card-inner {
+    flex: 1 1 auto;
     min-height: auto;
     min-width: 0;
     display: flex;
@@ -1849,7 +1789,6 @@ input[type="password"]::-ms-reveal {
     overflow: visible;
   }
 
-  /* Mobile: remove bottom illustration entirely */
   .auth-image-col {
     display: none !important;
   }
@@ -1861,21 +1800,13 @@ input[type="password"]::-ms-reveal {
  */
 @supports (-webkit-touch-callout: none) {
   @media (max-width: 1023px) {
-    .auth-page:not(.login-page):not(.signup-page) {
+    .auth-page {
       min-height: -webkit-fill-available;
       min-height: 100dvh;
       min-height: 100svh;
     }
-    .auth-page:not(.login-page):not(.signup-page) .auth-form-card.login-card,
-    .auth-page:not(.login-page):not(.signup-page) .auth-form-card.signup-card {
-      min-height: -webkit-fill-available;
-      min-height: 100dvh;
-      min-height: 100svh;
-    }
-    .auth-page.login-page,
-    .auth-page.signup-page,
-    .login-page .login-card.reset-flow-card,
-    .signup-page .signup-card.reset-flow-card {
+    .auth-form-card.login-card,
+    .auth-form-card.signup-card {
       min-height: -webkit-fill-available;
       min-height: 100dvh;
       min-height: 100svh;
@@ -1890,53 +1821,27 @@ input[type="password"]::-ms-reveal {
  */
 @media (hover: none) and (pointer: coarse) and (max-width: 1023px) {
   html:has(.auth-page),
-  body:has(.auth-page) {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+  html.auth-visible,
+  body:has(.auth-page),
+  body.auth-visible {
+    overscroll-behavior: none !important;
+    background-color: #021a46 !important;
+    background-image: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+    background-attachment: fixed !important;
+  }
+
+  .auth-page {
+    overscroll-behavior: none;
+    background-color: #021a46 !important;
+    background-image: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+    background-attachment: fixed !important;
+  }
+
+  .auth-form-card.login-card,
+  .auth-form-card.signup-card {
+    background: transparent !important;
+    background-image: none !important;
     min-height: 100% !important;
-    overflow: hidden !important;
-    overscroll-behavior-y: auto;
-    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
-  }
-  .auth-page:not(.login-page):not(.signup-page) {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100dvh;
-    min-height: 100dvh;
-    max-height: 100dvh;
-    padding: 0 !important;
-    justify-content: flex-start;
-    align-items: stretch;
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior-y: auto;
-    -webkit-overflow-scrolling: touch;
-    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
-  }
-  .auth-page:not(.login-page):not(.signup-page) .auth-layout {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    gap: 0 !important;
-    height: auto;
-    min-height: 100%;
-  }
-  .auth-page:not(.login-page):not(.signup-page) .auth-layout > div:first-child {
-    width: 100%;
-    height: auto;
-    min-height: 0;
-  }
-  .auth-page:not(.login-page):not(.signup-page) .auth-form-card {
-    width: 100%;
-    max-width: 100% !important;
-    height: auto;
-    min-height: 100dvh;
-    margin: 0;
-    border-radius: 0;
-    overflow: visible;
   }
 }
 
@@ -2130,56 +2035,6 @@ input[type="password"]::-ms-reveal {
   }
 }
 
-/* Mobile: full-bleed card; scroll on page when zoomed — no coloured bands above/below card */
-@media (max-width: 1023px) {
-  .auth-page.login-page,
-  .auth-page:has(.login-card),
-  .auth-page:has(.signup-card) {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-    touch-action: pan-y;
-    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
-  }
-
-  .login-card.auth-form-card,
-  .signup-card.auth-form-card {
-    flex: 1 1 auto;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 100dvh !important;
-    min-height: 100svh !important;
-    height: auto;
-    max-height: none !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
-    border-radius: 0 !important;
-  }
-
-  .login-card.auth-form-card .auth-card-content,
-  .login-card.auth-form-card .login-card-inner,
-  .signup-card.auth-form-card .signup-card-content {
-    overflow: visible !important;
-    max-height: none !important;
-  }
-
-  .auth-page .auth-layout {
-    min-height: 100dvh;
-    min-height: 100svh;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-  }
-
-  .auth-page .auth-layout > div:first-child {
-    flex: 1 1 auto;
-    min-height: 100dvh;
-    min-height: 100svh;
-    width: 100%;
-  }
-}
-
 @media (max-width: 420px) {
   .auth-form-card {
     overflow: visible !important;
@@ -2259,14 +2114,14 @@ input[type="password"]::-ms-reveal {
 
 /* Reset flow pages (OTP, verified, passwords): mobile full-bleed, no white bands */
 @media (max-width: 1023px) {
-  .reset-flow-page:not(.login-page):not(.signup-page),
+  .reset-flow-page,
   .forgot-password-page {
     min-height: 100dvh;
     min-height: 100svh;
     background: linear-gradient(180deg, #234e70 0%, #282738 100%) !important;
   }
 
-  .reset-flow-page:not(.login-page):not(.signup-page) .auth-layout,
+  .reset-flow-page .auth-layout,
   .forgot-password-page .auth-layout {
     flex: 1 1 auto;
     width: 100%;
@@ -2277,9 +2132,9 @@ input[type="password"]::-ms-reveal {
     margin: 0;
   }
 
-  .reset-flow-page:not(.login-page):not(.signup-page) .reset-flow-shell,
+  .reset-flow-page .reset-flow-shell,
   .forgot-password-page .forgot-password-card,
-  .reset-flow-page:not(.login-page):not(.signup-page) .reset-flow-card {
+  .reset-flow-page .reset-flow-card {
     width: 100% !important;
     max-width: none !important;
     min-height: 100dvh;
@@ -2289,24 +2144,15 @@ input[type="password"]::-ms-reveal {
     box-shadow: none !important;
   }
 
-  .reset-flow-page:not(.login-page):not(.signup-page) .reset-flow-illustration {
+  .reset-flow-page .reset-flow-illustration {
     display: none !important;
-  }
-
-  .login-page.reset-flow-page,
-  .signup-page.reset-flow-page {
-    min-height: 100dvh;
-    min-height: 100svh;
-    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
   }
 }
 
 @supports (-webkit-touch-callout: none) {
   @media (max-width: 1023px) {
-    .reset-flow-page:not(.login-page):not(.signup-page) .reset-flow-card,
-    .forgot-password-page .forgot-password-card,
-    .login-page .login-card.reset-flow-card,
-    .signup-page .signup-card.reset-flow-card {
+    .reset-flow-page .reset-flow-card,
+    .forgot-password-page .forgot-password-card {
       min-height: -webkit-fill-available;
       min-height: 100dvh;
       min-height: 100svh;
@@ -2315,13 +2161,8 @@ input[type="password"]::-ms-reveal {
 }
 
 @media (min-width: 1024px) {
-  .reset-flow-page:not(.login-page):not(.signup-page),
+  .reset-flow-page,
   .forgot-password-page {
-    background: #ffffff !important;
-  }
-
-  .auth-page.login-page,
-  .auth-page.signup-page {
     background: #ffffff !important;
   }
 }

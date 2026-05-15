@@ -6,7 +6,6 @@ import { FaAddressBook, FaLock } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { isApiConnectionError, login as loginApi } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
-import { isValidEmail } from "@/lib/validation";
 
 type LoginFormState = {
   email: string;
@@ -39,14 +38,18 @@ export default function LoginPage() {
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
     const setOverflow = () => {
-      // Keep page scroll available on desktop zoom (150-200%) to avoid clipped auth content.
-      document.body.style.overflow = "";
+      // Do not set overflow on mobile — CSS locks body for full-bleed auth gradient.
+      if (mql.matches) {
+        document.body.style.overflow = "";
+      } else {
+        document.body.style.removeProperty("overflow");
+      }
     };
     setOverflow();
     mql.addEventListener("change", setOverflow);
     return () => {
       mql.removeEventListener("change", setOverflow);
-      document.body.style.overflow = "";
+      document.body.style.removeProperty("overflow");
     };
   }, []);
 
@@ -60,63 +63,20 @@ export default function LoginPage() {
     };
   }, []);
 
-  useEffect(() => {
-    const page = document.querySelector(".login-page.auth-page") as HTMLElement | null;
-    if (!page) return;
-
-    let startY = 0;
-    let canPull = false;
-    let triggered = false;
-    const threshold = 88;
-
-    const onTouchStart = (event: TouchEvent) => {
-      if (window.innerWidth >= 1024 || event.touches.length !== 1) return;
-      startY = event.touches[0].clientY;
-      canPull = page.scrollTop <= 0;
-      triggered = false;
-    };
-
-    const onTouchMove = (event: TouchEvent) => {
-      if (!canPull || triggered || window.innerWidth >= 1024) return;
-      const deltaY = event.touches[0].clientY - startY;
-      if (deltaY > threshold && page.scrollTop <= 0) {
-        triggered = true;
-        window.location.reload();
-      } else if (deltaY < 0) {
-        canPull = false;
-      }
-    };
-
-    const onTouchEnd = () => {
-      canPull = false;
-      triggered = false;
-    };
-
-    page.addEventListener("touchstart", onTouchStart, { passive: true });
-    page.addEventListener("touchmove", onTouchMove, { passive: true });
-    page.addEventListener("touchend", onTouchEnd);
-    page.addEventListener("touchcancel", onTouchEnd);
-
-    return () => {
-      page.removeEventListener("touchstart", onTouchStart);
-      page.removeEventListener("touchmove", onTouchMove);
-      page.removeEventListener("touchend", onTouchEnd);
-      page.removeEventListener("touchcancel", onTouchEnd);
-    };
-  }, []);
-
   const validate = (values: LoginFormState): LoginFormErrors => {
     const newErrors: LoginFormErrors = {};
 
     const trimmedContact = values.email.trim();
     if (!trimmedContact) {
       newErrors.email = "Email or mobile number is required.";
-    } else if (trimmedContact.includes("@")) {
-      if (!isValidEmail(trimmedContact)) {
-        newErrors.email = "Enter a valid email address.";
+    } else {
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        trimmedContact.toLowerCase(),
+      );
+      const isMobileContact = isMobile(trimmedContact);
+      if (!isEmail && !isMobileContact) {
+        newErrors.email = "Enter valid email or mobile number.";
       }
-    } else if (!isMobile(trimmedContact)) {
-      newErrors.email = "Enter valid email or mobile number.";
     }
 
     if (!values.password || values.password.length < 8) {
@@ -149,16 +109,8 @@ export default function LoginPage() {
       setErrors((prev) => ({ ...prev, form: undefined }));
 
       const contact = form.email.trim();
+
       const isMobileContact = isMobile(contact);
-
-      if (!isMobileContact && !isValidEmail(contact)) {
-        setErrors((prev) => ({
-          ...prev,
-          email: "Enter a valid email address.",
-        }));
-        return;
-      }
-
       const result = await loginApi({
         ...(isMobileContact ? { mobile: contact } : { email: contact.toLowerCase() }),
         password: form.password,
@@ -186,11 +138,11 @@ export default function LoginPage() {
     }
   };
   return (
-    <div className="login-page reset-flow-page auth-page min-h-[100dvh] lg:min-h-screen flex flex-col justify-start lg:justify-center items-stretch overflow-y-auto px-0 py-0 lg:px-6 lg:py-4 bg-white">
-      <div className="w-full max-w-6xl mx-auto flex flex-1 flex-col lg:flex-none lg:flex-row items-stretch lg:items-center justify-start lg:justify-center gap-0 lg:gap-8 auth-layout">
+    <div className="login-page auth-page min-h-[100dvh] lg:min-h-screen flex flex-col max-lg:bg-transparent bg-white px-0 py-0 lg:px-6 lg:py-4 overflow-y-auto">
+      <div className="w-full max-lg:max-w-none max-w-6xl mx-auto flex flex-1 flex-col lg:flex-none lg:flex-row gap-0 lg:gap-8 auth-layout">
         {/* Card first on mobile (top), right on desktop */}
-        <div className="flex w-full flex-1 flex-col items-stretch justify-center order-1 lg:order-2 lg:w-1/2 lg:flex-none min-h-0">
-          <div className="login-card auth-form-card reset-flow-card relative flex w-full max-w-[520px] flex-1 flex-col justify-center self-center overflow-hidden bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] px-6 sm:px-10 py-6 sm:py-8 lg:flex-none lg:min-h-0 lg:rounded-[10px]">
+        <div className="flex w-full flex-1 flex-col items-stretch justify-center order-1 lg:order-2 lg:w-1/2 lg:flex-none">
+          <div className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-x-hidden overflow-y-visible self-center px-6 sm:px-10 max-lg:max-w-none lg:flex-none lg:rounded-[10px] lg:bg-gradient-to-b lg:from-[#5f82e8] lg:via-[#3f66c9] lg:to-[#021a46] login-card auth-form-card">
             <div className="auth-inner-panel pointer-events-none absolute inset-y-0 left-1/2 w-[78%] -translate-x-1/2 bg-gradient-to-b from-white/10 via-black/10 to-black/35" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_20px_0_45px_rgba(0,0,0,0.55),inset_-20px_0_45px_rgba(0,0,0,0.55)]" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)]" />
