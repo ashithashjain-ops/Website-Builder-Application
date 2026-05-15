@@ -737,6 +737,67 @@ export default function ECommercePage() {
 
   return (
     <main className="buyscreen-page min-h-[100dvh] overflow-x-hidden bg-[#f5f7fb] text-[#111827]">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @media (max-width: 1024px) {
+            /* 1. Fluid Layouts & Remove Fixed Constraints */
+            .buyscreen-page .w-96, .buyscreen-page .w-80, .buyscreen-page .w-72, .buyscreen-page .w-64, .buyscreen-page .w-56, .buyscreen-page .w-48, .buyscreen-page .max-w-md, .buyscreen-page .max-w-sm, .buyscreen-page .max-w-lg, .buyscreen-page .w-[350px] {
+              max-width: 100% !important;
+              width: 100% !important;
+            }
+            .buyscreen-page .h-96, .buyscreen-page .h-80, .buyscreen-page .h-72, .buyscreen-page .h-64, .buyscreen-page .h-48 {
+              height: auto !important;
+            }
+
+            /* 2. Prevent Text Overflow */
+            .buyscreen-page h1, .buyscreen-page h2, .buyscreen-page h3, .buyscreen-page h4, .buyscreen-page p, .buyscreen-page span, .buyscreen-page a, .buyscreen-page button {
+              overflow-wrap: break-word !important;
+              word-wrap: break-word !important;
+              hyphens: auto !important;
+              white-space: normal !important;
+            }
+
+            /* 3. Responsive Clamp Fonts */
+            .buyscreen-page h1 { font-size: clamp(1.5rem, 5vw + 0.5rem, 3rem) !important; line-height: 1.2 !important; }
+            .buyscreen-page h2 { font-size: clamp(1.25rem, 4vw + 0.5rem, 2.5rem) !important; line-height: 1.2 !important; }
+            .buyscreen-page h3 { font-size: clamp(1rem, 3vw + 0.5rem, 2rem) !important; line-height: 1.3 !important; }
+            .buyscreen-page p { font-size: clamp(0.875rem, 2.5vw + 0.25rem, 1.125rem) !important; line-height: 1.5 !important; }
+            .buyscreen-page button { font-size: clamp(0.75rem, 2vw + 0.25rem, 1rem) !important; }
+
+            /* 4. Images */
+            .buyscreen-page img, .buyscreen-page svg {
+              max-width: 100% !important;
+              height: auto !important;
+              object-fit: contain !important;
+              flex-shrink: 0 !important;
+            }
+
+            /* 5. Flexbox Wrapping for general sections, protect header icons */
+            .buyscreen-page header, .buyscreen-page section {
+              min-width: 0 !important;
+              max-width: 100% !important;
+              overflow: hidden !important;
+            }
+            .buyscreen-page .flex {
+              min-width: 0 !important;
+            }
+            .buyscreen-page .flex-row {
+              flex-wrap: wrap !important;
+            }
+            /* Protect icons/buttons from shrinking or wrapping unreadably */
+            .buyscreen-page button, .buyscreen-page .shrink-0 {
+              flex-shrink: 0 !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+             .buyscreen-page .gap-8 { gap: 1rem !important; }
+             .buyscreen-page .gap-6 { gap: 0.75rem !important; }
+             .buyscreen-page .p-8 { padding: 1rem !important; }
+             .buyscreen-page .p-6 { padding: 0.75rem !important; }
+          }
+        `
+      }} />
       {licenseProduct ? (
         <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto overscroll-contain p-4 sm:items-center sm:p-6">
           <button

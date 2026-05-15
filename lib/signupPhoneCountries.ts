@@ -63,7 +63,7 @@ export function nationalDigitsMessage(country: SignupPhoneCountry): string {
   if (country.minDigits === country.maxDigits) {
     return `Enter ${country.minDigits} digits for ${country.name}.`;
   }
-  return `Enter ${country.minDigits}–${country.maxDigits} digits for ${country.name}.`;
+  return `Enter ${country.minDigits}-${country.maxDigits} digits for ${country.name}.`;
 }
 
 /** Returns an error message string or null if length is valid. */
