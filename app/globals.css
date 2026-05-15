@@ -1691,8 +1691,7 @@ input[type="password"]::-ms-reveal {
 }
 
 /*
- * Mobile login/signup: one gradient on .auth-page (fills screen + grows when zoomed).
- * No extra html/body layers, no ::before — avoids top/bottom colour bands on iOS.
+ * Mobile login/signup: full-page gradient, content top-aligned (no light bands from vertical centering).
  */
 @media (max-width: 1023px) {
   html:has(.auth-page),
@@ -1705,19 +1704,18 @@ input[type="password"]::-ms-reveal {
     height: auto !important;
     min-height: 100% !important;
     overflow-x: hidden !important;
-    overflow-y: auto !important;
+    overflow-y: scroll !important;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: none;
-    /* Rubber-band only: match gradient bottom (not a second visible band) */
-    background-color: #021a46 !important;
+    overscroll-behavior-y: auto;
+    background-color: #3f66c9 !important;
     background-image: none !important;
   }
 
   .auth-page {
     --auth-gradient: linear-gradient(
       180deg,
-      #5f82e8 0%,
-      #3f66c9 52%,
+      #3f66c9 0%,
+      #2f56b8 42%,
       #021a46 100%
     );
     position: relative;
@@ -1727,14 +1725,13 @@ input[type="password"]::-ms-reveal {
     min-height: 100svh;
     height: auto;
     margin: 0;
-    padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px) !important;
+    padding: 0 !important;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
     overflow: visible;
-    touch-action: pan-y;
     background: var(--auth-gradient) !important;
     background-repeat: no-repeat !important;
     background-size: 100% 100% !important;
@@ -1742,12 +1739,12 @@ input[type="password"]::-ms-reveal {
   }
 
   .auth-page .auth-layout {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     display: flex;
     flex-direction: column;
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 100%;
+    min-height: 0;
     height: auto;
     margin: 0 !important;
     gap: 0 !important;
@@ -1756,21 +1753,22 @@ input[type="password"]::-ms-reveal {
   }
 
   .auth-page .auth-layout > div:first-child {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-height: 100%;
+    min-height: 0;
     height: auto;
     align-items: stretch;
+    justify-content: flex-start;
   }
 
   .auth-form-card.login-card,
   .auth-form-card.signup-card {
-    flex: 1 1 auto !important;
+    flex: 0 1 auto !important;
     width: 100% !important;
     max-width: none !important;
-    min-height: 100% !important;
+    min-height: auto !important;
     height: auto !important;
     margin: 0 !important;
     border-radius: 0 !important;
@@ -1797,6 +1795,12 @@ input[type="password"]::-ms-reveal {
 
   .signup-card-content {
     min-height: auto !important;
+  }
+
+  .auth-form-card .login-card-inner,
+  .auth-form-card .signup-card-content {
+    padding-top: max(1rem, env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .auth-image-col {
@@ -1828,12 +1832,16 @@ input[type="password"]::-ms-reveal {
   html.auth-visible,
   body:has(.auth-page),
   body.auth-visible {
-    overscroll-behavior-y: none !important;
-    background-color: #021a46 !important;
+    overflow-y: scroll !important;
+    overscroll-behavior-y: auto;
+    background-color: #3f66c9 !important;
   }
 
   .auth-page {
-    background: var(--auth-gradient, linear-gradient(180deg, #5f82e8 0%, #3f66c9 52%, #021a46 100%)) !important;
+    background: var(
+      --auth-gradient,
+      linear-gradient(180deg, #3f66c9 0%, #2f56b8 42%, #021a46 100%)
+    ) !important;
     background-size: 100% 100% !important;
   }
 }

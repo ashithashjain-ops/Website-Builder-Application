@@ -228,10 +228,10 @@ export default function SignupPage() {
     getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry();
 
   return (
-    <div className="auth-page min-h-[100dvh] min-h-[100svh] lg:min-h-screen flex flex-col max-lg:bg-gradient-to-b max-lg:from-[#5f82e8] max-lg:via-[#3f66c9] max-lg:to-[#021a46] lg:bg-white px-0 py-0 lg:px-6 lg:py-4 max-lg:overflow-visible lg:overflow-y-auto">
+    <div className="auth-page min-h-[100dvh] min-h-[100svh] lg:min-h-screen flex flex-col max-lg:bg-transparent lg:bg-white px-0 py-0 lg:px-6 lg:py-4 max-lg:overflow-visible lg:overflow-y-auto">
       <div className="w-full max-lg:max-w-none max-w-6xl mx-auto flex flex-1 flex-col lg:flex-none lg:flex-row gap-0 lg:gap-8 auth-layout">
         {/* Card first on mobile (top), right on desktop */}
-        <div className="flex w-full flex-1 flex-col items-stretch justify-center order-1 lg:order-2 lg:w-1/2 lg:flex-none">
+        <div className="flex w-full flex-1 flex-col items-stretch justify-start lg:justify-center order-1 lg:order-2 lg:w-1/2 lg:flex-none">
           <div
             className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-x-hidden overflow-y-visible self-center px-6 sm:px-10 max-lg:max-w-none lg:flex-none lg:rounded-[10px] lg:bg-gradient-to-b lg:from-[#5f82e8] lg:via-[#3f66c9] lg:to-[#021a46] signup-card auth-form-card"
           >
