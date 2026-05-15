@@ -1704,7 +1704,7 @@ input[type="password"]::-ms-reveal {
     background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
   }
 
-  .auth-page {
+  .auth-page:not(.login-page):not(.signup-page) {
     justify-content: flex-start;
     align-items: stretch;
     /* No top/bottom padding here — avoids strips (bg-white) on Android & iOS */
@@ -1728,7 +1728,76 @@ input[type="password"]::-ms-reveal {
     -webkit-overflow-scrolling: touch;
     background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
   }
-  .auth-page .auth-layout {
+
+  /* Login/signup: same full-bleed flow as forgot-password (relative page, not fixed) */
+  html:has(.login-page),
+  html:has(.signup-page),
+  body:has(.login-page),
+  body:has(.signup-page) {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-height: 100dvh !important;
+    min-height: 100svh !important;
+    height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: none;
+    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+  }
+
+  .auth-page.login-page,
+  .auth-page.signup-page {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    min-height: 100dvh !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+    height: auto !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
+  }
+
+  .auth-page.login-page .auth-layout,
+  .auth-page.signup-page .auth-layout {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100dvh;
+    min-height: 100svh;
+    gap: 0;
+    margin: 0;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+
+  .auth-page.login-page .auth-layout > div:first-child,
+  .auth-page.signup-page .auth-layout > div:first-child {
+    flex: 1 1 auto;
+    min-height: 100dvh;
+    min-height: 100svh;
+    width: 100%;
+  }
+
+  .login-page .login-card.reset-flow-card,
+  .signup-page .signup-card.reset-flow-card {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100dvh !important;
+    min-height: 100svh !important;
+    flex: 1 1 auto;
+    border-radius: 0 !important;
+    padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+    overflow: hidden !important;
+  }
+
+  .auth-page:not(.login-page):not(.signup-page) .auth-layout {
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
@@ -1742,7 +1811,7 @@ input[type="password"]::-ms-reveal {
     align-items: stretch;
   }
   /* First column = auth card (image column is second in DOM) */
-  .auth-page .auth-layout > div:first-child {
+  .auth-page:not(.login-page):not(.signup-page) .auth-layout > div:first-child {
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
@@ -1750,7 +1819,7 @@ input[type="password"]::-ms-reveal {
     min-height: 0;
     align-items: stretch;
   }
-  .auth-form-card {
+  .auth-page:not(.login-page):not(.signup-page) .auth-form-card {
     width: 100%;
     max-width: 100% !important;       /* edge-to-edge */
     align-self: stretch;
@@ -1792,13 +1861,21 @@ input[type="password"]::-ms-reveal {
  */
 @supports (-webkit-touch-callout: none) {
   @media (max-width: 1023px) {
-    .auth-page {
+    .auth-page:not(.login-page):not(.signup-page) {
       min-height: -webkit-fill-available;
       min-height: 100dvh;
       min-height: 100svh;
     }
-    .auth-form-card.login-card,
-    .auth-form-card.signup-card {
+    .auth-page:not(.login-page):not(.signup-page) .auth-form-card.login-card,
+    .auth-page:not(.login-page):not(.signup-page) .auth-form-card.signup-card {
+      min-height: -webkit-fill-available;
+      min-height: 100dvh;
+      min-height: 100svh;
+    }
+    .auth-page.login-page,
+    .auth-page.signup-page,
+    .login-page .login-card.reset-flow-card,
+    .signup-page .signup-card.reset-flow-card {
       min-height: -webkit-fill-available;
       min-height: 100dvh;
       min-height: 100svh;
@@ -1823,7 +1900,7 @@ input[type="password"]::-ms-reveal {
     overscroll-behavior-y: auto;
     background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
   }
-  .auth-page {
+  .auth-page:not(.login-page):not(.signup-page) {
     position: fixed;
     inset: 0;
     width: 100vw;
@@ -1839,7 +1916,7 @@ input[type="password"]::-ms-reveal {
     -webkit-overflow-scrolling: touch;
     background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
   }
-  .auth-page .auth-layout {
+  .auth-page:not(.login-page):not(.signup-page) .auth-layout {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
@@ -1847,12 +1924,12 @@ input[type="password"]::-ms-reveal {
     height: auto;
     min-height: 100%;
   }
-  .auth-page .auth-layout > div:first-child {
+  .auth-page:not(.login-page):not(.signup-page) .auth-layout > div:first-child {
     width: 100%;
     height: auto;
     min-height: 0;
   }
-  .auth-form-card {
+  .auth-page:not(.login-page):not(.signup-page) .auth-form-card {
     width: 100%;
     max-width: 100% !important;
     height: auto;
@@ -2182,14 +2259,14 @@ input[type="password"]::-ms-reveal {
 
 /* Reset flow pages (OTP, verified, passwords): mobile full-bleed, no white bands */
 @media (max-width: 1023px) {
-  .reset-flow-page,
+  .reset-flow-page:not(.login-page):not(.signup-page),
   .forgot-password-page {
     min-height: 100dvh;
     min-height: 100svh;
     background: linear-gradient(180deg, #234e70 0%, #282738 100%) !important;
   }
 
-  .reset-flow-page .auth-layout,
+  .reset-flow-page:not(.login-page):not(.signup-page) .auth-layout,
   .forgot-password-page .auth-layout {
     flex: 1 1 auto;
     width: 100%;
@@ -2200,9 +2277,9 @@ input[type="password"]::-ms-reveal {
     margin: 0;
   }
 
-  .reset-flow-page .reset-flow-shell,
+  .reset-flow-page:not(.login-page):not(.signup-page) .reset-flow-shell,
   .forgot-password-page .forgot-password-card,
-  .reset-flow-page .reset-flow-card {
+  .reset-flow-page:not(.login-page):not(.signup-page) .reset-flow-card {
     width: 100% !important;
     max-width: none !important;
     min-height: 100dvh;
@@ -2212,15 +2289,24 @@ input[type="password"]::-ms-reveal {
     box-shadow: none !important;
   }
 
-  .reset-flow-page .reset-flow-illustration {
+  .reset-flow-page:not(.login-page):not(.signup-page) .reset-flow-illustration {
     display: none !important;
+  }
+
+  .login-page.reset-flow-page,
+  .signup-page.reset-flow-page {
+    min-height: 100dvh;
+    min-height: 100svh;
+    background: linear-gradient(to bottom, #5f82e8 0%, #3f66c9 52%, #021a46 100%) !important;
   }
 }
 
 @supports (-webkit-touch-callout: none) {
   @media (max-width: 1023px) {
-    .reset-flow-page .reset-flow-card,
-    .forgot-password-page .forgot-password-card {
+    .reset-flow-page:not(.login-page):not(.signup-page) .reset-flow-card,
+    .forgot-password-page .forgot-password-card,
+    .login-page .login-card.reset-flow-card,
+    .signup-page .signup-card.reset-flow-card {
       min-height: -webkit-fill-available;
       min-height: 100dvh;
       min-height: 100svh;
@@ -2229,8 +2315,13 @@ input[type="password"]::-ms-reveal {
 }
 
 @media (min-width: 1024px) {
-  .reset-flow-page,
+  .reset-flow-page:not(.login-page):not(.signup-page),
   .forgot-password-page {
+    background: #ffffff !important;
+  }
+
+  .auth-page.login-page,
+  .auth-page.signup-page {
     background: #ffffff !important;
   }
 }
