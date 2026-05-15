@@ -8,7 +8,7 @@ import {
   Play, Download, ShoppingBag, FlipHorizontal, FlipVertical, RotateCcw, ArrowUpDown, SlidersHorizontal, Filter, Crop
 } from 'lucide-react';
 
-export type BlockPageType = 'image' | 'button';
+export type BlockPageType = 'image' | 'button' | 'text';
 
 type LeftSidebarProps = {
   activeBlockPage?: BlockPageType;
@@ -132,6 +132,11 @@ const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage }: LeftSideb
 
     if (type === 'Button') {
       onSelectBlockPage?.('button');
+      return;
+    }
+
+    if (type === 'Text' || type === 'Header') {
+      onSelectBlockPage?.('text');
       return;
     }
 
@@ -1064,7 +1069,9 @@ const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage }: LeftSideb
                         {cat.blocks.map((block, bIdx) => {
                           const isActive =
                             (block.name === 'Image' && activeBlockPage === 'image') ||
-                            (block.name === 'Button' && activeBlockPage === 'button');
+                            (block.name === 'Button' && activeBlockPage === 'button') ||
+                            (block.name === 'Text' && activeBlockPage === 'text') ||
+                            (block.name === 'Header' && activeBlockPage === 'text');
 
                           return (
                           <div

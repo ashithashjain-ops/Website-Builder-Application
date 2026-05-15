@@ -41,13 +41,13 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
       {/* Tabs */}
       <div className="flex border-b border-[#f2d8cf] bg-white/45 px-6 pt-5">
         <button 
-          className={`flex-1 pb-4 text-base font-bold border-b-[2px] transition-all duration-300 hover:-translate-y-[1px] ${activeTab === 'button' ? 'text-[#0B1D40] border-[#0B1D40]' : 'text-[#566583] border-gray-300 hover:bg-black/5'}`}
+          className={`flex-1 border-b-[2px] pb-4 text-base font-bold transition-colors ${activeTab === 'button' ? 'border-[#0B1D40] text-[#0B1D40]' : 'border-gray-300 text-[#566583] hover:text-[#0B1D40]'}`}
           onClick={() => setActiveTab('button')}
         >
           Button
         </button>
         <button 
-          className={`flex-1 pb-4 text-base font-bold border-b-[2px] transition-all duration-300 hover:-translate-y-[1px] ${activeTab === 'styles' ? 'text-[#0B1D40] border-[#0B1D40]' : 'text-[#566583] border-gray-300 hover:bg-black/5'}`}
+          className={`flex-1 border-b-[2px] pb-4 text-base font-bold transition-colors ${activeTab === 'styles' ? 'border-[#0B1D40] text-[#0B1D40]' : 'border-gray-300 text-[#566583] hover:text-[#0B1D40]'}`}
           onClick={() => setActiveTab('styles')}
         >
           Styles

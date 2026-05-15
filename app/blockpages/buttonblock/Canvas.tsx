@@ -140,62 +140,57 @@ export default function Canvas({
     >
       {/* Top Actions Bar */}
       <div
-        className="flex h-[64px] flex-shrink-0 items-center justify-between gap-4 overflow-x-auto overflow-y-hidden border-b border-[#dbe3ef] bg-white px-3 shadow-[0_1px_0_rgba(15,23,42,0.03)] md:px-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="flex h-[64px] flex-shrink-0 items-center justify-between gap-4 overflow-x-auto border-b border-[#dbe3ef] bg-white px-3 shadow-[0_1px_0_rgba(15,23,42,0.03)] md:px-5"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-1 md:gap-2">
-          {/* Visible on all sizes */}
-          <button className="flex items-center gap-1 md:gap-2 text-[#0B1D40] font-bold text-[14px] md:text-[15px] hover:bg-gray-100 py-1.5 px-1.5 md:px-3 rounded transition-all duration-300 hover:-translate-y-[1px] active:scale-95 whitespace-nowrap">
-            My Website
-            <ChevronDown className="w-4 h-4 text-gray-600" />
-          </button>
-        </div>
+        <button className="flex items-center gap-2 whitespace-nowrap rounded px-2 py-1.5 text-[14px] font-bold text-[#0B1D40] hover:bg-gray-100 md:text-[15px]">
+          My Website
+          <ChevronDown className="h-4 w-4 text-gray-600" />
+        </button>
 
         <div className="flex items-center gap-2 md:gap-3">
-          {/* Visible on all sizes */}
-          <div className="flex border border-gray-300 bg-white rounded-md overflow-hidden shadow-sm flex-shrink-0">
+          <div className="flex flex-shrink-0 overflow-hidden rounded-md border border-gray-300 bg-white shadow-sm">
             <button
-              className={`px-2.5 md:px-3.5 py-1.5 md:py-2 ${canUndo ? 'text-gray-600 hover:bg-gray-50 cursor-pointer hover:text-gray-900 transition-all duration-300 hover:scale-110 active:scale-95' : 'text-gray-300 cursor-not-allowed'} border-r border-gray-300`}
+              className={`border-r border-gray-300 px-3 py-2 ${canUndo ? 'text-gray-600 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-not-allowed'}`}
               onClick={onUndo}
               disabled={!canUndo}
               title="Undo"
             >
-              <Undo2 className="w-[16px] md:w-[18px] h-[16px] md:h-[18px]" strokeWidth={1.5} />
+              <Undo2 className="h-[18px] w-[18px]" strokeWidth={1.5} />
             </button>
             <button
-              className={`px-2.5 md:px-3.5 py-1.5 md:py-2 ${canRedo ? 'text-gray-600 hover:bg-gray-50 cursor-pointer hover:text-gray-900 transition-all duration-300 hover:scale-110 active:scale-95' : 'text-gray-300 cursor-not-allowed'}`}
+              className={`px-3 py-2 ${canRedo ? 'text-gray-600 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-not-allowed'}`}
               onClick={onRedo}
               disabled={!canRedo}
               title="Redo"
             >
-              <Redo2 className="w-[16px] md:w-[18px] h-[16px] md:h-[18px]" strokeWidth={1.5} />
+              <Redo2 className="h-[18px] w-[18px]" strokeWidth={1.5} />
             </button>
           </div>
 
-          {/* Visible on all sizes */}
           <button
-            className="border border-gray-300 bg-white text-[13px] md:text-[14px] font-bold px-2.5 lg:px-4 py-1.5 md:py-2 rounded-md text-[#0B1D40] hover:bg-gray-50 flex items-center justify-center gap-2 shadow-sm whitespace-nowrap transition-all duration-300 active:scale-95 hover:-translate-y-[1px] hover:shadow-md"
+            className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 py-2 text-[13px] font-bold text-[#0B1D40] shadow-sm hover:bg-gray-50"
             onClick={() => alert("Draft saved locally!")}
             title="Save Draft"
           >
-            <Save className="w-[16px] h-[16px] text-gray-600 lg:hidden" strokeWidth={2} />
+            <Save className="h-4 w-4 text-gray-600 lg:hidden" />
             <span className="hidden lg:inline">Save Draft</span>
           </button>
           <button
-            className="border border-gray-300 bg-white text-[13px] md:text-[14px] font-bold px-2.5 lg:px-3 py-1.5 md:py-2 rounded-md text-[#0B1D40] hover:bg-gray-50 flex items-center justify-center gap-2 shadow-sm whitespace-nowrap transition-all duration-300 active:scale-95 hover:-translate-y-[1px] hover:shadow-md"
+            className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 py-2 text-[13px] font-bold text-[#0B1D40] shadow-sm hover:bg-gray-50"
             onClick={() => alert("Preview mode not yet implemented.")}
             title="Preview"
           >
-            <Eye className="w-[16px] h-[16px] text-gray-600" strokeWidth={2} />
+            <Eye className="h-4 w-4" />
             <span className="hidden lg:inline">Preview</span>
           </button>
           <button
-            className="bg-[#0B1D40] text-[13px] md:text-[14px] font-bold px-2.5 lg:px-5 py-1.5 md:py-2 rounded-md text-white hover:bg-[#152B52] flex items-center justify-center gap-2 shadow-[0_2px_4px_rgba(11,29,64,0.3)] whitespace-nowrap transition-all duration-300 active:scale-95 hover:-translate-y-[1px] hover:shadow-lg"
+            className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#0B1D40] px-3 py-2 text-[13px] font-bold text-white shadow-[0_2px_4px_rgba(11,29,64,0.3)] hover:bg-[#152B52]"
             onClick={() => alert("Publish sequence initiated!")}
             title="Publish"
           >
             <span className="hidden lg:inline">Publish</span>
-            <Send className="w-[14px] h-[14px]" strokeWidth={2} />
+            <Send className="h-[14px] w-[14px]" />
           </button>
         </div>
       </div>

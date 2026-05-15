@@ -12,7 +12,7 @@ import {
   FaXTwitter,
   FaYoutube,
 } from 'react-icons/fa6';
-
+ 
 const ContactSection = () => {
   // Form State
   const [formData, setFormData] = useState({
@@ -22,14 +22,14 @@ const ContactSection = () => {
     projectType: '',
     message: ''
   });
-
+ 
   // Error States
   const [errors, setErrors] = useState({
     email: '',
     firstName: '',
     lastName: ''
   });
-
+ 
   const socialLinks = [
     { icon: FaFacebookF, color: 'text-[#1877F2]', label: 'Facebook', url: 'https://www.facebook.com/thestackly/' },
     { icon: FaYoutube, color: 'text-[#FF0000]', label: 'YouTube', url: 'https://www.youtube.com/@TheStackly' },
@@ -38,20 +38,20 @@ const ContactSection = () => {
     { icon: FaXTwitter, color: 'text-black', label: 'X', url: 'https://x.com/The_Stackly' },
     { icon: FaGlobe, color: 'text-[#06224C]', label: 'Website', url: 'https://www.thestackly.com/' },
   ];
-
+ 
   // Validation Logic
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
+ 
     // Name Validation: Only allow letters
     if (name === 'firstName' || name === 'lastName') {
       const onlyLetters = value.replace(/[^A-Za-z]/g, '');
       setFormData({ ...formData, [name]: onlyLetters });
       return;
     }
-
+ 
     setFormData({ ...formData, [name]: value });
-
+ 
     // Live Email Validation
     if (name === 'email') {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -62,18 +62,18 @@ const ContactSection = () => {
       }
     }
   };
-
+ 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!errors.email && formData.email) {
       alert("Message Sent Successfully!");
     }
   };
-
+ 
   return (
-    <section id="contact" className="bg-[#FFF1F2] py-12 md:py-20 px-4 sm:px-8 lg:px-16 w-full overflow-hidden">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
-
+    <section id="contact" className="bg-[#FFF1F2] py-8 md:py-14 px-2 sm:px-8 lg:px-14 w-full overflow-hidden">
+      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
+ 
         {/* LEFT COLUMN: Contact Information */}
         <div className="w-full lg:w-5/12 space-y-8 flex flex-col justify-center">
           <div className="space-y-4">
@@ -88,7 +88,7 @@ const ContactSection = () => {
               Or simply reach out directly to
             </p>
           </div>
-
+ 
           <div className="space-y-6">
             {/* Email Detail */}
             <div className="flex items-center gap-4">
@@ -100,7 +100,7 @@ const ContactSection = () => {
                 <p className="text-[#06224C] font-bold text-sm truncate">thestackly@gmail.com</p>
               </div>
             </div>
-
+ 
             {/* Location Detail */}
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
@@ -113,7 +113,7 @@ const ContactSection = () => {
                 </p>
               </div>
             </div>
-
+ 
             {/* WhatsApp Detail */}
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
@@ -125,7 +125,7 @@ const ContactSection = () => {
               </div>
             </div>
           </div>
-
+ 
           {/* Social Links */}
           <div className="pt-4">
             <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-4">Social Media hereby :</p>
@@ -142,12 +142,12 @@ const ContactSection = () => {
             </div>
           </div>
         </div>
-
+ 
         {/* RIGHT COLUMN: Form Card */}
         <div className="w-full lg:w-7/12 bg-white rounded-[2.5rem] p-6 sm:p-10 md:p-12 shadow-2xl border border-white relative z-10">
           <h3 className="text-2xl sm:text-3xl font-black text-[#06224C] mb-1">Send a Message</h3>
-          <p className="text-xs sm:text-sm text-gray-400 font-bold mb-8 uppercase tracking-wide">I&apos;ll get back to you within 48 hours.</p>
-
+          <p className="text-xs sm:text-sm text-gray-400 font-bold mb-8 uppercase tracking-wide">we will get back to you within 48 hours.</p>
+ 
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
@@ -159,34 +159,53 @@ const ContactSection = () => {
                 <input name="lastName" type="text" value={formData.lastName} onChange={handleInputChange} placeholder="Last Name" required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-blue-500 focus:bg-white outline-none transition-all" />
               </div>
             </div>
-
+ 
             <div className="space-y-2">
               <label className="block text-[10px] font-black text-[#06224C] uppercase tracking-widest">Email Address</label>
-              <input name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="ranade@gmail.com" required className={`w-full bg-gray-50 border ${errors.email ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:bg-white outline-none transition-all`} />
+              <input name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="test@gmail.com" required className={`w-full bg-gray-50 border ${errors.email ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:bg-white outline-none transition-all`} />
               {errors.email && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.email}</p>}
             </div>
-
+ 
             <div className="space-y-2">
-              <label className="block text-[10px] font-black text-[#06224C] uppercase tracking-widest">Project Type</label>
-              <div className="relative">
-                <select name="projectType" value={formData.projectType} onChange={handleInputChange} required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:bg-white outline-none appearance-none cursor-pointer">
-                  <option value="" disabled>Select a project type</option>
-                  <option value="ecommerce">E-commerce Website</option>
-                  <option value="portfolio">Portfolio Design</option>
-                  <option value="landing">Landing Page</option>
-                  <option value="business">Business Corporate</option>
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-    <i className="fa-solid fa-chevron-down text-[10px]"></i>
+  <label className="block text-[10px] font-black text-[#06224C] uppercase tracking-widest">
+    Project Type
+  </label>
+  <div className="relative">
+    <select
+      name="projectType"
+      value={formData.projectType}
+      onChange={handleInputChange}
+      required
+      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 pr-10 text-sm focus:border-blue-400 focus:bg-white outline-none appearance-none cursor-pointer"
+    >
+      <option value="" disabled>Select a project type</option>
+      <option value="ecommerce">E-commerce Website</option>
+      <option value="portfolio">Portfolio Design</option>
+      <option value="landing">Landing Page</option>
+      <option value="business">Business Corporate</option>
+    </select>
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
+    </div>
   </div>
-              </div>
-            </div>
-
+</div>
             <div className="space-y-2">
               <label className="block text-[10px] font-black text-[#06224C] uppercase tracking-widest">Message</label>
               <textarea name="message" rows={4} value={formData.message} onChange={handleInputChange} placeholder="Tell me about your project..." className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-sm focus:border-blue-400 focus:bg-white outline-none resize-none transition-all"></textarea>
             </div>
-
+ 
             <button type="submit" className="w-full bg-[#06224C] text-white py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-blue-900 transition-all shadow-lg active:scale-[0.98]">
               Send Message <i className="fa-solid fa-paper-plane text-[10px]"></i>
             </button>
@@ -196,5 +215,5 @@ const ContactSection = () => {
     </section>
   );
 };
-
-export default ContactSection;
+ 
+export default ContactSection

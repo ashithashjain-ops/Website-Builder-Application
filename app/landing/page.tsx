@@ -8,13 +8,24 @@ import {
   FaArrowRight,
   FaCartShopping,
   FaChevronDown,
+  FaEnvelope,
+  FaFacebookF,
+  FaGlobe,
   FaHeart,
+  FaInstagram,
+  FaLinkedinIn,
+  FaLocationDot,
   FaMagnifyingGlass,
   FaMinus,
+  FaPaperPlane,
+  FaPhoneVolume,
   FaPlay,
   FaPlus,
   FaStar,
+  FaWhatsapp,
   FaXmark,
+  FaXTwitter,
+  FaYoutube,
 } from "react-icons/fa6";
 import { assetPath } from "@/lib/paths";
 
@@ -43,8 +54,8 @@ const popularSearches = [
 ];
 
 const categories = [
-  { title: "Portfolio", image: "/landing-optimized/port.webp", alt: "Portfolio website preview", previewHref: "/portfolio" },
-  { title: "E-Commerce Templates", image: "/landing-optimized/ecommerce.webp", alt: "E-commerce website preview", previewHref: "/e-commerce" },
+  { title: "Portfolio", image: "/landing-optimized/port.webp", alt: "Portfolio website preview", previewHref: "/portfolio", editHref: "/blockpages?template=portfolio" },
+  { title: "E-Commerce Templates", image: "/landing-optimized/ecommerce.webp", alt: "E-commerce website preview", previewHref: "/e-commerce", editHref: "/blockpages?template=ecommerce" },
   { title: "Digital Marketing Templates", image: "/landing-optimized/digital01.webp", alt: "Digital marketing website preview" },
   { title: "Blogging", image: "/landing-optimized/bloggg.webp", alt: "Blogging website preview" },
   { title: "Construction Themes", image: "/landing-optimized/construction02.webp", alt: "Construction website preview" },
@@ -162,6 +173,152 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
     <h2 className="mb-8 border-l-4 border-blue-600 pl-3 text-xs font-black uppercase tracking-[0.3em] text-[#0A2357] md:mb-10">
       {children}
     </h2>
+  );
+}
+
+function LandingContactSection() {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    projectType: "",
+    message: "",
+  });
+  const [emailError, setEmailError] = useState("");
+
+  const socialLinks = [
+    { icon: FaFacebookF, color: "text-[#1877F2]", label: "Facebook", url: "https://www.facebook.com/thestackly/" },
+    { icon: FaYoutube, color: "text-[#FF0000]", label: "YouTube", url: "https://www.youtube.com/@TheStackly" },
+    { icon: FaInstagram, color: "text-[#E4405F]", label: "Instagram", url: "https://www.instagram.com/the_stackly" },
+    { icon: FaLinkedinIn, color: "text-[#0A66C2]", label: "LinkedIn", url: "https://in.linkedin.com/company/the-stackly" },
+    { icon: FaXTwitter, color: "text-black", label: "X", url: "https://x.com/The_Stackly" },
+    { icon: FaGlobe, color: "text-[#06224C]", label: "Website", url: "https://www.thestackly.com/" },
+  ];
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
+    const nextValue = name === "firstName" || name === "lastName" ? value.replace(/[^A-Za-z]/g, "") : value;
+
+    setFormData((current) => ({ ...current, [name]: nextValue }));
+
+    if (name === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setEmailError(value && !emailRegex.test(value) ? "Please type in valid format (e.g: ranade@gmail.com)" : "");
+    }
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!emailError && formData.email) {
+      alert("Message Sent Successfully!");
+    }
+  };
+
+  return (
+    <section id="contact" className="mx-auto my-12 max-w-7xl px-4 md:my-24 md:px-8">
+      <SectionHeading>Contact</SectionHeading>
+      <div className="flex flex-col items-start gap-10 rounded-[2rem] bg-[#E6EFF1] p-6 shadow-sm lg:flex-row lg:gap-16 lg:rounded-[3rem] lg:p-14">
+        <div className="flex w-full flex-col justify-center gap-8 lg:w-5/12">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 font-black text-[#06224C]">
+              <FaPhoneVolume className="text-xl" aria-hidden="true" />
+              <span className="text-xs uppercase tracking-[0.2em]">Contact</span>
+            </div>
+            <h2 className="text-3xl font-black leading-tight text-[#06224C] sm:text-4xl md:text-5xl">
+              Let&apos;s Get In Touch.
+            </h2>
+            <p className="text-base font-medium text-gray-600 sm:text-lg">
+              Or simply reach out directly to
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {[
+              { icon: FaEnvelope, label: "Email", value: "thestackly@gmail.com", color: "text-[#EA4335]" },
+              { icon: FaLocationDot, label: "Location", value: "MMR Complex, Chinna Thirupathi, Salem, Tamil Nadu 636008.", color: "text-[#EA4335]" },
+              { icon: FaWhatsapp, label: "Whatsapp", value: "+91 7010792745", color: "text-[#25D366]" },
+            ].map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <div key={item.label} className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
+                    <Icon className={`${item.color} text-2xl`} aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-600">{item.label}</p>
+                    <p className="max-w-[320px] text-sm font-bold leading-relaxed text-[#06224C]">{item.value}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="pt-4">
+            <p className="mb-4 text-[10px] font-black uppercase tracking-widest text-blue-600">Social Media hereby :</p>
+            <div className="flex flex-wrap gap-3">
+              {socialLinks.map((social) => {
+                const Icon = social.icon;
+
+                return (
+                  <a key={social.label} href={social.url} target="_blank" rel="noopener noreferrer" aria-label={social.label} className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-100 bg-white shadow-md transition hover:scale-110">
+                    <Icon className={`${social.color} text-lg`} aria-hidden="true" />
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full rounded-[2rem] border border-white bg-white p-6 shadow-2xl sm:p-10 lg:w-7/12">
+          <h3 className="mb-1 text-2xl font-black text-[#06224C] sm:text-3xl">Send a Message</h3>
+          <p className="mb-8 text-xs font-bold uppercase tracking-wide text-gray-400 sm:text-sm">
+            we will get back to you within 48 hours.
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+              <label className="space-y-2">
+                <span className="block text-[10px] font-black uppercase tracking-widest text-[#06224C]">First Name</span>
+                <input name="firstName" type="text" value={formData.firstName} onChange={handleInputChange} placeholder="First Name" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white" />
+              </label>
+              <label className="space-y-2">
+                <span className="block text-[10px] font-black uppercase tracking-widest text-[#06224C]">Last Name</span>
+                <input name="lastName" type="text" value={formData.lastName} onChange={handleInputChange} placeholder="Last Name" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white" />
+              </label>
+            </div>
+
+            <label className="block space-y-2">
+              <span className="block text-[10px] font-black uppercase tracking-widest text-[#06224C]">Email Address</span>
+              <input name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="test@gmail.com" required className={`w-full rounded-xl border bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:bg-white ${emailError ? "border-red-500" : "border-gray-200"}`} />
+              {emailError && <span className="block text-[10px] font-bold text-red-500">{emailError}</span>}
+            </label>
+
+            <label className="block space-y-2">
+              <span className="block text-[10px] font-black uppercase tracking-widest text-[#06224C]">Project Type</span>
+              <select name="projectType" value={formData.projectType} onChange={handleInputChange} required className="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:bg-white">
+                <option value="" disabled>Select a project type</option>
+                <option value="ecommerce">E-commerce Website</option>
+                <option value="portfolio">Portfolio Design</option>
+                <option value="landing">Landing Page</option>
+                <option value="business">Business Corporate</option>
+              </select>
+            </label>
+
+            <label className="block space-y-2">
+              <span className="block text-[10px] font-black uppercase tracking-widest text-[#06224C]">Message</span>
+              <textarea name="message" rows={4} value={formData.message} onChange={handleInputChange} placeholder="Tell me about your project..." className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm outline-none transition focus:border-blue-400 focus:bg-white" />
+            </label>
+
+            <button type="submit" className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#06224C] py-4 text-xs font-black uppercase tracking-[0.2em] text-white shadow-lg transition hover:bg-blue-900 active:scale-[0.98]">
+              Send Message
+              <FaPaperPlane className="text-[10px]" aria-hidden="true" />
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -461,7 +618,7 @@ export default function Home() {
               <div className="p-6 text-center">
                 <h3 className="text-base font-bold uppercase tracking-tight text-gray-800 md:text-lg">{category.title}</h3>
                 <div className="mt-4 flex justify-center gap-6 text-[10px] font-black uppercase text-blue-600 underline">
-                  <a href="#templates">Edit</a>
+                  <Link href={category.editHref ?? "#templates"}>Edit</Link>
                   <Link href={category.previewHref ?? "#templates"}>Preview</Link>
                 </div>
               </div>
@@ -573,7 +730,10 @@ export default function Home() {
                     >
                       Preview
                     </Link>
-                    <Link href="/planning" className="flex-1 rounded-xl bg-[#06224C] py-2.5 text-center text-sm font-bold text-white transition hover:bg-blue-900">
+                    <Link
+                      href={!template.price && template.category === "portfolio" ? "/blockpages?template=portfolio" : "/planning"}
+                      className="flex-1 rounded-xl bg-[#06224C] py-2.5 text-center text-sm font-bold text-white transition hover:bg-blue-900"
+                    >
                       {template.price ? "Buy" : "Edit"}
                     </Link>
                   </div>
@@ -721,6 +881,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <LandingContactSection />
 
       <Footer />
 
