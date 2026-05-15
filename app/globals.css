@@ -1579,14 +1579,14 @@ body.auth-visible {
     max-width: 100%;
   }
 
-  /* Mobile: move content slightly down for a balanced look */
+  /* Mobile: safe-area + balanced vertical padding inside scrollable content */
   .login-card-inner {
-    padding-top: clamp(1.25rem, 4vh, 2.25rem) !important;
-    padding-bottom: clamp(1.25rem, 5.5vh, 2.75rem) !important;
+    padding-top: max(clamp(1.25rem, 4vh, 2.25rem), env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: max(clamp(1.25rem, 5.5vh, 2.75rem), env(safe-area-inset-bottom, 0px)) !important;
   }
   .signup-card-content {
-    padding-top: clamp(1rem, 3.5vh, 2rem) !important;
-    padding-bottom: clamp(1.25rem, 5vh, 2.75rem) !important;
+    padding-top: max(clamp(1rem, 3.5vh, 2rem), env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: max(clamp(1.25rem, 5vh, 2.75rem), env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 
@@ -1709,118 +1709,129 @@ body.auth-visible {
   }
 }
 
-/* Mobile: full-screen auth gradient — no white/light bands; scroll inside page when zoomed */
+/*
+ * Mobile login/signup: one fixed full-screen surface (gradient + inner panel).
+ * Scroll only inside the content column so overscroll never exposes lighter bands.
+ */
 @media (max-width: 1023px) {
   html.auth-visible,
-  body.auth-visible,
-  html:has(.auth-page),
-  body:has(.auth-page) {
+  body.auth-visible {
     position: fixed;
     inset: 0;
     width: 100% !important;
     height: 100% !important;
     min-height: 100dvh !important;
     min-height: 100svh !important;
+    max-height: 100dvh !important;
+    max-height: 100svh !important;
+    margin: 0 !important;
+    padding: 0 !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
+    touch-action: manipulation;
+    background: #3f66c9 !important;
+    background-color: #3f66c9 !important;
+  }
+
+  .login-page.auth-page,
+  .auth-page:has(.signup-card) {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1;
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    height: 100svh !important;
+    min-height: 100dvh !important;
+    min-height: 100svh !important;
+    max-height: 100dvh !important;
+    max-height: 100svh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: manipulation;
     background: var(--auth-surface-gradient) !important;
     background-color: #3f66c9 !important;
   }
 
-  .auth-page {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    width: 100%;
-    min-height: 100%;
-    max-height: none;
-    margin: 0;
-    padding: 0 !important;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    background: transparent !important;
+  .login-page.auth-page::before,
+  .auth-page:has(.signup-card)::before {
+    display: none !important;
   }
 
-  /* Fixed backdrop: same gradient while scrolling / rubber-banding on iOS */
-  .auth-page::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    background: var(--auth-surface-gradient);
-    background-color: #3f66c9;
-    pointer-events: none;
-  }
-
-  .auth-page > * {
-    position: relative;
-    z-index: 1;
-    flex: 1 1 auto;
-    min-height: 0;
-    width: 100%;
-  }
-
-  .auth-page .auth-layout {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
+  .login-page.auth-page > .auth-layout,
+  .auth-page:has(.signup-card) > .auth-layout {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 100% !important;
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 100dvh;
-    min-height: 100svh;
-    height: auto;
     margin: 0 !important;
+    padding: 0 !important;
     gap: 0 !important;
-    justify-content: flex-start;
-    align-items: stretch;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: stretch !important;
+    align-items: stretch !important;
   }
 
-  .auth-page .auth-layout > div:first-child {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-height: 100dvh;
-    min-height: 100svh;
-    height: auto;
-    align-items: stretch;
+  .login-page.auth-page .auth-layout > div:first-child,
+  .auth-page:has(.signup-card) .auth-layout > div:first-child {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: stretch !important;
+    align-items: stretch !important;
   }
 
   .auth-form-card.login-card,
   .auth-form-card.signup-card {
-    flex: 1 1 auto;
+    flex: 1 1 auto !important;
+    align-self: stretch !important;
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 100dvh !important;
-    min-height: 100svh !important;
-    height: auto;
-    margin: 0;
+    min-height: 0 !important;
+    height: 100% !important;
+    margin: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
-    /* Same gradient as html/body backdrop — full bleed + original card look */
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
     background: var(--auth-surface-gradient) !important;
     background-image: var(--auth-surface-gradient) !important;
     background-color: #3f66c9 !important;
   }
 
-  .auth-form-card.login-card .auth-card-content,
+  .auth-form-card.login-card .auth-inner-panel,
+  .auth-form-card.signup-card .auth-inner-panel {
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100% !important;
+    min-height: 100% !important;
+  }
+
   .auth-form-card.login-card .login-card-inner,
+  .auth-form-card.login-card .auth-card-content,
   .auth-form-card.signup-card .signup-card-content {
-    flex: 1 1 auto;
-    min-height: auto;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
     justify-content: flex-start !important;
-    overflow: visible !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
     position: relative;
     z-index: 10;
   }
@@ -1836,16 +1847,16 @@ body.auth-visible {
  */
 @supports (-webkit-touch-callout: none) {
   @media (max-width: 1023px) {
-    .auth-page {
+    .login-page.auth-page,
+    .auth-page:has(.signup-card) {
       min-height: -webkit-fill-available;
       min-height: 100dvh;
       min-height: 100svh;
     }
     .auth-form-card.login-card,
     .auth-form-card.signup-card {
-      min-height: -webkit-fill-available;
-      min-height: 100dvh;
-      min-height: 100svh;
+      min-height: 0;
+      height: 100%;
     }
   }
 }
@@ -1873,24 +1884,21 @@ body.auth-visible {
  */
 @media (max-width: 1023px) and (hover: hover) and (pointer: fine) {
   html.auth-visible,
-  body.auth-visible,
-  html:has(.auth-page),
-  body:has(.auth-page) {
+  body.auth-visible {
     position: relative;
     inset: auto;
     overflow: auto !important;
     background: var(--background) !important;
   }
-  .auth-page {
-    position: relative;
-    inset: auto;
-    height: auto;
+  .login-page.auth-page,
+  .auth-page:has(.signup-card) {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
     min-height: 100dvh;
-    max-height: none;
+    max-height: none !important;
+    overflow-y: auto !important;
     background: transparent !important;
-  }
-  .auth-page::before {
-    display: none;
   }
   .auth-page .auth-layout {
     height: auto;
