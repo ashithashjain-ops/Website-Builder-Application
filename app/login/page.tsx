@@ -265,24 +265,23 @@ export default function LoginPage() {
                   <div className="flex flex-col">
                     <div className="flex items-center border-b border-white/60 pb-2 min-w-0">
                       <FaAddressBook className="login-email-icon mr-2 sm:mr-4 text-sm opacity-80 flex-shrink-0" />
-                      <div className="auth-input-wrap min-w-0">
+                      <div className="auth-input-placeholder-wrap relative min-w-0 flex-1">
+                        <span className="auth-floating-placeholder" aria-hidden="true">
+                          Email or Mobile number
+                        </span>
                         <input
                           type="text"
-                          placeholder=" "
+                          placeholder="Email or Mobile number"
                           value={form.email}
                           onChange={handleChange("email")}
                           onBlur={handleContactBlur}
                           maxLength={EMAIL_MAX_LENGTH}
-                          aria-label="Email or Mobile number"
-                          className="bg-transparent outline-none w-full min-w-0 text-sm tracking-tight login-email-input text-white"
+                          className="bg-transparent outline-none w-full min-w-0 placeholder-white text-sm tracking-tight login-email-input"
                           aria-invalid={!!errors.email}
                           aria-describedby={
                             errors.email ? "login-email-error" : undefined
                           }
                         />
-                        <span className="auth-input-hint login-email-hint" aria-hidden="true">
-                          Email or<span className="auth-input-hint-break">Mobile number</span>
-                        </span>
                       </div>
                     </div>
                     {errors.email && (

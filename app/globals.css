@@ -1453,6 +1453,85 @@ body.auth-visible {
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
+/*
+ * Mobile/tablet only: wrap-friendly placeholder overlay (native input placeholders are single-line).
+ * Desktop keeps the normal ::placeholder from markup.
+ */
+@media (max-width: 1023px) {
+  .auth-input-placeholder-wrap .auth-floating-placeholder {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    z-index: 0;
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: clamp(10px, 2.8vw, 14px);
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    padding-right: 0.25rem;
+  }
+
+  .auth-input-placeholder-wrap {
+    min-height: 1.25rem;
+  }
+
+  .auth-input-placeholder-wrap:has(input:placeholder-shown) {
+    min-height: 2.65em;
+  }
+
+  .auth-input-placeholder-wrap input {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+  }
+
+  .auth-input-placeholder-wrap input::placeholder {
+    color: transparent !important;
+    opacity: 0 !important;
+  }
+
+  .auth-input-placeholder-wrap:focus-within .auth-floating-placeholder,
+  .auth-input-placeholder-wrap:has(input:not(:placeholder-shown)) .auth-floating-placeholder {
+    display: none;
+  }
+
+  /* Signup phone: allow wrap when country + field cannot share one row (150–200% zoom). */
+  .signup-phone-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    row-gap: 0.35rem;
+  }
+
+  .signup-phone-row .signup-country-select {
+    flex: 0 1 auto;
+    max-width: calc(100% - 2rem);
+  }
+
+  .signup-phone-row .signup-mobile-input-wrap {
+    flex: 1 1 6.5rem;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .signup-phone-row .signup-mobile-input-wrap {
+    flex: 1 1 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-input-placeholder-wrap .auth-floating-placeholder {
+    display: none !important;
+  }
+}
+
 /* Forgot Password link - visibility and accessibility (WB_009) */
 .forgot-password-link {
   font-size: 16px;
@@ -1605,17 +1684,15 @@ body.auth-visible {
   .signup-card-content input::placeholder {
     font-size: 12px;
   }
-  .login-email-input::placeholder,
-  .login-email-hint {
+  .login-email-input::placeholder {
     font-size: clamp(8px, 2.4vw, 12px);
     letter-spacing: -0.03em;
   }
-
-  .auth-input-wrap {
-    min-height: 2.35rem;
+  .auth-input-placeholder-wrap .auth-floating-placeholder {
+    font-size: clamp(9px, 2.6vw, 12px);
+    letter-spacing: -0.02em;
   }
-  .signup-confirm-input::placeholder,
-  .signup-mobile-input-wrap .auth-input-hint {
+  .signup-confirm-input::placeholder {
     font-size: clamp(8px, 2.4vw, 12px);
     letter-spacing: -0.03em;
   }
@@ -1640,17 +1717,15 @@ body.auth-visible {
     max-width: 100% !important;
   }
   /* Long placeholders: scale with viewport so 100–200% zoom does not clip */
-  .login-email-input::placeholder,
-  .login-email-hint {
+  .login-email-input::placeholder {
     font-size: clamp(6px, 2.6vw, 11px);
     letter-spacing: -0.05em;
   }
-
-  .auth-input-wrap {
-    min-height: 2.5rem;
+  .auth-input-placeholder-wrap .auth-floating-placeholder {
+    font-size: clamp(8px, 2.5vw, 11px);
+    letter-spacing: -0.03em;
   }
-  .signup-confirm-input::placeholder,
-  .signup-mobile-input-wrap .auth-input-hint {
+  .signup-confirm-input::placeholder {
     font-size: clamp(6px, 2.5vw, 11px);
     letter-spacing: -0.06em;
   }
@@ -1882,6 +1957,69 @@ body.auth-visible {
     .auth-form-card.signup-card {
       min-height: 0;
       height: 100%;
+    }
+  }
+}
+
+/*
+ * Android Chrome: fixed full-screen auth shell blocks pan after pinch-zoom.
+ * Use document-level scroll (relative positioning) while iOS keeps the fixed shell above.
+ */
+@supports not (-webkit-touch-callout: none) {
+  @media (max-width: 1023px) and (hover: none) and (pointer: coarse) {
+    html.auth-visible,
+    body.auth-visible {
+      position: relative !important;
+      inset: auto !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+      max-height: none !important;
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: auto !important;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+
+    .login-page.auth-page,
+    .auth-page:has(.signup-card) {
+      position: relative !important;
+      inset: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: auto !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+      max-height: none !important;
+      overflow: visible !important;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+
+    .login-page.auth-page > .auth-layout,
+    .auth-page:has(.signup-card) > .auth-layout,
+    .login-page.auth-page .auth-layout > div:first-child,
+    .auth-page:has(.signup-card) .auth-layout > div:first-child {
+      height: auto !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+    }
+
+    .auth-form-card.login-card,
+    .auth-form-card.signup-card {
+      height: auto !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+      overflow: visible !important;
+    }
+
+    .auth-form-card.login-card .login-card-inner,
+    .auth-form-card.login-card .auth-card-content,
+    .auth-form-card.signup-card .signup-card-content {
+      overflow: visible !important;
+      max-height: none !important;
+      touch-action: pan-x pan-y pinch-zoom;
     }
   }
 }
@@ -2167,92 +2305,6 @@ body.auth-visible {
   object-fit: contain;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
-}
-
-/*
- * Auth: wrapping placeholder overlay — native <input> placeholders cannot wrap;
- * at 150–200% mobile zoom they clip ("Email or Mobile number", "Mobile number").
- */
-.auth-input-wrap {
-  position: relative;
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 1.25rem;
-  align-self: center;
-  display: flex;
-  align-items: center;
-}
-
-.auth-input-wrap > input {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  min-width: 0;
-  background: transparent !important;
-}
-
-.auth-input-wrap > input::placeholder {
-  color: transparent !important;
-  opacity: 0 !important;
-}
-
-.auth-input-wrap > .auth-input-hint {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.875rem;
-  line-height: 1.2;
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.auth-input-wrap > input:focus ~ .auth-input-hint,
-.auth-input-wrap > input:not(:placeholder-shown) ~ .auth-input-hint {
-  opacity: 0;
-  visibility: hidden;
-}
-
-.login-email-hint {
-  color: #ffffff;
-}
-
-.login-email-hint .auth-input-hint-break {
-  display: block;
-}
-
-@media (min-width: 640px) {
-  .login-email-hint .auth-input-hint-break,
-  .signup-mobile-input-wrap .auth-input-hint-break {
-    display: inline;
-  }
-
-  .login-email-hint .auth-input-hint-break::before,
-  .signup-mobile-input-wrap .auth-input-hint-break::before {
-    content: " ";
-  }
-}
-
-/* Signup phone: full-width mobile field on narrow / high-zoom viewports */
-@media (max-width: 420px) {
-  .signup-phone-row {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    row-gap: 0.35rem;
-  }
-
-  .signup-phone-row .signup-mobile-input-wrap {
-    flex: 1 1 100%;
-    width: 100%;
-    min-width: 0;
-    padding-left: 1.75rem;
-    box-sizing: border-box;
-  }
 }
 
 /* Forgot password form - high-contrast placeholder on dark gradient (WCAG AA) */
