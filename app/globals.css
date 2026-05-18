@@ -1657,44 +1657,76 @@ body.auth-visible {
     opacity: 0.9;
   }
 
+  /* Mobile default: single row (icon + country + mobile), same as desktop */
   .signup-card-content .signup-phone-row {
-    flex-wrap: wrap;
     align-items: center;
-    row-gap: 0.35rem;
     overflow: visible;
     min-width: 0;
   }
 
-  .signup-card-content .signup-phone-row .signup-phone-icon {
-    flex: 0 0 auto;
-    margin-right: 0.5rem !important;
+  .signup-card-content .signup-phone-fields {
+    flex-direction: row;
+    align-items: center;
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 0.5rem;
   }
 
   .signup-card-content .signup-phone-row .signup-country-select {
-    flex: 1 1 0;
-    min-width: 0;
-    max-width: none !important;
-    margin-right: 0;
+    width: fit-content;
+    max-width: min(200px, 48vw) !important;
+    flex: 0 0 auto;
   }
 
-  .signup-card-content .signup-phone-row .signup-mobile-input {
-    flex: 1 1 100%;
-    width: 100%;
-    min-width: 100%;
-    max-width: 100%;
-    align-self: stretch;
-  }
-}
-
-@media (min-width: 1024px) {
-  .signup-card-content .signup-phone-row {
-    flex-wrap: nowrap;
+  .signup-card-content .signup-phone-row .signup-country-select button {
+    width: auto;
   }
 
   .signup-card-content .signup-phone-row .signup-mobile-input {
     flex: 1 1 0%;
     width: auto;
     min-width: 0;
+    max-width: none;
+  }
+
+  /* ~200% pinch-zoom only: mobile number under country (content-width box) */
+  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row {
+    align-items: flex-start;
+  }
+
+  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-phone-icon {
+    margin-top: 0.125rem;
+  }
+
+  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-fields {
+    flex-direction: column;
+    align-items: flex-start;
+    width: fit-content;
+    max-width: 100%;
+    min-width: min(9.5rem, 100%);
+    flex: 1 1 auto;
+    gap: 0.35rem;
+  }
+
+  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-country-select {
+    align-self: flex-start;
+    max-width: min(200px, 100%) !important;
+  }
+
+  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-mobile-input {
+    flex: none;
+    width: 100%;
+    max-width: min(200px, 100%);
+    align-self: stretch;
+  }
+}
+
+@media (min-width: 1024px) {
+  .signup-card-content .signup-phone-row .signup-mobile-input {
+    flex: 1 1 0%;
+    width: auto;
+    max-width: none;
   }
 }
 
@@ -1753,9 +1785,6 @@ body.auth-visible {
 
   .signup-confirm-input {
     min-width: 0;
-  }
-  .signup-card-content .signup-phone-row .signup-country-select {
-    max-width: none !important;
   }
   .font-welcome-heading {
     font-size: clamp(0.95rem, 4.5vw, 1.15rem);

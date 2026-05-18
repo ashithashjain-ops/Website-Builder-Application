@@ -15,6 +15,7 @@ import {
   getAuthPullScrollRoot,
   isAuthPageZoomed,
   mountAuthAndroidClass,
+  mountSignupPhoneStackedClass,
 } from "@/lib/authMobileTouch";
 import {
   DEFAULT_SIGNUP_PHONE_COUNTRY_ID,
@@ -134,10 +135,12 @@ export default function SignupPage() {
     document.documentElement.classList.add("auth-visible");
     document.body.classList.add("auth-visible");
     const unmountAndroid = mountAuthAndroidClass();
+    const unmountPhoneStack = mountSignupPhoneStackedClass();
     return () => {
       document.documentElement.classList.remove("auth-visible");
       document.body.classList.remove("auth-visible");
       unmountAndroid();
+      unmountPhoneStack();
     };
   }, []);
 
@@ -493,7 +496,8 @@ export default function SignupPage() {
                   <div className="flex flex-col">
                     <div className="signup-phone-row flex items-center border-b border-white/80 pb-2 min-w-0">
                       <FaPhone className="signup-phone-icon mr-3 shrink-0 text-sm text-white/90" />
-                      <div className="signup-country-select relative z-20 mr-2 min-h-5 shrink-0 max-lg:max-w-none max-w-[200px] min-w-0 self-center" ref={countryDropdownRef}>
+                      <div className="signup-phone-fields flex min-w-0 flex-1 flex-row items-center gap-2">
+                      <div className="signup-country-select relative z-20 w-fit max-w-[200px] shrink-0 min-w-0" ref={countryDropdownRef}>
                         <button
                           type="button"
                           id="country-select-trigger"
@@ -501,7 +505,7 @@ export default function SignupPage() {
                           aria-haspopup="listbox"
                           aria-expanded={countryDropdownOpen}
                           onClick={() => setCountryDropdownOpen((o) => !o)}
-                          className="flex w-full min-w-0 items-center justify-between gap-1 rounded-md border border-white/80 bg-transparent px-2 py-0 text-left text-sm leading-5 text-white outline-none hover:border-white"
+                          className="flex w-auto max-w-full min-w-0 items-center justify-between gap-1 rounded-md border border-white/80 bg-transparent px-2 py-0 text-left text-sm leading-5 text-white outline-none hover:border-white"
                         >
                           <span className="min-w-0 truncate">
                             <span className="sm:hidden">
@@ -562,10 +566,11 @@ export default function SignupPage() {
                         placeholder="Mobile number"
                         value={form.mobileNumber}
                         onChange={handleChange("mobileNumber")}
-                        className="signup-mobile-input min-h-5 flex-1 min-w-0 self-center border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none placeholder-white/90"
+                        className="signup-mobile-input min-h-5 min-w-0 flex-1 border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none placeholder-white/90"
                         aria-invalid={!!errors.mobileNumber}
                         aria-describedby={errors.mobileNumber ? "mobile-error" : undefined}
                       />
+                      </div>
                     </div>
                     {errors.mobileNumber && (
                       <p id="mobile-error" className="auth-error-text mt-0.5 text-[11px] sm:text-xs lg:text-[11px]">

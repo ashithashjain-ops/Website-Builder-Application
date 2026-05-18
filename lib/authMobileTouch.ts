@@ -29,3 +29,33 @@ export function getAuthPullScrollRoot(loginPage: boolean): HTMLElement | null {
   }
   return document.querySelector(".auth-page") as HTMLElement | null;
 }
+
+/** ~200% pinch-zoom on mobile signup: stack mobile number under country selector. */
+const SIGNUP_PHONE_STACK_ZOOM = 1.85;
+
+export function mountSignupPhoneStackedClass(): () => void {
+  if (typeof window === "undefined") return () => undefined;
+
+  const mql = window.matchMedia("(max-width: 1023px)");
+  const update = () => {
+    const scale = window.visualViewport?.scale ?? 1;
+    document.documentElement.classList.toggle(
+      "signup-phone-zoom-stacked",
+      mql.matches && scale >= SIGNUP_PHONE_STACK_ZOOM
+    );
+  };
+
+  update();
+  mql.addEventListener("change", update);
+  window.visualViewport?.addEventListener("resize", update);
+  window.visualViewport?.addEventListener("scroll", update);
+  window.addEventListener("resize", update);
+
+  return () => {
+    mql.removeEventListener("change", update);
+    window.visualViewport?.removeEventListener("resize", update);
+    window.visualViewport?.removeEventListener("scroll", update);
+    window.removeEventListener("resize", update);
+    document.documentElement.classList.remove("signup-phone-zoom-stacked");
+  };
+}
