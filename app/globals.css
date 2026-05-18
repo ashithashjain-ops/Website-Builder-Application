@@ -1605,11 +1605,17 @@ body.auth-visible {
   .signup-card-content input::placeholder {
     font-size: 12px;
   }
-  .login-email-input::placeholder {
+  .login-email-input::placeholder,
+  .login-email-hint {
     font-size: clamp(8px, 2.4vw, 12px);
     letter-spacing: -0.03em;
   }
-  .signup-confirm-input::placeholder {
+
+  .auth-input-wrap {
+    min-height: 2.35rem;
+  }
+  .signup-confirm-input::placeholder,
+  .signup-mobile-input-wrap .auth-input-hint {
     font-size: clamp(8px, 2.4vw, 12px);
     letter-spacing: -0.03em;
   }
@@ -1634,11 +1640,17 @@ body.auth-visible {
     max-width: 100% !important;
   }
   /* Long placeholders: scale with viewport so 100–200% zoom does not clip */
-  .login-email-input::placeholder {
+  .login-email-input::placeholder,
+  .login-email-hint {
     font-size: clamp(6px, 2.6vw, 11px);
     letter-spacing: -0.05em;
   }
-  .signup-confirm-input::placeholder {
+
+  .auth-input-wrap {
+    min-height: 2.5rem;
+  }
+  .signup-confirm-input::placeholder,
+  .signup-mobile-input-wrap .auth-input-hint {
     font-size: clamp(6px, 2.5vw, 11px);
     letter-spacing: -0.06em;
   }
@@ -1710,8 +1722,8 @@ body.auth-visible {
 }
 
 /*
- * Mobile login/signup: one fixed full-screen surface (gradient + inner panel).
- * Scroll only inside the content column so overscroll never exposes lighter bands.
+ * Mobile login/signup: fixed full-screen surface (gradient + inner panel).
+ * overflow:auto + pan-x/pan-y on the chain so pinch-zoom users can pan in all directions (iOS/WebKit).
  */
 @media (max-width: 1023px) {
   html.auth-visible,
@@ -1726,7 +1738,8 @@ body.auth-visible {
     max-height: 100svh !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: hidden !important;
+    /* Allow pan after pinch-zoom (overflow:hidden traps the visual viewport on iOS/WebKit). */
+    overflow: auto !important;
     overscroll-behavior: none !important;
     /* Allow pinch-zoom on mobile (manipulation / pan-y alone can block it on some WebKit). */
     touch-action: pan-x pan-y pinch-zoom;
@@ -1752,7 +1765,7 @@ body.auth-visible {
     padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    overflow: hidden !important;
+    overflow: auto !important;
     overscroll-behavior: none !important;
     touch-action: pan-x pan-y pinch-zoom;
     background: var(--auth-surface-gradient) !important;
@@ -1803,7 +1816,7 @@ body.auth-visible {
     margin: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    overflow: hidden !important;
+    overflow: auto !important;
     display: flex !important;
     flex-direction: column !important;
     background: var(--auth-surface-gradient) !important;
@@ -1828,11 +1841,10 @@ body.auth-visible {
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+    overflow: auto !important;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-    touch-action: pan-y pinch-zoom;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y pinch-zoom;
     position: relative;
     z-index: 10;
     /* Scroll works; hide the visible scrollbar line (iOS Safari, Chrome, Firefox) */
@@ -2155,6 +2167,92 @@ body.auth-visible {
   object-fit: contain;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+}
+
+/*
+ * Auth: wrapping placeholder overlay — native <input> placeholders cannot wrap;
+ * at 150–200% mobile zoom they clip ("Email or Mobile number", "Mobile number").
+ */
+.auth-input-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 1.25rem;
+  align-self: center;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-wrap > input {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-width: 0;
+  background: transparent !important;
+}
+
+.auth-input-wrap > input::placeholder {
+  color: transparent !important;
+  opacity: 0 !important;
+}
+
+.auth-input-wrap > .auth-input-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  line-height: 1.2;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-input-wrap > input:focus ~ .auth-input-hint,
+.auth-input-wrap > input:not(:placeholder-shown) ~ .auth-input-hint {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.login-email-hint {
+  color: #ffffff;
+}
+
+.login-email-hint .auth-input-hint-break {
+  display: block;
+}
+
+@media (min-width: 640px) {
+  .login-email-hint .auth-input-hint-break,
+  .signup-mobile-input-wrap .auth-input-hint-break {
+    display: inline;
+  }
+
+  .login-email-hint .auth-input-hint-break::before,
+  .signup-mobile-input-wrap .auth-input-hint-break::before {
+    content: " ";
+  }
+}
+
+/* Signup phone: full-width mobile field on narrow / high-zoom viewports */
+@media (max-width: 420px) {
+  .signup-phone-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    row-gap: 0.35rem;
+  }
+
+  .signup-phone-row .signup-mobile-input-wrap {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+    padding-left: 1.75rem;
+    box-sizing: border-box;
+  }
 }
 
 /* Forgot password form - high-contrast placeholder on dark gradient (WCAG AA) */

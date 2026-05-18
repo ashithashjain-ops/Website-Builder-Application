@@ -402,18 +402,18 @@ export default function SignupPage() {
     getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry();
 
   return (
-    <div className="auth-page min-h-[100dvh] lg:min-h-screen flex flex-col max-lg:overflow-hidden bg-white px-0 py-0 lg:px-6 lg:py-4 lg:overflow-y-auto">
+    <div className="auth-page min-h-[100dvh] lg:min-h-screen flex flex-col max-lg:overflow-auto bg-white px-0 py-0 lg:px-6 lg:py-4 lg:overflow-y-auto">
       <div className="w-full max-lg:max-w-none max-w-6xl mx-auto flex flex-1 flex-col max-lg:h-full lg:flex-none lg:flex-row gap-0 lg:gap-8 auth-layout">
         {/* Card first on mobile (top), right on desktop */}
         <div className="flex w-full flex-1 flex-col items-stretch max-lg:justify-stretch justify-center max-lg:h-full order-1 lg:order-2 lg:w-1/2 lg:flex-none">
           <div
-            className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-hidden self-center max-lg:self-stretch bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] px-6 sm:px-10 max-lg:max-w-none max-lg:w-full max-lg:h-full max-lg:flex-1 lg:flex-none lg:rounded-[10px] signup-card auth-form-card"
+            className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-hidden max-lg:overflow-auto self-center max-lg:self-stretch bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] px-6 sm:px-10 max-lg:max-w-none max-lg:w-full max-lg:h-full max-lg:flex-1 lg:flex-none lg:rounded-[10px] signup-card auth-form-card"
           >
             <div className="auth-inner-panel pointer-events-none absolute inset-y-0 left-1/2 w-[78%] -translate-x-1/2 bg-gradient-to-b from-white/10 via-black/10 to-black/35" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_20px_0_45px_rgba(0,0,0,0.55),inset_-20px_0_45px_rgba(0,0,0,0.55)]" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)]" />
 
-            <div className="relative z-10 flex flex-col flex-1 min-h-0 min-w-0 px-4 sm:px-6 pt-2.5 sm:pt-4 pb-2 sm:pb-3 lg:pt-7 lg:pb-4 text-white signup-card-content text-left justify-start lg:justify-between max-lg:overflow-y-auto">
+            <div className="relative z-10 flex flex-col flex-1 min-h-0 min-w-0 px-4 sm:px-6 pt-2.5 sm:pt-4 pb-2 sm:pb-3 lg:pt-7 lg:pb-4 text-white signup-card-content text-left justify-start lg:justify-between max-lg:overflow-auto">
               {/* Single column: centers WELCOME and logo on the same axis (mobile + desktop) */}
               <div className="signup-brand-stack flex w-full min-w-0 flex-col items-center flex-shrink-0 mb-3 sm:mb-2.5 lg:mb-4">
                 <h1 className="signup-welcome-title font-welcome-heading text-xl sm:text-2xl font-semibold text-center mb-3 sm:mb-2.5 lg:mb-4 w-[120px] sm:w-[140px] lg:w-[180px]">
@@ -476,7 +476,7 @@ export default function SignupPage() {
                   </div>
 
                   <div className="flex flex-col">
-                    <div className="flex items-center border-b border-white/80 pb-2 min-w-0">
+                    <div className="signup-phone-row flex items-center border-b border-white/80 pb-2 min-w-0">
                       <FaPhone className="mr-3 shrink-0 text-sm text-white/90" />
                       <div className="signup-country-select relative z-20 mr-2 min-h-5 shrink-0 max-w-[108px] sm:max-w-[200px] min-w-0 self-center" ref={countryDropdownRef}>
                         <button
@@ -537,20 +537,26 @@ export default function SignupPage() {
                           </ul>
                         )}
                       </div>
-                      <input
-                        type="tel"
-                        inputMode="numeric"
-                        maxLength={
-                          (getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry())
-                            .maxDigits
-                        }
-                        placeholder="Phone number"
-                        value={form.mobileNumber}
-                        onChange={handleChange("mobileNumber")}
-                        className="min-h-5 flex-1 min-w-0 self-center border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none placeholder-white/90"
-                        aria-invalid={!!errors.mobileNumber}
-                        aria-describedby={errors.mobileNumber ? "mobile-error" : undefined}
-                      />
+                      <div className="auth-input-wrap signup-mobile-input-wrap min-h-5 flex-1 min-w-0 self-center">
+                        <input
+                          type="tel"
+                          inputMode="numeric"
+                          maxLength={
+                            (getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry())
+                              .maxDigits
+                          }
+                          placeholder=" "
+                          value={form.mobileNumber}
+                          onChange={handleChange("mobileNumber")}
+                          aria-label="Mobile number"
+                          className="signup-mobile-input min-h-5 w-full min-w-0 border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none"
+                          aria-invalid={!!errors.mobileNumber}
+                          aria-describedby={errors.mobileNumber ? "mobile-error" : undefined}
+                        />
+                        <span className="auth-input-hint" aria-hidden="true">
+                          Mobile<span className="auth-input-hint-break">number</span>
+                        </span>
+                      </div>
                     </div>
                     {errors.mobileNumber && (
                       <p id="mobile-error" className="auth-error-text mt-0.5 text-[11px] sm:text-xs lg:text-[11px]">

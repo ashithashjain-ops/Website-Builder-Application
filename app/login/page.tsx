@@ -233,16 +233,16 @@ export default function LoginPage() {
     }
   };
   return (
-    <div className="login-page auth-page min-h-[100dvh] lg:min-h-screen flex flex-col max-lg:overflow-hidden bg-white px-0 py-0 lg:px-6 lg:py-4 lg:overflow-y-auto">
+    <div className="login-page auth-page min-h-[100dvh] lg:min-h-screen flex flex-col max-lg:overflow-auto bg-white px-0 py-0 lg:px-6 lg:py-4 lg:overflow-y-auto">
       <div className="w-full max-lg:max-w-none max-w-6xl mx-auto flex flex-1 flex-col max-lg:h-full lg:flex-none lg:flex-row gap-0 lg:gap-8 auth-layout">
         {/* Card first on mobile (top), right on desktop */}
         <div className="flex w-full flex-1 flex-col items-stretch max-lg:justify-stretch justify-center max-lg:h-full order-1 lg:order-2 lg:w-1/2 lg:flex-none">
-          <div className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-hidden self-center max-lg:self-stretch bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] px-6 sm:px-10 max-lg:max-w-none max-lg:w-full max-lg:h-full max-lg:flex-1 lg:flex-none lg:rounded-[10px] login-card auth-form-card">
+          <div className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-hidden max-lg:overflow-auto self-center max-lg:self-stretch bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] px-6 sm:px-10 max-lg:max-w-none max-lg:w-full max-lg:h-full max-lg:flex-1 lg:flex-none lg:rounded-[10px] login-card auth-form-card">
             <div className="auth-inner-panel pointer-events-none absolute inset-y-0 left-1/2 w-[78%] -translate-x-1/2 bg-gradient-to-b from-white/10 via-black/10 to-black/35" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_20px_0_45px_rgba(0,0,0,0.55),inset_-20px_0_45px_rgba(0,0,0,0.55)]" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)]" />
 
-            <div className="relative z-10 flex flex-col flex-1 min-h-0 min-w-0 auth-card-content login-card-inner px-4 sm:px-6 pt-4 sm:pt-8 pb-4 sm:pb-8 lg:pt-14 lg:pb-10 text-white text-left justify-start lg:justify-center lg:min-h-0 max-lg:overflow-y-auto">
+            <div className="relative z-10 flex flex-col flex-1 min-h-0 min-w-0 auth-card-content login-card-inner px-4 sm:px-6 pt-4 sm:pt-8 pb-4 sm:pb-8 lg:pt-14 lg:pb-10 text-white text-left justify-start lg:justify-center lg:min-h-0 max-lg:overflow-auto">
               <div>
                 <div className="w-full flex justify-center flex-shrink-0 min-w-0">
                   <h1 className="font-welcome-heading text-lg sm:text-xl md:text-2xl lg:text-3xl text-center font-semibold mb-1 sm:mb-4 lg:mb-7 break-words tracking-widest">
@@ -265,19 +265,25 @@ export default function LoginPage() {
                   <div className="flex flex-col">
                     <div className="flex items-center border-b border-white/60 pb-2 min-w-0">
                       <FaAddressBook className="login-email-icon mr-2 sm:mr-4 text-sm opacity-80 flex-shrink-0" />
-                      <input
-                        type="text"
-                        placeholder="Email or Mobile number"
-                        value={form.email}
-                        onChange={handleChange("email")}
-                        onBlur={handleContactBlur}
-                        maxLength={EMAIL_MAX_LENGTH}
-                        className="bg-transparent outline-none w-full min-w-0 placeholder-white text-sm tracking-tight login-email-input"
-                        aria-invalid={!!errors.email}
-                        aria-describedby={
-                          errors.email ? "login-email-error" : undefined
-                        }
-                      />
+                      <div className="auth-input-wrap min-w-0">
+                        <input
+                          type="text"
+                          placeholder=" "
+                          value={form.email}
+                          onChange={handleChange("email")}
+                          onBlur={handleContactBlur}
+                          maxLength={EMAIL_MAX_LENGTH}
+                          aria-label="Email or Mobile number"
+                          className="bg-transparent outline-none w-full min-w-0 text-sm tracking-tight login-email-input text-white"
+                          aria-invalid={!!errors.email}
+                          aria-describedby={
+                            errors.email ? "login-email-error" : undefined
+                          }
+                        />
+                        <span className="auth-input-hint login-email-hint" aria-hidden="true">
+                          Email or<span className="auth-input-hint-break">Mobile number</span>
+                        </span>
+                      </div>
                     </div>
                     {errors.email && (
                       <p
