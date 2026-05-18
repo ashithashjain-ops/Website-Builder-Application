@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Stackly | Drag and Drop Website Builder",
   description: "Build responsive websites with Stackly templates and no-code tools.",
+  icons: {
+    icon: [{ url: "/stackly-title-icon.webp", type: "image/webp", sizes: "25x35" }],
+  },
 };
 
 /** Edge-to-edge on notched devices; pinch and accessibility zoom allowed (WCAG). */
