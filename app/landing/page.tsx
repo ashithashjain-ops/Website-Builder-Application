@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import CreateProjectFlow from "@/components/CreateProjectFlow";
 import { useEffect, useMemo, useState } from "react";
 import {
   FaArrowRight,
@@ -19,7 +20,6 @@ import {
   FaMinus,
   FaPaperPlane,
   FaPhoneVolume,
-  FaPlay,
   FaPlus,
   FaStar,
   FaWhatsapp,
@@ -560,7 +560,16 @@ export default function Home() {
               decoding="async"
             />
           </picture>
+
+
           <div className="relative z-10 flex min-h-[480px] items-end justify-center p-8 md:min-h-[540px] md:justify-start md:p-16">
+            {/* Replaced Link with CreateProjectFlow to trigger the modal locally */}
+            <CreateProjectFlow />
+          </div>
+
+
+
+          {/* <div className="relative z-10 flex min-h-[480px] items-end justify-center p-8 md:min-h-[540px] md:justify-start md:p-16">
             <Link
               href="#templates"
               className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#0A2357] px-7 py-3 font-bold text-white shadow-lg transition hover:bg-blue-900"
@@ -570,7 +579,7 @@ export default function Home() {
                 <FaPlay />
               </span>
             </Link>
-          </div>
+          </div> */}
         </div>
 
         <div className="mt-8 text-center md:mt-12">
@@ -772,9 +781,9 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <Link href="/signup" className="w-full rounded-full bg-white px-10 py-4 text-xs font-black uppercase tracking-[0.2em] text-[#005BC5] shadow-xl transition hover:bg-blue-50 sm:w-auto md:px-14">
+          {/* <Link href="/signup" className="w-full rounded-full bg-white px-10 py-4 text-xs font-black uppercase tracking-[0.2em] text-[#005BC5] shadow-xl transition hover:bg-blue-50 sm:w-auto md:px-14">
             Get Started
-          </Link>
+          </Link> */}
         </div>
       </section>
 
