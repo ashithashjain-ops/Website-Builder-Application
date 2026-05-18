@@ -119,10 +119,20 @@ export default function SignupPage() {
 
   useEffect(() => {
     if (!isMobileAuthViewport()) return;
-    const id = requestAnimationFrame(() =>
-      fitInputPlaceholderToWidth(mobileInputRef.current)
-    );
-    return () => cancelAnimationFrame(id);
+    const run = () => fitInputPlaceholderToWidth(mobileInputRef.current);
+    const id1 = requestAnimationFrame(() => requestAnimationFrame(run));
+    const t1 = window.setTimeout(run, 150);
+    const t2 = window.setTimeout(run, 400);
+    const vv = window.visualViewport;
+    vv?.addEventListener("resize", run);
+    vv?.addEventListener("scroll", run);
+    return () => {
+      cancelAnimationFrame(id1);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      vv?.removeEventListener("resize", run);
+      vv?.removeEventListener("scroll", run);
+    };
   }, [form.phoneCountryId, countryDropdownOpen]);
 
   useEffect(() => {

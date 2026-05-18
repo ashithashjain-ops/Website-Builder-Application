@@ -1401,15 +1401,16 @@ body.auth-visible {
 
 /*
  * Login: Remember me (left) + Forgot password (right).
- * Flex + wrap avoids a crushed second column at 150–200% zoom (no mid-word breaks).
+ * Same line while both fit; wrap to a second row only when they would overlap.
  */
 .login-page .login-remember-forgot {
+  container-type: inline-size;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  column-gap: clamp(0.5rem, 2.5vw, 0.875rem);
-  row-gap: 0.5rem;
+  justify-content: flex-start;
+  column-gap: clamp(0.35rem, 2vw, 0.75rem);
+  row-gap: 0.35rem;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -1419,8 +1420,9 @@ body.auth-visible {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 0 1 auto;
-  min-width: 0;
+  flex: 0 0 auto;
+  min-width: max-content;
+  white-space: nowrap;
 }
 
 .login-page .login-remember-forgot .forgot-password-link {
@@ -1428,20 +1430,19 @@ body.auth-visible {
   margin-left: auto;
   text-align: right;
   white-space: nowrap;
-  word-break: normal;
+  word-break: keep-all;
   overflow-wrap: normal;
   line-height: 1.35;
-  font-size: clamp(10px, 3.4vw, 13px);
+  font-size: clamp(10px, 3.2vw, 13px);
   max-width: 100%;
 }
 
-/* Mobile / high zoom: Forgot password on its own row, right-aligned, one line */
-@media (max-width: 1023px) {
+/* When the row is too narrow (high zoom), move Forgot Password to its own line, right-aligned */
+@container (max-width: 245px) {
   .login-page .login-remember-forgot .forgot-password-link {
     flex: 1 1 100%;
     margin-left: 0;
     text-align: right;
-    white-space: nowrap;
   }
 }
 
@@ -1596,6 +1597,7 @@ body.auth-visible {
 @media (max-width: 1023px) {
   .login-card-inner .login-contact-row,
   .signup-card-content .signup-phone-row {
+    container-type: inline-size;
     flex-wrap: nowrap;
     align-items: center;
     overflow: visible;
@@ -1637,6 +1639,23 @@ body.auth-visible {
     font-size: 1em;
     line-height: 1.25;
     opacity: 0.9;
+  }
+
+  /* Fallback if JS runs late: shrink only when the row is very narrow (≈150–200% zoom) */
+  @container (max-width: 220px) {
+    .login-card-inner .login-contact-row .login-email-input,
+    .signup-card-content .signup-phone-row .signup-mobile-input {
+      font-size: 11px;
+      letter-spacing: -0.03em;
+    }
+  }
+
+  @container (max-width: 175px) {
+    .login-card-inner .login-contact-row .login-email-input,
+    .signup-card-content .signup-phone-row .signup-mobile-input {
+      font-size: 9px;
+      letter-spacing: -0.04em;
+    }
   }
 }
 
