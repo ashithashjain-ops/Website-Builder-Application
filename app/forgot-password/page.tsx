@@ -5,6 +5,16 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { forgotPassword, isApiConnectionError } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
+import { stripContactWhitespace } from "@/lib/resetFlowValidation";
+import { MAX_MOBILE_INPUT_LENGTH } from "@/lib/signupPhoneCountries";
+
+const EMAIL_MAX_LENGTH = 254;
+const EMAIL_MAX_ERROR = `Email cannot exceed ${EMAIL_MAX_LENGTH} characters.`;
+const MOBILE_MAX_ERROR = `Mobile number cannot exceed ${MAX_MOBILE_INPUT_LENGTH} characters.`;
+
+/** Treat a value as mobile-format when it has digits and only allowed mobile chars. */
+const looksLikeMobile = (value: string): boolean =>
+  value.length > 0 && /^\+?\d*$/.test(value);
 
 function ForgotPasswordContent() {
   const router = useRouter();
@@ -33,6 +43,20 @@ function ForgotPasswordContent() {
     setError("");
     setMessage("");
     const trimmed = email.trim();
+    if (!trimmed) {
+      setError("Enter a valid email or mobile number");
+      return;
+    }
+
+    if (looksLikeMobile(trimmed) && trimmed.length > MAX_MOBILE_INPUT_LENGTH) {
+      setError(MOBILE_MAX_ERROR);
+      return;
+    }
+    if (!looksLikeMobile(trimmed) && trimmed.length > EMAIL_MAX_LENGTH) {
+      setError(EMAIL_MAX_ERROR);
+      return;
+    }
+
     const isEmailContact = validateEmail(trimmed);
     const isMobileContact = isMobile(trimmed);
 
@@ -80,7 +104,8 @@ function ForgotPasswordContent() {
           <div
             className="reset-flow-card forgot-password-card relative flex w-full max-w-[420px] flex-1 flex-col justify-center self-center overflow-hidden px-6 py-8 sm:px-10 sm:py-10 lg:flex-none lg:min-h-0 lg:rounded-xl"
             style={{
-              background: "linear-gradient(180deg, #234E70 0%, #282738 100%)",
+              background:
+                "linear-gradient(180deg, #4A76F3 0%, #2C4FAD 50%, #0A193F 100%)",
               boxShadow: "4px 4px 4px 0 rgba(0,0,0,0.25)",
             }}
           >
@@ -105,13 +130,29 @@ function ForgotPasswordContent() {
                     inputMode="email"
                     placeholder={contactPlaceholder}
                     value={email}
+                    maxLength={EMAIL_MAX_LENGTH}
                     onChange={(e) => {
-                      setEmail(e.target.value);
+                      const cleaned = stripContactWhitespace(e.target.value);
+                      const treatAsMobile = looksLikeMobile(cleaned);
+                      const cap = treatAsMobile
+                        ? MAX_MOBILE_INPUT_LENGTH
+                        : EMAIL_MAX_LENGTH;
+                      if (cleaned.length > cap) {
+                        setEmail(cleaned.slice(0, cap));
+                        setError(
+                          treatAsMobile ? MOBILE_MAX_ERROR : EMAIL_MAX_ERROR
+                        );
+                        return;
+                      }
+                      setEmail(cleaned);
                       setError("");
                     }}
-                    className="forgot-input w-full h-12 px-5 rounded-[1000px] border text-[14px] text-center outline-none focus:border-white/80 transition bg-transparent"
+                    onBlur={() => {
+                      setEmail((prev) => prev.trim());
+                    }}
+                    className="forgot-input w-full h-12 px-5 rounded-[1000px] border text-[14px] text-center outline-none focus:border-white transition bg-transparent"
                     style={{
-                      border: "1px solid rgba(255,255,255,0.5)",
+                      border: "1.5px solid #FFFFFF",
                       color: "#FFFFFF",
                       textAlign: "center",
                     }}

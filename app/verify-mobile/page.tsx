@@ -3,11 +3,19 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isApiConnectionError, verifyMobileOtp } from "@/lib/api";
+import {
+  createOtpChangeHandler,
+  createOtpKeyDownHandler,
+  createOtpPasteHandler,
+} from "@/lib/otpInputHandlers";
 import { assetPath } from "@/lib/paths";
 import ResetFlowBackButton from "@/components/ResetFlowBackButton";
 
+const MOBILE_OTP_INPUT_PREFIX = "mobile-otp";
+
 const resetFlowCardStyle = {
-  background: "linear-gradient(180deg, #234E70 0%, #282738 100%)",
+  background:
+    "linear-gradient(180deg, #4A76F3 0%, #2C4FAD 50%, #0A193F 100%)",
   boxShadow: "4px 4px 4px 0 rgba(0,0,0,0.25)",
 } as const;
 
@@ -21,20 +29,7 @@ function VerifyMobileContent() {
   const isCodeComplete = code.every((digit) => digit !== "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange =
-    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 1);
-      setCode((prev) => {
-        const next = [...prev];
-        next[index] = value;
-        return next;
-      });
-      if (value && index < 3) {
-        const nextInput = document.getElementById(`mobile-otp-${index + 1}`);
-        nextInput?.focus();
-      }
-      setError("");
-    };
+  const clearError = () => setError("");
 
   const handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +95,27 @@ function VerifyMobileContent() {
                   inputMode="numeric"
                   maxLength={1}
                   value={value}
-                  onChange={handleChange(idx)}
+                  onChange={createOtpChangeHandler(
+                    idx,
+                    code.length,
+                    MOBILE_OTP_INPUT_PREFIX,
+                    setCode,
+                    clearError
+                  )}
+                  onKeyDown={createOtpKeyDownHandler(
+                    idx,
+                    code,
+                    MOBILE_OTP_INPUT_PREFIX,
+                    setCode,
+                    clearError
+                  )}
+                  onPaste={createOtpPasteHandler(
+                    idx,
+                    code.length,
+                    MOBILE_OTP_INPUT_PREFIX,
+                    setCode,
+                    clearError
+                  )}
                   className="w-10 h-10 sm:w-12 sm:h-12 rounded border bg-transparent text-center text-lg text-white outline-none focus:border-white/80"
                   style={{
                     border: "1px solid rgba(255,255,255,0.7)",

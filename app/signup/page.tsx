@@ -8,6 +8,10 @@ import { useRouter } from "next/navigation";
 import { isApiConnectionError, register as registerApi } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
 import {
+  PASSWORD_WHITESPACE_ERROR,
+  passwordContainsWhitespace,
+} from "@/lib/resetFlowValidation";
+import {
   DEFAULT_SIGNUP_PHONE_COUNTRY_ID,
   SIGNUP_PHONE_COUNTRIES,
   getDefaultSignupPhoneCountry,
@@ -42,6 +46,40 @@ const initialSignupState: SignupFormState = {
   password: "",
   confirmPassword: "",
 };
+
+const NAME_MIN_LENGTH = 2;
+const NAME_MAX_LENGTH = 50;
+const EMAIL_MAX_LENGTH = 254;
+const PASSWORD_MIN_LENGTH = 8;
+const PASSWORD_MAX_LENGTH = 60;
+
+const NAME_MAX_ERROR = `Name cannot exceed ${NAME_MAX_LENGTH} characters.`;
+const EMAIL_MAX_ERROR = `Email cannot exceed ${EMAIL_MAX_LENGTH} characters.`;
+const PASSWORD_MAX_ERROR = `Password cannot exceed ${PASSWORD_MAX_LENGTH} characters.`;
+const CONFIRM_PASSWORD_MAX_ERROR = `Confirm password cannot exceed ${PASSWORD_MAX_LENGTH} characters.`;
+
+const FIELD_MAX_LENGTHS: Partial<Record<keyof SignupFormState, number>> = {
+  name: NAME_MAX_LENGTH,
+  email: EMAIL_MAX_LENGTH,
+  password: PASSWORD_MAX_LENGTH,
+  confirmPassword: PASSWORD_MAX_LENGTH,
+};
+
+const FIELD_MAX_ERRORS: Partial<Record<keyof SignupFormState, string>> = {
+  name: NAME_MAX_ERROR,
+  email: EMAIL_MAX_ERROR,
+  password: PASSWORD_MAX_ERROR,
+  confirmPassword: CONFIRM_PASSWORD_MAX_ERROR,
+};
+
+/** Strip all whitespace (space, tab, NBSP, ZWSP, etc.) — valid emails never contain these. */
+function stripEmailWhitespace(value: string): string {
+  return value.replace(/[\s\u00A0\uFEFF\u2000-\u200B\u202F\u205F\u3000]+/g, "");
+}
+
+function normalizeSignupEmail(raw: string | undefined | null): string {
+  return stripEmailWhitespace(String(raw ?? "")).trim().toLowerCase();
+}
 
 export default function SignupPage() {
   const router = useRouter();
@@ -145,19 +183,24 @@ export default function SignupPage() {
   const validate = (values: SignupFormState): SignupFormErrors => {
     const newErrors: SignupFormErrors = {};
 
-    if (!values.name.trim()) {
+    const trimmedName = values.name.trim();
+    if (!trimmedName) {
       newErrors.name = "Name is required.";
-    } else if (values.name.trim().length < 2) {
-      newErrors.name = "Name must be at least 2 characters.";
-    } else if (!/^[a-zA-Z\s]+$/.test(values.name.trim())) {
+    } else if (trimmedName.length < NAME_MIN_LENGTH) {
+      newErrors.name = `Name must be at least ${NAME_MIN_LENGTH} characters.`;
+    } else if (trimmedName.length > NAME_MAX_LENGTH) {
+      newErrors.name = NAME_MAX_ERROR;
+    } else if (!/^[a-zA-Z\s]+$/.test(trimmedName)) {
       newErrors.name = "Name must contain only letters.";
     }
 
-    if (!values.email.trim()) {
+    // Email: required first, then length, then format (do not show format errors for an empty field).
+    const emailNormalized = normalizeSignupEmail(values.email);
+    if (!emailNormalized) {
       newErrors.email = "Email is required.";
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim().toLowerCase())
-    ) {
+    } else if (emailNormalized.length > EMAIL_MAX_LENGTH) {
+      newErrors.email = EMAIL_MAX_ERROR;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNormalized)) {
       newErrors.email = "Please enter a valid email address.";
     }
 
@@ -172,15 +215,21 @@ export default function SignupPage() {
       }
     }
 
-    if (!values.password) {
+    const passwordRaw = values.password ?? "";
+    // Empty or whitespace-only must show required first (not min-length).
+    if (passwordRaw.length === 0 || /^\s+$/.test(passwordRaw)) {
       newErrors.password = "Password is required.";
-    } else if (values.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters.";
+    } else if (passwordContainsWhitespace(passwordRaw)) {
+      newErrors.password = PASSWORD_WHITESPACE_ERROR;
+    } else if (passwordRaw.length < PASSWORD_MIN_LENGTH) {
+      newErrors.password = `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`;
+    } else if (passwordRaw.length > PASSWORD_MAX_LENGTH) {
+      newErrors.password = PASSWORD_MAX_ERROR;
     } else {
-      const hasLower = /[a-z]/.test(values.password);
-      const hasUpper = /[A-Z]/.test(values.password);
-      const hasNumber = /[0-9]/.test(values.password);
-      const hasSpecial = /[!@#$%^&*(),.?\x3a{}|<>]/.test(values.password);
+      const hasLower = /[a-z]/.test(passwordRaw);
+      const hasUpper = /[A-Z]/.test(passwordRaw);
+      const hasNumber = /[0-9]/.test(passwordRaw);
+      const hasSpecial = /[!@#$%^&*(),.?\x3a{}|<>]/.test(passwordRaw);
       if (!hasLower) {
         newErrors.password = "Password must include a lowercase letter.";
       } else if (!hasUpper) {
@@ -192,9 +241,14 @@ export default function SignupPage() {
       }
     }
 
-    if (!values.confirmPassword) {
+    const confirmRaw = values.confirmPassword ?? "";
+    if (confirmRaw.length === 0 || /^\s+$/.test(confirmRaw)) {
       newErrors.confirmPassword = "Please confirm your password.";
-    } else if (values.password !== values.confirmPassword) {
+    } else if (passwordContainsWhitespace(confirmRaw)) {
+      newErrors.confirmPassword = PASSWORD_WHITESPACE_ERROR;
+    } else if (confirmRaw.length > PASSWORD_MAX_LENGTH) {
+      newErrors.confirmPassword = CONFIRM_PASSWORD_MAX_ERROR;
+    } else if (passwordRaw !== confirmRaw) {
       newErrors.confirmPassword = "Passwords do not match.";
     }
 
@@ -204,18 +258,81 @@ export default function SignupPage() {
   const handleChange =
     (field: keyof SignupFormState) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const raw = event.target.value;
+      let raw = event.target.value;
+
       if (field === "mobileNumber") {
         setForm((prev) => {
           const country = getSignupPhoneCountry(prev.phoneCountryId) ?? getDefaultSignupPhoneCountry();
           const digits = raw.replace(/\D/g, "").slice(0, country.maxDigits);
           return { ...prev, mobileNumber: digits };
         });
-      } else {
-        setForm((prev) => ({ ...prev, [field]: raw }));
+        setErrors((prev) => ({ ...prev, mobileNumber: undefined, form: undefined }));
+        return;
       }
-      setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
+
+      if (field === "name") {
+        // Strip leading whitespace immediately so the name can never start with a space.
+        raw = raw.replace(/^\s+/, "");
+      }
+
+      if (field === "email") {
+        raw = stripEmailWhitespace(raw);
+      }
+
+      let passwordWhitespaceRemoved = false;
+      if (field === "password" || field === "confirmPassword") {
+        if (passwordContainsWhitespace(raw)) {
+          raw = raw.replace(/\s/g, "");
+          passwordWhitespaceRemoved = true;
+        }
+      }
+
+      const maxLength = FIELD_MAX_LENGTHS[field];
+      if (typeof maxLength === "number" && raw.length > maxLength) {
+        const overflowError = FIELD_MAX_ERRORS[field];
+        setForm((prev) => ({ ...prev, [field]: raw.slice(0, maxLength) }));
+        setErrors((prev) => ({
+          ...prev,
+          [field]: overflowError,
+          form: undefined,
+        }));
+        return;
+      }
+
+      setForm((prev) => ({ ...prev, [field]: raw }));
+      if (field === "password" || field === "confirmPassword") {
+        setErrors((prev) => ({
+          ...prev,
+          [field]: passwordWhitespaceRemoved ? PASSWORD_WHITESPACE_ERROR : undefined,
+          form: undefined,
+        }));
+      } else {
+        setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
+      }
     };
+
+  const handleNameBlur = () => {
+    setForm((prev) => ({ ...prev, name: prev.name.trim() }));
+  };
+
+  const handleEmailBlur = () => {
+    setForm((prev) => ({
+      ...prev,
+      email: stripEmailWhitespace(prev.email).trim(),
+    }));
+  };
+
+  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === " ") {
+      e.preventDefault();
+    }
+  };
+
+  const handlePasswordKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === " ") {
+      e.preventDefault();
+    }
+  };
 
   const selectPhoneCountry = (id: string) => {
     const country = getSignupPhoneCountry(id) ?? getDefaultSignupPhoneCountry();
@@ -245,7 +362,7 @@ export default function SignupPage() {
         getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry();
       await registerApi({
         name: form.name.trim(),
-        email: form.email.trim().toLowerCase(),
+        email: normalizeSignupEmail(form.email),
         mobile: toE164Mobile(phoneCountry, form.mobileNumber.trim()),
         password: form.password,
         confirmPassword: form.confirmPassword,
@@ -261,6 +378,20 @@ export default function SignupPage() {
       }
       const message =
         error instanceof Error ? error.message : "Registration failed. Please try again.";
+      const normalizedEmail = normalizeSignupEmail(form.email);
+      const apiMessageLooksLikeMissingEmail =
+        !normalizedEmail &&
+        (message === "Enter valid email" ||
+          message === "All fields are required" ||
+          message === "Email is required");
+      if (apiMessageLooksLikeMissingEmail) {
+        setErrors((prev) => ({
+          ...prev,
+          email: "Email is required.",
+          form: undefined,
+        }));
+        return;
+      }
       setErrors((prev) => ({ ...prev, form: message }));
     } finally {
       setIsSubmitting(false);
@@ -303,6 +434,9 @@ export default function SignupPage() {
                         placeholder="Name"
                         value={form.name}
                         onChange={handleChange("name")}
+                        onBlur={handleNameBlur}
+                        minLength={NAME_MIN_LENGTH}
+                        maxLength={NAME_MAX_LENGTH}
                         className="bg-transparent outline-none w-full placeholder-white/90 text-sm text-white"
                         aria-invalid={!!errors.name}
                         aria-describedby={errors.name ? "name-error" : undefined}
@@ -319,10 +453,16 @@ export default function SignupPage() {
                     <div className="flex items-center border-b border-white/80 pb-2">
                       <FaEnvelope className="mr-3 text-sm text-white/90" />
                       <input
-                        type="email"
+                        type="text"
+                        inputMode="email"
+                        autoComplete="email"
+                        spellCheck={false}
                         placeholder="Email"
                         value={form.email}
                         onChange={handleChange("email")}
+                        onBlur={handleEmailBlur}
+                        onKeyDown={handleEmailKeyDown}
+                        maxLength={EMAIL_MAX_LENGTH}
                         className="bg-transparent outline-none w-full placeholder-white/90 text-sm text-white"
                         aria-invalid={!!errors.email}
                         aria-describedby={errors.email ? "email-error" : undefined}
@@ -338,18 +478,23 @@ export default function SignupPage() {
                   <div className="flex flex-col">
                     <div className="flex items-center border-b border-white/80 pb-2 min-w-0">
                       <FaPhone className="mr-3 shrink-0 text-sm text-white/90" />
-                      <div className="relative z-20 mr-2 min-h-5 shrink-0 max-w-[46%] sm:max-w-[200px] min-w-0 self-center" ref={countryDropdownRef}>
+                      <div className="signup-country-select relative z-20 mr-2 min-h-5 shrink-0 max-w-[108px] sm:max-w-[200px] min-w-0 self-center" ref={countryDropdownRef}>
                         <button
                           type="button"
                           id="country-select-trigger"
-                          aria-label="Country calling code"
+                          aria-label={`Country calling code: ${selectedPhoneCountry.name} (+${selectedPhoneCountry.dialCode})`}
                           aria-haspopup="listbox"
                           aria-expanded={countryDropdownOpen}
                           onClick={() => setCountryDropdownOpen((o) => !o)}
                           className="flex w-full min-w-0 items-center justify-between gap-1 rounded-md border border-white/80 bg-transparent px-2 py-0 text-left text-sm leading-5 text-white outline-none hover:border-white"
                         >
                           <span className="min-w-0 truncate">
-                            {selectedPhoneCountry.name} (+{selectedPhoneCountry.dialCode})
+                            <span className="sm:hidden">
+                              {selectedPhoneCountry.id} (+{selectedPhoneCountry.dialCode})
+                            </span>
+                            <span className="hidden sm:inline">
+                              {selectedPhoneCountry.name} (+{selectedPhoneCountry.dialCode})
+                            </span>
                           </span>
                           <span
                             className={`shrink-0 text-white/90 transition-transform ${countryDropdownOpen ? "rotate-180" : ""}`}
@@ -368,7 +513,7 @@ export default function SignupPage() {
                           <ul
                             role="listbox"
                             aria-labelledby="country-select-trigger"
-                            className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg [scrollbar-color:#94a3b8_#f1f5f9]"
+                            className="signup-country-list absolute left-0 top-full z-50 mt-1 max-h-60 w-max min-w-full max-w-[80vw] overflow-y-auto rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg [scrollbar-color:#94a3b8_#f1f5f9]"
                           >
                             {SIGNUP_PHONE_COUNTRIES.map((c) => {
                               const selected = form.phoneCountryId === c.id;
@@ -378,12 +523,13 @@ export default function SignupPage() {
                                     type="button"
                                     role="option"
                                     aria-selected={selected}
-                                    className={`w-full cursor-pointer px-3 py-2 text-left text-gray-900 hover:bg-[#1A73E8] hover:text-white ${
+                                    className={`flex w-full cursor-pointer items-center gap-2 whitespace-nowrap px-3 py-2 text-left text-sm text-gray-900 hover:bg-[#1A73E8] hover:text-white ${
                                       selected ? "bg-[#1A73E8] text-white" : "bg-white"
                                     }`}
                                     onClick={() => selectPhoneCountry(c.id)}
                                   >
-                                    {c.name} (+{c.dialCode})
+                                    <span className="inline-block w-6 shrink-0 font-medium">{c.id}</span>
+                                    <span className="truncate">{c.name} (+{c.dialCode})</span>
                                   </button>
                                 </li>
                               );
@@ -421,6 +567,8 @@ export default function SignupPage() {
                         placeholder="Password"
                         value={form.password}
                         onChange={handleChange("password")}
+                        onKeyDown={handlePasswordKeyDown}
+                        maxLength={PASSWORD_MAX_LENGTH}
                         className="bg-transparent outline-none w-full placeholder-white/90 text-sm text-white pr-9"
                         aria-invalid={!!errors.password}
                         aria-describedby={errors.password ? "password-error" : undefined}
@@ -453,6 +601,8 @@ export default function SignupPage() {
                         placeholder="Confirm Password"
                         value={form.confirmPassword}
                         onChange={handleChange("confirmPassword")}
+                        onKeyDown={handlePasswordKeyDown}
+                        maxLength={PASSWORD_MAX_LENGTH}
                         className="bg-transparent outline-none w-full placeholder-white/90 text-sm text-white pr-9 signup-confirm-input"
                         aria-invalid={!!errors.confirmPassword}
                         aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}

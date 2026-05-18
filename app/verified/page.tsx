@@ -6,7 +6,8 @@ import { assetPath } from "@/lib/paths";
 import ResetFlowBackButton from "@/components/ResetFlowBackButton";
 
 const resetFlowCardStyle = {
-  background: "linear-gradient(180deg, #234E70 0%, #282738 100%)",
+  background:
+    "linear-gradient(180deg, #4A76F3 0%, #2C4FAD 50%, #0A193F 100%)",
   boxShadow: "4px 4px 4px 0 rgba(0,0,0,0.25)",
 } as const;
 

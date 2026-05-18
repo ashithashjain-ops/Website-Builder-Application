@@ -28,6 +28,11 @@ const initialLoginState: LoginFormState = {
   rememberMe: false,
 };
 
+const EMAIL_MAX_LENGTH = 254;
+const PASSWORD_MAX_LENGTH = 60;
+const EMAIL_MAX_ERROR = `Email or mobile number cannot exceed ${EMAIL_MAX_LENGTH} characters.`;
+const PASSWORD_MAX_ERROR = `Password cannot exceed ${PASSWORD_MAX_LENGTH} characters.`;
+
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState<LoginFormState>(initialLoginState);
@@ -112,6 +117,8 @@ export default function LoginPage() {
     const trimmedContact = values.email.trim();
     if (!trimmedContact) {
       newErrors.email = "Email or mobile number is required.";
+    } else if (trimmedContact.length > EMAIL_MAX_LENGTH) {
+      newErrors.email = EMAIL_MAX_ERROR;
     } else {
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
         trimmedContact.toLowerCase(),
@@ -122,7 +129,11 @@ export default function LoginPage() {
       }
     }
 
-    if (!values.password || values.password.length < 8) {
+    if (!values.password) {
+      newErrors.password = "Enter valid password";
+    } else if (values.password.length > PASSWORD_MAX_LENGTH) {
+      newErrors.password = PASSWORD_MAX_ERROR;
+    } else if (values.password.length < 8) {
       newErrors.password = "Enter valid password";
     }
 
@@ -132,11 +143,52 @@ export default function LoginPage() {
   const handleChange =
     (field: keyof LoginFormState) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value =
-        field === "rememberMe" ? event.target.checked : event.target.value;
-      setForm((prev) => ({ ...prev, [field]: value }));
+      if (field === "rememberMe") {
+        setForm((prev) => ({ ...prev, rememberMe: event.target.checked }));
+        setErrors((prev) => ({ ...prev, form: undefined }));
+        return;
+      }
+
+      const rawValue = event.target.value;
+      const contactValue =
+        field === "email" ? rawValue.replace(/\s+/g, "") : rawValue;
+
+      if (field === "email" && contactValue.length > EMAIL_MAX_LENGTH) {
+        setForm((prev) => ({
+          ...prev,
+          email: contactValue.slice(0, EMAIL_MAX_LENGTH),
+        }));
+        setErrors((prev) => ({
+          ...prev,
+          email: EMAIL_MAX_ERROR,
+          form: undefined,
+        }));
+        return;
+      }
+
+      if (field === "password" && rawValue.length > PASSWORD_MAX_LENGTH) {
+        setForm((prev) => ({
+          ...prev,
+          password: rawValue.slice(0, PASSWORD_MAX_LENGTH),
+        }));
+        setErrors((prev) => ({
+          ...prev,
+          password: PASSWORD_MAX_ERROR,
+          form: undefined,
+        }));
+        return;
+      }
+
+      setForm((prev) => ({
+        ...prev,
+        [field]: field === "email" ? contactValue : rawValue,
+      }));
       setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
     };
+
+  const handleContactBlur = () => {
+    setForm((prev) => ({ ...prev, email: prev.email.trim() }));
+  };
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -218,6 +270,8 @@ export default function LoginPage() {
                         placeholder="Email or Mobile number"
                         value={form.email}
                         onChange={handleChange("email")}
+                        onBlur={handleContactBlur}
+                        maxLength={EMAIL_MAX_LENGTH}
                         className="bg-transparent outline-none w-full min-w-0 placeholder-white text-sm tracking-tight login-email-input"
                         aria-invalid={!!errors.email}
                         aria-describedby={
@@ -243,6 +297,7 @@ export default function LoginPage() {
                         placeholder="Password"
                         value={form.password}
                         onChange={handleChange("password")}
+                        maxLength={PASSWORD_MAX_LENGTH}
                         className="bg-transparent outline-none w-full min-w-0 placeholder-white text-sm pr-9"
                         aria-invalid={!!errors.password}
                         aria-describedby={

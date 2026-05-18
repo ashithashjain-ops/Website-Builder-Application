@@ -1728,7 +1728,8 @@ body.auth-visible {
     padding: 0 !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
-    touch-action: manipulation;
+    /* Allow pinch-zoom on mobile (manipulation / pan-y alone can block it on some WebKit). */
+    touch-action: pan-x pan-y pinch-zoom;
     background: #3f66c9 !important;
     background-color: #3f66c9 !important;
   }
@@ -1753,7 +1754,7 @@ body.auth-visible {
     flex-direction: column !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
-    touch-action: manipulation;
+    touch-action: pan-x pan-y pinch-zoom;
     background: var(--auth-surface-gradient) !important;
     background-color: #3f66c9 !important;
   }
@@ -1831,7 +1832,7 @@ body.auth-visible {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
-    touch-action: pan-y;
+    touch-action: pan-y pinch-zoom;
     position: relative;
     z-index: 10;
     /* Scroll works; hide the visible scrollbar line (iOS Safari, Chrome, Firefox) */
@@ -2156,9 +2157,20 @@ body.auth-visible {
   image-rendering: crisp-edges;
 }
 
-/* Forgot password form - placeholder light grey to match design */
+/* Forgot password form - high-contrast placeholder on dark gradient (WCAG AA) */
 .forgot-input::placeholder {
-  color: #cccccc;
+  color: rgba(255, 255, 255, 0.85);
+  opacity: 1;
+}
+.forgot-input::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.85);
+}
+.forgot-input::-moz-placeholder {
+  color: rgba(255, 255, 255, 0.85);
+  opacity: 1;
+}
+.forgot-input:-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* Reset flow pages (OTP, verified, passwords): mobile full-bleed, no white bands */
@@ -2167,7 +2179,7 @@ body.auth-visible {
   .forgot-password-page {
     min-height: 100dvh;
     min-height: 100svh;
-    background: linear-gradient(180deg, #234e70 0%, #282738 100%) !important;
+    background: linear-gradient(180deg, #4A76F3 0%, #2C4FAD 50%, #0A193F 100%) !important;
   }
 
   .reset-flow-page .auth-layout,

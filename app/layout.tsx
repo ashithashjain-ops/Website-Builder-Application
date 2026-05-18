@@ -19,11 +19,12 @@ export const metadata: Metadata = {
   description: "Build responsive websites with Stackly templates and no-code tools.",
 };
 
-/** Edge-to-edge on notched devices; users can still zoom (accessibility). */
+/** Edge-to-edge on notched devices; pinch and accessibility zoom allowed (WCAG). */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  userScalable: true,
   viewportFit: "cover",
 };
 

@@ -12,13 +12,19 @@ exports.register = async (req, res) => {
     console.log("BODY RECEIVED:", req.body);
  
     const name = req.body.name?.trim();
-    const email = req.body.email?.trim().toLowerCase();
+    const email = (req.body.email ?? "").trim().toLowerCase();
     const mobile = req.body.mobile?.trim();
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
  
-    // Empty Field Verification
-    if (!name || !email || !mobile || !password || !confirmPassword) {
+    // Required fields — return specific message for empty email before format checks.
+    if (!name) {
+      return res.status(400).json({ message: "Name is required" });
+    }
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+    if (!mobile || !password || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
  

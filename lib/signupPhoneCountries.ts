@@ -51,6 +51,24 @@ export const SIGNUP_PHONE_COUNTRIES: SignupPhoneCountry[] = [...RAW_SIGNUP_PHONE
   (a, b) => a.name.localeCompare(b.name)
 );
 
+/**
+ * Upper bound for mobile numbers entered as international format on shared
+ * inputs (e.g. Forgot Password) that do not have a country selector.
+ * Computed as the longest national number plus the longest country dial code
+ * plus 1 character for the optional leading "+".
+ */
+export const MAX_MOBILE_INPUT_LENGTH: number = (() => {
+  const maxDial = SIGNUP_PHONE_COUNTRIES.reduce(
+    (acc, c) => Math.max(acc, c.dialCode.length),
+    0
+  );
+  const maxNational = SIGNUP_PHONE_COUNTRIES.reduce(
+    (acc, c) => Math.max(acc, c.maxDigits),
+    0
+  );
+  return 1 + maxDial + maxNational;
+})();
+
 export function getSignupPhoneCountry(id: string): SignupPhoneCountry | undefined {
   return SIGNUP_PHONE_COUNTRIES.find((c) => c.id === id);
 }

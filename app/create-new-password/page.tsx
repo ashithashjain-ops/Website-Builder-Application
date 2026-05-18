@@ -4,12 +4,22 @@ import { Suspense, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isApiConnectionError, resetPassword } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
+import {
+  PASSWORD_WHITESPACE_ERROR,
+  passwordContainsWhitespace,
+} from "@/lib/resetFlowValidation";
 import ResetFlowBackButton from "@/components/ResetFlowBackButton";
 
 const resetFlowCardStyle = {
-  background: "linear-gradient(180deg, #234E70 0%, #282738 100%)",
+  background:
+    "linear-gradient(180deg, #4A76F3 0%, #2C4FAD 50%, #0A193F 100%)",
   boxShadow: "4px 4px 4px 0 rgba(0,0,0,0.25)",
 } as const;
+
+const PASSWORD_MIN_LENGTH = 8;
+const PASSWORD_MAX_LENGTH = 60;
+const PASSWORD_LENGTH_ERROR = "Password must be 8-60 characters.";
+const PASSWORD_MAX_ERROR = "Password cannot exceed 60 characters.";
 
 function CreateNewPasswordContent() {
   const router = useRouter();
@@ -24,16 +34,44 @@ function CreateNewPasswordContent() {
   const requirementText =
     "Password must be 8-60 characters and include uppercase, lowercase, number, and symbol.";
 
+  const applyPasswordInput = (
+    raw: string,
+    setter: (value: string) => void
+  ): void => {
+    if (passwordContainsWhitespace(raw)) {
+      setError(PASSWORD_WHITESPACE_ERROR);
+      return;
+    }
+    if (raw.length > PASSWORD_MAX_LENGTH) {
+      setter(raw.slice(0, PASSWORD_MAX_LENGTH));
+      setError(PASSWORD_MAX_ERROR);
+      return;
+    }
+    setter(raw);
+    setError("");
+  };
+
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setMessage("");
+    if (
+      passwordContainsWhitespace(newPassword) ||
+      passwordContainsWhitespace(confirmPassword)
+    ) {
+      setError(PASSWORD_WHITESPACE_ERROR);
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
-    if (newPassword.length < 8 || newPassword.length > 60) {
-      setError("Password must be 8-60 characters.");
+    if (
+      newPassword.length < PASSWORD_MIN_LENGTH ||
+      newPassword.length > PASSWORD_MAX_LENGTH ||
+      confirmPassword.length > PASSWORD_MAX_LENGTH
+    ) {
+      setError(PASSWORD_LENGTH_ERROR);
       return;
     }
     const hasUpper = /[A-Z]/.test(newPassword);
@@ -109,10 +147,11 @@ function CreateNewPasswordContent() {
                     id="new-password"
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
-                    onChange={(e) => {
-                      setNewPassword(e.target.value);
-                      setError("");
-                    }}
+                    minLength={PASSWORD_MIN_LENGTH}
+                    maxLength={PASSWORD_MAX_LENGTH}
+                    onChange={(e) => applyPasswordInput(e.target.value, setNewPassword)}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "create-password-error" : undefined}
                     className="w-full h-12 pl-4 pr-12 rounded border text-[14px] outline-none focus:border-white/80 transition bg-transparent"
                     style={{
                       border: "1px solid rgba(255,255,255,0.5)",
@@ -147,10 +186,13 @@ function CreateNewPasswordContent() {
                     id="confirm-password"
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={(e) => {
-                      setConfirmPassword(e.target.value);
-                      setError("");
-                    }}
+                    minLength={PASSWORD_MIN_LENGTH}
+                    maxLength={PASSWORD_MAX_LENGTH}
+                    onChange={(e) =>
+                      applyPasswordInput(e.target.value, setConfirmPassword)
+                    }
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "create-password-error" : undefined}
                     className="w-full h-12 pl-4 pr-12 rounded border text-[14px] outline-none focus:border-white/80 transition bg-transparent"
                     style={{
                       border: "1px solid rgba(255,255,255,0.5)",
@@ -179,7 +221,12 @@ function CreateNewPasswordContent() {
                 {requirementText}
               </p>
               {error && (
-                <p className="text-[12px]" style={{ color: "#ff6b6b" }}>
+                <p
+                  id="create-password-error"
+                  className="text-[12px]"
+                  style={{ color: "#ff6b6b" }}
+                  role="alert"
+                >
                   {error}
                 </p>
               )}
