@@ -276,7 +276,7 @@ export default function LoginPage() {
                 <form onSubmit={handleLogin} noValidate>
                   <div className="space-y-6 sm:space-y-4 lg:space-y-6 flex-shrink-0">
                   <div className="flex flex-col">
-                    <div className="flex items-center border-b border-white/60 pb-2 min-w-0">
+                    <div className="login-contact-row flex items-center border-b border-white/60 pb-2 min-w-0">
                       <FaAddressBook className="login-email-icon mr-2 sm:mr-4 text-sm opacity-80 flex-shrink-0" />
                       <input
                         type="text"
@@ -373,7 +373,7 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <div className="login-remember-forgot mt-5 sm:mt-4 text-xs opacity-90 w-full min-w-0">
+                <div className="login-remember-forgot mt-5 sm:mt-4 text-xs opacity-90 w-full">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"

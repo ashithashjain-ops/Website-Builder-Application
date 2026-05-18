@@ -116,37 +116,40 @@ input[type="password"]::-ms-reveal {
 }
  
 /*
- * Login: Remember me (left) + Forgot password (right) — full-width row under password field.
- * Grid keeps alignment at 100%–200% zoom; flex+column was stacking and looked misaligned.
+ * Login: Remember me (left) + Forgot password (right).
+ * Same line while both fit; wrap only when they would overlap (see globals.css).
  */
 .login-page .login-remember-forgot {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  column-gap: clamp(0.5rem, 2.5vw, 0.875rem);
-  row-gap: 0.5rem;
+  justify-content: flex-start;
+  column-gap: clamp(0.35rem, 2vw, 0.75rem);
+  row-gap: 0.35rem;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
 }
- 
+
 .login-page .login-remember-forgot > label {
-  justify-self: start;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  min-width: 0;
+  flex: 0 0 auto;
+  min-width: max-content;
+  white-space: nowrap;
 }
- 
+
 .login-page .login-remember-forgot .forgot-password-link {
-  justify-self: end;
+  flex: 0 0 auto;
+  margin-left: auto;
   text-align: right;
-  min-width: 0;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
   line-height: 1.35;
-  font-size: clamp(10px, 3.4vw, 13px);
+  font-size: clamp(10px, 3.2vw, 13px);
+  max-width: 100%;
 }
  
 /* Error text - sufficient contrast on dark blue background */

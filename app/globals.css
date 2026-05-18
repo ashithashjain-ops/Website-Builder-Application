@@ -1401,26 +1401,32 @@ body.auth-visible {
 
 /*
  * Login: Remember me (left) + Forgot password (right).
- * Flex + wrap avoids a crushed second column at 150–200% zoom (no mid-word breaks).
+ * Same line while both fit; flex-wrap moves the link to the next line only when they would overlap.
  */
 .login-page .login-remember-forgot {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  column-gap: clamp(0.5rem, 2.5vw, 0.875rem);
-  row-gap: 0.5rem;
+  justify-content: flex-start;
+  column-gap: clamp(0.35rem, 2vw, 0.75rem);
+  row-gap: 0.35rem;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  overflow: visible;
 }
 
 .login-page .login-remember-forgot > label {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 0 1 auto;
-  min-width: 0;
+  flex: 0 0 auto;
+  min-width: max-content;
+  white-space: nowrap;
+}
+
+.login-page .login-remember-forgot > label span {
+  white-space: nowrap;
 }
 
 .login-page .login-remember-forgot .forgot-password-link {
@@ -1428,18 +1434,17 @@ body.auth-visible {
   margin-left: auto;
   text-align: right;
   white-space: nowrap;
-  word-break: normal;
+  word-break: keep-all;
   overflow-wrap: normal;
   line-height: 1.35;
-  font-size: clamp(10px, 3.4vw, 13px);
+  font-size: clamp(10px, 3.2vw, 13px);
   max-width: 100%;
 }
 
-/* Mobile / high zoom: Forgot password on its own row, right-aligned, one line */
+/* When wrapped to a second row, keep Forgot Password right-aligned */
 @media (max-width: 1023px) {
   .login-page .login-remember-forgot .forgot-password-link {
-    flex: 1 1 100%;
-    margin-left: 0;
+    margin-left: auto;
     text-align: right;
     white-space: nowrap;
   }
@@ -1590,6 +1595,50 @@ body.auth-visible {
   }
 }
 
+/*
+ * Login contact row: at mobile / 150–200% zoom, wrap so "Email or Mobile number" is never clipped.
+ */
+@media (max-width: 1023px) {
+  .login-card-inner .login-contact-row {
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
+    align-items: center;
+  }
+
+  .login-card-inner .login-contact-row .login-email-input {
+    flex: 1 1 13rem;
+    min-width: min(100%, 13rem);
+    max-width: 100%;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+
+/*
+ * Signup phone row: at mobile / 150–200% zoom, wrap so "Mobile number" placeholder is never clipped.
+ */
+@media (max-width: 1023px) {
+  .signup-card-content .signup-phone-row {
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
+    align-items: center;
+  }
+
+  .signup-card-content .signup-phone-row .signup-country-select {
+    flex: 0 1 auto;
+    max-width: min(100px, 50vw);
+    margin-right: 0.35rem;
+  }
+
+  .signup-card-content .signup-phone-row .signup-mobile-input {
+    flex: 1 1 8.5rem;
+    min-width: min(100%, 8.5rem);
+    max-width: 100%;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+
 /* Narrow/zoomed mobile: give inputs more width so placeholder/value never clips */
 @media (max-width: 420px) {
   .auth-inner-panel {
@@ -1606,12 +1655,33 @@ body.auth-visible {
     font-size: 12px;
   }
   .login-email-input::placeholder {
-    font-size: clamp(8px, 2.4vw, 12px);
-    letter-spacing: -0.03em;
+    font-size: clamp(7px, 2.3vw, 12px);
+    letter-spacing: -0.04em;
+  }
+  .login-card-inner .login-contact-row .login-email-input {
+    flex: 1 1 100%;
+    min-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    letter-spacing: normal;
   }
   .signup-confirm-input::placeholder {
     font-size: clamp(8px, 2.4vw, 12px);
     letter-spacing: -0.03em;
+  }
+  .signup-mobile-input::placeholder {
+    font-size: clamp(8px, 2.4vw, 12px);
+    letter-spacing: -0.03em;
+  }
+  .signup-card-content .signup-phone-row .signup-country-select {
+    max-width: min(92px, 48vw) !important;
+  }
+  .signup-card-content .signup-phone-row .signup-mobile-input {
+    flex: 1 1 100%;
+    min-width: 100%;
+    width: 100%;
+    padding-left: 0;
+    box-sizing: border-box;
   }
   .font-welcome-heading {
     /* Zoom-safe: avoid horizontal overflow / clipping */
@@ -1642,6 +1712,10 @@ body.auth-visible {
     font-size: clamp(6px, 2.5vw, 11px);
     letter-spacing: -0.06em;
   }
+  .signup-mobile-input::placeholder {
+    font-size: clamp(6px, 2.5vw, 11px);
+    letter-spacing: -0.05em;
+  }
   .login-email-icon {
     margin-right: 0.35rem !important;
     font-size: 0.85rem;
@@ -1664,9 +1738,27 @@ body.auth-visible {
     font-size: 16px !important; /* iOS: avoid focus zoom; placeholder scaled via ::placeholder */
     min-width: 0;
   }
+  .login-card-inner .login-contact-row .login-email-input {
+    flex: 1 1 100%;
+    min-width: 100%;
+    width: 100%;
+    letter-spacing: normal;
+  }
 
   .signup-confirm-input {
     min-width: 0;
+  }
+  .signup-mobile-input {
+    min-width: 0;
+    font-size: 16px !important;
+  }
+  .signup-card-content .signup-phone-row .signup-country-select {
+    max-width: min(84px, 44vw) !important;
+  }
+  .signup-card-content .signup-phone-row .signup-mobile-input {
+    flex: 1 1 100%;
+    min-width: 100%;
+    width: 100%;
   }
   .font-welcome-heading {
     font-size: clamp(0.95rem, 4.5vw, 1.15rem);

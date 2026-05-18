@@ -491,8 +491,8 @@ export default function SignupPage() {
                   </div>
 
                   <div className="flex flex-col">
-                    <div className="flex items-center border-b border-white/80 pb-2 min-w-0">
-                      <FaPhone className="mr-3 shrink-0 text-sm text-white/90" />
+                    <div className="signup-phone-row flex items-center border-b border-white/80 pb-2 min-w-0">
+                      <FaPhone className="signup-phone-icon mr-3 shrink-0 text-sm text-white/90" />
                       <div className="signup-country-select relative z-20 mr-2 min-h-5 shrink-0 max-w-[108px] sm:max-w-[200px] min-w-0 self-center" ref={countryDropdownRef}>
                         <button
                           type="button"
@@ -562,7 +562,7 @@ export default function SignupPage() {
                         placeholder="Mobile number"
                         value={form.mobileNumber}
                         onChange={handleChange("mobileNumber")}
-                        className="min-h-5 flex-1 min-w-0 self-center border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none placeholder-white/90"
+                        className="signup-mobile-input min-h-5 flex-1 min-w-0 self-center border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none placeholder-white/90"
                         aria-invalid={!!errors.mobileNumber}
                         aria-describedby={errors.mobileNumber ? "mobile-error" : undefined}
                       />
