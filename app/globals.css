@@ -1346,6 +1346,43 @@ body.auth-visible {
   background-color: #3f66c9 !important;
 }
 
+/*
+ * Desktop login/signup: allow document scroll at 100–200% browser zoom.
+ * Mobile keeps overflow:hidden above; touch layout uses max-width 1023px rules.
+ */
+@media (min-width: 1024px) {
+  html.auth-visible,
+  body.auth-visible {
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: auto !important;
+  }
+
+  .login-page.auth-page,
+  .auth-page:has(.signup-card) {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    min-height: 100dvh;
+    height: auto;
+    max-height: none;
+  }
+
+  .login-page.auth-page .auth-form-card,
+  .auth-page:has(.signup-card) .auth-form-card {
+    overflow: visible !important;
+    height: auto;
+    max-height: none;
+  }
+
+  .auth-form-card .auth-card-content,
+  .auth-form-card .login-card-inner,
+  .auth-form-card .signup-card-content {
+    overflow: visible !important;
+  }
+}
+
 .auth-page {
   -webkit-overflow-scrolling: touch;
 }
@@ -1484,10 +1521,19 @@ body.auth-visible {
   text-underline-offset: 3px;
 }
 
-/* Auth layout - responsive spacing (desktop can scroll inside card if needed) */
+/* Auth layout - inner scroll only below desktop breakpoint */
 .auth-card-content {
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+@media (min-width: 1024px) {
+  .auth-card-content,
+  .auth-form-card .login-card-inner {
+    overflow: visible;
+    overflow-y: visible;
+    overflow-x: hidden;
+  }
 }
 
 /* Mobile: keep layout natural (no clipping); outer page scroll handles overflow */
@@ -1677,12 +1723,24 @@ body.auth-visible {
 
   .signup-card-content .signup-phone-row .signup-country-select {
     width: fit-content;
-    max-width: min(200px, 48vw) !important;
+    max-width: min(7.25rem, 38vw) !important;
     flex: 0 0 auto;
   }
 
-  .signup-card-content .signup-phone-row .signup-country-select button {
+  .signup-card-content .signup-phone-row .signup-country-select .signup-country-trigger {
     width: auto;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    letter-spacing: normal;
+    min-height: 1.25rem;
+    padding: 0 0.25rem !important;
+    gap: 0.125rem !important;
+    border-radius: 0.25rem;
+  }
+
+  .signup-card-content .signup-phone-row .signup-country-select .signup-country-trigger svg {
+    width: 0.625rem;
+    height: 0.625rem;
   }
 
   .signup-card-content .signup-phone-row .signup-mobile-input {
@@ -1717,7 +1775,7 @@ body.auth-visible {
   html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-country-select,
   .signup-card-content .signup-phone-fields.signup-phone-fields--stacked .signup-country-select {
     align-self: flex-start;
-    max-width: min(200px, 100%) !important;
+    max-width: min(7.25rem, 100%) !important;
   }
 
   html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-mobile-input,
@@ -1749,7 +1807,7 @@ body.auth-visible {
 
     html.auth-android .signup-card-content .signup-phone-fields .signup-country-select {
       align-self: flex-start;
-      max-width: min(200px, 100%) !important;
+      max-width: min(7.25rem, 100%) !important;
     }
 
     html.auth-android .signup-card-content .signup-phone-fields .signup-mobile-input {
@@ -2224,20 +2282,20 @@ body.auth-visible {
   }
 }
 
-/* Desktop: consistent login/signup card size, no page scroll */
+/* Desktop: consistent login/signup card size; page scroll when zoom clips content */
 @media (min-width: 1024px) {
   .auth-form-card {
     min-height: 580px;
-    max-height: min(680px, 82vh);
-    height: min(680px, 82vh);
+    height: auto;
+    max-height: none;
     display: flex;
     flex-direction: column;
   }
   .auth-form-card .auth-card-content,
   .auth-form-card .signup-card-content {
-    flex: 1;
+    flex: 1 1 auto;
     min-height: 0;
-  overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -2246,22 +2304,6 @@ body.auth-visible {
   .signup-card-content .auth-error-text {
     margin-top: 0.125rem;
     line-height: 1.15;
-  }
-}
-
-/* Desktop zoom safety: prevent overlap/clipping at 150-200% while preserving default desktop layout. */
-@media (min-width: 1024px) and (min-resolution: 1.25dppx) {
-  .auth-page {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-  .auth-form-card {
-    height: auto;
-    max-height: none;
-  }
-  .auth-form-card .auth-card-content,
-  .auth-form-card .signup-card-content {
-    overflow: visible;
   }
 }
 

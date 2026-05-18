@@ -425,7 +425,7 @@ export default function SignupPage() {
         {/* Card first on mobile (top), right on desktop */}
         <div className="flex w-full flex-1 flex-col items-stretch max-lg:justify-stretch justify-center max-lg:h-full order-1 lg:order-2 lg:w-1/2 lg:flex-none">
           <div
-            className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-hidden max-lg:overflow-auto self-center max-lg:self-stretch bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] px-6 sm:px-10 max-lg:max-w-none max-lg:w-full max-lg:h-full max-lg:flex-1 lg:flex-none lg:rounded-[10px] signup-card auth-form-card"
+            className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-hidden max-lg:overflow-auto lg:overflow-visible self-center max-lg:self-stretch bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] px-6 sm:px-10 max-lg:max-w-none max-lg:w-full max-lg:h-full max-lg:flex-1 lg:flex-none lg:rounded-[10px] signup-card auth-form-card"
           >
             <div className="auth-inner-panel pointer-events-none absolute inset-y-0 left-1/2 w-[78%] -translate-x-1/2 bg-gradient-to-b from-white/10 via-black/10 to-black/35" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_20px_0_45px_rgba(0,0,0,0.55),inset_-20px_0_45px_rgba(0,0,0,0.55)]" />
@@ -497,7 +497,7 @@ export default function SignupPage() {
                     <div className="signup-phone-row flex items-center border-b border-white/80 pb-2 min-w-0">
                       <FaPhone className="signup-phone-icon mr-3 shrink-0 text-sm text-white/90" />
                       <div className="signup-phone-fields flex min-w-0 flex-1 items-center gap-2">
-                      <div className="signup-country-select relative z-20 w-fit max-w-[200px] shrink-0 min-w-0" ref={countryDropdownRef}>
+                      <div className="signup-country-select relative z-20 w-fit max-lg:max-w-[7.25rem] max-w-[200px] shrink-0 min-w-0" ref={countryDropdownRef}>
                         <button
                           type="button"
                           id="country-select-trigger"
@@ -505,7 +505,7 @@ export default function SignupPage() {
                           aria-haspopup="listbox"
                           aria-expanded={countryDropdownOpen}
                           onClick={() => setCountryDropdownOpen((o) => !o)}
-                          className="flex w-auto max-w-full min-w-0 items-center justify-between gap-1 rounded-md border border-white/80 bg-transparent px-2 py-0 text-left text-sm leading-5 text-white outline-none hover:border-white"
+                          className="signup-country-trigger flex w-auto max-w-full min-w-0 items-center justify-between gap-1 rounded border border-white/80 bg-transparent px-2 py-0 text-left text-sm leading-5 text-white outline-none hover:border-white max-lg:gap-0.5 max-lg:rounded-sm max-lg:px-1"
                         >
                           <span className="min-w-0 truncate">
                             <span className="sm:hidden">
@@ -519,7 +519,11 @@ export default function SignupPage() {
                             className={`shrink-0 text-white/90 transition-transform ${countryDropdownOpen ? "rotate-180" : ""}`}
                             aria-hidden
                           >
-                            <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <svg
+                              className="h-3 w-3 max-lg:h-2.5 max-lg:w-2.5"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
                               <path
                                 fillRule="evenodd"
                                 d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
