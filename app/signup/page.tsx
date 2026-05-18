@@ -12,6 +12,11 @@ import {
   passwordContainsWhitespace,
 } from "@/lib/resetFlowValidation";
 import {
+  getAuthPullScrollRoot,
+  isAuthPageZoomed,
+  mountAuthAndroidClass,
+} from "@/lib/authMobileTouch";
+import {
   DEFAULT_SIGNUP_PHONE_COUNTRY_ID,
   SIGNUP_PHONE_COUNTRIES,
   getDefaultSignupPhoneCountry,
@@ -128,15 +133,17 @@ export default function SignupPage() {
   useEffect(() => {
     document.documentElement.classList.add("auth-visible");
     document.body.classList.add("auth-visible");
+    const unmountAndroid = mountAuthAndroidClass();
     return () => {
       document.documentElement.classList.remove("auth-visible");
       document.body.classList.remove("auth-visible");
+      unmountAndroid();
     };
   }, []);
 
   useEffect(() => {
-    const page = document.querySelector(".auth-page") as HTMLElement | null;
-    if (!page) return;
+    const scrollEl = getAuthPullScrollRoot(false);
+    if (!scrollEl) return;
 
     let startY = 0;
     let canPull = false;
@@ -144,16 +151,24 @@ export default function SignupPage() {
     const threshold = 88;
 
     const onTouchStart = (event: TouchEvent) => {
-      if (window.innerWidth >= 1024 || event.touches.length !== 1) return;
+      if (window.innerWidth >= 1024 || event.touches.length !== 1 || isAuthPageZoomed()) return;
       startY = event.touches[0].clientY;
-      canPull = page.scrollTop <= 0;
+      canPull = scrollEl.scrollTop <= 0;
       triggered = false;
     };
 
     const onTouchMove = (event: TouchEvent) => {
-      if (!canPull || triggered || window.innerWidth >= 1024) return;
+      if (
+        !canPull ||
+        triggered ||
+        window.innerWidth >= 1024 ||
+        isAuthPageZoomed() ||
+        event.touches.length !== 1
+      ) {
+        return;
+      }
       const deltaY = event.touches[0].clientY - startY;
-      if (deltaY > threshold && page.scrollTop <= 0) {
+      if (deltaY > threshold && scrollEl.scrollTop <= 0) {
         triggered = true;
         window.location.reload();
       } else if (deltaY < 0) {
@@ -166,16 +181,16 @@ export default function SignupPage() {
       triggered = false;
     };
 
-    page.addEventListener("touchstart", onTouchStart, { passive: true });
-    page.addEventListener("touchmove", onTouchMove, { passive: true });
-    page.addEventListener("touchend", onTouchEnd);
-    page.addEventListener("touchcancel", onTouchEnd);
+    scrollEl.addEventListener("touchstart", onTouchStart, { passive: true });
+    scrollEl.addEventListener("touchmove", onTouchMove, { passive: true });
+    scrollEl.addEventListener("touchend", onTouchEnd);
+    scrollEl.addEventListener("touchcancel", onTouchEnd);
 
     return () => {
-      page.removeEventListener("touchstart", onTouchStart);
-      page.removeEventListener("touchmove", onTouchMove);
-      page.removeEventListener("touchend", onTouchEnd);
-      page.removeEventListener("touchcancel", onTouchEnd);
+      scrollEl.removeEventListener("touchstart", onTouchStart);
+      scrollEl.removeEventListener("touchmove", onTouchMove);
+      scrollEl.removeEventListener("touchend", onTouchEnd);
+      scrollEl.removeEventListener("touchcancel", onTouchEnd);
     };
   }, []);
 
@@ -476,8 +491,8 @@ export default function SignupPage() {
                   </div>
 
                   <div className="flex flex-col">
-                    <div className="signup-phone-row flex items-center border-b border-white/80 pb-2 min-w-0">
-                      <FaPhone className="signup-phone-icon mr-3 shrink-0 text-sm text-white/90" />
+                    <div className="flex items-center border-b border-white/80 pb-2 min-w-0">
+                      <FaPhone className="mr-3 shrink-0 text-sm text-white/90" />
                       <div className="signup-country-select relative z-20 mr-2 min-h-5 shrink-0 max-w-[108px] sm:max-w-[200px] min-w-0 self-center" ref={countryDropdownRef}>
                         <button
                           type="button"
@@ -537,25 +552,20 @@ export default function SignupPage() {
                           </ul>
                         )}
                       </div>
-                      <div className="auth-input-placeholder-wrap signup-mobile-input-wrap relative min-h-5 min-w-0 flex-1 self-center">
-                        <span className="auth-floating-placeholder" aria-hidden="true">
-                          Mobile number
-                        </span>
-                        <input
-                          type="tel"
-                          inputMode="numeric"
-                          maxLength={
-                            (getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry())
-                              .maxDigits
-                          }
-                          placeholder="Mobile number"
-                          value={form.mobileNumber}
-                          onChange={handleChange("mobileNumber")}
-                          className="signup-mobile-input min-h-5 w-full border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none placeholder-white/90"
-                          aria-invalid={!!errors.mobileNumber}
-                          aria-describedby={errors.mobileNumber ? "mobile-error" : undefined}
-                        />
-                      </div>
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        maxLength={
+                          (getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry())
+                            .maxDigits
+                        }
+                        placeholder="Mobile number"
+                        value={form.mobileNumber}
+                        onChange={handleChange("mobileNumber")}
+                        className="min-h-5 flex-1 min-w-0 self-center border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none placeholder-white/90"
+                        aria-invalid={!!errors.mobileNumber}
+                        aria-describedby={errors.mobileNumber ? "mobile-error" : undefined}
+                      />
                     </div>
                     {errors.mobileNumber && (
                       <p id="mobile-error" className="auth-error-text mt-0.5 text-[11px] sm:text-xs lg:text-[11px]">

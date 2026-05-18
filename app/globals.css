@@ -1453,85 +1453,6 @@ body.auth-visible {
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
-/*
- * Mobile/tablet only: wrap-friendly placeholder overlay (native input placeholders are single-line).
- * Desktop keeps the normal ::placeholder from markup.
- */
-@media (max-width: 1023px) {
-  .auth-input-placeholder-wrap .auth-floating-placeholder {
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    z-index: 0;
-    pointer-events: none;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: clamp(10px, 2.8vw, 14px);
-    line-height: 1.35;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    padding-right: 0.25rem;
-  }
-
-  .auth-input-placeholder-wrap {
-    min-height: 1.25rem;
-  }
-
-  .auth-input-placeholder-wrap:has(input:placeholder-shown) {
-    min-height: 2.65em;
-  }
-
-  .auth-input-placeholder-wrap input {
-    position: relative;
-    z-index: 1;
-    background: transparent;
-  }
-
-  .auth-input-placeholder-wrap input::placeholder {
-    color: transparent !important;
-    opacity: 0 !important;
-  }
-
-  .auth-input-placeholder-wrap:focus-within .auth-floating-placeholder,
-  .auth-input-placeholder-wrap:has(input:not(:placeholder-shown)) .auth-floating-placeholder {
-    display: none;
-  }
-
-  /* Signup phone: allow wrap when country + field cannot share one row (150–200% zoom). */
-  .signup-phone-row {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    row-gap: 0.35rem;
-  }
-
-  .signup-phone-row .signup-country-select {
-    flex: 0 1 auto;
-    max-width: calc(100% - 2rem);
-  }
-
-  .signup-phone-row .signup-mobile-input-wrap {
-    flex: 1 1 6.5rem;
-    min-width: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .signup-phone-row .signup-mobile-input-wrap {
-    flex: 1 1 100%;
-    width: 100%;
-    box-sizing: border-box;
-    padding-left: 1.75rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .auth-input-placeholder-wrap .auth-floating-placeholder {
-    display: none !important;
-  }
-}
-
 /* Forgot Password link - visibility and accessibility (WB_009) */
 .forgot-password-link {
   font-size: 16px;
@@ -1688,10 +1609,6 @@ body.auth-visible {
     font-size: clamp(8px, 2.4vw, 12px);
     letter-spacing: -0.03em;
   }
-  .auth-input-placeholder-wrap .auth-floating-placeholder {
-    font-size: clamp(9px, 2.6vw, 12px);
-    letter-spacing: -0.02em;
-  }
   .signup-confirm-input::placeholder {
     font-size: clamp(8px, 2.4vw, 12px);
     letter-spacing: -0.03em;
@@ -1720,10 +1637,6 @@ body.auth-visible {
   .login-email-input::placeholder {
     font-size: clamp(6px, 2.6vw, 11px);
     letter-spacing: -0.05em;
-  }
-  .auth-input-placeholder-wrap .auth-floating-placeholder {
-    font-size: clamp(8px, 2.5vw, 11px);
-    letter-spacing: -0.03em;
   }
   .signup-confirm-input::placeholder {
     font-size: clamp(6px, 2.5vw, 11px);
@@ -1797,143 +1710,265 @@ body.auth-visible {
 }
 
 /*
- * Mobile login/signup: fixed full-screen surface (gradient + inner panel).
- * overflow:auto + pan-x/pan-y on the chain so pinch-zoom users can pan in all directions (iOS/WebKit).
+ * Mobile login/signup — iOS: fixed full-screen + inner scroll (rubber-band safe).
+ * Android: document-level scroll so pinch-zoom pan works in all directions (Chrome).
  */
 @media (max-width: 1023px) {
-  html.auth-visible,
-  body.auth-visible {
-    position: fixed;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 100dvh !important;
-    min-height: 100svh !important;
-    max-height: 100dvh !important;
-    max-height: 100svh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    /* Allow pan after pinch-zoom (overflow:hidden traps the visual viewport on iOS/WebKit). */
-    overflow: auto !important;
-    overscroll-behavior: none !important;
-    /* Allow pinch-zoom on mobile (manipulation / pan-y alone can block it on some WebKit). */
-    touch-action: pan-x pan-y pinch-zoom;
-    background: #3f66c9 !important;
-    background-color: #3f66c9 !important;
+  @supports (-webkit-touch-callout: none) {
+    html.auth-visible,
+    body.auth-visible {
+      position: fixed;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+      max-height: 100dvh !important;
+      max-height: 100svh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: auto !important;
+      overscroll-behavior: none !important;
+      touch-action: pan-x pan-y pinch-zoom;
+      background: #3f66c9 !important;
+      background-color: #3f66c9 !important;
+    }
+
+    .login-page.auth-page,
+    .auth-page:has(.signup-card) {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 1;
+      width: 100% !important;
+      max-width: 100vw !important;
+      height: 100% !important;
+      height: 100dvh !important;
+      height: 100svh !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+      max-height: 100dvh !important;
+      max-height: 100svh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: auto !important;
+      overscroll-behavior: none !important;
+      touch-action: pan-x pan-y pinch-zoom;
+      background: var(--auth-surface-gradient) !important;
+      background-color: #3f66c9 !important;
+    }
+
+    .login-page.auth-page::before,
+    .auth-page:has(.signup-card)::before {
+      display: none !important;
+    }
+
+    .login-page.auth-page > .auth-layout,
+    .auth-page:has(.signup-card) > .auth-layout {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: stretch !important;
+      align-items: stretch !important;
+    }
+
+    .login-page.auth-page .auth-layout > div:first-child,
+    .auth-page:has(.signup-card) .auth-layout > div:first-child {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      width: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: stretch !important;
+      align-items: stretch !important;
+    }
+
+    .auth-form-card.login-card,
+    .auth-form-card.signup-card {
+      flex: 1 1 auto !important;
+      align-self: stretch !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      overflow: auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      background: var(--auth-surface-gradient) !important;
+      background-image: var(--auth-surface-gradient) !important;
+      background-color: #3f66c9 !important;
+    }
+
+    .auth-form-card.login-card .auth-inner-panel,
+    .auth-form-card.signup-card .auth-inner-panel {
+      top: 0 !important;
+      bottom: 0 !important;
+      height: 100% !important;
+      min-height: 100% !important;
+    }
+
+    .auth-form-card.login-card .login-card-inner,
+    .auth-form-card.login-card .auth-card-content,
+    .auth-form-card.signup-card .signup-card-content {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      min-width: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-start !important;
+      overflow: auto !important;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-x pan-y pinch-zoom;
+      position: relative;
+      z-index: 10;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .auth-form-card.login-card .login-card-inner::-webkit-scrollbar,
+    .auth-form-card.login-card .auth-card-content::-webkit-scrollbar,
+    .auth-form-card.signup-card .signup-card-content::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+      background: transparent;
+    }
   }
 
-  .login-page.auth-page,
-  .auth-page:has(.signup-card) {
-    position: fixed !important;
-    inset: 0 !important;
-    z-index: 1;
-    width: 100% !important;
-    max-width: 100vw !important;
-    height: 100% !important;
-    height: 100dvh !important;
-    height: 100svh !important;
-    min-height: 100dvh !important;
-    min-height: 100svh !important;
-    max-height: 100dvh !important;
-    max-height: 100svh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: auto !important;
-    overscroll-behavior: none !important;
-    touch-action: pan-x pan-y pinch-zoom;
-    background: var(--auth-surface-gradient) !important;
-    background-color: #3f66c9 !important;
-  }
+  /* Android Chrome: fixed + nested scroll traps the visual viewport after pinch-zoom */
+  @supports not (-webkit-touch-callout: none) {
+    html.auth-visible,
+    html.auth-android,
+    body.auth-visible,
+    body.auth-android {
+      position: relative !important;
+      inset: auto !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+      max-height: none !important;
+      overflow: auto !important;
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+      overscroll-behavior: auto !important;
+      touch-action: auto;
+      -webkit-overflow-scrolling: touch;
+      background: var(--auth-surface-gradient) !important;
+      background-color: #3f66c9 !important;
+    }
 
-  .login-page.auth-page::before,
-  .auth-page:has(.signup-card)::before {
-    display: none !important;
-  }
+    .login-page.auth-page,
+    .auth-page:has(.signup-card) {
+      position: relative !important;
+      inset: auto !important;
+      z-index: 1;
+      width: 100% !important;
+      max-width: none !important;
+      height: auto !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: block !important;
+      overflow: visible !important;
+      touch-action: auto;
+      background: var(--auth-surface-gradient) !important;
+      background-color: #3f66c9 !important;
+    }
 
-  .login-page.auth-page > .auth-layout,
-  .auth-page:has(.signup-card) > .auth-layout {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    height: 100% !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    gap: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: stretch !important;
-    align-items: stretch !important;
-  }
+    .login-page.auth-page::before,
+    .auth-page:has(.signup-card)::before {
+      display: none !important;
+    }
 
-  .login-page.auth-page .auth-layout > div:first-child,
-  .auth-page:has(.signup-card) .auth-layout > div:first-child {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    height: 100% !important;
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: stretch !important;
-    align-items: stretch !important;
-  }
+    .login-page.auth-page > .auth-layout,
+    .auth-page:has(.signup-card) > .auth-layout {
+      height: auto !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
 
-  .auth-form-card.login-card,
-  .auth-form-card.signup-card {
-    flex: 1 1 auto !important;
-    align-self: stretch !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 0 !important;
-    height: 100% !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    overflow: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    background: var(--auth-surface-gradient) !important;
-    background-image: var(--auth-surface-gradient) !important;
-    background-color: #3f66c9 !important;
-  }
+    .login-page.auth-page .auth-layout > div:first-child,
+    .auth-page:has(.signup-card) .auth-layout > div:first-child {
+      height: auto !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+      width: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
 
-  .auth-form-card.login-card .auth-inner-panel,
-  .auth-form-card.signup-card .auth-inner-panel {
-    top: 0 !important;
-    bottom: 0 !important;
-    height: 100% !important;
-    min-height: 100% !important;
-  }
+    .auth-form-card.login-card,
+    .auth-form-card.signup-card {
+      flex: none !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: 100dvh !important;
+      min-height: 100svh !important;
+      height: auto !important;
+      max-height: none !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      overflow: visible !important;
+      display: flex !important;
+      flex-direction: column !important;
+      background: var(--auth-surface-gradient) !important;
+      background-image: var(--auth-surface-gradient) !important;
+      background-color: #3f66c9 !important;
+    }
 
-  .auth-form-card.login-card .login-card-inner,
-  .auth-form-card.login-card .auth-card-content,
-  .auth-form-card.signup-card .signup-card-content {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    min-width: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    overflow: auto !important;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    touch-action: pan-x pan-y pinch-zoom;
-    position: relative;
-    z-index: 10;
-    /* Scroll works; hide the visible scrollbar line (iOS Safari, Chrome, Firefox) */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
+    .auth-form-card.login-card .auth-inner-panel,
+    .auth-form-card.signup-card .auth-inner-panel {
+      top: 0 !important;
+      bottom: 0 !important;
+      height: 100% !important;
+      min-height: 100% !important;
+    }
 
-  .auth-form-card.login-card .login-card-inner::-webkit-scrollbar,
-  .auth-form-card.login-card .auth-card-content::-webkit-scrollbar,
-  .auth-form-card.signup-card .signup-card-content::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
-    background: transparent;
+    .auth-form-card.login-card .login-card-inner,
+    .auth-form-card.login-card .auth-card-content,
+    .auth-form-card.signup-card .signup-card-content {
+      flex: none !important;
+      min-height: auto !important;
+      min-width: 0 !important;
+      overflow: visible !important;
+      overscroll-behavior: auto !important;
+      touch-action: auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Override Tailwind max-lg:h-full so zoomed content can extend past the viewport */
+    .login-page.auth-page .auth-layout,
+    .login-page.auth-page .auth-layout > *,
+    .auth-page:has(.signup-card) .auth-layout,
+    .auth-page:has(.signup-card) .auth-layout > * {
+      height: auto !important;
+      max-height: none !important;
+    }
   }
 
   .auth-image-col {
@@ -1962,69 +1997,6 @@ body.auth-visible {
 }
 
 /*
- * Android Chrome: fixed full-screen auth shell blocks pan after pinch-zoom.
- * Use document-level scroll (relative positioning) while iOS keeps the fixed shell above.
- */
-@supports not (-webkit-touch-callout: none) {
-  @media (max-width: 1023px) and (hover: none) and (pointer: coarse) {
-    html.auth-visible,
-    body.auth-visible {
-      position: relative !important;
-      inset: auto !important;
-      width: 100% !important;
-      height: auto !important;
-      min-height: 100dvh !important;
-      min-height: 100svh !important;
-      max-height: none !important;
-      overflow-x: auto !important;
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: auto !important;
-      touch-action: pan-x pan-y pinch-zoom;
-    }
-
-    .login-page.auth-page,
-    .auth-page:has(.signup-card) {
-      position: relative !important;
-      inset: auto !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      height: auto !important;
-      min-height: 100dvh !important;
-      min-height: 100svh !important;
-      max-height: none !important;
-      overflow: visible !important;
-      touch-action: pan-x pan-y pinch-zoom;
-    }
-
-    .login-page.auth-page > .auth-layout,
-    .auth-page:has(.signup-card) > .auth-layout,
-    .login-page.auth-page .auth-layout > div:first-child,
-    .auth-page:has(.signup-card) .auth-layout > div:first-child {
-      height: auto !important;
-      min-height: 100dvh !important;
-      min-height: 100svh !important;
-    }
-
-    .auth-form-card.login-card,
-    .auth-form-card.signup-card {
-      height: auto !important;
-      min-height: 100dvh !important;
-      min-height: 100svh !important;
-      overflow: visible !important;
-    }
-
-    .auth-form-card.login-card .login-card-inner,
-    .auth-form-card.login-card .auth-card-content,
-    .auth-form-card.signup-card .signup-card-content {
-      overflow: visible !important;
-      max-height: none !important;
-      touch-action: pan-x pan-y pinch-zoom;
-    }
-  }
-}
-
-/*
  * Some phones render with wider CSS viewports (or desktop-site mode), which can bypass
  * width breakpoints and reintroduce white bands. Force edge-to-edge auth layout on
  * touch-first devices regardless of reported width.
@@ -2034,9 +2006,20 @@ body.auth-visible {
   body.auth-visible,
   html:has(.auth-page),
   body:has(.auth-page) {
-    overscroll-behavior: none !important;
     background: var(--auth-surface-gradient) !important;
     background-color: #3f66c9 !important;
+  }
+}
+
+/* iOS only: suppress overscroll chrome; Android needs auto for post-zoom pan */
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none) and (pointer: coarse) and (max-width: 1023px) {
+    html.auth-visible,
+    body.auth-visible,
+    html:has(.auth-page),
+    body:has(.auth-page) {
+      overscroll-behavior: none !important;
+    }
   }
 }
 

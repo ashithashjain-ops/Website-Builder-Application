@@ -4,6 +4,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaAddressBook, FaLock } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import {
+  getAuthPullScrollRoot,
+  isAuthPageZoomed,
+  mountAuthAndroidClass,
+} from "@/lib/authMobileTouch";
 import { isApiConnectionError, login as loginApi } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
 
@@ -58,16 +63,16 @@ export default function LoginPage() {
   useEffect(() => {
     document.documentElement.classList.add("auth-visible");
     document.body.classList.add("auth-visible");
+    const unmountAndroid = mountAuthAndroidClass();
     return () => {
       document.documentElement.classList.remove("auth-visible");
       document.body.classList.remove("auth-visible");
+      unmountAndroid();
     };
   }, []);
 
   useEffect(() => {
-    const scrollEl = document.querySelector(
-      ".login-page .login-card-inner"
-    ) as HTMLElement | null;
+    const scrollEl = getAuthPullScrollRoot(true);
     if (!scrollEl) return;
 
     let startY = 0;
@@ -76,14 +81,22 @@ export default function LoginPage() {
     const threshold = 88;
 
     const onTouchStart = (event: TouchEvent) => {
-      if (window.innerWidth >= 1024 || event.touches.length !== 1) return;
+      if (window.innerWidth >= 1024 || event.touches.length !== 1 || isAuthPageZoomed()) return;
       startY = event.touches[0].clientY;
       canPull = scrollEl.scrollTop <= 0;
       triggered = false;
     };
 
     const onTouchMove = (event: TouchEvent) => {
-      if (!canPull || triggered || window.innerWidth >= 1024) return;
+      if (
+        !canPull ||
+        triggered ||
+        window.innerWidth >= 1024 ||
+        isAuthPageZoomed() ||
+        event.touches.length !== 1
+      ) {
+        return;
+      }
       const deltaY = event.touches[0].clientY - startY;
       if (deltaY > threshold && scrollEl.scrollTop <= 0) {
         triggered = true;
@@ -265,24 +278,19 @@ export default function LoginPage() {
                   <div className="flex flex-col">
                     <div className="flex items-center border-b border-white/60 pb-2 min-w-0">
                       <FaAddressBook className="login-email-icon mr-2 sm:mr-4 text-sm opacity-80 flex-shrink-0" />
-                      <div className="auth-input-placeholder-wrap relative min-w-0 flex-1">
-                        <span className="auth-floating-placeholder" aria-hidden="true">
-                          Email or Mobile number
-                        </span>
-                        <input
-                          type="text"
-                          placeholder="Email or Mobile number"
-                          value={form.email}
-                          onChange={handleChange("email")}
-                          onBlur={handleContactBlur}
-                          maxLength={EMAIL_MAX_LENGTH}
-                          className="bg-transparent outline-none w-full min-w-0 placeholder-white text-sm tracking-tight login-email-input"
-                          aria-invalid={!!errors.email}
-                          aria-describedby={
-                            errors.email ? "login-email-error" : undefined
-                          }
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        placeholder="Email or Mobile number"
+                        value={form.email}
+                        onChange={handleChange("email")}
+                        onBlur={handleContactBlur}
+                        maxLength={EMAIL_MAX_LENGTH}
+                        className="bg-transparent outline-none w-full min-w-0 placeholder-white text-sm tracking-tight login-email-input"
+                        aria-invalid={!!errors.email}
+                        aria-describedby={
+                          errors.email ? "login-email-error" : undefined
+                        }
+                      />
                     </div>
                     {errors.email && (
                       <p
