@@ -496,7 +496,7 @@ export default function SignupPage() {
                   <div className="flex flex-col">
                     <div className="signup-phone-row flex items-center border-b border-white/80 pb-2 min-w-0">
                       <FaPhone className="signup-phone-icon mr-3 shrink-0 text-sm text-white/90" />
-                      <div className="signup-phone-fields flex min-w-0 flex-1 flex-row items-center gap-2">
+                      <div className="signup-phone-fields flex min-w-0 flex-1 items-center gap-2">
                       <div className="signup-country-select relative z-20 w-fit max-w-[200px] shrink-0 min-w-0" ref={countryDropdownRef}>
                         <button
                           type="button"

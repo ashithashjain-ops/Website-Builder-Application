@@ -1665,6 +1665,8 @@ body.auth-visible {
   }
 
   .signup-card-content .signup-phone-fields {
+    container-type: inline-size;
+    container-name: signup-phone-fields;
     flex-direction: row;
     align-items: center;
     width: auto;
@@ -1690,16 +1692,19 @@ body.auth-visible {
     max-width: none;
   }
 
-  /* ~200% pinch-zoom only: mobile number under country (content-width box) */
-  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row {
+  /* 150–200% zoom: mobile number under country (JS class + Android container fallback) */
+  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row,
+  .signup-card-content .signup-phone-row:has(.signup-phone-fields--stacked) {
     align-items: flex-start;
   }
 
-  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-phone-icon {
+  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-phone-icon,
+  .signup-card-content .signup-phone-row:has(.signup-phone-fields--stacked) .signup-phone-icon {
     margin-top: 0.125rem;
   }
 
-  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-fields {
+  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-fields,
+  .signup-card-content .signup-phone-fields.signup-phone-fields--stacked {
     flex-direction: column !important;
     align-items: flex-start;
     width: fit-content;
@@ -1709,16 +1714,50 @@ body.auth-visible {
     gap: 0.35rem;
   }
 
-  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-country-select {
+  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-country-select,
+  .signup-card-content .signup-phone-fields.signup-phone-fields--stacked .signup-country-select {
     align-self: flex-start;
     max-width: min(200px, 100%) !important;
   }
 
-  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-mobile-input {
-    flex: none;
+  html.signup-phone-zoom-stacked .signup-card-content .signup-phone-row .signup-mobile-input,
+  .signup-card-content .signup-phone-fields.signup-phone-fields--stacked .signup-mobile-input {
+    flex: none !important;
     width: 100%;
     max-width: min(200px, 100%);
     align-self: stretch;
+  }
+
+  /* Android: stack when fields column is narrow (≈150%+ layout zoom, scale API often missing) */
+  @container signup-phone-fields (max-width: 13.5rem) {
+    html.auth-android .signup-card-content .signup-phone-fields {
+      flex-direction: column !important;
+      align-items: flex-start;
+      width: fit-content;
+      max-width: 100%;
+      min-width: min(9.5rem, 100%);
+      gap: 0.35rem;
+    }
+
+    html.auth-android .signup-card-content .signup-phone-row {
+      align-items: flex-start;
+    }
+
+    html.auth-android .signup-card-content .signup-phone-row .signup-phone-icon {
+      margin-top: 0.125rem;
+    }
+
+    html.auth-android .signup-card-content .signup-phone-fields .signup-country-select {
+      align-self: flex-start;
+      max-width: min(200px, 100%) !important;
+    }
+
+    html.auth-android .signup-card-content .signup-phone-fields .signup-mobile-input {
+      flex: none !important;
+      width: 100%;
+      max-width: min(200px, 100%);
+      align-self: stretch;
+    }
   }
 }
 
