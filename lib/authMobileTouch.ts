@@ -30,8 +30,8 @@ export function getAuthPullScrollRoot(loginPage: boolean): HTMLElement | null {
   return document.querySelector(".auth-page") as HTMLElement | null;
 }
 
-/** ~200% pinch-zoom on mobile signup: stack mobile number under country selector. */
-const SIGNUP_PHONE_STACK_ZOOM = 1.85;
+/** 150%–200%+ pinch-zoom on mobile signup: stack mobile number under country selector. */
+const SIGNUP_PHONE_STACK_ZOOM = 1.5;
 
 export function mountSignupPhoneStackedClass(): () => void {
   if (typeof window === "undefined") return () => undefined;
