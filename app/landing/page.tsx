@@ -511,7 +511,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#fff1f2] text-gray-900">
       <div
-        className={`fixed left-0 top-[65px] z-40 w-full transition duration-200 ${isSearchOpen ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none -translate-y-2 opacity-0"}`}
+        className={`fixed left-0 top-[65px] z-[6000] w-full transition duration-200 ${isSearchOpen ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none -translate-y-2 opacity-0"}`}
       >
         <div data-landing-search className="mx-auto max-w-7xl px-4 py-2 md:px-8">
           <form

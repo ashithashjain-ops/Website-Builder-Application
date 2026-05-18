@@ -389,6 +389,9 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
           <button
             type="button"
             onClick={() => {
+              closeMenus();
+              setMobileOpen(false);
+
               const currentPath = window.location.pathname.replace(/\/+$/, "");
               const landingPath = assetPath("/landing").replace(/\/+$/, "");
 
