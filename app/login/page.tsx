@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { FaAddressBook, FaLock } from "react-icons/fa";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,10 @@ import {
   isAuthPageZoomed,
   mountAuthAndroidClass,
 } from "@/lib/authMobileTouch";
+import {
+  fitInputPlaceholderToWidth,
+  observeAuthPlaceholderFit,
+} from "@/lib/authPlaceholderFit";
 import { isApiConnectionError, login as loginApi } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
 
@@ -44,6 +48,22 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 1023px)");
+    const setup = () => observeAuthPlaceholderFit(emailInputRef.current, mql.matches);
+    let cleanup = setup();
+    const onChange = () => {
+      cleanup();
+      cleanup = setup();
+    };
+    mql.addEventListener("change", onChange);
+    return () => {
+      mql.removeEventListener("change", onChange);
+      cleanup();
+    };
+  }, []);
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
@@ -279,13 +299,19 @@ export default function LoginPage() {
                     <div className="login-contact-row flex items-center border-b border-white/60 pb-2 min-w-0">
                       <FaAddressBook className="login-email-icon mr-2 sm:mr-4 text-sm opacity-80 flex-shrink-0" />
                       <input
+                        ref={emailInputRef}
                         type="text"
                         placeholder="Email or Mobile number"
                         value={form.email}
                         onChange={handleChange("email")}
-                        onBlur={handleContactBlur}
+                        onBlur={() => {
+                          handleContactBlur();
+                          requestAnimationFrame(() =>
+                            fitInputPlaceholderToWidth(emailInputRef.current)
+                          );
+                        }}
                         maxLength={EMAIL_MAX_LENGTH}
-                        className="bg-transparent outline-none w-full min-w-0 placeholder-white text-sm tracking-tight login-email-input"
+                        className="bg-transparent outline-none w-full min-w-0 placeholder-white text-sm login-email-input"
                         aria-invalid={!!errors.email}
                         aria-describedby={
                           errors.email ? "login-email-error" : undefined
@@ -373,7 +399,7 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <div className="login-remember-forgot mt-5 sm:mt-4 text-xs opacity-90 w-full">
+                <div className="login-remember-forgot mt-5 sm:mt-4 text-xs opacity-90 w-full min-w-0">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
