@@ -12,11 +12,6 @@ import {
   passwordContainsWhitespace,
 } from "@/lib/resetFlowValidation";
 import {
-  fitInputPlaceholderToWidth,
-  isMobileAuthViewport,
-  observeAuthPlaceholderFit,
-} from "@/lib/authPlaceholderFit";
-import {
   getAuthPullScrollRoot,
   isAuthPageZoomed,
   mountAuthAndroidClass,
@@ -100,40 +95,6 @@ export default function SignupPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
   const countryDropdownRef = useRef<HTMLDivElement>(null);
-  const mobileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const mql = window.matchMedia("(max-width: 1023px)");
-    const setup = () => observeAuthPlaceholderFit(mobileInputRef.current, mql.matches);
-    let cleanup = setup();
-    const onChange = () => {
-      cleanup();
-      cleanup = setup();
-    };
-    mql.addEventListener("change", onChange);
-    return () => {
-      mql.removeEventListener("change", onChange);
-      cleanup();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isMobileAuthViewport()) return;
-    const run = () => fitInputPlaceholderToWidth(mobileInputRef.current);
-    const id1 = requestAnimationFrame(() => requestAnimationFrame(run));
-    const t1 = window.setTimeout(run, 150);
-    const t2 = window.setTimeout(run, 400);
-    const vv = window.visualViewport;
-    vv?.addEventListener("resize", run);
-    vv?.addEventListener("scroll", run);
-    return () => {
-      cancelAnimationFrame(id1);
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      vv?.removeEventListener("resize", run);
-      vv?.removeEventListener("scroll", run);
-    };
-  }, [form.phoneCountryId, countryDropdownOpen]);
 
   useEffect(() => {
     if (!countryDropdownOpen) return;
@@ -532,7 +493,7 @@ export default function SignupPage() {
                   <div className="flex flex-col">
                     <div className="signup-phone-row flex items-center border-b border-white/80 pb-2 min-w-0">
                       <FaPhone className="signup-phone-icon mr-3 shrink-0 text-sm text-white/90" />
-                      <div className="signup-country-select relative z-20 mr-2 min-h-5 shrink-0 max-w-[82px] sm:max-w-[200px] min-w-0 self-center" ref={countryDropdownRef}>
+                      <div className="signup-country-select relative z-20 mr-2 min-h-5 shrink-0 max-lg:max-w-none max-w-[200px] min-w-0 self-center" ref={countryDropdownRef}>
                         <button
                           type="button"
                           id="country-select-trigger"
@@ -592,7 +553,6 @@ export default function SignupPage() {
                         )}
                       </div>
                       <input
-                        ref={mobileInputRef}
                         type="tel"
                         inputMode="numeric"
                         maxLength={
@@ -602,11 +562,6 @@ export default function SignupPage() {
                         placeholder="Mobile number"
                         value={form.mobileNumber}
                         onChange={handleChange("mobileNumber")}
-                        onBlur={() =>
-                          requestAnimationFrame(() =>
-                            fitInputPlaceholderToWidth(mobileInputRef.current)
-                          )
-                        }
                         className="signup-mobile-input min-h-5 flex-1 min-w-0 self-center border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none placeholder-white/90"
                         aria-invalid={!!errors.mobileNumber}
                         aria-describedby={errors.mobileNumber ? "mobile-error" : undefined}
