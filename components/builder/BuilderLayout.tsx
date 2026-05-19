@@ -8,7 +8,6 @@ import Canvas from "./Canvas";
 import ComponentPalette from "./ComponentPalette";
 import PropertyEditor from "./PropertyEditor";
 import { useBuilder } from "@/hooks/useBuilder";
-import { useBuilderStore } from "@/store/builderStore";
 import type { ComponentType } from "@/types/builder";
 
 const collisionDetectionStrategy: CollisionDetection = (args) => {
@@ -30,7 +29,6 @@ export default function BuilderLayout() {
   const searchParams = useSearchParams();
   const hasLoadedRequirements = useRef(false);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 3 } }));
-  const isInlineEditing = useBuilderStore((s) => s.isInlineEditing);
   const selectedComponent = components.find((component) => component.id === selectedComponentId) || null;
 
   useEffect(() => {
@@ -114,7 +112,7 @@ export default function BuilderLayout() {
   };
 
   return (
-    <DndContext sensors={isInlineEditing ? [] : sensors} collisionDetection={collisionDetectionStrategy} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
+    <DndContext sensors={sensors} collisionDetection={collisionDetectionStrategy} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
       <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#e9eef6] font-sans">
         <div className="relative flex min-h-screen w-full flex-1 flex-shrink-0 gap-4 overflow-hidden p-4">
           <button

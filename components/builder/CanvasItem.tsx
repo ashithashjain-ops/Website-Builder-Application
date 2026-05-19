@@ -28,11 +28,13 @@ function CanvasItem({
   const isSectionComponent = component.type === "contact" || component.type === "hero" || component.type === "navigation" || component.type === "features" || component.type === "gallery";
 
   useEffect(() => {
-    if (!isSelected) {
-      window.setTimeout(() => {
+    if (!isSelected && isEditing) {
+      const timeout = window.setTimeout(() => {
         setIsEditing(false);
         setInlineEditing(false);
       }, 0);
+
+      return () => window.clearTimeout(timeout);
     }
   }, [isSelected, isEditing, setInlineEditing]);
 

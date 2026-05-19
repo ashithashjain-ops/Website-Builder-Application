@@ -1,7 +1,9 @@
 "use client";
 
-import { type FocusEvent, type KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
+import { type FocusEvent, type KeyboardEvent, type LegacyRef, type MouseEvent, type PointerEvent, useLayoutEffect, useRef, useState } from "react";
 import { useBuilderStore } from "@/store/builderStore";
+
+type InlineTextTag = "span" | "h1" | "h2" | "h3" | "p" | "figcaption" | "button";
 
 export default function InlineText({
   as = "span",
@@ -9,7 +11,7 @@ export default function InlineText({
   onSave,
   className = "",
 }: {
-  as?: string;
+  as?: InlineTextTag;
   value: string;
   onSave: (v: string) => void;
   className?: string;
@@ -33,7 +35,12 @@ export default function InlineText({
     }
   }, [editing, value]);
 
-  function startEdit() {
+  function stopCanvasEvent(event: MouseEvent<HTMLElement> | PointerEvent<HTMLElement>) {
+    event.stopPropagation();
+  }
+
+  function startEdit(event: MouseEvent<HTMLElement>) {
+    event.stopPropagation();
     if (editing) return;
     original.current = value;
     committed.current = false;
@@ -56,19 +63,24 @@ export default function InlineText({
     setInlineEditing(false);
   }
 
-  const Tag = as as "span";
+  const Tag = (as === "button" ? "span" : as) as "span";
+  const buttonLayoutClass = as === "button" ? "inline-flex w-fit items-center justify-center whitespace-nowrap align-middle" : "";
 
   return (
     <Tag
-      ref={ref as unknown as React.LegacyRef<HTMLSpanElement>}
+      ref={ref as unknown as LegacyRef<HTMLSpanElement>}
+      role={as === "button" ? "button" : undefined}
+      tabIndex={as === "button" ? 0 : undefined}
       contentEditable={editing ? "true" : undefined}
       suppressContentEditableWarning
-      className={`rounded-sm transition-[outline] duration-100 ${className} ${
+      className={`rounded-sm transition-[outline] duration-100 ${buttonLayoutClass} ${className} ${
         editing
           ? "cursor-text outline outline-2 outline-blue-400/70 outline-offset-1"
           : "cursor-text hover:outline hover:outline-1 hover:outline-blue-200/80 hover:outline-offset-1"
       }`}
+      onDoubleClick={stopCanvasEvent}
       onClick={startEdit}
+      onPointerDown={stopCanvasEvent}
       onBlur={
         editing
           ? (e: FocusEvent<HTMLSpanElement>) => {
@@ -80,6 +92,7 @@ export default function InlineText({
       onKeyDown={
         editing
           ? (e: KeyboardEvent<HTMLSpanElement>) => {
+              e.stopPropagation();
               if (e.key === "Enter") { e.preventDefault(); save(e.currentTarget.textContent ?? ""); }
               else if (e.key === "Escape") { e.preventDefault(); discard(); }
             }
