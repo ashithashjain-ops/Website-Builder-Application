@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import { ChevronDown, Eye, Save, Sparkles, Trash2 } from "lucide-react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -7,9 +8,8 @@ import SortableItem from "./SortableItem";
 import ExportButton from "./ExportButton";
 import type { BuilderComponent } from "@/types/builder";
 
-export default function Canvas({
+function Canvas({
   components,
-  selectedComponentId,
   onSelect,
   onDelete,
   onDuplicate,
@@ -17,7 +17,6 @@ export default function Canvas({
   onClear,
 }: {
   components: BuilderComponent[];
-  selectedComponentId: string | null;
   onSelect: (id: string | null) => void;
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
@@ -25,6 +24,7 @@ export default function Canvas({
   onClear: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: "builder-canvas" });
+  const sortableIds = useMemo(() => components.map((c) => c.id), [components]);
 
   return (
     <main
@@ -83,10 +83,10 @@ export default function Canvas({
 
       <div
         ref={setNodeRef}
-        className={`flex flex-1 flex-col items-center gap-6 overflow-y-auto px-4 py-6 transition sm:px-6 lg:px-8 ${isOver ? "bg-blue-50/50" : ""}`}
+        className={`flex flex-1 flex-col items-center gap-6 overflow-y-auto px-4 py-6 transition-colors duration-150 sm:px-6 lg:px-8 ${isOver ? "bg-blue-50/60" : ""}`}
       >
         {components.length === 0 ? (
-          <div className="flex min-h-[420px] w-full max-w-[900px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#dbe3ef] bg-white px-6 text-center shadow-[0_18px_45px_rgba(15,35,75,0.08)] transition">
+          <div className={`flex min-h-[420px] w-full max-w-[900px] flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 text-center shadow-[0_18px_45px_rgba(15,35,75,0.08)] transition-all duration-150 ${isOver ? "border-blue-400 bg-blue-50/50" : "border-[#dbe3ef] bg-white"}`}>
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#eef4fb] text-[#0B1D40]">
               <ChevronDown className="h-7 w-7" />
             </div>
@@ -107,11 +107,10 @@ export default function Canvas({
             </button>
           </div>
         ) : (
-          <SortableContext items={components.map((component) => component.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
             {components.map((component) => (
               <SortableItem
                 component={component}
-                isSelected={selectedComponentId === component.id}
                 key={component.id}
                 onDelete={onDelete}
                 onDuplicate={onDuplicate}
@@ -124,3 +123,5 @@ export default function Canvas({
     </main>
   );
 }
+
+export default memo(Canvas);

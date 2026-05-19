@@ -153,7 +153,7 @@ export default function LoginPage() {
     } else if (trimmedContact.length > EMAIL_MAX_LENGTH) {
       newErrors.email = EMAIL_MAX_ERROR;
     } else {
-      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+      const isEmail = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|in|org|net|edu)$/i.test(
         trimmedContact.toLowerCase(),
       );
       const isMobileContact = isMobile(trimmedContact);

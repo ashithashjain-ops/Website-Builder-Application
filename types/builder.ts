@@ -45,11 +45,13 @@ export interface BuilderRequirements {
 export interface BuilderState {
   components: BuilderComponent[];
   selectedComponentId: string | null;
-  addComponent: (type: ComponentType, parentId?: string | null) => void;
+  addComponent: (type: ComponentType, parentId?: string | null, afterId?: string | null) => void;
   updateComponent: (id: string, updates: Partial<Omit<BuilderComponent, "id" | "children">> & { styles?: ComponentStyles }) => void;
   duplicateComponent: (id: string) => void;
   deleteComponent: (id: string) => void;
   selectComponent: (id: string | null) => void;
+  isInlineEditing: boolean;
+  setInlineEditing: (v: boolean) => void;
   reorderComponents: (activeId: string, overId: string) => void;
   loadStarterWebsite: () => void;
   loadWebsiteFromRequirements: (requirements: BuilderRequirements) => void;

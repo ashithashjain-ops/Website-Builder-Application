@@ -12,7 +12,12 @@ import GalleryComponent from "@/components/draggable/GalleryComponent";
 import ContactComponent from "@/components/draggable/ContactComponent";
 import ContainerComponent from "@/components/draggable/ContainerComponent";
 
-export type BuilderRenderer = (props: { component: BuilderComponent }) => React.ReactNode;
+export type BuilderRenderer = (props: {
+  component: BuilderComponent;
+  children?: React.ReactNode;
+  isEditing?: boolean;
+  onUpdate?: (content: string | null) => void;
+}) => React.ReactNode;
 
 export const componentRegistry: Record<ComponentType, BuilderRenderer> = {
   navigation: NavigationComponent,

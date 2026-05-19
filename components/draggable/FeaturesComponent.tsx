@@ -1,11 +1,20 @@
+"use client";
+
+import InlineText from "@/components/builder/InlineText";
 import type { BuilderComponent } from "@/types/builder";
 import { toReactStyle } from "./componentStyles";
 
-export default function FeaturesComponent({ component }: { component: BuilderComponent }) {
-  const features = component.content
-    .split("\n")
-    .map((item) => item.split("|"))
-    .filter(([title]) => title?.trim());
+export default function FeaturesComponent({ component, onUpdate }: { component: BuilderComponent; onUpdate?: (content: string | null) => void }) {
+  const lines = component.content.split("\n");
+  const features = lines.map((item) => item.split("|")).filter(([title]) => title?.trim());
+
+  function saveField(lineIdx: number, partIdx: number, val: string) {
+    const updated = [...lines];
+    const parts = (updated[lineIdx] ?? "").split("|");
+    parts[partIdx] = val;
+    updated[lineIdx] = parts.join("|");
+    onUpdate?.(updated.join("\n"));
+  }
 
   return (
     <section className="w-full border border-[#dbe3ef] shadow-sm" style={toReactStyle(component.styles)}>
@@ -15,8 +24,8 @@ export default function FeaturesComponent({ component }: { component: BuilderCom
             <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-md bg-[#0B1D40] text-sm font-bold text-white">
               {index + 1}
             </div>
-            <h3 className="text-base font-bold text-[#0B1D40]">{title}</h3>
-            <p className="mt-2 text-sm font-medium leading-6 text-[#566583]">{description}</p>
+            <InlineText as="h3" value={title ?? ""} onSave={(v) => saveField(index, 0, v)} className="text-base font-bold text-[#0B1D40]" />
+            <InlineText as="p" value={description ?? ""} onSave={(v) => saveField(index, 1, v)} className="mt-2 text-sm font-medium leading-6 text-[#566583]" />
           </article>
         ))}
       </div>
