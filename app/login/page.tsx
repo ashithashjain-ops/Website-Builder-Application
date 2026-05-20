@@ -15,6 +15,7 @@ import {
 } from "@/lib/authPlaceholderFit";
 import { isApiConnectionError, login as loginApi } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
+import AuthGoogleButton from "@/components/AuthGoogleButton";
 
 type LoginFormState = {
   email: string;
@@ -435,12 +436,23 @@ export default function LoginPage() {
                 </form>
               </div>
 
-              <p className="text-center text-xs mt-4 sm:mt-2 text-white/80 flex-shrink-0">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="text-yellow-400 hover:text-yellow-300 font-medium">
-                  Sign Up
-                </Link>
-              </p>
+              <div className="flex-shrink-0 mt-2 max-lg:mt-2 lg:mt-4">
+                <p className="text-center text-xs mb-2 sm:mb-2.5 lg:mb-3 text-white/80">
+                  Don&apos;t have an account?{" "}
+                  <Link
+                    href="/signup"
+                    className="text-yellow-400 hover:text-yellow-300 font-medium"
+                  >
+                    Sign Up
+                  </Link>
+                </p>
+
+                <div className="mt-1.5 mb-1 lg:mt-1 lg:mb-0.5 border-t border-white/50" />
+
+                <div className="pt-0.5 pb-1 sm:pt-1 sm:pb-3 lg:pb-2">
+                  <AuthGoogleButton intent="login" label="Login with Google" />
+                </div>
+              </div>
             </div>
           </div>
         </div>

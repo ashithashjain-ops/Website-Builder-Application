@@ -2307,6 +2307,41 @@ body.auth-visible {
   }
 }
 
+/* Login + signup: Google OAuth button — full width, zoom-safe on mobile */
+.auth-google-button {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1023px) {
+  .login-card-inner .auth-google-button,
+  .signup-card-content .auth-google-button {
+    font-size: 0.875rem !important;
+    line-height: 1.25rem;
+    min-height: 2.625rem;
+    height: auto;
+    padding: 0.375rem 0.5rem;
+  }
+
+  .auth-google-button .auth-google-button-label {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .auth-google-button svg,
+  .auth-google-button .auth-google-button-label {
+    flex-shrink: 1;
+  }
+}
+
 .auth-layout {
   min-width: 0;
 }
