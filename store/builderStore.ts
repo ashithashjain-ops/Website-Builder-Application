@@ -72,6 +72,88 @@ const defaults: Record<ComponentType, Pick<BuilderComponent, "content" | "styles
 const orderComponents = (components: BuilderComponent[]) =>
   components.map((component, index) => ({ ...component, order: index }));
 
+// --- Recursive tree helpers ---
+
+const findComponentById = (components: BuilderComponent[], id: string): BuilderComponent | null => {
+  for (const c of components) {
+    if (c.id === id) return c;
+    const found = findComponentById(c.children, id);
+    if (found) return found;
+  }
+  return null;
+};
+
+const updateNodeById = (
+  components: BuilderComponent[],
+  id: string,
+  updater: (c: BuilderComponent) => BuilderComponent,
+): BuilderComponent[] => {
+  let mutated = false;
+  const result = components.map((c) => {
+    if (c.id === id) {
+      mutated = true;
+      return updater(c);
+    }
+    if (c.children.length === 0) return c;
+    const newChildren = updateNodeById(c.children, id, updater);
+    if (newChildren === c.children) return c;
+    mutated = true;
+    return { ...c, children: newChildren };
+  });
+  return mutated ? result : components;
+};
+
+const deleteNodeById = (components: BuilderComponent[], id: string): BuilderComponent[] => {
+  const topIdx = components.findIndex((c) => c.id === id);
+
+  if (topIdx >= 0) {
+    return [...components.slice(0, topIdx), ...components.slice(topIdx + 1)];
+  }
+
+  let mutated = false;
+  const result = components.map((c) => {
+    if (c.children.length === 0) return c;
+    const newChildren = deleteNodeById(c.children, id);
+    if (newChildren === c.children) return c;
+    mutated = true;
+    return { ...c, children: newChildren };
+  });
+  return mutated ? result : components;
+};
+
+const insertAfterNodeById = (
+  components: BuilderComponent[],
+  id: string,
+  newNode: BuilderComponent,
+): BuilderComponent[] | null => {
+  const index = components.findIndex((c) => c.id === id);
+
+  if (index >= 0) {
+    return [...components.slice(0, index + 1), newNode, ...components.slice(index + 1)];
+  }
+
+  for (let i = 0; i < components.length; i++) {
+    const newChildren = insertAfterNodeById(components[i].children, id, newNode);
+
+    if (newChildren !== null) {
+      return [
+        ...components.slice(0, i),
+        { ...components[i], children: newChildren },
+        ...components.slice(i + 1),
+      ];
+    }
+  }
+
+  return null;
+};
+
+const deepCloneComponent = (component: BuilderComponent): BuilderComponent => ({
+  ...component,
+  id: uuidv4(),
+  styles: { ...component.styles },
+  children: component.children.map(deepCloneComponent),
+});
+
 const createComponent = (type: ComponentType, order: number): BuilderComponent => ({
   id: uuidv4(),
   type,
@@ -151,9 +233,29 @@ const createRequirementComponents = (requirements: BuilderRequirements) => {
 export const useBuilderStore = create<BuilderState>((set, get) => ({
   components: [],
   selectedComponentId: null,
-  addComponent: (type) =>
+  isInlineEditing: false,
+  setInlineEditing: (v) => set({ isInlineEditing: v }),
+  addComponent: (type, parentId, afterId) =>
     set((state) => {
+      if (parentId) {
+        const parent = findComponentById(state.components, parentId);
+        const component = createComponent(type, parent ? parent.children.length : 0);
+        const components = updateNodeById(state.components, parentId, (p) => ({
+          ...p,
+          children: [...p.children, component],
+        }));
+
+        return { components, selectedComponentId: component.id };
+      }
+
       const component = createComponent(type, state.components.length);
+
+      if (afterId) {
+        const result = insertAfterNodeById(state.components, afterId, component);
+        const components = result ? orderComponents(result) : [...state.components, component];
+
+        return { components, selectedComponentId: component.id };
+      }
 
       return {
         components: [...state.components, component],
@@ -162,35 +264,28 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
     }),
   updateComponent: (id, updates) =>
     set((state) => ({
-      components: state.components.map((component) =>
-        component.id === id
-          ? { ...component, ...updates, styles: { ...component.styles, ...updates.styles } }
-          : component,
-      ),
+      components: updateNodeById(state.components, id, (c) => ({
+        ...c,
+        ...updates,
+        styles: { ...c.styles, ...updates.styles },
+      })),
     })),
   duplicateComponent: (id) =>
     set((state) => {
-      const index = state.components.findIndex((component) => component.id === id);
+      const source = findComponentById(state.components, id);
 
-      if (index < 0) {
-        return state;
-      }
+      if (!source) return state;
 
-      const source = state.components[index];
-      const copy: BuilderComponent = {
-        ...source,
-        id: uuidv4(),
-        content: source.content,
-        styles: { ...source.styles },
-        children: source.children.map((child, childIndex) => ({ ...child, id: uuidv4(), order: childIndex })),
-      };
-      const components = [...state.components.slice(0, index + 1), copy, ...state.components.slice(index + 1)];
+      const copy = deepCloneComponent(source);
+      const components = insertAfterNodeById(state.components, id, copy);
+
+      if (!components) return state;
 
       return { components: orderComponents(components), selectedComponentId: copy.id };
     }),
   deleteComponent: (id) =>
     set((state) => ({
-      components: orderComponents(state.components.filter((component) => component.id !== id)),
+      components: orderComponents(deleteNodeById(state.components, id)),
       selectedComponentId: state.selectedComponentId === id ? null : state.selectedComponentId,
     })),
   selectComponent: (id) => set({ selectedComponentId: id }),

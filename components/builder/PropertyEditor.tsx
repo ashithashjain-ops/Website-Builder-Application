@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { AlignCenter, AlignLeft, AlignRight, SlidersHorizontal } from "lucide-react";
 import type { BuilderComponent, ComponentStyles } from "@/types/builder";
+import LayersPanel from "./LayersPanel";
 
 const styleFields: Array<{ key: keyof ComponentStyles; label: string; type?: string; placeholder?: string }> = [
   { key: "fontSize", label: "Font Size", placeholder: "16px" },
@@ -52,6 +54,8 @@ export default function PropertyEditor({
   component: BuilderComponent | null;
   onUpdate: (id: string, updates: Partial<BuilderComponent>) => void;
 }) {
+  const [activeTab, setActiveTab] = useState<"settings" | "layers">("settings");
+
   const updateStyle = (styles: ComponentStyles) => {
     if (!component) return;
     onUpdate(component.id, { styles: { ...component.styles, ...styles } });
@@ -187,15 +191,27 @@ export default function PropertyEditor({
   return (
     <aside className="relative hidden h-full w-[286px] flex-shrink-0 flex-col overflow-hidden rounded-xl border border-[#f4d8cc] bg-[#fff7f4] shadow-[0_18px_45px_rgba(113,63,18,0.10)] xl:flex">
       <div className="flex border-b border-[#f2d8cf] bg-white/45 px-6 pt-5">
-        <button className="flex-1 border-b-[2px] border-[#0B1D40] pb-4 text-base font-bold text-[#0B1D40]" type="button">
-          Settings
-        </button>
-        <button className="flex-1 border-b-[2px] border-gray-300 pb-4 text-base font-bold text-[#566583]" type="button">
-          Styles
-        </button>
+        {(["settings", "layers"] as const).map((tab) => (
+          <button
+            key={tab}
+            className={`flex-1 border-b-[2px] pb-4 text-sm font-bold capitalize transition-colors duration-150 ${
+              activeTab === tab
+                ? "border-[#0B1D40] text-[#0B1D40]"
+                : "border-transparent text-[#566583] hover:text-[#0B1D40]"
+            }`}
+            onClick={() => setActiveTab(tab)}
+            type="button"
+          >
+            {tab === "settings" ? "Settings" : "Layers"}
+          </button>
+        ))}
       </div>
 
-      <div className="flex-1 space-y-5 overflow-y-auto px-6 pb-8 pt-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {activeTab === "layers" ? (
+          <LayersPanel />
+        ) : (
+          <div className="space-y-5 px-6 pb-8 pt-6">
         {!component ? (
           <div className="flex h-full flex-col items-center justify-center text-center text-sm font-medium leading-6 text-[#566583]">
             <SlidersHorizontal className="mb-3 h-8 w-8 text-[#0B1D40]" />
@@ -247,6 +263,8 @@ export default function PropertyEditor({
               ))}
             </div>
           </>
+        )}
+          </div>
         )}
       </div>
     </aside>
