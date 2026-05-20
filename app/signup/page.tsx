@@ -680,21 +680,16 @@ export default function SignupPage() {
                 <div className="mt-1.5 mb-1 lg:mt-1 lg:mb-0.5 border-t border-white/50" />
 
                 <div className="pt-0.5 pb-1 sm:pt-1 sm:pb-3 lg:pb-2">
-                  <a
-                    href={
-                      "https://accounts.google.com/o/oauth2/v2/auth" +
-                      "?client_id=703831654489-m34p97it8cppn924006cgt8u6jgk9tsa.apps.googleusercontent.com" +
-                      "&redirect_uri=http://localhost:5000/api/auth/google" +
-                      "&response_type=code" +
-                      "&scope=openid%20email%20profile" +
-                      "&access_type=online" +
-                      "&prompt=select_account"
-                    }
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.href = "http://localhost:5000/api/auth/google";
+                    }}
                     className="w-full h-[42px] border border-white/80 rounded-md flex items-center justify-center text-sm font-medium bg-transparent text-white hover:bg-white hover:text-[#0c2b5a] transition"
                   >
                     <FcGoogle className="mr-3 text-lg" />
                     Sign up with Google
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
