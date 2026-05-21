@@ -4,7 +4,6 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import CreateProjectFlow from "@/components/CreateProjectFlow";
-import AboutPage from "../aboutus/page";
 import { useEffect, useMemo, useState } from "react";
 import {
   FaArrowRight,
@@ -29,6 +28,7 @@ import {
   FaYoutube,
 } from "react-icons/fa6";
 import { assetPath } from "@/lib/paths";
+
 type TemplateCategory = "portfolio" | "blog" | "ecommerce" | "business";
 
 const Footer = dynamic(() => import("@/components/Footer"), {
@@ -323,7 +323,6 @@ function LandingContactSection() {
 }
 
 export default function Home() {
-  const [currentPage, setCurrentPage] = useState<"home" | "about">("home");
   const [activeFilter, setActiveFilter] = useState<(typeof templateFilters)[number]["value"]>("all");
   const [activeFeature, setActiveFeature] = useState(0);
   const [openFaq, setOpenFaq] = useState(0);
@@ -423,24 +422,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const handleOpenAbout = () => {
-      setCurrentPage("about");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    window.addEventListener("stackly-open-about", handleOpenAbout);
-
-    return () => {
-      window.removeEventListener("stackly-open-about", handleOpenAbout);
-    };
-  }, []);
-
-  useEffect(() => {
     if (!isSearchOpen) {
       return;
     }
 
-    const closeSearch = (event: globalThis.MouseEvent) => {
+    const closeSearch = (event: MouseEvent) => {
       const target = event.target as Element | null;
 
       if (!target?.closest("[data-landing-search]")) {
@@ -505,10 +491,6 @@ export default function Home() {
     showWishlistToast(`${product.title} added to cart!`);
   };
 
-  if (currentPage === "about") {
-    return <AboutPage onBack={() => setCurrentPage("home")} />;
-  }
-
   const submitSearch = (query: string) => {
     const nextQuery = query.trim();
 
@@ -527,7 +509,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#fff1f2] text-gray-900 flex flex-col justify-between">
+    <main className="min-h-screen bg-[#fff1f2] text-gray-900">
       <div
         className={`fixed left-0 top-[65px] z-[6000] w-full transition duration-200 ${isSearchOpen ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none -translate-y-2 opacity-0"}`}
       >
@@ -579,53 +561,26 @@ export default function Home() {
             />
           </picture>
 
+
           <div className="relative z-10 flex min-h-[480px] items-end justify-center p-8 md:min-h-[540px] md:justify-start md:p-16">
+            {/* Replaced Link with CreateProjectFlow to trigger the modal locally */}
             <CreateProjectFlow />
           </div>
-        </div>
 
-        {/* ── WHO WE ARE SECTION ─────────────────────────────── */}
-        <div className="mt-16 md:mt-24 flex flex-col lg:flex-row gap-8 md:gap-12 items-center">
-          <div className="w-full lg:w-1/2 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white flex-shrink-0">
-            <img
-              src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800"
-              alt="Stackly office"
-              className="w-full h-auto object-cover transition duration-700 hover:scale-105"
-              loading="lazy"
-            />
-          </div>
 
-          <div className="w-full lg:w-1/2 space-y-4 md:space-y-6 text-left">
-            {/* Added About Us box and Blue Line */}
-            <div className="">
-               <span className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#0A2357] px-8 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg transition hover:bg-blue-900 active:scale-95">About us</span>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-6 bg-blue-600"></div>
-              <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[#0A2357]">Who We Are</h2>
-            </div>
-            
-            <p className="text-base md:text-lg leading-relaxed font-bold text-[#0A2357] italic">
-              Stackly is a powerful platform that streamlines workflow, enhances efficiency, and drives digital success.
-            </p>
-            <p className="text-sm leading-relaxed text-gray-600">
-              Founded in 2015, Stackly has grown into one of the leading and most trusted companies in the industry.
-            </p>
-            
-            <button
-              onClick={() => {
-                setCurrentPage("about");
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#0A2357] px-8 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg transition hover:bg-blue-900 active:scale-95"
+
+          {/* <div className="relative z-10 flex min-h-[480px] items-end justify-center p-8 md:min-h-[540px] md:justify-start md:p-16">
+            <Link
+              href="#templates"
+              className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#0A2357] px-7 py-3 font-bold text-white shadow-lg transition hover:bg-blue-900"
             >
-              READ MORE..
-            </button>
-          </div>
+              Get Started
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] text-[#0A2357]">
+                <FaPlay />
+              </span>
+            </Link>
+          </div> */}
         </div>
-        {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* ─────────────────────────────────────────────────────────────────── */}
 
         <div className="mt-8 text-center md:mt-12">
           <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-800">Popular Searches</p>
@@ -805,7 +760,7 @@ export default function Home() {
       </section>
 
       <section className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
-        <div className="flex flex-col items-center rounded-[1.5rem] bg-gradient-to-b bg-[#082A5A] to-[#002B5C] p-8 text-center text-white shadow-2xl md:rounded-[2.5rem] md:p-16">
+        <div className="flex flex-col items-center rounded-[1.5rem] bg-gradient-to-b from-[#005BC5] to-[#002B5C] p-8 text-center text-white shadow-2xl md:rounded-[2.5rem] md:p-16">
           <div className="mb-10 max-w-4xl">
             <h2 className="mb-4 text-3xl font-black leading-tight text-white md:text-6xl">
               Step into the digital world with confidence
@@ -826,6 +781,9 @@ export default function Home() {
               </div>
             ))}
           </div>
+          {/* <Link href="/signup" className="w-full rounded-full bg-white px-10 py-4 text-xs font-black uppercase tracking-[0.2em] text-[#005BC5] shadow-xl transition hover:bg-blue-50 sm:w-auto md:px-14">
+            Get Started
+          </Link> */}
         </div>
       </section>
 
@@ -891,7 +849,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto my-16 max-w-7xl px-4 md:mt-24 md:px-8">
+      <section className="mx-auto my-16 max-w-7xl px-4 md:my-24 md:px-8">
         <SectionHeading>Drag & drop website builder FAQ</SectionHeading>
         <div className="flex flex-col items-center gap-10 rounded-[2rem] border-l-4 border-blue-500 bg-[#E6EFF1] p-6 shadow-sm lg:flex-row lg:items-start lg:gap-16 lg:rounded-[3rem] lg:p-14">
           <div className="flex w-full justify-center lg:w-2/5">
@@ -945,3 +903,4 @@ export default function Home() {
     </main>
   );
 }
+
