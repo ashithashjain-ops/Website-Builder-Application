@@ -1,6 +1,6 @@
 "use client";
-
-import { useState } from "react";
+ 
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import ButtonCanvas from "./buttonblock/Canvas";
 import ButtonRightSidebar from "./buttonblock/RightSidebar";
@@ -12,7 +12,7 @@ import ImageRightSidebar from "./imageblock/RightSidebar";
 import TextCanvas from "./textblock/Canvas";
 import TextRightSidebar from "./textblock/RightSidebar";
 import type { TextBlockState, TextTemplateType } from "./textblock/types";
-
+ 
 const initialButtonBlock: BlockData = {
   id: "button-default",
   type: "button",
@@ -21,7 +21,7 @@ const initialButtonBlock: BlockData = {
     borderRadius: "18 px",
   },
 };
-
+ 
 const initialTextBlockState: TextBlockState = {
   selectedTarget: "main",
   isTextEditable: false,
@@ -40,7 +40,7 @@ const initialTextBlockState: TextBlockState = {
     shadow: false,
   },
 };
-
+ 
 export default function BlockPagesClient() {
   const searchParams = useSearchParams();
   const requestedTemplate = searchParams.get("template");
@@ -55,19 +55,47 @@ export default function BlockPagesClient() {
   const [textBlockState, setTextBlockState] = useState<TextBlockState>(initialTextBlockState);
   const [pastTextStates, setPastTextStates] = useState<TextBlockState[]>([]);
   const [futureTextStates, setFutureTextStates] = useState<TextBlockState[]>([]);
-
+ 
+  const [isImageEditingMode, setIsImageEditingMode] = useState(false);
+  const [editingImageId, setEditingImageId] = useState<string | null>(null);
+  const [customImages, setCustomImages] = useState<Record<string, string>>({});
+ 
+  useEffect(() => {
+    try {
+      const storedImages = localStorage.getItem("stackly-custom-images");
+      if (storedImages) {
+        const parsed = JSON.parse(storedImages);
+        const validImages: Record<string, string> = {};
+        let hasChanges = false;
+        for (const key in parsed) {
+          if (typeof parsed[key] === "string" && parsed[key].startsWith("blob:")) {
+            hasChanges = true;
+          } else {
+            validImages[key] = parsed[key];
+          }
+        }
+        setCustomImages(validImages);
+        if (hasChanges) {
+          localStorage.setItem("stackly-custom-images", JSON.stringify(validImages));
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load custom images", e);
+    }
+  }, []);
+ 
   const pushButtonState = (nextBlocks: BlockData[]) => {
     setPastButtonStates((current) => [...current, buttonBlocks]);
     setFutureButtonStates([]);
     setButtonBlocks(nextBlocks);
   };
-
+ 
   const undoButton = () => {
     setPastButtonStates((currentPast) => {
       if (currentPast.length === 0) {
         return currentPast;
       }
-
+ 
       const previous = currentPast[currentPast.length - 1];
       setFutureButtonStates((currentFuture) => [buttonBlocks, ...currentFuture]);
       setButtonBlocks(previous);
@@ -75,13 +103,13 @@ export default function BlockPagesClient() {
       return currentPast.slice(0, -1);
     });
   };
-
+ 
   const redoButton = () => {
     setFutureButtonStates((currentFuture) => {
       if (currentFuture.length === 0) {
         return currentFuture;
       }
-
+ 
       const [next, ...remaining] = currentFuture;
       setPastButtonStates((currentPast) => [...currentPast, buttonBlocks]);
       setButtonBlocks(next);
@@ -89,83 +117,102 @@ export default function BlockPagesClient() {
       return remaining;
     });
   };
-
+ 
   const updateButtonBlock = (id: string, props: Record<string, unknown>) => {
     if (!id) {
       return;
     }
-
+ 
     pushButtonState(
       buttonBlocks.map((block) =>
         block.id === id
           ? {
-              ...block,
-              props: {
-                ...block.props,
-                ...props,
-              },
-            }
+            ...block,
+            props: {
+              ...block.props,
+              ...props,
+            },
+          }
           : block,
       ),
     );
   };
-
+ 
   const removeButtonBlock = (id: string) => {
     const nextBlocks = buttonBlocks.filter((block) => block.id !== id);
     pushButtonState(nextBlocks);
     setSelectedButtonBlockId(nextBlocks[0]?.id ?? null);
   };
-
+ 
   const selectedButtonBlock =
     buttonBlocks.find((block) => block.id === selectedButtonBlockId) ?? buttonBlocks[0] ?? null;
-
+ 
   const pushTextState = (nextState: TextBlockState) => {
     setPastTextStates((current) => [...current, textBlockState]);
     setFutureTextStates([]);
     setTextBlockState(nextState);
   };
-
+ 
   const undoText = () => {
     setPastTextStates((currentPast) => {
       if (currentPast.length === 0) {
         return currentPast;
       }
-
+ 
       const previous = currentPast[currentPast.length - 1];
       setFutureTextStates((currentFuture) => [textBlockState, ...currentFuture]);
       setTextBlockState(previous);
       return currentPast.slice(0, -1);
     });
   };
-
+ 
   const redoText = () => {
     setFutureTextStates((currentFuture) => {
       if (currentFuture.length === 0) {
         return currentFuture;
       }
-
+ 
       const [next, ...remaining] = currentFuture;
       setPastTextStates((currentPast) => [...currentPast, textBlockState]);
       setTextBlockState(next);
       return remaining;
     });
   };
-
+ 
   return (
     <BuilderProvider>
       <section className="flex min-h-[calc(100vh-64px)] flex-1 gap-4 overflow-hidden bg-[#e9eef6] p-4">
         <div className="contents lg:block lg:overflow-hidden lg:rounded-xl lg:shadow-[0_18px_45px_rgba(11,29,64,0.12)]">
           <LeftSidebar
             activeBlockPage={activeBlockPage}
+            isImageEditingMode={isImageEditingMode}
+            editingImageId={editingImageId}
+            onImageSelected={(url) => {
+              if (editingImageId) {
+                setCustomImages((prev) => {
+                  const next = { ...prev, [editingImageId]: url };
+                  localStorage.setItem("stackly-custom-images", JSON.stringify(next));
+                  return next;
+                });
+              }
+              setEditingImageId(null);
+              setIsImageEditingMode(false);
+            }}
+            onCloseMobileImageSelect={() => setEditingImageId(null)}
             onSelectBlockPage={(page) => {
+              if (page === "image" && activeBlockPage === "text") {
+                setIsImageEditingMode((prev) => !prev);
+                return;
+              }
               setActiveBlockPage(page);
               if (page === "text") {
                 setTextTemplate("ecommerce");
+                setIsImageEditingMode(false);
               }
             }}
           />
         </div>
-
+ 
         {activeBlockPage === "button" ? (
           <div className="flex min-w-0 flex-1 gap-4">
             <ButtonCanvas
@@ -192,6 +239,14 @@ export default function BlockPagesClient() {
               onUndo={undoText}
               onRedo={redoText}
               template={textTemplate}
+              isImageEditingMode={isImageEditingMode}
+              customImages={customImages}
+              onEditImage={(imageId) => {
+                setEditingImageId(imageId);
+                if (typeof window !== "undefined" && window.innerWidth >= 1024) {
+                  setActiveBlockPage("image");
+                }
+              }}
             />
             <div className="hidden w-[286px] shrink-0 lg:block">
               <TextRightSidebar state={textBlockState} onStateChange={pushTextState} />
@@ -199,7 +254,21 @@ export default function BlockPagesClient() {
           </div>
         ) : (
           <div className="flex min-w-0 flex-1 gap-4">
-            <ImageMainCanvas />
+            <ImageMainCanvas
+              editingImageId={editingImageId}
+              onImageSelected={(url) => {
+                if (editingImageId) {
+                  setCustomImages((prev) => {
+                    const next = { ...prev, [editingImageId]: url };
+                    localStorage.setItem("stackly-custom-images", JSON.stringify(next));
+                    return next;
+                  });
+                }
+                setActiveBlockPage("text");
+                setEditingImageId(null);
+                setIsImageEditingMode(false);
+              }}
+            />
             <div className="hidden w-[286px] shrink-0 lg:block">
               <ImageRightSidebar />
             </div>
@@ -209,3 +278,4 @@ export default function BlockPagesClient() {
     </BuilderProvider>
   );
 }
+ 

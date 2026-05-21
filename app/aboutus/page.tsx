@@ -1,236 +1,261 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import {
-  FaArrowRight,
-  FaCrosshairs,
-  FaDesktop,
-  FaEye,
-  FaGem,
-  FaGlobe,
-  FaHeadset,
-  FaRegFlag,
-  FaRegHeart,
-  FaRegStar,
-  FaRocket,
-  FaUsers,
-} from "react-icons/fa";
-import { assetPath } from "@/lib/paths";
+import Footer from "@/components/Footer";
+import { FaArrowRight, FaBullseye, FaEye, FaGem, FaHeart, FaFlag, FaUsers, FaRocket, FaStar, FaGlobe, FaLayerGroup, FaHeadset } from "react-icons/fa6";
 
-const focusCards = [
-  {
-    title: "Our Mission",
-    text: "To make website building easy, accessible, and effective for everyone.",
-    icon: FaRocket,
-  },
-  {
-    title: "Our Vision",
-    text: "To be the world's most trusted website platform for creators and businesses.",
-    icon: FaEye,
-  },
-  {
-    title: "Our Values",
-    text: "Simplicity, innovation, reliability, and customer success drive everything we do.",
-    icon: FaGem,
-  },
-  {
-    title: "Our Promise",
-    text: "We're committed to your success with tools, support, and continuous improvement.",
-    icon: FaRegHeart,
-  },
-];
-
-const timelineCards = [
-  {
-    year: "2015",
-    title: "The Beginning",
-    text: "Stackly was founded with a mission to simplify website creation for all.",
-    icon: FaRegFlag,
-  },
-  {
-    year: "2018",
-    title: "Growing Together",
-    text: "We reached our first 10,000 users and expanded our team and features.",
-    icon: FaUsers,
-  },
-  {
-    year: "2021",
-    title: "Expanding Horizons",
-    text: "New tools, templates, and integrations helped businesses scale online.",
-    icon: FaCrosshairs,
-  },
-  {
-    year: "Today",
-    title: "Stronger Than Ever",
-    text: "Thousands of users trust Stackly to build, manage, and grow their online presence.",
-    icon: FaRegStar,
-  },
-];
-
-const stats = [
-  {
-    value: "50K+",
-    label: "Happy Users",
-    icon: FaUsers,
-  },
-  {
-    value: "120+",
-    label: "Countries",
-    icon: FaGlobe,
-  },
-  {
-    value: "500+",
-    label: "Templates",
-    icon: FaDesktop,
-  },
-  {
-    value: "24/7 Customer",
-    label: "Support",
-    icon: FaHeadset,
-  },
-];
-
-const timelineAnimationClasses = [
-  "[animation:planning-card-in_0.55s_ease_0.10s_both]",
-  "[animation:planning-card-in_0.55s_ease_0.16s_both]",
-  "[animation:planning-card-in_0.55s_ease_0.22s_both]",
-  "[animation:planning-card-in_0.55s_ease_0.28s_both]",
-];
-
-export default function AboutUs() {
+export default function AboutPage({ onBack }: { onBack: () => void }) {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-white text-[#092652]">
-      <section className="relative bg-[#e7f0fc] px-5 pb-20 pt-10 shadow-[inset_0_-2px_5px_rgba(6,34,76,0.18)] sm:px-8 lg:px-12 lg:pb-24 xl:px-0">
-        <div className="mx-auto grid w-full max-w-[1180px] items-center gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16">
-          <div className="min-w-0 text-center [animation:planning-fade-up_0.58s_ease_both] lg:text-left">
-            <p className="mb-5 text-sm font-bold uppercase tracking-wide text-[#2454ff] sm:text-base">
-              About Us
-            </p>
-            <h1 className="mx-auto max-w-[620px] text-balance text-3xl font-extrabold italic leading-tight text-[#092652] sm:text-4xl lg:mx-0 lg:text-5xl">
-              Building Better Websites for a Better Future
-            </h1>
-            <p className="mx-auto mt-6 max-w-[560px] text-pretty text-base leading-7 text-[#173866] sm:text-lg lg:mx-0">
-              Stackly is a powerful website builder that empowers individuals, businesses, and organizations to create stunning websites without any coding. We combine simplicity with flexibility to help you build, grow, and succeed online.
-            </p>
+    <div className="min-h-screen bg-[#FFF1F2] text-[#06224C] font-sans flex flex-col">
+      <div className="flex-grow pb-12">
+        {/* Back Button */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8">
+          <button onClick={onBack} className="inline-flex items-center gap-2 text-[#06224C] hover:text-blue-600 uppercase text-[10px] font-black tracking-widest outline-none">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+            Back to Home
+          </button>
+        </div>
 
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
-              <Link
-                href="/landing#templates"
-                className="inline-flex h-11 min-w-0 items-center justify-center rounded-md bg-[#06285b] px-6 text-sm font-bold text-white shadow-[0_4px_8px_rgba(6,34,76,0.22)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#0a3471] hover:shadow-[0_12px_24px_rgba(6,34,76,0.22)] active:scale-95 sm:min-w-[15rem] sm:text-base"
-              >
-                Explore Our Products
-              </Link>
-              <Link
-                href="/landing#contact"
-                className="inline-flex h-11 min-w-0 items-center justify-center rounded-md border border-[#06285b] bg-white px-6 text-sm font-bold text-[#092652] shadow-[0_3px_8px_rgba(6,34,76,0.18)] transition duration-300 hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-[0_12px_24px_rgba(6,34,76,0.14)] active:scale-95 sm:min-w-[10.5rem] sm:text-base"
-              >
-                Contact Us
-              </Link>
+        {/* ── Marquee Banner ───────────────────────────────────────────────── */}
+        <section className="py-12 md:py-20 bg-white/50 text-center border-y border-[#06224C]/5 overflow-hidden">
+          <h1
+            className="text-5xl md:text-8xl font-black text-[#06224C] opacity-5 tracking-tighter uppercase pointer-events-none select-none break-words"
+            aria-hidden="true"
+          >
+            Innovation * Growth
+          </h1>
+        </section>
+
+        {/* ── Existing Mission / Vision / Why Us ───────────────────────────── */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+            {/* 01 Mission */}
+            <div className="bg-[#06224C] p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-lg group text-white">
+              <span className="text-4xl md:text-5xl font-black text-blue-400/30 group-hover:text-blue-500 transition duration-500 block" aria-hidden="true">
+                01.
+              </span>
+              <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mt-4 mb-4 break-words" style={{ letterSpacing: "-1px" }}>
+                Our Mission
+              </h3>
+              <p className="text-xs text-blue-100/70 leading-relaxed mb-6 break-words" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
+                Our mission is simple—create tools that solve real problems. We aim to enhance your experience through innovation and reliability.
+              </p>
+              <div className="rounded-2xl overflow-hidden h-36 md:h-40">
+                <img
+                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800"
+                  className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
+                  alt="Team collaborating in office"
+                  loading="lazy"
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="relative mx-auto w-full max-w-[610px] [animation:planning-panel-in_0.68s_ease_0.08s_both] lg:max-w-none">
-            <div className="group relative aspect-[1.49/1] overflow-hidden rounded-xl shadow-[0_3px_10px_rgba(6,34,76,0.22)] ring-1 ring-[#9fb0c7] transition duration-500 hover:-translate-y-1 hover:shadow-[0_22px_42px_rgba(6,34,76,0.20)]">
-              <Image
-                src={assetPath("/business09.webp")}
-                alt="Stackly team meeting"
-                fill
-                sizes="(max-width: 1024px) 92vw, 46vw"
-                className="object-cover transition duration-700 group-hover:scale-105"
-                priority
-                unoptimized
-              />
-              <div className="absolute left-4 top-4 rounded-full bg-white/75 px-3 py-1.5 shadow-sm backdrop-blur-sm sm:left-6 sm:top-5">
-                <Image
-                  src={assetPath("/stackly-logo.webp")}
-                  alt="Stackly"
-                  width={92}
-                  height={28}
-                  className="h-auto w-[92px]"
-                  unoptimized
+            {/* 02 Vision */}
+            <div className="bg-[#06224C] p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-lg group text-white">
+              <span className="text-4xl md:text-5xl font-black text-blue-400/30 group-hover:text-blue-500 transition duration-500 block" aria-hidden="true">
+                02.
+              </span>
+              <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mt-4 mb-4 break-words" style={{ letterSpacing: "-1px" }}>
+                Our Vision
+              </h3>
+              <p className="text-xs text-blue-100/70 leading-relaxed mb-6 break-words" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
+                We envision a future where technology serves as an enabler for creativity. Stackly strives to be a leader in scalable tools.
+              </p>
+              <div className="rounded-2xl overflow-hidden h-36 md:h-40">
+                <img
+                  src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=500"
+                  className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
+                  alt="Meeting room discussion"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+
+            {/* 03 Why Us */}
+            <div className="bg-[#06224C] p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-lg group text-white">
+              <span className="text-4xl md:text-5xl font-black text-blue-400/30 group-hover:text-blue-500 transition duration-500 block" aria-hidden="true">
+                03.
+              </span>
+              <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mt-4 mb-4 break-words" style={{ letterSpacing: "-1px" }}>
+                Why Us?
+              </h3>
+              <p className="text-xs text-blue-100/70 leading-relaxed mb-6 break-words" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
+                Our team brings a wealth of knowledge to every project. We prioritize your needs to deliver solutions that truly add value.
+              </p>
+              <div className="rounded-2xl overflow-hidden h-36 md:h-40 grayscale group-hover:grayscale-0 transition duration-500">
+                <img
+                  src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=500"
+                  className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
+                  alt="Team working together"
+                  loading="lazy"
                 />
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="relative z-10 mx-auto -mt-14 w-full max-w-[1180px] px-5 sm:px-8 xl:px-0">
-        <div className="grid overflow-hidden rounded-2xl border border-[#8ea2bd] bg-white p-5 shadow-[0_4px_8px_rgba(6,34,76,0.22)] [animation:planning-card-in_0.6s_ease_0.12s_both] sm:grid-cols-2 sm:p-6 lg:grid-cols-4 lg:p-7">
-          {focusCards.map(({ title, text, icon: Icon }, index) => (
-            <article
-              key={title}
-              className="group grid min-w-0 grid-cols-[2.5rem_1fr] gap-x-4 gap-y-2 rounded-lg py-3 text-left transition duration-300 hover:bg-[#f6f9ff] sm:p-3 lg:border-r lg:border-[#8ea2bd] lg:px-5 lg:last:border-r-0"
-            >
-              <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#06285b] text-white shadow-[0_3px_6px_rgba(6,34,76,0.35)] transition duration-300 group-hover:-translate-y-1 group-hover:rotate-3">
-                <Icon className="text-sm" />
-              </span>
-              <h2 className="text-base font-bold text-[#092652] sm:text-lg">{title}</h2>
-              <p className="col-start-2 text-pretty text-sm leading-6 text-[#173866] sm:text-base">{text}</p>
-              {index < focusCards.length - 1 && <span className="col-span-2 my-3 h-px bg-[#8ea2bd] lg:hidden" />}
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto grid w-full max-w-[1180px] gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[0.85fr_2.15fr] lg:gap-14 lg:py-20 xl:px-0">
-        <div className="min-w-0 text-center [animation:planning-fade-up_0.58s_ease_0.18s_both] lg:text-left">
-          <p className="mb-4 text-sm font-bold uppercase tracking-wide text-[#2454ff] sm:text-base">Our Story</p>
-          <h2 className="text-balance text-2xl font-extrabold leading-tight text-[#092652] sm:text-3xl lg:text-4xl">
-            From an Idea to a Powerful Platform
-          </h2>
-          <p className="mt-4 text-pretty text-base leading-7 text-[#173866] sm:text-lg">
-            Founded in 2015, Stackly began with a simple goal: to help people create professional websites without technical barriers. What started as a small idea has grown into a powerful platform trusted by thousands of users worldwide.
-          </p>
-          <p className="mt-4 text-pretty text-base leading-7 text-[#173866] sm:text-lg">
-            Today, we continue to innovate and expand our features to deliver the best website building experience possible.
-          </p>
-          <Link
-            href="/landing#features"
-            aria-label="Explore Stackly features"
-            className="mx-auto mt-5 inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-[#2454ff] transition duration-300 hover:translate-x-1 hover:bg-blue-100 lg:mx-0"
-          >
-            <FaArrowRight className="text-base" />
-          </Link>
-        </div>
-
-        <div className="grid min-w-0 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {timelineCards.map(({ year, title, text, icon: Icon }, index) => (
-            <article
-              key={`${year}-${title}`}
-              className={`group flex min-h-[280px] min-w-0 flex-col items-center justify-start rounded-2xl border border-[#9aaac0] bg-white px-5 py-6 text-center shadow-[0_4px_6px_rgba(6,34,76,0.22)] transition duration-300 hover:-translate-y-2 hover:border-[#2454ff]/50 hover:shadow-[0_16px_32px_rgba(6,34,76,0.18)] sm:min-h-[300px] sm:px-6 sm:py-7 ${timelineAnimationClasses[index]}`}
-            >
-              <span className="mb-8 flex h-16 w-16 items-center justify-center rounded-md bg-[#e0ecff] text-[#092652] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105 group-hover:bg-[#06285b] group-hover:text-white sm:h-[74px] sm:w-[74px]">
-                <Icon className="text-xl sm:text-2xl" />
-              </span>
-              <h3 className="text-base font-extrabold leading-tight text-[#092652] sm:text-lg">
-                {year}
-                <br />
-                {title}
-              </h3>
-              <p className="mt-3 text-pretty text-sm leading-6 text-[#173866] sm:text-base">{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-[1180px] px-5 pb-12 sm:px-8 lg:pb-16 xl:px-0">
-        <div className="grid gap-4 rounded-2xl bg-[#06285b] px-5 py-8 text-white shadow-[0_4px_8px_rgba(6,34,76,0.25)] [animation:planning-panel-in_0.62s_ease_0.22s_both] sm:grid-cols-2 sm:px-8 sm:py-9 lg:grid-cols-4 lg:gap-0 lg:px-10">
-          {stats.map(({ value, label, icon: Icon }) => (
-            <article
-              key={label}
-              className="group flex min-w-0 items-center justify-center gap-4 rounded-xl px-3 py-4 text-center transition duration-300 hover:bg-white/10 sm:justify-start sm:text-left lg:justify-center lg:border-r lg:border-white/40 lg:px-6 lg:last:border-r-0"
-            >
-              <Icon className="shrink-0 text-4xl text-white transition duration-300 group-hover:scale-110 sm:text-5xl" />
-              <div className="min-w-0">
-                <p className="text-pretty text-xl font-semibold leading-tight sm:text-2xl">{value}</p>
-                <p className="mt-1 text-sm leading-tight text-white/90 sm:text-base">{label}</p>
+        {/* ── Existing Stats Row ────────────────────────────────────────────── */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-12 md:pb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-8">
+            {[
+              { value: "500K +", label: "Users Worldwide" },
+              { value: "120 +",  label: "Team Members"    },
+              { value: "2015",   label: "Founded"         },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="bg-white rounded-2xl p-6 md:p-8 shadow-md text-center border border-gray-50"
+              >
+                <p className="text-2xl md:text-4xl font-black text-[#06224C]">
+                  {stat.value}
+                </p>
+                <p className="mt-1 text-[11px] md:text-xs font-bold uppercase tracking-widest text-gray-500">
+                  {stat.label}
+                </p>
               </div>
-            </article>
-          ))}
+            ))}
+          </div>
+        </section>
+
+        {/* ── Expanded Content (Now Always Visible) ────────────────────────── */}
+        <div className="bg-white pt-16 border-t border-gray-200">
+          
+          {/* New Hero Section */}
+          <section className="bg-[#EAF1FA] py-16 md:py-24 px-4 sm:px-6 rounded-t-[3rem]">
+            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+              <div className="w-full lg:w-1/2 space-y-6">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-blue-600">About Us</h3>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif italic font-black text-[#0A2357] leading-tight">
+                  Building Better Websites for a Better Future
+                </h2>
+                <p className="text-gray-600 text-base md:text-lg leading-relaxed max-w-xl">
+                  Stackly is a powerful website builder that empowers individuals, businesses, and organizations to create stunning websites without any coding. We combine simplicity with flexibility to help you build, grow, and succeed online.
+                </p>
+                <div className="flex flex-wrap items-center gap-4 pt-4">
+                  <Link href="/products" className="bg-[#0A2357] text-white px-8 py-3.5 rounded-lg text-sm font-bold shadow-lg hover:bg-blue-900 transition">
+                    Explore Our Products
+                  </Link>
+                  <Link href="/contact" className="bg-white text-[#0A2357] border border-gray-200 px-8 py-3.5 rounded-lg text-sm font-bold shadow-sm hover:border-gray-300 transition">
+                    Contact Us
+                  </Link>
+                </div>
+              </div>
+              <div className="w-full lg:w-1/2">
+                <img 
+                  src="https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&q=80&w=1000" 
+                  alt="Team shaking hands" 
+                  className="rounded-2xl shadow-2xl object-cover w-full h-[300px] md:h-[450px]"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Mission / Vision / Values / Promise Bar */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 -mt-10 relative z-10">
+            <div className="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-gray-100 p-2 md:p-4">
+              {[
+                { icon: <FaBullseye />, title: "Our Mission", desc: "To make website building easy, accessible, and effective for everyone." },
+                { icon: <FaEye />, title: "Our Vision", desc: "To be the world's most trusted website platform for creators and businesses." },
+                { icon: <FaGem />, title: "Our Values", desc: "Simplicity, innovation, reliability, and customer success drive everything we do." },
+                { icon: <FaHeart />, title: "Our Promise", desc: "We're committed to your success with tools, support, and continuous improvement." },
+              ].map((item, idx) => (
+                <div key={idx} className="flex-1 p-6 flex gap-4 items-start">
+                  <div className="bg-[#0A2357] text-white p-2.5 rounded-lg flex-shrink-0 mt-1">
+                    {item.icon}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-[#0A2357] mb-2">{item.title}</h4>
+                    <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Our Story Timeline */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-28">
+            <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
+              
+              <div className="w-full lg:w-1/3 space-y-6">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-blue-600">Our Story</h3>
+                <h2 className="text-3xl md:text-4xl font-black text-[#0A2357] leading-tight">
+                  From an Idea to a Powerful Platform
+                </h2>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Founded in 2015, Stackly began with a simple goal: to help people create professional websites without technical barriers. What started as a small idea has grown into a powerful platform trusted by thousands of users worldwide.
+                </p>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Today, we continue to innovate and expand our features to deliver the best website building experience possible.
+                </p>
+                <button className="text-blue-600 hover:text-blue-800 transition">
+                  <FaArrowRight />
+                </button>
+              </div>
+
+              <div className="w-full lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                {[
+                  { icon: <FaFlag />, year: "2015", title: "The Beginning", desc: "Stackly was founded with a mission to simplify website creation for all." },
+                  { icon: <FaUsers />, year: "2018", title: "Growing Together", desc: "We reached our first 10,000 users and expanded our team and features." },
+                  { icon: <FaRocket />, year: "2021", title: "Expanding Horizons", desc: "New tools, templates, and integrations helped businesses scale online." },
+                  { icon: <FaStar />, year: "Today", title: "Stronger Than Ever", desc: "Thousands of users trust Stackly to build, manage, and grow their online presence." },
+                ].map((item, idx) => (
+                  <div key={idx} className="bg-white border border-gray-100 rounded-2xl p-6 text-center shadow-sm hover:shadow-xl transition duration-300 group flex flex-col items-center">
+                    <div className="bg-[#EAF1FA] text-blue-600 w-12 h-12 rounded-xl flex items-center justify-center text-xl mb-6 group-hover:scale-110 transition duration-300">
+                      {item.icon}
+                    </div>
+                    <h4 className="font-bold text-[#0A2357] text-sm mb-1">{item.year}</h4>
+                    <h5 className="font-bold text-[#0A2357] text-sm mb-3">{item.title}</h5>
+                    <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+          </section>
+
+          {/* Dark Stats Banner */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
+            <div className="bg-[#06183A] rounded-2xl md:rounded-[2rem] p-8 md:p-12 shadow-2xl">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/10">
+                {[
+                  { icon: <FaUsers />, stat: "50K+", label: "Happy Users" },
+                  { icon: <FaGlobe />, stat: "120+", label: "Countries" },
+                  { icon: <FaLayerGroup />, stat: "500+", label: "Templates" },
+                  { icon: <FaHeadset />, stat: "24/7", label: "Customer Support" },
+                ].map((item, idx) => (
+                  <div key={idx} className={`flex items-center gap-4 ${idx !== 0 && idx !== 2 ? 'pl-4 sm:pl-8' : ''} ${idx === 2 ? 'pl-0 md:pl-8' : ''}`}>
+                    <div className="text-white text-3xl opacity-80">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <h4 className="text-white font-bold text-lg md:text-xl">{item.stat}</h4>
+                      <p className="text-white/60 text-[10px] md:text-xs font-medium">{item.label}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
-    </main>
+      </div>
+
+      {/* ── Footer ────────────────────────────────────────────────────────── */}
+      <Footer />
+
+      {/* ── Zoom-safe global styles ───────────────────────────────────────── */}
+      <style>{`
+        h1, h2, h3, h4, p {
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+          hyphens: auto;
+        }
+        @media (max-width: 480px) {
+          section {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+          }
+        }
+      `}</style>
+    </div>
   );
 }

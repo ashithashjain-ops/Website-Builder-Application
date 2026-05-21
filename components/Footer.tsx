@@ -200,15 +200,8 @@ export default function Footer() {
 
   const openFooterItem = (key: string) => {
     if (key === "about") {
-      const featuresSection = document.getElementById("features");
-
-      if (featuresSection) {
-        featuresSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.history.pushState(null, "", "/landing#features");
-        return;
-      }
-
-      router.push("/landing#features");
+      // Dispatches the event caught by the Home component to open About Us
+      window.dispatchEvent(new Event("stackly-open-about"));
       return;
     }
 
