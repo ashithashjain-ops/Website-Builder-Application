@@ -2,6 +2,7 @@
  
 import Link from "next/link";
 import { MouseEvent, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   FaBars,
   FaBookOpen,
@@ -164,6 +165,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [mobileSection, setMobileSection] = useState<"products" | "categories" | null>(null);
   const [mobileCategory, setMobileCategory] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navRef = useRef<HTMLElement>(null);
  
   const scrollLandingSection = (event: MouseEvent<HTMLAnchorElement>, sectionId: string, closeMobile = false) => {
@@ -225,8 +227,17 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
     };
  
     document.addEventListener("mousedown", handleClickOutside);
- 
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 8);
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
  
   const wishlistCount = wishlistCountProp ?? wishlistItems.reduce((total, item) => total + (item.quantity || item.qty || 1), 0);
@@ -278,7 +289,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
  
   return (
     <>
-    <header className="stackly-navbar sticky top-0 z-[5000] overflow-visible border-b border-white/10 bg-[#06224C] px-2 py-3 shadow-sm md:px-12">
+    <header className={`stackly-navbar sticky top-0 z-[5000] overflow-visible border-b px-2 py-3 transition-all duration-300 md:px-12 ${isScrolled ? "border-white/15 bg-[#06224C]/90 shadow-[0_16px_44px_rgba(2,15,38,0.24)] backdrop-blur-xl" : "border-white/10 bg-[#06224C] shadow-sm backdrop-blur-none"}`}>
       <nav ref={navRef} className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-2 overflow-visible md:gap-4">
         <div className="flex min-w-0 items-center gap-1 md:gap-8">
           <button
@@ -299,14 +310,14 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
           </Link>
  
           <div className="hidden items-center justify-center gap-12 text-[13px] font-bold uppercase tracking-wide text-white lg:flex">
-            <Link href="/landing" className="whitespace-nowrap transition hover:text-blue-300">HOME</Link>
-            <Link href="/landing#about" onClick={(event) => scrollLandingSection(event, "about")} className="whitespace-nowrap transition hover:text-blue-300">ABOUT US</Link>
+            <Link href="/landing" className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300">HOME</Link>
+            <Link href="/landing#about" onClick={(event) => scrollLandingSection(event, "about")} className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300">ABOUT US</Link>
  
             <div className="relative">
               <button
                 type="button"
                 onClick={() => toggleMenu("products")}
-                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-1 transition hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="stackly-nav-link inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-1 transition hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 aria-haspopup="true"
                 aria-expanded={activeMenu === "products"}
               >
@@ -325,7 +336,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               <button
                 type="button"
                 onClick={() => toggleMenu("categories")}
-                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-1 transition hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="stackly-nav-link inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-1 transition hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 aria-haspopup="true"
                 aria-expanded={activeMenu === "categories"}
               >
@@ -354,7 +365,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               </div>
             </div>
  
-            <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact")} className="whitespace-nowrap transition hover:text-blue-300">CONTACT</Link>
+            <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact")} className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300">CONTACT</Link>
           </div>
         </div>
  
@@ -444,8 +455,15 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
         </div>
       </nav>
  
+      <AnimatePresence>
       {mobileOpen && (
-        <div className="stackly-mobile-menu border-t border-white/10 bg-[#06224C] py-4 text-[11px] font-bold uppercase tracking-widest text-white shadow-inner lg:hidden">
+        <motion.div
+          className="stackly-mobile-menu border-t border-white/10 bg-[#06224C] py-4 text-[11px] font-bold uppercase tracking-widest text-white shadow-inner lg:hidden"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+        >
           <div className="flex flex-col">
             <Link href="/landing" onClick={() => setMobileOpen(false)} className="border-b border-white/5 px-6 py-4">Home</Link>
             <Link href="/landing#about" onClick={(event) => scrollLandingSection(event, "about", true)} className="border-b border-white/5 px-6 py-4">About Us</Link>
@@ -508,8 +526,9 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
  
             <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact", true)} className="px-6 py-4">Contact</Link>
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </header>
  
     {activePanel && (

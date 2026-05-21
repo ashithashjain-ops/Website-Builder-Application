@@ -35,6 +35,40 @@ body {
   overflow-x: hidden;
 }
 
+html:has(body > main.landing-page) {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-color: #8fb8e8 #071936;
+  scrollbar-width: thin;
+}
+
+body:has(> main.landing-page) {
+  overflow-x: hidden;
+  overflow-y: visible;
+  background: #fff1f2;
+}
+
+html:has(body > main.landing-page)::-webkit-scrollbar {
+  width: 12px;
+}
+
+html:has(body > main.landing-page)::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, #071936 0%, #0a2357 52%, #071936 100%);
+}
+
+html:has(body > main.landing-page)::-webkit-scrollbar-thumb {
+  min-height: 64px;
+  border: 3px solid #071936;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #dbeafe 0%, #60a5fa 48%, #1d4ed8 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 18px rgba(96, 165, 250, 0.35);
+}
+
+html:has(body > main.landing-page)::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #eff6ff 0%, #93c5fd 45%, #2563eb 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 24px rgba(96, 165, 250, 0.55);
+}
+
 /* Plans (/planning): match static index — page bg fills viewport so default white body does not frame the layout */
 html:has(body > main.planning-page),
 body:has(> main.planning-page) {
@@ -2960,4 +2994,40 @@ body.auth-visible {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Landing page: use body as the only vertical scroll container. */
+html:has(body > main.landing-page) {
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+body:has(> main.landing-page) {
+  height: 100dvh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  background: #fff1f2;
+  scrollbar-color: #93c5fd #071936;
+  scrollbar-width: thin;
+}
+
+body:has(> main.landing-page)::-webkit-scrollbar {
+  width: 12px;
+}
+
+body:has(> main.landing-page)::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, #071936 0%, #0a2357 52%, #071936 100%);
+}
+
+body:has(> main.landing-page)::-webkit-scrollbar-thumb {
+  min-height: 64px;
+  border: 3px solid #071936;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #dbeafe 0%, #60a5fa 48%, #1d4ed8 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 18px rgba(96, 165, 250, 0.35);
+}
+
+body:has(> main.landing-page)::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #eff6ff 0%, #93c5fd 45%, #2563eb 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 24px rgba(96, 165, 250, 0.55);
 }
