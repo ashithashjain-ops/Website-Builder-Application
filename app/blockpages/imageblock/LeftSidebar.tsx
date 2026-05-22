@@ -13,6 +13,10 @@ export type BlockPageType = 'image' | 'button' | 'text';
 type LeftSidebarProps = {
   activeBlockPage?: BlockPageType;
   onSelectBlockPage?: (page: BlockPageType) => void;
+  isImageEditingMode?: boolean;
+  editingImageId?: string | null;
+  onImageSelected?: (url: string) => void;
+  onCloseMobileImageSelect?: () => void;
 };
 
 const blockCategories = [
@@ -42,7 +46,7 @@ const blockCategories = [
   }
 ];
 
-const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage }: LeftSidebarProps) => {
+const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage, isImageEditingMode = false, editingImageId, onImageSelected, onCloseMobileImageSelect }: LeftSidebarProps) => {
   const [activeTab, setActiveTab] = useState('Blocks');
   const [openCategories, setOpenCategories] = useState<number[]>([0, 1, 2]);
   const [subTab, setSubTab] = useState<'all' | 'next'>('all');
@@ -111,6 +115,14 @@ const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage }: LeftSideb
     return () => document.removeEventListener('click', closeDropdown);
   }, []);
 
+  useEffect(() => {
+    if (editingImageId && typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setIsOpen(true);
+      setMobileView('Blocks');
+      setMobileOverlayTab('Images');
+    }
+  }, [editingImageId]);
+
   const colors = [
     'bg-gradient-to-r from-[#22C55E] to-[#EF4444]',
     'bg-[#EF4444]',
@@ -170,7 +182,10 @@ const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage }: LeftSideb
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black/50"
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              onCloseMobileImageSelect?.();
+            }}
           />
           
           {/* Overlay Content */}
@@ -373,7 +388,10 @@ const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage }: LeftSideb
                     <Type className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                     <span className="text-[10px] font-semibold text-[#0B182B]">Text</span>
                   </div>
-                  <div onClick={() => setMobileOverlayTab('Images')} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                  <div onClick={() => {
+                      setIsOpen(false);
+                      onSelectBlockPage?.('image');
+                    }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
                     <ImageIcon className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                     <span className="text-[10px] font-semibold text-[#0B182B]">Images</span>
                   </div>
@@ -512,20 +530,47 @@ const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage }: LeftSideb
             {/* Images Content */}
             {mobileOverlayTab === 'Images' && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300 px-5 pb-8">
+                <input
+                  type="file"
+                  id="mobile-image-upload"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        onImageSelected?.(reader.result as string);
+                        setIsOpen(false);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
                 <h3 className="text-white font-medium text-[15px] mb-4">Images</h3>
                 <div className="grid grid-cols-3 gap-3">
                   {/* Upload Image Button */}
-                  <div onClick={() => mobileAddBlock('Upload Image')} className="border border-[#4E627C] rounded-xl flex flex-col items-center justify-center aspect-square cursor-pointer hover:bg-[#203354]/50 transition-colors">
+                  <label htmlFor="mobile-image-upload" className="border border-[#4E627C] rounded-xl flex flex-col items-center justify-center aspect-square cursor-pointer hover:bg-[#203354]/50 transition-colors">
                     <Plus size={24} className="text-[#8495A5] mb-2" strokeWidth={1.5} />
                     <span className="text-[11px] text-[#8495A5] font-medium text-center leading-tight">Upload<br/>Image</span>
-                  </div>
+                  </label>
                   
                   {/* Image Thumbnails */}
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div onClick={() => mobileAddBlock(`Image ${i}`)} key={i} className="rounded-xl overflow-hidden aspect-square border-2 border-transparent hover:border-[#517AA5] cursor-pointer transition-colors">
+                  {[
+                    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80",
+                    "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&q=80"
+                  ].map((imgSrc, i) => (
+                    <div onClick={() => {
+                        if (editingImageId) {
+                          onImageSelected?.(imgSrc);
+                          setIsOpen(false);
+                        } else {
+                          mobileAddBlock(`Image ${i}`);
+                        }
+                      }} key={i} className="rounded-xl overflow-hidden aspect-square border-2 border-transparent hover:border-[#517AA5] cursor-pointer transition-colors">
                       <img 
-                        src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300&h=300&fit=crop" 
-                        alt={`Mountain ${i}`} 
+                        src={imgSrc} 
+                        alt={`Preset ${i}`} 
                         className="w-full h-full object-cover" 
                       />
                     </div>
@@ -1068,10 +1113,10 @@ const LeftSidebar = ({ activeBlockPage = 'image', onSelectBlockPage }: LeftSideb
                       <div className="grid grid-cols-3 gap-2">
                         {cat.blocks.map((block, bIdx) => {
                           const isActive =
-                            (block.name === 'Image' && activeBlockPage === 'image') ||
+                            (block.name === 'Image' && (activeBlockPage === 'image' || isImageEditingMode)) ||
                             (block.name === 'Button' && activeBlockPage === 'button') ||
-                            (block.name === 'Text' && activeBlockPage === 'text') ||
-                            (block.name === 'Header' && activeBlockPage === 'text');
+                            (block.name === 'Text' && activeBlockPage === 'text' && !isImageEditingMode) ||
+                            (block.name === 'Header' && activeBlockPage === 'text' && !isImageEditingMode);
 
                           return (
                           <div

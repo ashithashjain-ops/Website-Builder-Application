@@ -1,8 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
-
+ 
 import Link from "next/link";
 import { MouseEvent, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   FaBars,
   FaBookOpen,
@@ -32,9 +32,9 @@ import {
 } from "react-icons/fa6";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { assetPath } from "@/lib/paths";
-
+ 
 const products = ["PREMIUM TEMPLATES", "UI KITS", "WORDPRESS THEMES", "FREE ASSETS"];
-
+ 
 const navCategories = [
   {
     title: "LANDING PAGE",
@@ -103,12 +103,12 @@ const navCategories = [
     items: ["Wedding", "Baby & Kids", "Fashion", "Studio Personal", "General/Portfolio", "Travel", "Event", "Food", "Studio/Personal", "Others"],
   },
 ];
-
+ 
 type NavBarProps = {
   wishlistCount?: number;
   onWishlistClick?: () => void;
 };
-
+ 
 type StoredCommerceItem = {
   title?: string;
   name?: string;
@@ -119,14 +119,14 @@ type StoredCommerceItem = {
   quantity?: number;
   qty?: number;
 };
-
+ 
 const STORAGE_SYNC_EVENT = "stackly-storage-change";
-
+ 
 function readRawJsonArray(key: string): unknown[] {
   if (typeof window === "undefined") {
     return [];
   }
-
+ 
   try {
     const raw = window.localStorage.getItem(key);
     const parsed = raw ? JSON.parse(raw) : [];
@@ -135,16 +135,16 @@ function readRawJsonArray(key: string): unknown[] {
     return [];
   }
 }
-
+ 
 function readJsonArray(key: string): StoredCommerceItem[] {
   return readRawJsonArray(key).filter(
     (item): item is StoredCommerceItem => Boolean(item) && typeof item === "object",
   );
 }
-
+ 
 function normalizeStoredItem(item: StoredCommerceItem) {
   const quantity = item.quantity || item.qty || 1;
-
+ 
   return {
     title: item.title || item.name || "Saved item",
     type: item.type || "Template",
@@ -155,7 +155,7 @@ function normalizeStoredItem(item: StoredCommerceItem) {
     total: (typeof item.price === "number" ? item.price : 0) * quantity,
   };
 }
-
+ 
 export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistClick }: NavBarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [wishlistItems, setWishlistItems] = useState<StoredCommerceItem[]>([]);
@@ -165,32 +165,33 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [mobileSection, setMobileSection] = useState<"products" | "categories" | null>(null);
   const [mobileCategory, setMobileCategory] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navRef = useRef<HTMLElement>(null);
-
+ 
   const scrollLandingSection = (event: MouseEvent<HTMLAnchorElement>, sectionId: string, closeMobile = false) => {
     const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
-
+ 
     if (currentPath !== "/landing") {
       if (closeMobile) {
         setMobileOpen(false);
       }
       return;
     }
-
+ 
     event.preventDefault();
     document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
     window.history.pushState(null, "", `/landing#${sectionId}`);
-
+ 
     if (closeMobile) {
       setMobileOpen(false);
     }
   };
-
+ 
   const refreshStoredCommerce = () => {
     const wishlist = readJsonArray("wishlistItems");
     const cart = readJsonArray("cartItems");
     const cartCount = Number.parseInt(window.localStorage.getItem("cartCount") || "", 10);
-
+ 
     setWishlistItems(wishlist);
     setCartItems(
       [
@@ -201,22 +202,22 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
       ],
     );
   };
-
+ 
   useEffect(() => {
     const refreshTimer = window.setTimeout(refreshStoredCommerce, 0);
-
+ 
     const handleStorageUpdate = () => refreshStoredCommerce();
-
+ 
     window.addEventListener("storage", handleStorageUpdate);
     window.addEventListener(STORAGE_SYNC_EVENT, handleStorageUpdate);
-
+ 
     return () => {
       window.clearTimeout(refreshTimer);
       window.removeEventListener("storage", handleStorageUpdate);
       window.removeEventListener(STORAGE_SYNC_EVENT, handleStorageUpdate);
     };
   }, []);
-
+ 
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {
       if (navRef.current && !navRef.current.contains(event.target as Node)) {
@@ -224,25 +225,34 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
         setIsProfileMenuOpen(false);
       }
     };
-
+ 
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 8);
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+ 
   const wishlistCount = wishlistCountProp ?? wishlistItems.reduce((total, item) => total + (item.quantity || item.qty || 1), 0);
   const cartCount = cartItems.reduce((total, item) => total + (item.quantity || item.qty || 1), 0);
   const cartSubtotal = cartItems.reduce((total, storedItem) => {
     const item = normalizeStoredItem(storedItem);
     return total + item.total;
   }, 0);
-
+ 
   const removeWishlistItem = (title: string) => {
     const next = wishlistItems.filter((item) => (item.title || item.name) !== title);
     window.localStorage.setItem("wishlistItems", JSON.stringify(next));
     window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
   };
-
+ 
   const removeCartItem = (title: string) => {
     const next = cartItems.filter((item) => (item.title || item.name) !== title);
     const nextCount = next.reduce((total, item) => total + (item.quantity || item.qty || 1), 0);
@@ -250,36 +260,36 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
     window.localStorage.setItem("cartCount", String(nextCount));
     window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
   };
-
+ 
   const updateCartQuantity = (title: string, change: -1 | 1) => {
     const next = cartItems.map((item) => {
       if ((item.title || item.name) !== title) {
         return item;
       }
-
+ 
       const currentQuantity = item.quantity || item.qty || 1;
       return { ...item, quantity: Math.max(1, currentQuantity + change), qty: undefined };
     });
     const nextCount = next.reduce((total, item) => total + (item.quantity || item.qty || 1), 0);
-
+ 
     window.localStorage.setItem("cartItems", JSON.stringify(next));
     window.localStorage.setItem("cartCount", String(nextCount));
     window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
   };
-
+ 
   const toggleMenu = (menuName: "products" | "categories") => {
     setActiveMenu((currentMenu) => (currentMenu === menuName ? null : menuName));
     setIsProfileMenuOpen(false);
   };
-
+ 
   const closeMenus = () => {
     setActiveMenu(null);
     setIsProfileMenuOpen(false);
   };
-
+ 
   return (
     <>
-    <header className="stackly-navbar sticky top-0 z-[5000] overflow-visible border-b border-white/10 bg-[#06224C] px-2 py-3 shadow-sm md:px-12">
+    <header className={`stackly-navbar sticky top-0 z-[5000] overflow-visible border-b px-2 py-3 transition-all duration-300 md:px-12 ${isScrolled ? "border-white/15 bg-[#06224C]/90 shadow-[0_16px_44px_rgba(2,15,38,0.24)] backdrop-blur-xl" : "border-white/10 bg-[#06224C] shadow-sm backdrop-blur-none"}`}>
       <nav ref={navRef} className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-2 overflow-visible md:gap-4">
         <div className="flex min-w-0 items-center gap-1 md:gap-8">
           <button
@@ -290,7 +300,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
           >
             {mobileOpen ? <FaXmark /> : <FaBars />}
           </button>
-
+ 
           <Link
             href="/landing"
             className="inline-flex aspect-[2/1] min-w-[75px] items-center justify-center rounded-[60%] bg-white px-2 py-2 shadow-md transition hover:scale-95 md:min-w-[90px] md:px-4 md:py-3"
@@ -298,16 +308,16 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
           >
             <img src={assetPath("/stackly-logo.webp")} alt="Stackly" className="h-3 w-auto object-contain md:h-5" />
           </Link>
-
+ 
           <div className="hidden items-center justify-center gap-12 text-[13px] font-bold uppercase tracking-wide text-white lg:flex">
-            <Link href="/landing" className="whitespace-nowrap transition hover:text-blue-300">HOME</Link>
-            <Link href="/landing#about" onClick={(event) => scrollLandingSection(event, "about")} className="whitespace-nowrap transition hover:text-blue-300">ABOUT US</Link>
-
+            <Link href="/landing" className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300">HOME</Link>
+            <Link href="/landing#about" onClick={(event) => scrollLandingSection(event, "about")} className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300">ABOUT US</Link>
+ 
             <div className="relative">
               <button
                 type="button"
                 onClick={() => toggleMenu("products")}
-                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-1 transition hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="stackly-nav-link inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-1 transition hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 aria-haspopup="true"
                 aria-expanded={activeMenu === "products"}
               >
@@ -321,12 +331,12 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
                 ))}
               </div>
             </div>
-
+ 
             <div className="relative">
               <button
                 type="button"
                 onClick={() => toggleMenu("categories")}
-                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-1 transition hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="stackly-nav-link inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-1 transition hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 aria-haspopup="true"
                 aria-expanded={activeMenu === "categories"}
               >
@@ -354,11 +364,11 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
                 ))}
               </div>
             </div>
-
-            <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact")} className="whitespace-nowrap transition hover:text-blue-300">CONTACT</Link>
+ 
+            <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact")} className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300">CONTACT</Link>
           </div>
         </div>
-
+ 
         <div className="ml-auto flex flex-shrink-0 items-center gap-2 md:gap-3">
           <button
             type="button"
@@ -391,15 +401,15 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
             onClick={() => {
               closeMenus();
               setMobileOpen(false);
-
+ 
               const currentPath = window.location.pathname.replace(/\/+$/, "");
               const landingPath = assetPath("/landing").replace(/\/+$/, "");
-
+ 
               if (currentPath === landingPath || currentPath === "/landing") {
                 window.dispatchEvent(new Event("stackly-open-search"));
                 return;
               }
-
+ 
               window.sessionStorage.setItem("stackly-open-search-on-landing", "true");
               window.location.href = assetPath("/landing/");
             }}
@@ -421,7 +431,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
             >
               <img src={assetPath("/profile.webp")} alt="User Profile Picture" className="h-full w-full object-cover" />
             </button>
-
+ 
             <div className={`${isProfileMenuOpen ? "block" : "hidden"} absolute right-0 top-full z-[100] mt-3 w-48 rounded-xl border border-gray-100 bg-white py-2 text-left shadow-2xl`}>
               <div className="mb-1 border-b border-gray-50 px-4 py-2">
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">User Menu</p>
@@ -444,13 +454,20 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
           </div>
         </div>
       </nav>
-
+ 
+      <AnimatePresence>
       {mobileOpen && (
-        <div className="stackly-mobile-menu border-t border-white/10 bg-[#06224C] py-4 text-[11px] font-bold uppercase tracking-widest text-white shadow-inner lg:hidden">
+        <motion.div
+          className="stackly-mobile-menu border-t border-white/10 bg-[#06224C] py-4 text-[11px] font-bold uppercase tracking-widest text-white shadow-inner lg:hidden"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+        >
           <div className="flex flex-col">
             <Link href="/landing" onClick={() => setMobileOpen(false)} className="border-b border-white/5 px-6 py-4">Home</Link>
             <Link href="/landing#about" onClick={(event) => scrollLandingSection(event, "about", true)} className="border-b border-white/5 px-6 py-4">About Us</Link>
-
+ 
             <div>
               <button
                 type="button"
@@ -470,7 +487,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
                 </div>
               )}
             </div>
-
+ 
             <div>
               <button
                 type="button"
@@ -506,13 +523,14 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
                 </div>
               )}
             </div>
-
+ 
             <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact", true)} className="px-6 py-4">Contact</Link>
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </header>
-
+ 
     {activePanel && (
       <>
         <button
@@ -536,7 +554,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               <FaXmark className="text-2xl" />
             </button>
           </div>
-
+ 
           <div className={`flex-grow overflow-y-auto ${activePanel === "cart" ? "p-0" : "space-y-6 p-6"}`}>
             {(activePanel === "wishlist" ? wishlistItems : cartItems).length === 0 ? (
               <div className="py-20 text-center">
@@ -554,7 +572,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
                 {cartItems.map((storedItem) => {
                   const item = normalizeStoredItem(storedItem);
                   const title = storedItem.title || storedItem.name || item.title;
-
+ 
                   return (
                     <div key={`cart-${title}`} className="flex items-start gap-4 py-5 first:pt-0">
                       <img src={assetPath(item.image)} alt={item.alt} className="h-[72px] w-24 flex-shrink-0 rounded-xl object-cover" />
@@ -600,7 +618,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               wishlistItems.map((storedItem) => {
                 const item = normalizeStoredItem(storedItem);
                 const title = storedItem.title || storedItem.name || item.title;
-
+ 
                 return (
                   <div key={`wishlist-${title}`} className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
                     <img src={assetPath(item.image)} alt={item.alt} className="h-16 w-20 flex-shrink-0 rounded-xl object-cover" />
@@ -624,7 +642,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               })
             )}
           </div>
-
+ 
           {activePanel === "cart" ? (
             <div className="border-t bg-gray-50 px-6 py-8">
               <div className="mb-8 flex items-center justify-between">
@@ -652,3 +670,4 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
     </>
   );
 }
+ 

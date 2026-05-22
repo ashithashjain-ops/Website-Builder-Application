@@ -1,14 +1,14 @@
 "use client";
-
+ 
 import { useEffect, useRef } from "react";
 import { ChevronDown, Eye, Redo2, Save, Send, Undo2 } from "lucide-react";
 import { assetPath } from "@/lib/paths";
 import PortfolioPreview from "./PortfolioPreview";
 import StorefrontPreview from "./StorefrontPreview";
 import type { TextBlockState, TextEditorTarget, TextStyles, TextTemplateType } from "./types";
-
+ 
 const TEXTBLOCK_PREVIEW_STORAGE_KEY = "stackly-textblock-preview-html";
-
+ 
 type TextCanvasProps = {
   state: TextBlockState;
   onStateChange: (nextState: TextBlockState) => void;
@@ -17,8 +17,11 @@ type TextCanvasProps = {
   onUndo?: () => void;
   onRedo?: () => void;
   template?: TextTemplateType;
+  isImageEditingMode?: boolean;
+  customImages?: Record<string, string>;
+  onEditImage?: (imageId: string) => void;
 };
-
+ 
 const rgbToHex = (rgb: string) => {
   if (!rgb) return "#000000";
   if (rgb.startsWith("#")) return rgb;
@@ -28,55 +31,55 @@ const rgbToHex = (rgb: string) => {
     .map((value) => parseInt(value, 10).toString(16).padStart(2, "0"))
     .join("")}`;
 };
-
-export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onUndo, onRedo, template = "ecommerce" }: TextCanvasProps) {
+ 
+export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onUndo, onRedo, template = "ecommerce", isImageEditingMode = false, customImages = {}, onEditImage }: TextCanvasProps) {
   const isPreviewMode = false;
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const activeEditableRef = useRef<HTMLElement | null>(null);
   const { section, isTextEditable } = state;
-
+ 
   const selectTarget = (target: TextEditorTarget) => {
     onStateChange({ ...state, selectedTarget: target });
   };
-
+ 
   useEffect(() => {
     const activeText = canvasRef.current?.querySelector(".editable-text-active") as HTMLElement | null;
     if (!activeText || state.selectedTarget !== "text") return;
-
+ 
     activeText.style.color = state.textStyles.color || "";
     activeText.style.fontSize = state.textStyles.fontSize ? `${state.textStyles.fontSize}px` : "";
     activeText.style.fontFamily = state.textStyles.fontFamily || "";
   }, [state.selectedTarget, state.textStyles]);
-
+ 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
+ 
     const textTags = ["H1", "H2", "H3", "H4", "H5", "H6", "P", "SPAN", "LI", "LABEL", "A", "BUTTON"];
-
+ 
     const handleTextClick = (event: Event) => {
       if (!isTextEditable || isPreviewMode) return;
       event.stopPropagation();
-
+ 
       const target = event.target as HTMLElement;
       activeEditableRef.current = target;
       canvas.querySelectorAll(".editable-text-active").forEach((element) => element.classList.remove("editable-text-active"));
       target.classList.add("editable-text-active");
-
+ 
       const computedStyle = window.getComputedStyle(target);
       const nextTextStyles: TextStyles = {
         color: rgbToHex(target.style.color || computedStyle.color),
         fontSize: target.style.fontSize.replace("px", "") || computedStyle.fontSize.replace("px", ""),
         fontFamily: target.style.fontFamily || computedStyle.fontFamily,
       };
-
+ 
       onStateChange({ ...state, selectedTarget: "text", textStyles: nextTextStyles });
     };
-
+ 
     const makeEditable = (node: Element) => {
       if (node.closest("[data-builder-chrome='true']")) return;
-
+ 
       if (textTags.includes(node.tagName)) {
         if (isTextEditable && !isPreviewMode) {
           node.setAttribute("contenteditable", "true");
@@ -87,12 +90,12 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
           node.classList.remove("editable-text-active");
         }
       }
-
+ 
       Array.from(node.children).forEach(makeEditable);
     };
-
+ 
     Array.from(canvas.children).forEach(makeEditable);
-
+ 
     return () => {
       const removeListeners = (node: Element) => {
         if (textTags.includes(node.tagName)) {
@@ -103,40 +106,40 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
       Array.from(canvas.children).forEach(removeListeners);
     };
   }, [isPreviewMode, isTextEditable, onStateChange, state]);
-
+ 
   const runNativeTextCommand = (command: "undo" | "redo") => {
     const activeEditable = activeEditableRef.current;
     if (!isTextEditable || !activeEditable || !canvasRef.current?.contains(activeEditable)) {
       return false;
     }
-
+ 
     activeEditable.focus();
     return document.execCommand(command);
   };
-
+ 
   const handleUndo = () => {
     if (!runNativeTextCommand("undo")) {
       onUndo?.();
     }
   };
-
+ 
   const handleRedo = () => {
     if (!runNativeTextCommand("redo")) {
       onRedo?.();
     }
   };
-
+ 
   const openPreviewPage = () => {
     const previewClone = canvasRef.current?.cloneNode(true) as HTMLDivElement | undefined;
     previewClone?.querySelectorAll("[contenteditable]").forEach((element) => element.removeAttribute("contenteditable"));
     previewClone?.querySelectorAll(".editable-text-active").forEach((element) => element.classList.remove("editable-text-active"));
     previewClone?.querySelectorAll("[data-builder-chrome='true']").forEach((element) => element.remove());
     previewClone?.querySelector("[data-textblock-canvas]")?.removeAttribute("class");
-
+ 
     window.localStorage.setItem(TEXTBLOCK_PREVIEW_STORAGE_KEY, previewClone?.innerHTML ?? "");
     window.open(assetPath("/blockpages/preview/"), "_blank", "noopener,noreferrer");
   };
-
+ 
   return (
     <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-[#dbe3ef] bg-[#f7f9fc] shadow-sm">
       <div
@@ -147,7 +150,7 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
           My Website
           <ChevronDown className="h-4 w-4 text-gray-600" />
         </button>
-
+ 
         <div className="flex items-center gap-2 md:gap-3">
           <div className="flex flex-shrink-0 overflow-hidden rounded-md border border-gray-300 bg-white shadow-sm">
             <button className={`border-r border-gray-300 px-3 py-2 ${canUndo || isTextEditable ? "text-gray-600 hover:bg-gray-50" : "cursor-not-allowed text-gray-300"}`} onClick={handleUndo} disabled={!canUndo && !isTextEditable} title="Undo">
@@ -175,7 +178,7 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
           </button>
         </div>
       </div>
-
+ 
       <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-[1280px] overflow-hidden rounded-xl border border-[#dbe3ef] bg-white shadow-[0_18px_45px_rgba(15,35,75,0.08)]">
           <div data-builder-chrome="true" className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e6edf5] px-5 py-4 sm:px-6">
@@ -194,7 +197,7 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
               ))}
             </div>
           </div>
-
+ 
           <div
             ref={canvasRef}
             className={`relative min-h-[640px] ${section.shadow ? "shadow-inner" : ""}`}
@@ -241,7 +244,7 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
               className={template === "ecommerce" ? "h-[calc(100vh-160px)] min-h-[560px] overflow-y-auto" : undefined}
             >
               <div ref={contentRef}>
-                {template === "portfolio" ? <PortfolioPreview /> : <StorefrontPreview />}
+                {template === "portfolio" ? <PortfolioPreview isImageEditingMode={isImageEditingMode} customImages={customImages} onEditImage={onEditImage} /> : <StorefrontPreview />}
               </div>
             </div>
           </div>

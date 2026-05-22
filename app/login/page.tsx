@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { FaAddressBook, FaLock } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import {
   getAuthPullScrollRoot,
   isAuthPageZoomed,
@@ -42,6 +43,27 @@ const EMAIL_MAX_LENGTH = 254;
 const PASSWORD_MAX_LENGTH = 60;
 const EMAIL_MAX_ERROR = `Email or mobile number cannot exceed ${EMAIL_MAX_LENGTH} characters.`;
 const PASSWORD_MAX_ERROR = `Password cannot exceed ${PASSWORD_MAX_LENGTH} characters.`;
+
+const loginContainerVariants: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } },
+};
+
+const loginFadeUp: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
+};
+
+const loginCardVariants: Variants = {
+  hidden: { opacity: 0, y: 24, scale: 0.985 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
+const loginErrorVariants: Variants = {
+  hidden: { opacity: 0, y: -5 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } },
+  exit: { opacity: 0, y: -5, transition: { duration: 0.16, ease: "easeIn" } },
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -267,37 +289,37 @@ export default function LoginPage() {
     }
   };
   return (
-    <div className="login-page auth-page min-h-[100dvh] lg:min-h-screen flex flex-col max-lg:overflow-auto bg-white px-0 py-0 lg:px-6 lg:py-4 lg:overflow-y-auto">
-      <div className="w-full max-lg:max-w-none max-w-6xl mx-auto flex flex-1 flex-col max-lg:h-full lg:flex-none lg:flex-row gap-0 lg:gap-8 auth-layout">
+    <motion.div className="login-page auth-page min-h-[100dvh] lg:min-h-screen flex flex-col max-lg:overflow-auto bg-white px-0 py-0 lg:px-6 lg:py-4 lg:overflow-y-auto" initial="hidden" animate="visible" variants={loginContainerVariants}>
+      <motion.div className="w-full max-lg:max-w-none max-w-6xl mx-auto flex flex-1 flex-col max-lg:h-full lg:flex-none lg:flex-row gap-0 lg:gap-8 auth-layout" variants={loginContainerVariants}>
         {/* Card first on mobile (top), right on desktop */}
-        <div className="flex w-full flex-1 flex-col items-stretch max-lg:justify-stretch justify-center max-lg:h-full order-1 lg:order-2 lg:w-1/2 lg:flex-none">
-          <div className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-hidden max-lg:overflow-auto lg:overflow-visible self-center max-lg:self-stretch bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] px-6 sm:px-10 max-lg:max-w-none max-lg:w-full max-lg:h-full max-lg:flex-1 lg:flex-none lg:rounded-[10px] login-card auth-form-card">
+        <motion.div className="flex w-full flex-1 flex-col items-stretch max-lg:justify-stretch justify-center max-lg:h-full order-1 lg:order-2 lg:w-1/2 lg:flex-none" variants={loginCardVariants}>
+          <motion.div className="relative flex w-full max-w-[520px] flex-1 flex-col overflow-hidden max-lg:overflow-auto lg:overflow-visible self-center max-lg:self-stretch bg-gradient-to-b from-[#5f82e8] via-[#3f66c9] to-[#021a46] px-6 sm:px-10 max-lg:max-w-none max-lg:w-full max-lg:h-full max-lg:flex-1 lg:flex-none lg:rounded-[10px] login-card auth-form-card" whileHover={{ y: -3, boxShadow: "0 28px 70px rgba(2,15,38,0.22)", transition: { duration: 0.24 } }}>
             <div className="auth-inner-panel pointer-events-none absolute inset-y-0 left-1/2 w-[78%] -translate-x-1/2 bg-gradient-to-b from-white/10 via-black/10 to-black/35" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_20px_0_45px_rgba(0,0,0,0.55),inset_-20px_0_45px_rgba(0,0,0,0.55)]" />
             <div className="pointer-events-none absolute inset-0 rounded-none lg:rounded-[10px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)]" />
 
-            <div className="relative z-10 flex flex-col flex-1 min-h-0 min-w-0 auth-card-content login-card-inner px-4 sm:px-6 pt-4 sm:pt-8 pb-4 sm:pb-8 lg:pt-14 lg:pb-10 text-white text-left justify-start lg:justify-center lg:min-h-0 max-lg:overflow-auto">
-              <div>
-                <div className="w-full flex justify-center flex-shrink-0 min-w-0">
+            <motion.div className="relative z-10 flex flex-col flex-1 min-h-0 min-w-0 auth-card-content login-card-inner px-4 sm:px-6 pt-4 sm:pt-8 pb-4 sm:pb-8 lg:pt-14 lg:pb-10 text-white text-left justify-start lg:justify-center lg:min-h-0 max-lg:overflow-auto" variants={loginContainerVariants}>
+              <motion.div variants={loginContainerVariants}>
+                <motion.div className="w-full flex justify-center flex-shrink-0 min-w-0" variants={loginFadeUp}>
                   <h1 className="font-welcome-heading text-lg sm:text-xl md:text-2xl lg:text-3xl text-center font-semibold mb-1 sm:mb-4 lg:mb-7 break-words tracking-widest">
                     WELCOME
                   </h1>
-                </div>
+                </motion.div>
 
-                <div className="flex justify-center mb-8 sm:mb-4 lg:mb-8 flex-shrink-0">
-                  <div className="bg-white w-[120px] h-[44px] sm:w-[160px] sm:h-[60px] lg:w-[200px] lg:h-[80px] rounded-[50%] flex items-center justify-center shadow-lg overflow-hidden">
+                <motion.div className="flex justify-center mb-8 sm:mb-4 lg:mb-8 flex-shrink-0" variants={loginFadeUp}>
+                  <motion.div className="bg-white w-[120px] h-[44px] sm:w-[160px] sm:h-[60px] lg:w-[200px] lg:h-[80px] rounded-[50%] flex items-center justify-center shadow-lg overflow-hidden" whileHover={{ scale: 1.04, transition: { duration: 0.2 } }}>
                     <img
                       src={assetPath("/stackly-logo.webp")}
                       alt="Stackly Logo"
                       className="h-4 sm:h-5 lg:h-8 object-contain"
                     />
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
 
-                <form onSubmit={handleLogin} noValidate>
-                  <div className="space-y-6 sm:space-y-4 lg:space-y-6 flex-shrink-0">
-                  <div className="flex flex-col">
-                    <div className="login-contact-row flex items-center border-b border-white/60 pb-2 min-w-0">
+                <motion.form onSubmit={handleLogin} noValidate variants={loginContainerVariants}>
+                  <motion.div className="space-y-6 sm:space-y-4 lg:space-y-6 flex-shrink-0" variants={loginContainerVariants}>
+                  <motion.div className="flex flex-col" variants={loginFadeUp}>
+                    <motion.div className="login-contact-row flex items-center border-b border-white/60 pb-2 min-w-0" whileFocus={{ scale: 1.01 }} whileHover={{ borderColor: "rgba(255,255,255,0.95)", transition: { duration: 0.2 } }}>
                       <FaAddressBook className="login-email-icon mr-2 sm:mr-4 text-sm opacity-80 flex-shrink-0" />
                       <input
                         ref={emailInputRef}
@@ -318,19 +340,25 @@ export default function LoginPage() {
                           errors.email ? "login-email-error" : undefined
                         }
                       />
-                    </div>
-                    {errors.email && (
-                      <p
-                        id="login-email-error"
-                        className="auth-error-text mt-0.5 text-[11px] sm:text-xs"
-                      >
-                        {errors.email}
-                      </p>
-                    )}
-                  </div>
+                    </motion.div>
+                    <AnimatePresence>
+                      {errors.email && (
+                        <motion.p
+                          id="login-email-error"
+                          className="auth-error-text mt-0.5 text-[11px] sm:text-xs"
+                          variants={loginErrorVariants}
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                        >
+                          {errors.email}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
 
-                  <div className="flex flex-col">
-                    <div className="flex items-center border-b border-white/60 pb-2 relative min-w-0">
+                  <motion.div className="flex flex-col" variants={loginFadeUp}>
+                    <motion.div className="flex items-center border-b border-white/60 pb-2 relative min-w-0" whileHover={{ borderColor: "rgba(255,255,255,0.95)", transition: { duration: 0.2 } }}>
                       <FaLock className="mr-2 sm:mr-4 text-sm opacity-80 flex-shrink-0" />
                       <input
                         type={showPassword ? "text" : "password"}
@@ -388,19 +416,25 @@ export default function LoginPage() {
                           </svg>
                         )}
                       </button>
-                    </div>
-                    {errors.password && (
-                      <p
-                        id="login-password-error"
-                        className="auth-error-text mt-0.5 text-[11px] sm:text-xs"
-                      >
-                        {errors.password}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                    </motion.div>
+                    <AnimatePresence>
+                      {errors.password && (
+                        <motion.p
+                          id="login-password-error"
+                          className="auth-error-text mt-0.5 text-[11px] sm:text-xs"
+                          variants={loginErrorVariants}
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                        >
+                          {errors.password}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </motion.div>
 
-                <div className="login-remember-forgot mt-5 sm:mt-4 text-xs opacity-90 w-full min-w-0">
+                <motion.div className="login-remember-forgot mt-5 sm:mt-4 text-xs opacity-90 w-full min-w-0" variants={loginFadeUp}>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -416,27 +450,36 @@ export default function LoginPage() {
                   >
                     Forgot Password?
                   </Link>
-                </div>
+                </motion.div>
 
-                {errors.form && (
-                  <p
-                    className={`mt-1.5 sm:mt-2 text-[11px] sm:text-xs font-medium ${errors.form === "Login successful!" ? "text-green-300" : "auth-error-text"}`}
-                  >
-                    {errors.form}
-                  </p>
-                )}
+                <AnimatePresence>
+                  {errors.form && (
+                    <motion.p
+                      className={`mt-1.5 sm:mt-2 text-[11px] sm:text-xs font-medium ${errors.form === "Login successful!" ? "text-green-300" : "auth-error-text"}`}
+                      variants={loginErrorVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                    >
+                      {errors.form}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
 
-                  <button
+                  <motion.button
                     type="submit"
                     disabled={isSubmitting}
                     className="mt-6 sm:mt-6 lg:mt-8 w-full h-[42px] sm:h-[45px] bg-gradient-to-r from-[#2d8cf0] to-[#5a78c7] rounded-md text-sm font-medium shadow-md hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed flex-shrink-0"
+                    variants={loginFadeUp}
+                    whileHover={!isSubmitting ? { scale: 1.025, filter: "brightness(1.08)" } : undefined}
+                    whileTap={!isSubmitting ? { scale: 0.98 } : undefined}
                   >
                     {isSubmitting ? "Checking..." : "Login"}
-                  </button>
-                </form>
-              </div>
+                  </motion.button>
+                </motion.form>
+              </motion.div>
 
-              <div className="flex-shrink-0 mt-2 max-lg:mt-2 lg:mt-4">
+              <motion.div className="flex-shrink-0 mt-2 max-lg:mt-2 lg:mt-4" variants={loginFadeUp}>
                 <p className="text-center text-xs mb-2 sm:mb-2.5 lg:mb-3 text-white/80">
                   Don&apos;t have an account?{" "}
                   <Link
@@ -452,20 +495,29 @@ export default function LoginPage() {
                 <div className="pt-0.5 pb-1 sm:pt-1 sm:pb-3 lg:pb-2">
                   <AuthGoogleButton intent="login" label="Login with Google" />
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
 
         {/* Illustration below on mobile, left on desktop */}
-        <div className="auth-image-col w-full lg:w-1/2 flex justify-center order-2 lg:order-1 mt-6 sm:mt-8 lg:mt-0">
-          <img
-            src={assetPath("/login.webp")}
-            alt="Secure login illustration"
+        <motion.div
+          className="auth-image-col w-full lg:w-1/2 flex justify-center order-2 lg:order-1 mt-6 sm:mt-8 lg:mt-0"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: [0, -8, 0] }}
+          transition={{
+            opacity: { duration: 0.45, ease: "easeOut" },
+            y: { duration: 5, repeat: Infinity, ease: "easeInOut" },
+          }}
+        >
+          <motion.img
+            src={assetPath("/login-animation.gif")}
+            alt="Secure login animation"
             className="auth-image w-[80%] sm:w-[70%] lg:w-[90%] max-w-[550px] object-contain"
+            whileHover={{ scale: 1.02, transition: { duration: 0.24 } }}
           />
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 }

@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, ReactNode, useState } from "react";
+import { motion } from "framer-motion";
 import {
   FaEnvelope,
   FaFacebookF,
@@ -200,15 +201,8 @@ export default function Footer() {
 
   const openFooterItem = (key: string) => {
     if (key === "about") {
-      const featuresSection = document.getElementById("features");
-
-      if (featuresSection) {
-        featuresSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.history.pushState(null, "", "/landing#features");
-        return;
-      }
-
-      router.push("/landing#features");
+      // Dispatches the event caught by the Home component to open About Us
+      window.dispatchEvent(new Event("stackly-open-about"));
       return;
     }
 
@@ -224,7 +218,14 @@ export default function Footer() {
 
   return (
     <>
-      <footer id="contact" className="stackly-footer relative mt-auto w-full overflow-hidden bg-[#071936] py-10 md:py-12">
+      <motion.footer
+        id="contact"
+        className="stackly-footer relative mt-auto w-full overflow-hidden bg-[#071936] py-10 md:py-12"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.12 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/70 to-transparent" />
         <div className="pointer-events-none absolute -right-24 top-8 h-56 w-56 rounded-full bg-sky-400/10 blur-3xl" />
         <div className="pointer-events-none absolute -left-20 bottom-8 h-56 w-56 rounded-full bg-emerald-300/10 blur-3xl" />
@@ -305,7 +306,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-      </footer>
+      </motion.footer>
 
       {modal && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="legal-modal-title">

@@ -4,7 +4,9 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import CreateProjectFlow from "@/components/CreateProjectFlow";
+import AboutPage from "../aboutus/page";
 import { useEffect, useMemo, useState } from "react";
+import { motion, type TargetAndTransition, type Variants } from "framer-motion";
 import {
   FaArrowRight,
   FaCartShopping,
@@ -28,7 +30,6 @@ import {
   FaYoutube,
 } from "react-icons/fa6";
 import { assetPath } from "@/lib/paths";
-
 type TemplateCategory = "portfolio" | "blog" | "ecommerce" | "business";
 
 const Footer = dynamic(() => import("@/components/Footer"), {
@@ -174,6 +175,29 @@ const steps = [
   ["Drag & drop thousands of design features.", "Add text, galleries, videos, vector art, and more."],
 ];
 
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+};
+
+const revealContainer: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
+};
+
+const cardReveal: Variants = {
+  hidden: { opacity: 0, y: 22 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
+};
+
+const softHover: TargetAndTransition = {
+  y: -5,
+  scale: 1.015,
+  boxShadow: "0 24px 60px rgba(6, 34, 76, 0.16)",
+  borderColor: "rgba(59, 130, 246, 0.42)",
+  transition: { duration: 0.22, ease: "easeOut" },
+};
+
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <h2 className="mb-8 border-l-4 border-blue-600 pl-3 text-xs font-black uppercase tracking-[0.3em] text-[#0A2357] md:mb-10">
@@ -222,10 +246,10 @@ function LandingContactSection() {
   };
 
   return (
-    <section id="contact" className="mx-auto my-12 max-w-7xl px-4 md:my-24 md:px-8">
+    <motion.section id="contact" className="mx-auto my-12 max-w-7xl px-4 md:my-24 md:px-8" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.16 }}>
       <SectionHeading>Contact</SectionHeading>
-      <div className="flex flex-col items-start gap-10 rounded-[2rem] bg-[#E6EFF1] p-6 shadow-sm lg:flex-row lg:gap-16 lg:rounded-[3rem] lg:p-14">
-        <div className="flex w-full flex-col justify-center gap-8 lg:w-5/12">
+      <motion.div className="flex flex-col items-start gap-10 rounded-[2rem] bg-[#E6EFF1] p-6 shadow-sm lg:flex-row lg:gap-16 lg:rounded-[3rem] lg:p-14" variants={revealContainer}>
+        <motion.div className="flex w-full flex-col justify-center gap-8 lg:w-5/12" variants={fadeUp}>
           <div className="space-y-4">
             <div className="flex items-center gap-2 font-black text-[#06224C]">
               <FaPhoneVolume className="text-xl" aria-hidden="true" />
@@ -275,9 +299,9 @@ function LandingContactSection() {
               })}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="w-full rounded-[2rem] border border-white bg-white p-6 shadow-2xl sm:p-10 lg:w-7/12">
+        <motion.div className="w-full rounded-[2rem] border border-white bg-white p-6 shadow-2xl sm:p-10 lg:w-7/12" variants={fadeUp} whileHover={{ y: -4, boxShadow: "0 28px 70px rgba(6,34,76,0.16)", transition: { duration: 0.22 } }}>
           <h3 className="mb-1 text-2xl font-black text-[#06224C] sm:text-3xl">Send a Message</h3>
           <p className="mb-8 text-xs font-bold uppercase tracking-wide text-gray-400 sm:text-sm">
             we will get back to you within 48 hours.
@@ -317,18 +341,19 @@ function LandingContactSection() {
               <textarea name="message" rows={4} value={formData.message} onChange={handleInputChange} placeholder="Tell me about your project..." className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm outline-none transition focus:border-blue-400 focus:bg-white" />
             </label>
 
-            <button type="submit" className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#06224C] py-4 text-xs font-black uppercase tracking-[0.2em] text-white shadow-lg transition hover:bg-blue-900 active:scale-[0.98]">
+            <button type="submit" className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#06224C] py-4 text-xs font-black uppercase tracking-[0.2em] text-white shadow-lg transition hover:scale-[1.02] hover:bg-blue-900 hover:brightness-110 active:scale-[0.98]">
               Send Message
               <FaPaperPlane className="text-[10px]" aria-hidden="true" />
             </button>
           </form>
-        </div>
-      </div>
-    </section>
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 }
 
 export default function Home() {
+  const [currentPage, setCurrentPage] = useState<"home" | "about">("home");
   const [activeFilter, setActiveFilter] = useState<(typeof templateFilters)[number]["value"]>("all");
   const [activeFeature, setActiveFeature] = useState(0);
   const [openFaq, setOpenFaq] = useState(0);
@@ -428,11 +453,24 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const handleOpenAbout = () => {
+      setCurrentPage("about");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    window.addEventListener("stackly-open-about", handleOpenAbout);
+
+    return () => {
+      window.removeEventListener("stackly-open-about", handleOpenAbout);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isSearchOpen) {
       return;
     }
 
-    const closeSearch = (event: MouseEvent) => {
+    const closeSearch = (event: globalThis.MouseEvent) => {
       const target = event.target as Element | null;
 
       if (!target?.closest("[data-landing-search]")) {
@@ -497,6 +535,10 @@ export default function Home() {
     showWishlistToast(`${product.title} added to cart!`);
   };
 
+  if (currentPage === "about") {
+    return <AboutPage onBack={() => setCurrentPage("home")} />;
+  }
+
   const submitSearch = (query: string) => {
     const nextQuery = query.trim();
 
@@ -515,25 +557,35 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#fff1f2] text-gray-900">
-      <div
-        className={`fixed left-0 top-[65px] z-[6000] w-full transition duration-200 ${isSearchOpen ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none -translate-y-2 opacity-0"}`}
+    <main className="landing-page min-h-screen bg-[#fff1f2] text-gray-900 flex flex-col justify-between">
+      <motion.div
+        className={`fixed inset-x-0 top-[82px] z-[6000] px-4 transition ${isSearchOpen ? "visible" : "invisible pointer-events-none"}`}
+        initial={false}
+        animate={isSearchOpen ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
       >
-        <div data-landing-search className="mx-auto max-w-7xl px-4 py-2 md:px-8">
+        <motion.div
+          data-landing-search
+          className="mx-auto w-full max-w-3xl rounded-[1.4rem] border border-white/70 bg-white/90 p-2 shadow-[0_24px_70px_rgba(6,34,76,0.20)] ring-1 ring-[#06224C]/10 backdrop-blur-xl md:max-w-4xl"
+          initial={false}
+          animate={isSearchOpen ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -14, scale: 0.985 }}
+          transition={{ duration: 0.26, ease: "easeOut" }}
+        >
           <form
             onSubmit={(event) => {
               event.preventDefault();
               submitSearch(searchQuery);
             }}
-            className="flex items-center overflow-hidden rounded-lg border border-gray-300 bg-gray-50 shadow-xl ring-1 ring-black/5"
+            className="group flex items-center overflow-hidden rounded-[1rem] border border-slate-200 bg-slate-50/90 shadow-inner transition focus-within:border-blue-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10"
           >
+            <FaMagnifyingGlass className="ml-4 hidden flex-shrink-0 text-sm text-slate-400 transition group-focus-within:text-blue-500 sm:block" />
             <input
               id="landing-search-input"
               type="text"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="What are you looking for?"
-              className="min-w-0 flex-grow bg-transparent py-3 pl-3 pr-1 text-[10px] text-gray-700 outline-none placeholder:text-gray-400 md:pl-5 md:text-sm"
+              className="min-w-0 flex-grow bg-transparent py-3.5 pl-3 pr-1 text-sm font-semibold text-slate-700 outline-none placeholder:text-slate-400 sm:py-4 md:text-base"
             />
             <button
               type="button"
@@ -541,21 +593,26 @@ export default function Home() {
                 setSearchQuery("");
                 setIsSearchOpen(false);
               }}
-              className="px-3 py-3 text-gray-400 transition hover:text-gray-700"
+              className="mx-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:scale-105 hover:bg-slate-200/80 hover:text-slate-700 active:scale-95"
               aria-label="Close search"
             >
               <FaXmark />
             </button>
-            <button type="submit" className="border-l border-gray-300 bg-gray-100 px-6 py-3 text-gray-600 transition hover:bg-gray-200" aria-label="Search websites">
+            <button type="submit" className="m-1 flex h-10 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#06224C] text-white shadow-lg transition hover:scale-105 hover:bg-blue-800 hover:brightness-110 active:scale-95 md:w-14" aria-label="Search websites">
               <FaMagnifyingGlass />
             </button>
           </form>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <section className="mx-auto w-full max-w-7xl px-4 pt-8 md:px-8">
-        <div className="relative min-h-[480px] overflow-hidden rounded-[2rem] bg-[#fde2e4] md:min-h-[540px] md:rounded-[3rem]">
-          <picture>
+        <motion.div
+          className="relative min-h-[480px] overflow-hidden rounded-[2rem] bg-[#fde2e4] md:min-h-[540px] md:rounded-[3rem]"
+          variants={revealContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.picture variants={fadeUp}>
             <source media="(max-width: 768px)" srcSet={assetPath("/landing-optimized/landinmble3.webp")} />
             <img
               src={assetPath("/landing-optimized/landing22.webp")}
@@ -565,30 +622,75 @@ export default function Home() {
               fetchPriority="high"
               decoding="async"
             />
-          </picture>
+          </motion.picture>
 
-
-          <div className="relative z-10 flex min-h-[480px] items-end justify-center p-8 md:min-h-[540px] md:justify-start md:p-16">
-            {/* Replaced Link with CreateProjectFlow to trigger the modal locally */}
+          <motion.div
+            className="relative z-10 flex min-h-[480px] items-end justify-center p-8 md:min-h-[540px] md:justify-start md:p-16"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: [0, -8, 0] }}
+            transition={{
+              opacity: { duration: 0.45, ease: "easeOut" },
+              y: { duration: 5, repeat: Infinity, ease: "easeInOut" },
+            }}
+          >
             <CreateProjectFlow />
-          </div>
+          </motion.div>
+        </motion.div>
 
+        {/* ── WHO WE ARE SECTION ─────────────────────────────── */}
+        <motion.div
+          id="about"
+          className="mt-16 md:mt-24 flex flex-col lg:flex-row gap-8 md:gap-12 items-center"
+          variants={revealContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+        >
+          <motion.div className="w-full lg:w-1/2 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white flex-shrink-0" variants={fadeUp} whileHover={softHover}>
+            <img
+              src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800"
+              alt="Stackly office"
+              className="w-full h-auto object-cover transition duration-700 hover:scale-105"
+              loading="lazy"
+            />
+          </motion.div>
 
-
-          {/* <div className="relative z-10 flex min-h-[480px] items-end justify-center p-8 md:min-h-[540px] md:justify-start md:p-16">
-            <Link
-              href="#templates"
-              className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#0A2357] px-7 py-3 font-bold text-white shadow-lg transition hover:bg-blue-900"
+          <motion.div className="w-full lg:w-1/2 space-y-4 md:space-y-6 text-left" variants={revealContainer}>
+            {/* Added About Us box and Blue Line */}
+            <motion.div className="" variants={fadeUp}>
+               <span className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#0A2357] px-8 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg transition hover:bg-blue-900 active:scale-95">About us</span>
+            </motion.div>
+            
+            <motion.div className="flex items-center gap-3" variants={fadeUp}>
+              <div className="w-1.5 h-6 bg-blue-600"></div>
+              <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[#0A2357]">Who We Are</h2>
+            </motion.div>
+            
+            <motion.p className="text-base md:text-lg leading-relaxed font-bold text-[#0A2357] italic" variants={fadeUp}>
+              Stackly is a powerful platform that streamlines workflow, enhances efficiency, and drives digital success.
+            </motion.p>
+            <motion.p className="text-sm leading-relaxed text-gray-600" variants={fadeUp}>
+              Founded in 2015, Stackly has grown into one of the leading and most trusted companies in the industry.
+            </motion.p>
+            
+            <motion.button
+              onClick={() => {
+                setCurrentPage("about");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#0A2357] px-8 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg transition hover:bg-blue-900 active:scale-95"
+              variants={fadeUp}
+              whileHover={{ scale: 1.04, filter: "brightness(1.08)" }}
+              whileTap={{ scale: 0.98 }}
             >
-              Get Started
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] text-[#0A2357]">
-                <FaPlay />
-              </span>
-            </Link>
-          </div> */}
-        </div>
+              READ MORE..
+            </motion.button>
+          </motion.div>
+        </motion.div>
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {/* ─────────────────────────────────────────────────────────────────── */}
 
-        <div className="mt-8 text-center md:mt-12">
+        <motion.div className="mt-8 text-center md:mt-12" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
           <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-800">Popular Searches</p>
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
             {popularSearches.map((search) => (
@@ -619,14 +721,14 @@ export default function Home() {
               </button>
             </div>
           )}
-        </div>
+        </motion.div>
       </section>
 
       <section id="categories" className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
         <SectionHeading>Categories</SectionHeading>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" variants={revealContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.16 }}>
           {visibleCategories.map((category) => (
-            <article key={category.title} className="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+            <motion.article key={category.title} className="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl" variants={cardReveal} whileHover={softHover}>
               <div className="h-44 overflow-hidden md:h-52">
                 <img src={assetPath(category.image)} alt={category.alt} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
               </div>
@@ -637,19 +739,19 @@ export default function Home() {
                   <Link href={category.previewHref ?? "#templates"}>Preview</Link>
                 </div>
               </div>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       <section className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
         <SectionHeading>Top Selling This Week</SectionHeading>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" variants={revealContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.16 }}>
           {visibleTopProducts.map((product) => {
             const isWishlisted = wishlistItems.some((item) => item.title === product.title);
 
             return (
-            <article key={product.title} className="group flex flex-col rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm transition hover:shadow-2xl">
+            <motion.article key={product.title} className="group flex flex-col rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm transition hover:shadow-2xl" variants={cardReveal} whileHover={softHover}>
               <div className="mb-5 h-52 overflow-hidden rounded-[1.5rem] bg-gray-50">
                 <img src={assetPath(product.image)} alt={product.alt} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
               </div>
@@ -687,20 +789,20 @@ export default function Home() {
                   >
                     <FaCartShopping />
                   </button>
-                  <a href="#templates" className="flex h-10 flex-1 items-center justify-center rounded-xl border-2 border-dashed border-blue-400 text-sm font-bold text-blue-500 transition hover:bg-blue-50">
+                  <a href="#templates" className="flex h-10 flex-1 items-center justify-center rounded-xl border-2 border-dashed border-blue-400 text-sm font-bold text-blue-500 transition hover:scale-[1.02] hover:bg-blue-50 hover:brightness-105">
                     View Template
                   </a>
                 </div>
               </div>
-            </article>
+            </motion.article>
             );
           })}
-        </div>
+        </motion.div>
       </section>
 
       <section id="templates" className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
         <SectionHeading>All Templates</SectionHeading>
-        <div className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm md:rounded-[2.5rem] md:p-10">
+        <motion.div className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm md:rounded-[2.5rem] md:p-10" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.14 }}>
           <div className="mb-12 flex flex-wrap justify-center gap-3" aria-label="Template categories">
             {templateFilters.map((filter) => {
               const active = activeFilter === filter.value;
@@ -710,7 +812,7 @@ export default function Home() {
                   type="button"
                   aria-pressed={active}
                   onClick={() => setActiveFilter(filter.value)}
-                  className={`inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-semibold shadow-sm transition ${
+                  className={`inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-semibold shadow-sm transition hover:scale-[1.03] hover:brightness-105 ${
                     active
                       ? "border-[#06224C] bg-[#06224C] text-white"
                       : "border-gray-200 bg-white text-gray-600 hover:border-blue-400 hover:text-blue-600"
@@ -723,9 +825,9 @@ export default function Home() {
             })}
           </div>
 
-          <div className="grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div className="grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3" variants={revealContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.12 }}>
             {visibleTemplates.map((template) => (
-              <article key={template.title} className="group">
+              <motion.article key={template.title} className="group" variants={cardReveal} whileHover={{ y: -5, transition: { duration: 0.22 } }}>
                 <div className="relative mb-5 aspect-[4/3] overflow-hidden rounded-2xl bg-gray-50 shadow-md">
                   <img src={assetPath(template.image)} alt={template.alt} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
                   <span className={`absolute left-4 top-4 rounded-full px-3 py-1 text-[10px] font-black uppercase ${template.badge === "Free" ? "bg-green-500 text-white" : "bg-yellow-400 text-[#06224C]"}`}>
@@ -741,101 +843,118 @@ export default function Home() {
                   <div className="mt-4 flex gap-3">
                     <Link
                       href={template.category === "portfolio" ? "/portfolio" : template.category === "ecommerce" ? "/e-commerce" : "#features"}
-                      className="flex-1 rounded-xl border-2 border-dashed border-blue-400 py-2.5 text-center text-sm font-bold text-blue-500 transition hover:bg-blue-50"
+                      className="flex-1 rounded-xl border-2 border-dashed border-blue-400 py-2.5 text-center text-sm font-bold text-blue-500 transition hover:scale-[1.03] hover:bg-blue-50 hover:brightness-105"
                     >
                       Preview
                     </Link>
                     <Link
                       href={!template.price && template.category === "portfolio" ? "/blockpages?template=portfolio" : "/planning"}
-                      className="flex-1 rounded-xl bg-[#06224C] py-2.5 text-center text-sm font-bold text-white transition hover:bg-blue-900"
+                      className="flex-1 rounded-xl bg-[#06224C] py-2.5 text-center text-sm font-bold text-white transition hover:scale-[1.03] hover:bg-blue-900 hover:brightness-110"
                     >
                       {template.price ? "Buy" : "Edit"}
                     </Link>
                   </div>
                 </div>
-              </article>
+              </motion.article>
             ))}
-          </div>
+          </motion.div>
           {visibleTemplates.length === 0 && (
             <div className="py-16 text-center">
               <p className="text-sm font-black uppercase tracking-widest text-[#06224C]">No matching websites found</p>
               <p className="mt-2 text-sm text-gray-500">Try searching for portfolio, blog, ecommerce, business, food, or dashboard.</p>
             </div>
           )}
-        </div>
+        </motion.div>
       </section>
 
       <section className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
-        <div className="flex flex-col items-center rounded-[1.5rem] bg-gradient-to-b from-[#005BC5] to-[#002B5C] p-8 text-center text-white shadow-2xl md:rounded-[2.5rem] md:p-16">
-          <div className="mb-10 max-w-4xl">
-            <h2 className="mb-4 text-3xl font-black leading-tight text-white md:text-6xl">
+        <motion.div className="flex flex-col items-center rounded-[1.5rem] bg-gradient-to-b bg-[#082A5A] to-[#002B5C] p-8 text-center text-white shadow-2xl md:rounded-[2.5rem] md:p-16" variants={revealContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
+          <motion.div className="mb-10 max-w-4xl" variants={fadeUp}>
+            <motion.h2 className="mb-4 text-3xl font-black leading-tight text-white md:text-6xl" variants={fadeUp}>
               Step into the digital world with confidence
-            </h2>
-            <p className="text-sm italic leading-relaxed opacity-90 md:text-xl">
+            </motion.h2>
+            <motion.p className="text-sm italic leading-relaxed opacity-90 md:text-xl" variants={fadeUp}>
               Join millions turning ideas into reality and start building your own success story today
-            </p>
-          </div>
-          <div className="mb-10 grid w-full max-w-5xl grid-cols-1 gap-6 sm:grid-cols-3">
+            </motion.p>
+          </motion.div>
+          <motion.div className="mb-10 grid w-full max-w-5xl grid-cols-1 gap-6 sm:grid-cols-3" variants={revealContainer}>
             {[
               ["500K +", "users"],
               ["12 +", "countries"],
               ["10 +", "sites created daily"],
             ].map(([value, label]) => (
-              <div key={label} className="rounded-2xl bg-white p-6 shadow-lg transition hover:scale-105 md:p-8">
+              <motion.div key={label} className="rounded-2xl bg-white p-6 shadow-lg transition hover:scale-105 md:p-8" variants={cardReveal} whileHover={{ y: -5, scale: 1.04, transition: { duration: 0.22 } }}>
                 <p className="text-2xl font-black text-gray-800 md:text-4xl">{value}</p>
                 <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-gray-500 md:text-xs">{label}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
-          {/* <Link href="/signup" className="w-full rounded-full bg-white px-10 py-4 text-xs font-black uppercase tracking-[0.2em] text-[#005BC5] shadow-xl transition hover:bg-blue-50 sm:w-auto md:px-14">
-            Get Started
-          </Link> */}
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       <section className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
-        <div className="flex flex-col gap-10 rounded-[2rem] border-l-4 border-blue-600 bg-[#E6EFF1] p-8 md:flex-row md:gap-16 md:rounded-[3rem] md:p-16">
-          <div className="flex w-full flex-col items-center gap-6 text-center md:w-1/2">
+        <motion.div className="relative flex flex-col gap-10 overflow-hidden rounded-[2rem] border-l-4 border-blue-600 bg-[#E6EFF1] p-8 md:flex-row md:gap-16 md:rounded-[3rem] md:p-16" variants={revealContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.22 }}>
+          <motion.div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-blue-300/30 blur-3xl" animate={{ opacity: [0.35, 0.65, 0.35], scale: [1, 1.08, 1] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} />
+          <motion.div
+            className="flex w-full flex-col items-center gap-6 text-center md:w-1/2"
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: [0, -6, 0] }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{
+              opacity: { duration: 0.45, ease: "easeOut" },
+              y: { duration: 5, repeat: Infinity, ease: "easeInOut" },
+            }}
+          >
             <h2 className="text-4xl font-black leading-tight text-gray-900 md:text-5xl">
               How to use a drag & drop website builder
             </h2>
             <p className="text-xs font-bold uppercase tracking-widest text-gray-500">
               Create your site in 3 simple steps
             </p>
-            <Link href="/signup" className="mt-2 rounded-full bg-[#2B2B2B] px-8 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg transition hover:bg-gray-800">
+            <Link href="/signup" className="mt-2 rounded-full bg-[#2B2B2B] px-8 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg transition hover:scale-[1.04] hover:bg-gray-800 hover:brightness-110">
               Get Started
             </Link>
-          </div>
-          <div className="flex w-full flex-col gap-8 text-left md:w-1/2">
+          </motion.div>
+          <motion.div className="flex w-full flex-col gap-8 text-left md:w-1/2" variants={revealContainer}>
             {steps.map(([title, body], index) => (
-              <div key={title} className="flex flex-col gap-2">
+              <motion.div key={title} className="flex flex-col gap-2" variants={cardReveal}>
                 <p className="text-lg font-black leading-snug text-gray-900 md:text-xl">
                   <span className="text-blue-600">{index + 1}.</span> {title}
                 </p>
                 <p className="pl-6 text-xs font-semibold text-gray-600">{body}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       <section id="features" className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
-        <div className="flex flex-col gap-8 rounded-[2rem] border-l-4 border-blue-500 bg-[#E6EFF1] p-4 shadow-sm sm:p-6 lg:flex-row lg:gap-16 lg:rounded-[3rem] lg:p-14">
-          <div className="w-full lg:w-1/2">
-            <div className="group relative flex min-h-[300px] overflow-hidden rounded-2xl bg-white shadow-lg sm:min-h-[380px] lg:min-h-[450px]">
+        <motion.div className="relative flex flex-col gap-8 overflow-hidden rounded-[2rem] border-l-4 border-blue-500 bg-[#E6EFF1] p-4 shadow-sm sm:p-6 lg:flex-row lg:gap-16 lg:rounded-[3rem] lg:p-14" variants={revealContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.18 }}>
+          <motion.div className="pointer-events-none absolute -bottom-20 left-1/4 h-64 w-64 rounded-full bg-cyan-300/20 blur-3xl" animate={{ opacity: [0.25, 0.55, 0.25], scale: [1, 1.1, 1] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }} />
+          <motion.div
+            className="w-full lg:w-1/2"
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: [0, -8, 0] }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{
+              opacity: { duration: 0.45, ease: "easeOut" },
+              y: { duration: 5, repeat: Infinity, ease: "easeInOut" },
+            }}
+          >
+            <motion.div className="group relative flex min-h-[300px] overflow-hidden rounded-2xl bg-white shadow-lg sm:min-h-[380px] lg:min-h-[450px]" whileHover={softHover}>
               <img src={assetPath(selectedFeature.image)} alt={`${selectedFeature.title} feature preview`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#06224C]/90 via-[#06224C]/40 to-transparent" />
               <p className="absolute inset-x-0 bottom-0 p-5 text-base font-black leading-tight text-white sm:p-8 md:text-xl">
                 &quot;{selectedFeature.quote}&quot;
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <div className="flex w-full flex-col justify-center gap-4 lg:w-1/2">
+          <motion.div className="flex w-full flex-col justify-center gap-4 lg:w-1/2" variants={revealContainer}>
             {features.map((item, index) => {
               const isActive = activeFeature === index;
               return (
-                <div key={item.title} className="rounded-xl transition hover:bg-white/40">
+                <motion.div key={item.title} className="rounded-xl border border-transparent transition hover:bg-white/40 hover:border-blue-300/40 hover:shadow-lg" variants={cardReveal} whileHover={{ y: -3, transition: { duration: 0.2 } }}>
                   <button type="button" onClick={() => setActiveFeature(index)} className="flex w-full items-start justify-between gap-3 rounded-xl p-4 text-left">
                     <h3 className="flex items-start gap-3 text-lg font-black text-[#06224C] md:text-2xl">
                       <span className="text-blue-600">{index + 1}.</span>
@@ -848,45 +967,45 @@ export default function Home() {
                       {item.description}
                     </p>
                   )}
-                </div>
+                </motion.div>
               );
             })}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
-      <section className="mx-auto my-16 max-w-7xl px-4 md:my-24 md:px-8">
+      <section className="mx-auto my-16 max-w-7xl px-4 md:mt-24 md:px-8">
         <SectionHeading>Drag & drop website builder FAQ</SectionHeading>
-        <div className="flex flex-col items-center gap-10 rounded-[2rem] border-l-4 border-blue-500 bg-[#E6EFF1] p-6 shadow-sm lg:flex-row lg:items-start lg:gap-16 lg:rounded-[3rem] lg:p-14">
-          <div className="flex w-full justify-center lg:w-2/5">
+        <motion.div className="flex flex-col items-center gap-10 rounded-[2rem] border-l-4 border-blue-500 bg-[#E6EFF1] p-6 shadow-sm lg:flex-row lg:items-start lg:gap-16 lg:rounded-[3rem] lg:p-14" variants={revealContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.16 }}>
+          <motion.div className="flex w-full justify-center lg:w-2/5" variants={fadeUp}>
             <img src={assetPath("/landing-optimized/faqq.webp")} alt="FAQ illustration" className="w-full max-w-[280px] object-contain lg:max-w-md" loading="lazy" />
-          </div>
-          <div className="flex w-full flex-col gap-4 lg:w-3/5">
+          </motion.div>
+          <motion.div className="flex w-full flex-col gap-4 lg:w-3/5" variants={revealContainer}>
             {faqs.map((faq, index) => {
               const isOpen = openFaq === index;
               return (
-                <div key={faq.question} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                <motion.div key={faq.question} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm" variants={cardReveal} whileHover={{ y: -3, boxShadow: "0 18px 40px rgba(6,34,76,0.10)", transition: { duration: 0.2 } }}>
                   <button type="button" onClick={() => setOpenFaq(isOpen ? -1 : index)} className="flex w-full items-start justify-between gap-4 p-5 text-left transition hover:bg-gray-50 md:p-6">
                     <h3 className="text-sm font-bold leading-snug text-[#06224C] md:text-base">{faq.question}</h3>
                     {isOpen ? <FaMinus className="mt-1 flex-shrink-0 text-[#06224C]" /> : <FaPlus className="mt-1 flex-shrink-0 text-[#06224C]" />}
                   </button>
                   {isOpen && <p className="px-5 pb-5 pt-0 text-sm leading-relaxed text-gray-700 md:px-6 md:pb-6">{faq.answer}</p>}
-                </div>
+                </motion.div>
               );
             })}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       <section className="mx-auto my-12 max-w-7xl bg-[#FFF1F1] px-4 py-12 md:px-8 md:py-20">
-        <div className="overflow-hidden rounded-[2.5rem] bg-[#082A5A] p-8 text-center shadow-[0_24px_70px_rgba(8,42,90,0.20)] md:rounded-[3rem] md:p-16">
+        <motion.div className="overflow-hidden rounded-[2.5rem] bg-[#082A5A] p-8 text-center shadow-[0_24px_70px_rgba(8,42,90,0.20)] md:rounded-[3rem] md:p-16" variants={revealContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.25 }}>
           <h2 className="mb-3 font-serif text-2xl font-black leading-tight text-white md:text-5xl">
             Drag & drop your vision to life
           </h2>
           <p className="mb-8 font-serif text-2xl font-black text-white md:text-4xl">
             Your vision. Your goals. Your website.
           </p>
-          <Link href="/signup" className="inline-flex rounded-full bg-white px-10 py-3.5 text-sm font-bold uppercase tracking-wider text-[#06224C] shadow-xl transition hover:bg-blue-50">
+          <Link href="/signup" className="inline-flex rounded-full bg-white px-10 py-3.5 text-sm font-bold uppercase tracking-wider text-[#06224C] shadow-xl transition hover:scale-[1.04] hover:bg-blue-50 hover:brightness-105">
             Get Started
           </Link>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-2 text-sm text-white">
@@ -894,7 +1013,7 @@ export default function Home() {
             <span>/</span>
             <span>Drag and Drop Website Builder</span>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       <LandingContactSection />
@@ -909,4 +1028,3 @@ export default function Home() {
     </main>
   );
 }
-

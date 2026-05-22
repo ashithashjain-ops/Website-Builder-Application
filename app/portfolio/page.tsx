@@ -85,6 +85,31 @@ function AnimatedCount({
 
 export default function Portfolioedit() {
   const [innerMobileMenuOpen, setInnerMobileMenuOpen] = useState(false);
+  const [customImages, setCustomImages] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    try {
+      const storedImages = localStorage.getItem("stackly-custom-images");
+      if (storedImages) {
+        const parsed = JSON.parse(storedImages);
+        const validImages: Record<string, string> = {};
+        let hasChanges = false;
+        for (const key in parsed) {
+          if (typeof parsed[key] === "string" && parsed[key].startsWith("blob:")) {
+            hasChanges = true;
+          } else {
+            validImages[key] = parsed[key];
+          }
+        }
+        setCustomImages(validImages);
+        if (hasChanges) {
+          localStorage.setItem("stackly-custom-images", JSON.stringify(validImages));
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load custom images", e);
+    }
+  }, []);
 
   const [heroImageProps] = useState({
     width: 165,
@@ -385,7 +410,7 @@ export default function Portfolioedit() {
                                 opacity: heroImageProps.opacity / 100
                               }}>
                               <Image
-                                src={assetPath("/portfoliologo.webp")}
+                                src={customImages["hero_image_1"] || assetPath("/portfoliologo.webp")}
                                 alt="Srinivas Pentakota - UI/UX Designer Portfolio"
                                 fill
                                 sizes="220px"
@@ -449,7 +474,7 @@ export default function Portfolioedit() {
                               boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
                               opacity: heroImageProps.opacity / 100
                             }}>
-                            <Image src={assetPath("/portfoliologo.webp")} alt="Srinivas Pentakota - UI/UX Designer Portfolio" fill sizes="245px" className="w-full h-full object-cover" unoptimized />
+                            <Image src={customImages["hero_image_1"] || assetPath("/portfoliologo.webp")} alt="Srinivas Pentakota - UI/UX Designer Portfolio" fill sizes="245px" className="w-full h-full object-cover" unoptimized />
                           </div>
                         </div>
                       </div>
@@ -874,9 +899,11 @@ export default function Portfolioedit() {
                       }
                     ].map((proj, i) => (
                       <div key={i} className="portfolio-project-card flex flex-col flex-none w-[240px] sm:w-[260px] max-w-[80vw] shrink-0 snap-start cursor-pointer group" style={{ animationDelay: `${i * 80}ms` }}>
-                        <div className="w-full aspect-square rounded-[20px] overflow-hidden mb-4 sm:mb-5 relative border border-gray-100 shadow-sm">
-                          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors z-10 w-full h-full"></div>
-                          <Image src={proj.img} alt={proj.title} fill sizes="260px" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" unoptimized />
+                        <div className="w-full aspect-square rounded-[20px] mb-4 sm:mb-5 relative border border-gray-100 shadow-sm">
+                          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors z-10 w-full h-full rounded-[20px] pointer-events-none"></div>
+                          <div className="absolute inset-0 overflow-hidden rounded-[20px]">
+                            <Image src={customImages[`project_image_${i}`] || proj.img} alt={proj.title} fill sizes="260px" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" unoptimized />
+                          </div>
                         </div>
                         <div className="flex items-start mb-3">
                           <span className="bg-[#63e5ff] border border-gray-900 text-gray-900 px-3.5 py-1.5 rounded-full text-[11px] font-semibold leading-none">
@@ -1031,7 +1058,7 @@ export default function Portfolioedit() {
 
                   </div>
                 </div>
-</div>
+              </div>
             </div>
 
             {/* <div className="w-full flex items-center justify-between mt-8 px-4"> */}

@@ -13,7 +13,7 @@ import {
   FaPaperPlane,
 } from "react-icons/fa";
 
-import { FaEye } from "react-icons/fa";
+import { FaEye, FaPen } from "react-icons/fa";
 import { assetPath } from "@/lib/paths";
 
 function useLocalInView<T extends HTMLElement>({
@@ -82,7 +82,15 @@ function AnimatedCount({
   );
 }
 
-export default function PortfolioPreview() {
+export default function PortfolioPreview({
+  isImageEditingMode = false,
+  customImages = {},
+  onEditImage
+}: {
+  isImageEditingMode?: boolean;
+  customImages?: Record<string, string>;
+  onEditImage?: (id: string) => void;
+} = {}) {
   const [innerMobileMenuOpen, setInnerMobileMenuOpen] = useState(false);
 
   const [heroImageProps] = useState({
@@ -374,23 +382,36 @@ export default function PortfolioPreview() {
                               <div className="absolute w-[65%] h-[95%] bg-white/70 rounded-[80px] rotate-[-30deg] shadow-md"></div>
                             </div>
 
-                            <div className="relative overflow-hidden border-4 border-white z-10 transition-all duration-300 mx-auto"
+                            <div className="relative mx-auto transition-all duration-300"
                               style={{
                                 width: `${heroImageProps.width}px`,
                                 height: `${heroImageProps.height}px`,
                                 maxWidth: '100%',
-                                borderRadius: `${heroImageProps.borderRadius}%`,
-                                boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
-                                opacity: heroImageProps.opacity / 100
                               }}>
-                              <Image
-                                src={assetPath("/portfoliologo.webp")}
-                                alt="Srinivas Pentakota - UI/UX Designer Portfolio"
-                                fill
-                                sizes="220px"
-                                className="w-full h-full object-cover"
-                                unoptimized
-                              />
+                              <div className="absolute inset-0 overflow-hidden border-4 border-white z-10"
+                                style={{
+                                  borderRadius: `${heroImageProps.borderRadius}%`,
+                                  boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
+                                  opacity: heroImageProps.opacity / 100
+                                }}>
+                                <Image
+                                  src={customImages["hero_image_1"] || assetPath("/portfoliologo.webp")}
+                                  alt="Srinivas Pentakota - UI/UX Designer Portfolio"
+                                  fill
+                                  sizes="220px"
+                                  className="w-full h-full object-cover"
+                                  unoptimized
+                                />
+                              </div>
+                              {isImageEditingMode && (
+                                <button
+                                  onClick={() => onEditImage?.("hero_image_1")}
+                                  className="absolute -top-2 -right-2 bg-white/90 text-gray-800 p-2 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-transform z-50 flex items-center justify-center cursor-pointer border border-gray-200"
+                                  title="Edit Image"
+                                >
+                                  <FaPen size={12} />
+                                </button>
+                              )}
                             </div>
 
                           </div>
@@ -440,15 +461,28 @@ export default function PortfolioPreview() {
                             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">Focus</p>
                             <p className="text-sm font-extrabold text-gray-900">Human centered UI</p>
                           </div>
-                          <div className="relative overflow-hidden border-4 border-white z-20 animate-[float_6s_ease-in-out_infinite] transition-all duration-300"
+                          <div className="relative z-20 animate-[float_6s_ease-in-out_infinite] transition-all duration-300"
                             style={{
                               width: `${heroImageProps.width}px`,
                               height: `${heroImageProps.height}px`,
-                              borderRadius: `${heroImageProps.borderRadius}%`,
-                              boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
-                              opacity: heroImageProps.opacity / 100
                             }}>
-                            <Image src={assetPath("/portfoliologo.webp")} alt="Srinivas Pentakota - UI/UX Designer Portfolio" fill sizes="245px" className="w-full h-full object-cover" unoptimized />
+                            <div className="absolute inset-0 overflow-hidden border-4 border-white"
+                                style={{
+                                  borderRadius: `${heroImageProps.borderRadius}%`,
+                                  boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
+                                  opacity: heroImageProps.opacity / 100
+                                }}>
+                              <Image src={customImages["hero_image_1"] || assetPath("/portfoliologo.webp")} alt="Srinivas Pentakota - UI/UX Designer Portfolio" fill sizes="245px" className="w-full h-full object-cover" unoptimized />
+                            </div>
+                            {isImageEditingMode && (
+                              <button
+                                onClick={() => onEditImage?.("hero_image_1")}
+                                className="absolute -top-2 -right-2 bg-white/90 text-gray-800 p-2 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-transform z-50 flex items-center justify-center cursor-pointer border border-gray-200"
+                                title="Edit Image"
+                              >
+                                <FaPen size={14} />
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -873,9 +907,20 @@ export default function PortfolioPreview() {
                       }
                     ].map((proj, i) => (
                       <div key={i} className="portfolio-project-card flex flex-col flex-none w-[240px] sm:w-[260px] max-w-[80vw] shrink-0 snap-start cursor-pointer group" style={{ animationDelay: `${i * 80}ms` }}>
-                        <div className="w-full aspect-square rounded-[20px] overflow-hidden mb-4 sm:mb-5 relative border border-gray-100 shadow-sm">
-                          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors z-10 w-full h-full"></div>
-                          <Image src={proj.img} alt={proj.title} fill sizes="260px" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" unoptimized />
+                        <div className="w-full aspect-square rounded-[20px] mb-4 sm:mb-5 relative border border-gray-100 shadow-sm">
+                          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors z-10 w-full h-full rounded-[20px] pointer-events-none"></div>
+                          <div className="absolute inset-0 overflow-hidden rounded-[20px]">
+                            <Image src={customImages[`project_image_${i}`] || proj.img} alt={proj.title} fill sizes="260px" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" unoptimized />
+                          </div>
+                          {isImageEditingMode && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); onEditImage?.(`project_image_${i}`); }}
+                              className="absolute top-3 right-3 bg-white/90 text-gray-800 p-2 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-transform z-50 flex items-center justify-center cursor-pointer border border-gray-200"
+                              title="Edit Image"
+                            >
+                              <FaPen size={14} />
+                            </button>
+                          )}
                         </div>
                         <div className="flex items-start mb-3">
                           <span className="bg-[#63e5ff] border border-gray-900 text-gray-900 px-3.5 py-1.5 rounded-full text-[11px] font-semibold leading-none">
@@ -1075,4 +1120,3 @@ export default function PortfolioPreview() {
     </main>
   );
 }
-
