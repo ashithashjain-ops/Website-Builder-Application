@@ -57,7 +57,13 @@ const categories = [
   { title: "Portfolio", image: "/landing-optimized/port.webp", alt: "Portfolio website preview", previewHref: "/portfolio", editHref: "/blockpages?template=portfolio" },
   { title: "E-Commerce Templates", image: "/landing-optimized/ecommerce.webp", alt: "E-commerce website preview", previewHref: "/e-commerce", editHref: "/blockpages?template=ecommerce" },
   { title: "Digital Marketing Templates", image: "/landing-optimized/digital01.webp", alt: "Digital marketing website preview" },
-  { title: "Blogging", image: "/landing-optimized/bloggg.webp", alt: "Blogging website preview" },
+  {
+    title: "Blogging",
+    image: "/landing-optimized/bloggg.webp",
+    alt: "Blogging website preview",
+    previewHref: "/blog",
+    editHref: "/blockpages?template=blog",
+  },
   { title: "Construction Themes", image: "/landing-optimized/construction02.webp", alt: "Construction website preview" },
   { title: "Food Restaurant", image: "/landing-optimized/foodd03.webp", alt: "Food restaurant website preview" },
 ];

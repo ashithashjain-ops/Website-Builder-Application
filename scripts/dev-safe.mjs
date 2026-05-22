@@ -78,7 +78,10 @@ function clearNextLockFile() {
 
 function startNextDev() {
   const nextCli = resolve(PROJECT_ROOT, "node_modules", "next", "dist", "bin", "next");
-  const child = spawn(process.execPath, [nextCli, "dev"], { stdio: "inherit" });
+  const child = spawn(process.execPath, [nextCli, "dev"], {
+    cwd: PROJECT_ROOT,
+    stdio: "inherit",
+  });
 
   child.on("exit", (code, signal) => {
     if (signal) {
