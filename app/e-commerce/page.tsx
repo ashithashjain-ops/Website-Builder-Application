@@ -759,7 +759,7 @@ export default function ECommercePage() {
       if (Math.abs(dx) < 28 || Math.abs(dx) <= Math.abs(dy)) return;
       moveProducts(dx < 0 ? 1 : -1);
     },
-    [isCarouselMode]
+    [isCarouselMode, moveProducts]
   );
 
   function BuyFeatureIcon({ type }: { type: BuyFeatureIconType }) {
@@ -817,6 +817,7 @@ export default function ECommercePage() {
       <style dangerouslySetInnerHTML={{
         __html: `
           @media (max-width: 1024px) {
+            /* 1. Fluid Layouts & Remove Fixed Constraints */
             .buyscreen-page .w-96, .buyscreen-page .w-80, .buyscreen-page .w-72, .buyscreen-page .w-64, .buyscreen-page .w-56, .buyscreen-page .w-48, .buyscreen-page .max-w-md, .buyscreen-page .max-w-sm, .buyscreen-page .max-w-lg, .buyscreen-page .w-[350px] {
               max-width: 100% !important;
               width: 100% !important;
@@ -825,6 +826,7 @@ export default function ECommercePage() {
               height: auto !important;
             }
 
+            /* 2. Prevent Text Overflow */
             .buyscreen-page h1, .buyscreen-page h2, .buyscreen-page h3, .buyscreen-page h4, .buyscreen-page p, .buyscreen-page span, .buyscreen-page a, .buyscreen-page button {
               overflow-wrap: break-word !important;
               word-wrap: break-word !important;
@@ -832,12 +834,14 @@ export default function ECommercePage() {
               white-space: normal !important;
             }
 
+            /* 3. Responsive Clamp Fonts */
             .buyscreen-page h1 { font-size: clamp(1.5rem, 5vw + 0.5rem, 3rem) !important; line-height: 1.2 !important; }
             .buyscreen-page h2 { font-size: clamp(1.25rem, 4vw + 0.5rem, 2.5rem) !important; line-height: 1.2 !important; }
             .buyscreen-page h3 { font-size: clamp(1rem, 3vw + 0.5rem, 2rem) !important; line-height: 1.3 !important; }
             .buyscreen-page p { font-size: clamp(0.875rem, 2.5vw + 0.25rem, 1.125rem) !important; line-height: 1.5 !important; }
             .buyscreen-page button { font-size: clamp(0.75rem, 2vw + 0.25rem, 1rem) !important; }
 
+            /* 4. Images */
             .buyscreen-page img, .buyscreen-page svg {
               max-width: 100% !important;
               height: auto !important;
@@ -845,6 +849,7 @@ export default function ECommercePage() {
               flex-shrink: 0 !important;
             }
 
+            /* 5. Flexbox Wrapping for general sections, protect header icons */
             .buyscreen-page header, .buyscreen-page section {
               min-width: 0 !important;
               max-width: 100% !important;
@@ -856,8 +861,58 @@ export default function ECommercePage() {
             .buyscreen-page .flex-row {
               flex-wrap: wrap !important;
             }
+
+            /* Protect icons/buttons from shrinking or wrapping unreadably */
             .buyscreen-page button, .buyscreen-page .shrink-0 {
               flex-shrink: 0 !important;
+            }
+
+            /* 6. Hero Banner Overlay Fix (Responsive) */
+            .buyscreen-page .buyscreen-hero {
+              position: relative !important;
+              overflow: hidden !important;
+              border-radius: 1.75rem !important;
+              display: flex !important;
+              flex-direction: column !important;
+              align-items: center !important;
+              justify-content: center !important;
+              padding: 3rem 1.5rem !important;
+              min-height: min-content !important;
+              height: auto !important;
+              width: 100% !important;
+            }
+            .buyscreen-page .buyscreen-hero > picture {
+              position: absolute !important;
+              top: 0 !important;
+              left: 0 !important;
+              width: 100% !important;
+              height: 100% !important;
+              flex-shrink: unset !important;
+            }
+            .buyscreen-page .buyscreen-hero > picture img {
+              position: absolute !important;
+              top: 0 !important;
+              left: 0 !important;
+              width: 100% !important;
+              height: 100% !important;
+              object-fit: cover !important;
+              object-position: center !important;
+              max-height: none !important;
+            }
+            .buyscreen-page .buyscreen-hero-overlay {
+              display: block !important;
+              position: absolute !important;
+              inset: 0 !important;
+              z-index: 1 !important;
+            }
+            .buyscreen-page .buyscreen-hero-content {
+              position: relative !important;
+              z-index: 10 !important;
+              text-align: center !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              min-width: 0 !important;
+              padding: 0 !important;
             }
           }
 
@@ -1044,6 +1099,7 @@ export default function ECommercePage() {
       <section className="hidden">
         <div ref={topHeaderBarRef}>
           <div className="buyscreen-top-header-inner mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            {/* Mobile / tablet / desktop-zoom: hamburger + logo + actions (cart/search/profile stay right) */}
             <div className="buyscreen-top-header-row buyscreen-top-header-mobile-row flex min-w-0 flex-wrap items-center justify-between gap-2 py-2.5 lg:hidden">
               <div className="flex min-w-0 shrink-0 flex-wrap items-center gap-2">
                 <button
@@ -1125,6 +1181,7 @@ export default function ECommercePage() {
               </div>
             </div>
 
+            {/* Desktop: equal space between each segment — logo … nav links … actions (cart stays right with inner icon gaps) */}
             <div className="buyscreen-top-header-row buyscreen-top-header-desktop-row hidden w-full min-w-0 items-center py-3 lg:flex">
               <nav
                 className="flex w-full min-w-0 flex-nowrap items-center justify-between gap-0 text-[13px] font-semibold text-white"
@@ -1300,9 +1357,8 @@ export default function ECommercePage() {
             </p>
           </div>
 
-          {/* Hidden dynamically on actual mobile viewport widths using hidden sm:inline-flex */}
           {!isEmbeddedPreview ? (
-            <div className="hidden sm:inline-flex justify-center">
+            <div className="hidden justify-center sm:inline-flex">
               <BuyPreviewToolbar
                 isPreviewOpen={isPreviewOpen}
                 previewDevice={previewDevice}
@@ -1325,8 +1381,8 @@ export default function ECommercePage() {
         </div>
 
         <section className="buyscreen-shell overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_28px_90px_rgba(15,35,75,0.13)]">
-          <div className="space-y-10 px-4 py-8 sm:space-y-12 sm:px-8 sm:py-10 lg:py-12">
-            {!isEmbeddedPreview && isPreviewOpen ? (
+          {!isEmbeddedPreview && isPreviewOpen ? (
+            <div className="space-y-10 px-4 py-8 sm:space-y-12 sm:px-8 sm:py-10 lg:py-12">
               <section className="overflow-hidden rounded-[1.75rem] border border-[#dbe3ef] bg-[linear-gradient(180deg,#f8fbff_0%,#eaf1f8_100%)] p-3 shadow-[0_20px_60px_rgba(15,35,75,0.12)] sm:p-5">
                 <div
                   className="mx-auto transition-all duration-300"
@@ -1345,9 +1401,202 @@ export default function ECommercePage() {
                   </div>
                 </div>
               </section>
-            ) : (
-              <>
-                <section className="buyscreen-hero relative flex min-h-[400px] sm:min-h-[500px] lg:min-h-0 lg:aspect-[16/8] items-center overflow-hidden rounded-[1.75rem] border border-[#dbe3ef] py-12 px-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] sm:p-8 lg:p-12">
+            </div>
+          ) : (
+            <>
+              {/* RESTORED E-SHOP NAVIGATION SECTION */}
+              <header className="buyscreen-header flex flex-col gap-4 border-b border-[#e7edf5] bg-white/95 px-4 py-4 sm:px-8 sm:py-5 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:py-4">
+                <div className="flex shrink-0 items-center justify-between lg:justify-start">
+                  <span className="inline-flex items-center gap-2 text-base font-black tracking-tight text-[#06224C] sm:text-lg">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#22c55e] shadow-[0_0_0_5px_rgba(34,197,94,0.14)]" aria-hidden />
+                    e-shop.
+                  </span>
+                </div>
+
+                <div className="buyscreen-header-actions flex w-full min-w-0 items-center justify-end gap-2 text-[#4b5563] sm:gap-3 lg:w-auto">
+                  <label className="buyscreen-search flex h-9 w-[150px] items-center rounded-full border border-[#dbe3ef] bg-[#f8fafc] px-3 text-[11px] text-[#4b5563] shadow-inner sm:h-10 sm:w-[210px] sm:text-xs">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        const nextValue = e.target.value;
+                        setSearchQuery(nextValue);
+                        setActiveProductStart(0);
+                        setShowAllProducts(false);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key !== "Enter") return;
+                        e.preventDefault();
+                        setActiveProductStart(0);
+                        setShowAllProducts(false);
+                        featuredProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }}
+                      placeholder="Search..."
+                      className="min-w-0 flex-1 bg-transparent text-[#4b5563] outline-none placeholder:text-[#4b5563] placeholder:opacity-100"
+                    />
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#374151]" aria-hidden>
+                      <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
+                      <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                    </svg>
+                  </label>
+                  <div className="buyscreen-header-trailing flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" className="buyscreen-cart-trigger flex items-center gap-2 rounded-md px-2 py-1" onClick={() => setIsCartOpen(true)}>
+                      <span className="relative shrink-0">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                          <path d="M3 4h2l1.6 9.2a1 1 0 0 0 1 .8H18a1 1 0 0 0 1-.8L20.6 7H7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="10" cy="19" r="1.5" fill="currentColor" />
+                          <circle cx="17" cy="19" r="1.5" fill="currentColor" />
+                        </svg>
+                        {cartItemCount > 0 ? (
+                          <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ff664f] px-1 text-[10px] font-bold leading-none text-white">
+                            {cartItemCount}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className="min-w-0 leading-tight">
+                        <span className="block text-[11px] font-semibold sm:text-xs">Cart</span>
+                        <span className="buyscreen-cart-secondary block text-[11px] tabular-nums sm:text-xs">{cartItems.length ? formatUsd(cartTotalCents) : "Empty"}</span>
+                      </span>
+                    </button>
+                    <button type="button" className="buyscreen-cart-trigger flex items-center gap-2 rounded-md px-2 py-1" onClick={() => setIsFavoritesOpen(true)}>
+                      <span className="relative shrink-0">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                          <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733C11.285 5.876 9.623 4.75 7.688 4.75 5.099 4.75 3 6.765 3 9.25c0 7.22 9 12 9 12s9-4.78 9-12z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        {favoriteProducts.length > 0 ? (
+                          <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ff664f] px-1 text-[10px] font-bold leading-none text-white">
+                            {favoriteProducts.length}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className="min-w-0 leading-tight">
+                        <span className="block text-[11px] font-semibold sm:text-xs">Favorites</span>
+                        <span className="buyscreen-cart-secondary block text-[11px] tabular-nums sm:text-xs">{favoriteProducts.length ? `${favoriteProducts.length} items` : "Empty"}</span>
+                      </span>
+                    </button>
+                    <span className="h-6 w-px shrink-0 bg-[#d1d5db]" aria-hidden />
+                    <div ref={userMenuWrapRef} className="buyscreen-user-menu-wrap relative shrink-0">
+                      <button
+                        type="button"
+                        aria-expanded={isUserMenuOpen}
+                        aria-haspopup="menu"
+                        className="buyscreen-user-summary buyscreen-user-trigger flex min-w-0 items-center gap-2 rounded-md border-0 bg-transparent px-2 py-1 text-left text-inherit"
+                        onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0" aria-hidden>
+                          <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.8" />
+                          <path d="M5.8 19.2c1.1-2.5 3.3-3.8 6.2-3.8s5.1 1.3 6.2 3.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                        </svg>
+                        <span className="min-w-0 leading-tight">
+                          <span className="block text-[11px] font-semibold sm:text-xs">User</span>
+                          <span className="buyscreen-user-secondary block text-[11px] sm:text-xs">Account</span>
+                        </span>
+                      </button>
+                      <div
+                        className={`buyscreen-user-menu-dropdown ${isUserMenuOpen ? "buyscreen-user-menu-dropdown--open" : ""}`}
+                        role="menu"
+                        aria-hidden={!isUserMenuOpen}
+                      >
+                        <button
+                          type="button"
+                          role="menuitem"
+                          className="buyscreen-user-menu-item"
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            router.push("/login");
+                          }}
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </header>
+
+              <nav className="buyscreen-categories border-b border-[#e7edf5] bg-[#06224C] px-4 py-3 text-[10px] font-semibold text-white sm:px-8 sm:text-xs">
+                <div className="flex items-center justify-end lg:hidden">
+                  <button
+                    type="button"
+                    aria-expanded={isCategoryMenuOpen}
+                    aria-controls="buyscreen-category-menu"
+                    className="inline-flex items-center gap-2 rounded-md border border-white/30 px-2.5 py-1.5 text-[11px] font-semibold text-white transition-colors duration-150 hover:bg-white hover:text-[#06224C]"
+                    onClick={() => setIsCategoryMenuOpen((prev) => !prev)}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                    Menu
+                  </button>
+                </div>
+                <div
+                  id="buyscreen-category-menu"
+                  className={`buyscreen-categories-list ${isCategoryMenuOpen ? "buyscreen-categories-list--open" : ""}`}
+                >
+                  {buyCategories.map((item) => (
+                    item.label === "All Categories" ? (
+                      <div
+                        key={item.label}
+                        ref={allCategoriesWrapRef}
+                        className="buyscreen-all-categories-wrap relative shrink-0"
+                        onMouseEnter={() => setIsAllCategoriesDropdownOpen(true)}
+                        onMouseLeave={() => setIsAllCategoriesDropdownOpen(false)}
+                        onFocus={() => setIsAllCategoriesDropdownOpen(true)}
+                        onBlur={(e) => {
+                          if (!e.currentTarget.contains(e.relatedTarget)) {
+                            setIsAllCategoriesDropdownOpen(false);
+                          }
+                        }}
+                      >
+                        <button
+                          type="button"
+                          aria-expanded={isAllCategoriesDropdownOpen}
+                          aria-controls="buyscreen-all-categories-menu"
+                          aria-haspopup="menu"
+                          className="buyscreen-all-categories-toggle inline-flex items-center gap-1 rounded-md px-2 py-1 text-left text-[10px] font-semibold transition-colors duration-150 bg-transparent text-white hover:bg-transparent hover:!text-white focus:bg-transparent focus:!text-white active:bg-transparent active:!text-white focus-visible:outline-none focus-visible:bg-transparent focus-visible:!text-white focus-visible:ring-2 focus-visible:ring-white/50 sm:text-xs"
+                          onClick={() => setIsAllCategoriesDropdownOpen((prev) => !prev)}
+                        >
+                          All Categories
+                          <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden>
+                            <path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                        <div
+                          id="buyscreen-all-categories-menu"
+                          role="menu"
+                          className={`buyscreen-all-categories-dropdown ${isAllCategoriesDropdownOpen ? "buyscreen-all-categories-dropdown--open" : ""}`}
+                        >
+                          {buyAllSubCategories.map((subCategory) => (
+                            <button
+                              key={subCategory.key}
+                              type="button"
+                              role="menuitem"
+                              tabIndex={isAllCategoriesDropdownOpen ? 0 : -1}
+                              className="buyscreen-all-categories-item focus-visible:outline-none focus-visible:bg-[#f1f5f9] focus-visible:text-[#06224C]"
+                              onClick={() => handleSubCategoryClick(subCategory.key)}
+                            >
+                              {subCategory.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        key={item.label}
+                        type="button"
+                        className={`buyscreen-category-item shrink-0 rounded-md px-2 py-1 text-left transition-colors duration-150 bg-transparent text-white hover:bg-transparent hover:!text-white focus:bg-transparent focus:!text-white active:bg-transparent active:!text-white focus-visible:outline-none focus-visible:bg-transparent focus-visible:!text-white focus-visible:ring-2 focus-visible:ring-white/50 ${item.label === "Limited Sale" ? "lg:ml-auto" : ""} ${item.label === "Best Seller" ? "!bg-transparent !border-0 !shadow-none !ring-0" : ""}`}
+                        onClick={() => handleCategoryClick(item.label)}
+                      >
+                        {item.label}
+                      </button>
+                    )
+                  ))}
+                </div>
+              </nav>
+              {/* -------------------------------------- */}
+
+              <div className="space-y-10 px-4 py-8 sm:space-y-12 sm:px-8 sm:py-10 lg:py-12">
+                <section className="buyscreen-hero relative flex min-h-[400px] items-center overflow-hidden rounded-[1.75rem] border border-[#dbe3ef] px-5 py-12 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] sm:min-h-[500px] sm:p-8 lg:min-h-0 lg:aspect-[16/8] lg:p-12">
                   <picture className="absolute inset-0 block h-full w-full">
                     <source media="(max-width: 767px)" srcSet={assetPath("/mobilebackground.png")} />
                     <img src={assetPath("/background.webp")} alt="Electronics hero background" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" decoding="async" />
@@ -1384,8 +1633,8 @@ export default function ECommercePage() {
                         <BuyFeatureIcon type={feature.icon} />
                       </span>
                       <div className="min-w-0">
-                        <p className="font-black break-words [overflow-wrap:anywhere] text-[#111827]">{feature.title}</p>
-                        <p className="mt-0.5 break-words [overflow-wrap:anywhere] text-xs leading-relaxed text-[#6b7280] sm:text-sm">{feature.subtitle}</p>
+                        <p className="break-words font-black text-[#111827] [overflow-wrap:anywhere]">{feature.title}</p>
+                        <p className="mt-0.5 break-words text-xs leading-relaxed text-[#6b7280] [overflow-wrap:anywhere] sm:text-sm">{feature.subtitle}</p>
                       </div>
                     </div>
                   ))}
@@ -1405,13 +1654,13 @@ export default function ECommercePage() {
                     {buyCategorySpotlights.map((category) => (
                       <article
                         key={category.title}
-                        className="buyscreen-category-card group overflow-hidden rounded-2xl border border-[#e7edf5] bg-[#f8fafc] hover:bg-white hover:border-[#bfdbfe] hover:shadow-md p-5 shadow-sm transition duration-300"
+                        className="buyscreen-category-card group overflow-hidden rounded-2xl border border-[#e7edf5] bg-[#f8fafc] p-5 shadow-sm transition duration-300 hover:border-[#bfdbfe] hover:bg-white hover:shadow-md"
                       >
                         <div className="flex min-h-[210px] flex-col justify-between gap-5">
-                          <div className="flex flex-wrap sm:flex-nowrap items-start justify-between gap-4">
+                          <div className="flex flex-wrap items-start justify-between gap-4 sm:flex-nowrap">
                             <div className="min-w-0">
-                              <p className="text-lg break-words [overflow-wrap:anywhere] font-black text-[#111827]">{category.title}</p>
-                              <p className="mt-2 text-sm break-words [overflow-wrap:anywhere] leading-relaxed text-[#64748b]">{category.subtitle}</p>
+                              <p className="break-words text-lg font-black text-[#111827] [overflow-wrap:anywhere]">{category.title}</p>
+                              <p className="mt-2 break-words text-sm leading-relaxed text-[#64748b] [overflow-wrap:anywhere]">{category.subtitle}</p>
                             </div>
                             <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#06224C] shadow-sm transition duration-300 group-hover:rotate-12 group-hover:bg-[#06224C] group-hover:text-white">
                               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -1419,7 +1668,7 @@ export default function ECommercePage() {
                               </svg>
                             </span>
                           </div>
-                          <div className="flex flex-wrap-reverse sm:flex-nowrap items-end justify-between gap-4">
+                          <div className="flex flex-wrap-reverse items-end justify-between gap-4 sm:flex-nowrap">
                             <button
                               type="button"
                               className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#06224C] shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-[#06224C] hover:text-white"
@@ -1432,7 +1681,7 @@ export default function ECommercePage() {
                               alt={`${category.title} category`}
                               width={128}
                               height={112}
-                              className="h-20 w-24 sm:h-28 sm:w-32 shrink-0 max-w-full object-contain transition duration-500 group-hover:scale-110"
+                              className="h-20 w-24 shrink-0 max-w-full object-contain transition duration-500 group-hover:scale-110 sm:h-28 sm:w-32"
                               loading="lazy"
                               unoptimized
                             />
@@ -1475,9 +1724,9 @@ export default function ECommercePage() {
                     </div>
                     <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
                       {buyDealHighlights.map((item) => (
-                        <div key={item.label} className="flex-1 min-w-[70px] sm:min-w-[90px] rounded-2xl border border-white/15 bg-white/10 p-3 sm:p-4 text-center backdrop-blur">
-                          <p className="text-xl break-words [overflow-wrap:anywhere] font-black sm:text-2xl">{item.value}</p>
-                          <p className="mt-1 break-words [overflow-wrap:anywhere] text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.16em] text-white/65">{item.label}</p>
+                        <div key={item.label} className="min-w-[70px] flex-1 rounded-2xl border border-white/15 bg-white/10 p-3 text-center backdrop-blur sm:min-w-[90px] sm:p-4">
+                          <p className="break-words text-xl font-black [overflow-wrap:anywhere] sm:text-2xl">{item.value}</p>
+                          <p className="mt-1 break-words text-[9px] font-bold uppercase tracking-[0.16em] text-white/65 [overflow-wrap:anywhere] sm:text-[10px]">{item.label}</p>
                         </div>
                       ))}
                     </div>
@@ -1493,9 +1742,9 @@ export default function ECommercePage() {
                     <button
                       type="button"
                       className="inline-flex items-center gap-2 rounded-full border border-[#fecaca] bg-[#fff7ed] px-4 py-2 text-sm font-black text-[#ff664f] transition duration-300 hover:-translate-y-0.5 hover:bg-[#ff664f] hover:text-white"
-                      onClick={() => setShowAllProducts(true)}
+                      onClick={() => setShowAllProducts((prev) => !prev)}
                     >
-                      {showAllProducts ? "All Products" : "View All"}
+                      {showAllProducts ? "Carousel View" : "View All"}
                       {!showAllProducts ? (
                         <span className="text-base" aria-hidden>
                           →
@@ -1578,17 +1827,17 @@ export default function ECommercePage() {
                                 }}
                               />
                             </div>
-                            <div className="buyscreen-product-meta flex flex-1 flex-col mt-3 min-w-0 px-1 pb-1 sm:mt-4">
+                            <div className="buyscreen-product-meta mt-3 flex min-w-0 flex-1 flex-col px-1 pb-1 sm:mt-4">
                               <p className="text-center text-[10px] font-semibold uppercase leading-snug tracking-tight text-[#6b7280] [overflow-wrap:anywhere] sm:text-xs sm:leading-normal sm:tracking-[0.06em] md:tracking-[0.08em]">
                                 {product.name}
                               </p>
-                              <p className="mt-1 text-center text-xs font-bold leading-snug tracking-tight text-[#171717] [overflow-wrap:anywhere] tabular-nums sm:text-sm">
+                              <p className="mt-1 text-center text-xs font-bold leading-snug tracking-tight text-[#171717] tabular-nums [overflow-wrap:anywhere] sm:text-sm">
                                 {product.originalPrice ? (
                                   <span className="mr-1.5 text-[10px] font-semibold text-[#9ca3af] line-through sm:text-xs">{product.originalPrice}</span>
                                 ) : null}
                                 {product.price}
                               </p>
-                              <div className="mt-auto pt-2 flex justify-center">
+                              <div className="mt-auto flex justify-center pt-2">
                                 {product.badge ? (
                                   <span className="inline-block rounded bg-[#ff664f] px-2 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm">{product.badge}</span>
                                 ) : null}
@@ -1694,7 +1943,7 @@ export default function ECommercePage() {
                       <p className="text-xs font-black uppercase tracking-[0.22em] text-[#2563eb]">Partner ecosystem</p>
                       <h2 className="mt-2 text-2xl font-black tracking-tight text-[#111827] sm:text-3xl">Featured Tech Brands</h2>
                     </div>
-                    <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3 sm:grid-cols-5">
+                    <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:grid-cols-5">
                       {buyBrandPartners.map((brand, index) => (
                         <div key={brand} className="buyscreen-brand-tile flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-[#e7edf5] bg-white px-3 text-center text-xs font-black uppercase tracking-[0.14em] text-[#64748b] shadow-sm transition duration-300">
                           <span className="buyscreen-brand-mark shrink-0 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#eff6ff] text-sm font-black text-[#2563eb]">
@@ -1741,19 +1990,19 @@ export default function ECommercePage() {
                         </button>
                       </form>
                     </div>
-                    <div className="buyscreen-update-art grid grid-cols-3 gap-2 sm:gap-3 items-stretch rounded-[1.5rem] bg-[#f8fafc] p-3 sm:p-4">
+                    <div className="buyscreen-update-art grid grid-cols-3 items-stretch gap-2 rounded-[1.5rem] bg-[#f8fafc] p-3 sm:gap-3 sm:p-4">
                       {buyUpdateProducts.map((product) => (
-                        <div key={product.name} className="buyscreen-update-product flex flex-col items-center justify-between rounded-2xl border border-[#e7edf5] bg-white p-2 sm:p-3 shadow-sm h-full w-full">
-                          <Image src={product.image} alt={product.name} width={100} height={100} className="h-16 sm:h-20 w-full object-contain shrink-0" unoptimized />
-                          <p className="mt-2 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-[0.12em] text-[#64748b]">{product.name}</p>
+                        <div key={product.name} className="buyscreen-update-product flex h-full w-full flex-col items-center justify-between rounded-2xl border border-[#e7edf5] bg-white p-2 shadow-sm sm:p-3">
+                          <Image src={product.image} alt={product.name} width={100} height={100} className="h-16 w-full shrink-0 object-contain sm:h-20" unoptimized />
+                          <p className="mt-2 text-center text-[9px] font-black uppercase tracking-[0.12em] text-[#64748b] sm:text-[10px]">{product.name}</p>
                         </div>
                       ))}
                     </div>
                   </div>
                 </section>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </section>
       </div>
       <Footer />

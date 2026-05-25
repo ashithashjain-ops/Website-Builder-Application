@@ -12,6 +12,8 @@ import {
   FaMobileAlt,
   FaEnvelope,
   FaPaperPlane,
+  FaLaptop,
+  FaTabletAlt,
 } from "react-icons/fa";
 
 import { FaEye } from "react-icons/fa";
@@ -85,31 +87,8 @@ function AnimatedCount({
 
 export default function Portfolioedit() {
   const [innerMobileMenuOpen, setInnerMobileMenuOpen] = useState(false);
-  const [customImages, setCustomImages] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    try {
-      const storedImages = localStorage.getItem("stackly-custom-images");
-      if (storedImages) {
-        const parsed = JSON.parse(storedImages);
-        const validImages: Record<string, string> = {};
-        let hasChanges = false;
-        for (const key in parsed) {
-          if (typeof parsed[key] === "string" && parsed[key].startsWith("blob:")) {
-            hasChanges = true;
-          } else {
-            validImages[key] = parsed[key];
-          }
-        }
-        setCustomImages(validImages);
-        if (hasChanges) {
-          localStorage.setItem("stackly-custom-images", JSON.stringify(validImages));
-        }
-      }
-    } catch (e) {
-      console.error("Failed to load custom images", e);
-    }
-  }, []);
+  const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const [heroImageProps] = useState({
     width: 165,
@@ -140,20 +119,20 @@ export default function Portfolioedit() {
     threshold: 0.2,
   });
 
-  const stats = [
+  const [stats, setStats] = useState([
     { value: 5, suffix: "+", label: "Years of Experience" },
     { value: 120, suffix: "+", label: "Projects Done" },
     { value: 98, suffix: "%", label: "Client Satisfaction" },
-  ];
+  ]);
 
-  const skills = [
+  const [skills, setSkills] = useState([
     { name: "Photoshop", value: 90, color: "#1a3636" },
     { name: "Figma", value: 80, color: "#e84b72" },
     { name: "HTML", value: 85, color: "#e44d26" },
     { name: "CSS", value: 75, color: "#264de4" },
-  ];
+  ]);
 
-  const processSteps = [
+  const [processSteps, setProcessSteps] = useState([
     {
       step: "01",
       title: "Discover",
@@ -169,9 +148,9 @@ export default function Portfolioedit() {
       title: "Deliver",
       desc: "Prepare developer-ready assets with smooth handoff notes and launch support.",
     },
-  ];
+  ]);
 
-  const testimonials = [
+  const [testimonials, setTestimonials] = useState([
     {
       quote: "The design felt premium, fast, and very easy for our team to present to clients.",
       name: "Aarav Mehta",
@@ -182,7 +161,7 @@ export default function Portfolioedit() {
       name: "Priya Shah",
       role: "Startup Founder",
     },
-  ];
+  ]);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -192,108 +171,100 @@ export default function Portfolioedit() {
   };
 
   return (
-
     <main className="flex flex-col min-h-screen bg-white">
       {/* ====== MAIN BUILDER LAYOUT ====== */}
       <div className="flex flex-1">
-
         {/* MAIN CONTENT */}
-
-        {/* <div className="flex-1 bg-white p-4 md:p-7 flex justify-center min-w-0 overflow-hidden"> */}
-        <div className="flex-1 bg-white p-4 md:p-7 flex justify-center min-w-0">
-
+        <div className="flex-1 bg-white p-4 @md:p-7 flex justify-center min-w-0">
           <div className="w-full max-w-[1200px] relative flex flex-col h-[calc(100vh-80px)] min-w-0">
+            {/* FLOATING DEVICE TOOLBAR */}
+            <div className="flex justify-center mb-6 shrink-0 pt-2">
+              <div className="flex items-center gap-3 bg-white rounded-full border border-[#E5E7EB] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] px-4 py-2">
+                 <Link href="/landing#templates" className="w-12 h-12 flex items-center justify-center rounded-full bg-white border border-gray-100 shadow-sm hover:shadow-md text-[#06224C] transition" title="Preview">
+                    <FaEye size={18} />
+                 </Link>
+                 <div className="w-px h-8 bg-gray-200 mx-1"></div>
+                 <button onClick={() => setDeviceMode("desktop")} className={`w-12 h-12 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${deviceMode === "desktop" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Desktop View">
+                    <FaLaptop size={18} />
+                 </button>
+                 <button onClick={() => setDeviceMode("tablet")} className={`w-12 h-12 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${deviceMode === "tablet" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Tablet View">
+                    <FaTabletAlt size={18} />
+                 </button>
+                 <button onClick={() => setDeviceMode("mobile")} className={`w-12 h-12 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${deviceMode === "mobile" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Mobile View">
+                    <FaMobileAlt size={18} />
+                 </button>
+              </div>
+            </div>
 
             {/* Canvas Box */}
+            <div className={`flex-1 overflow-y-auto min-w-0 relative z-0 transition-colors duration-300 ${deviceMode !== "desktop" ? "bg-gray-200/50 p-2 @sm:p-4 rounded-xl" : ""}`}>
+              <div className={`@container mx-auto w-full min-h-[530px] bg-[#F2F2F2] rounded-xl border-2 border-gray-300 flex flex-col relative portfolio-shell overflow-hidden transition-all duration-500 ease-in-out ${
+                deviceMode === "mobile"
+                  ? "max-w-[375px] shadow-2xl"
+                  : deviceMode === "tablet"
+                    ? "max-w-[768px] shadow-2xl"
+                    : "max-w-full"
+              }`}>
 
-            {/* <div className="flex-1 overflow-y-auto min-w-0"> */}
-            <div className="flex-1 overflow-y-auto min-w-0 relative z-0">
-              <div className="w-full min-h-[530px] bg-[#F2F2F2] rounded-xl border-2 border-gray-300 flex flex-col relative portfolio-shell">
 
-
-                {/* <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 xl:flex-nowrap border-b border-gray-300 bg-[#06224C] rounded-t-xl"> */}
-                <div className="sticky top-0 z-50 backdrop-blur-md bg-[#06224C]/95 flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 xl:flex-nowrap border-b border-gray-300 rounded-t-xl">
+                {/* <div className="flex w-full flex-wrap items-center justify-between gap-2 @sm:gap-4 px-3 @sm:px-4 py-2 @sm:py-3 @md:px-8 @xl:flex-nowrap border-b border-gray-300 bg-[#06224C] rounded-t-xl"> */}
+                <div className="sticky top-0 z-50 backdrop-blur-md bg-[#06224C]/95 flex w-full flex-wrap items-center justify-between gap-2 @sm:gap-4 px-3 @sm:px-4 py-2 @sm:py-3 @md:px-8 @xl:flex-nowrap border-b border-gray-300 rounded-t-xl">
 
                   {/* ✅ MOBILE LAYOUT */}
-                  <div className="flex flex-col w-full lg:hidden gap-2">
+                  <div className="flex w-full items-center justify-between @lg:hidden relative">
 
-                    {/* ROW 1 → Logo + Menu */}
-                    {/* TOP ROW → Logo + Title + Menu */}
-                    <div className="flex flex-wrap items-center justify-between w-full gap-2">
+                    {/* LEFT → Logo */}
+                    <Link
+                      href="/landing"
+                      className="flex h-7 w-[64px] @sm:h-8 @sm:w-[80px] items-center justify-center overflow-hidden rounded-[50%] bg-white px-1 @sm:px-2 shrink-0 z-10"
+                    >
+                      <Image
+                        src={assetPath("/stackly-logo.webp")}
+                        alt="Stackly logo"
+                        width={80}
+                        height={24}
+                        className="h-[12px] @sm:h-[14px] object-contain"
+                        unoptimized
+                      />
+                    </Link>
 
-                      {/* LEFT → Logo */}
-                      <Link
-                        href="/landing"
-                        className="flex h-7 w-[64px] sm:h-8 sm:w-[80px] items-center justify-center overflow-hidden rounded-[50%] bg-white px-1 sm:px-2 shrink-0"
-                      >
-                        <Image
-                          src={assetPath("/stackly-logo.webp")}
-                          alt="Stackly logo"
-                          width={80}
-                          height={24}
-                          className="h-[12px] sm:h-[14px] object-contain"
-                          unoptimized
-                        />
-                      </Link>
+                    {/* CENTER → Title */}
+                    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-base @sm:text-lg font-semibold text-white text-center break-words pointer-events-none z-0">
+                      Portfolio
+                    </span>
 
-                      {/* CENTER → Title */}
-                      <span className="text-base sm:text-lg font-semibold text-white text-center flex-1 min-w-[100px]">
-                        Portfolio
-                      </span>
-
-                      {/* RIGHT → Menu */}
+                    {/* RIGHT → Menu */}
+                    <div className="flex items-center shrink-0 z-10">
                       <button
                         onClick={() => setInnerMobileMenuOpen((v) => !v)}
-                        className="h-8 w-8 border border-white/25 text-white rounded-md hover:bg-white/10 transition flex items-center justify-center shrink-0"
+                        className="h-7 w-7 @sm:h-8 @sm:w-8 border border-white/25 text-white rounded-md hover:bg-white/10 transition flex items-center justify-center shrink-0"
                       >
-                        <FaBars />
+                        <FaBars size={12} />
                       </button>
-
-                    </div>
-
-                    {/* ROW 3 → Actions (NOW VISIBLE ON MOBILE ✅) */}
-                    <div className="flex justify-center">
-                      <div className="flex flex-wrap justify-center gap-2 w-full max-w-[220px]">
-
-                        {/* Save Draft */}
-                        <button className="px-3 py-1 text-xs font-semibold border border-gray-300 rounded-md text-white hover:bg-white hover:text-black transition">
-                          Save Draft
-                        </button>
-
-                        {/* Preview */}
-                        <a href="preview.html" className="px-3 py-1 text-xs font-semibold flex items-center gap-1 border border-gray-300 rounded-md text-white hover:bg-white hover:text-black transition">
-                          Preview <FaEye className="text-[10px]" />
-                        </a>
-
-                      </div>
                     </div>
 
                   </div>
 
-                  {/* ✅ DESKTOP (unchanged) */}
-                  <div className="hidden lg:flex w-full items-center justify-between">
+                  {/* ✅ DESKTOP */}
+                  <div className="w-full items-center justify-between hidden @lg:flex relative">
 
-                    <div className="flex shrink-0 justify-start">
+                    {/* LEFT: Logo */}
+                    <div className="flex shrink-0 items-center justify-start z-10">
                       <Link href="/landing" className="flex h-10 min-w-[92px] items-center justify-center rounded-[50%] bg-white px-3">
                         <Image src={assetPath("/stackly-logo.webp")} alt="Stackly logo" width={92} height={28} className="h-[18px] w-auto" unoptimized />
                       </Link>
                     </div>
 
-                    <div className="flex flex-1 justify-center px-4">
-                      <span className="text-lg font-semibold text-white">Portfolio</span>
-                    </div>
+                    {/* CENTER → Title */}
+                    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-semibold text-white pointer-events-none z-0">
+                      Portfolio
+                    </span>
 
-
-                    <div className="flex shrink-0 items-center gap-x-6">
+                    {/* RIGHT: Nav Links */}
+                    <div className="flex shrink-0 items-center gap-x-6 z-10">
 
                       {/* NAV LINKS */}
                       <div className="flex gap-x-6">
-                        {/* {["Home", "About Me", "Projects", "Contacts"].map((item, i) => (
-                          <button key={i} className="relative text-white text-sm group">
-                            {item}
-                            <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                          </button>
-                        ))} */}
                         {[
                           { name: "Home", id: "home" },
                           { name: "About Me", id: "about" },
@@ -309,21 +280,6 @@ export default function Portfolioedit() {
                             <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
                           </button>
                         ))}
-                      </div>
-
-                      {/* ACTION BUTTONS ✅ */}
-                      <div className="flex border-2 border-gray-300 rounded-md overflow-hidden text-xs text-white font-bold">
-
-                        <button className="px-2 py-1 hover:bg-white hover:text-black transition">
-                          Save Draft
-                        </button>
-
-                        <div className="w-px border-1 border-gray-300"></div>
-
-                        <a href="preview.html" className="px-2 py-1 flex items-center gap-1 hover:bg-white hover:text-black transition">
-                          Preview <FaEye className="text-[10px]" />
-                        </a>
-
                       </div>
 
                     </div>
@@ -365,26 +321,26 @@ export default function Portfolioedit() {
 
                   {/* HERO CONTENT */}
 
-                  <div className="flex-1 flex flex-col px-4 sm:px-6 md:px-8 lg:px-12 py-6 md:py-8 relative z-10">
-                    <div className="flex flex-col lg:flex-row items-center lg:items-stretch justify-between w-full gap-8">
+                  <div className="flex-1 flex flex-col px-4 @sm:px-6 @md:px-8 @lg:px-12 py-6 @md:py-8 relative z-10">
+                    <div className="flex flex-col @lg:flex-row items-center @lg:items-stretch justify-between w-full gap-8">
 
-                      <div className="w-full lg:w-[50%] xl:w-[55%] shrink-0 flex flex-col relative z-30 text-center lg:text-left portfolio-hero-copy">
-                        <div className="mx-auto lg:mx-0 mb-4 inline-flex w-max items-center gap-2 rounded-full border border-[#63e5ff]/60 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#06224C] shadow-sm">
+                      <div className="w-full @xl:w-[55%] shrink-0 flex flex-col relative z-30 text-center @lg:w-[50%] @lg:text-left">
+                        <div className="mx-auto mb-4 inline-flex w-max items-center gap-2 rounded-full border border-[#63e5ff]/60 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#06224C] shadow-sm @lg:mx-0">
                           <span className="h-2 w-2 rounded-full bg-[#63e5ff] animate-pulse"></span>
                           Available for freelance work
                         </div>
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mt-4 md:mt-6 text-gray-800 leading-snug md:leading-normal break-words whitespace-normal">
-                          <div className="mb-2">Hello, I&apos;m</div>
-                          <div className="text-[#63e5ff] mb-2 leading-snug break-words">Srinivas Pentakota</div>
-                          <div className="leading-snug break-words">UI/UX Designer</div>
+                        <h1 className="text-[clamp(1.75rem,5cqi,3rem)] @md:text-4xl @lg:text-5xl font-bold mt-4 @md:mt-6 text-gray-800 leading-snug @md:leading-normal break-words whitespace-normal min-w-0 max-w-full">
+                          <div className="mb-2 min-w-0 break-words">Hello, I&apos;m</div>
+                          <div className="text-[#63e5ff] mb-2 leading-snug break-words min-w-0 max-w-full">Srinivas Pentakota</div>
+                          <div className="leading-snug break-words min-w-0 max-w-full">UI/UX Designer</div>
                         </h1>
 
-                        <p className="text-gray-600 mt-4 md:mt-6 text-base md:text-lg max-w-xl mx-auto lg:mx-0 break-words relative z-20">
+                        <p className="text-[clamp(0.875rem,2.5cqi,1.125rem)] @md:text-lg text-gray-600 mt-4 @md:mt-6 max-w-xl mx-auto break-words relative z-20 @lg:mx-0 min-w-0 max-w-full">
                           I design sleek digital products, landing pages, and brand experiences that feel clear, fast, and memorable.
                         </p>
 
                         {/* MOBILE BLOBS + IMAGE */}
-                        <div className="lg:hidden mt-8 mb-4 flex justify-center px-4 sm:px-6 w-full">
+                        <div className="mt-8 mb-4 flex justify-center px-4 @sm:px-6 w-full @lg:hidden">
                           <div className="relative w-full max-w-[220px]">
 
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -410,7 +366,7 @@ export default function Portfolioedit() {
                                 opacity: heroImageProps.opacity / 100
                               }}>
                               <Image
-                                src={customImages["hero_image_1"] || assetPath("/portfoliologo.webp")}
+                                src={assetPath("/portfoliologo.webp")}
                                 alt="Srinivas Pentakota - UI/UX Designer Portfolio"
                                 fill
                                 sizes="220px"
@@ -423,30 +379,30 @@ export default function Portfolioedit() {
                         </div>
 
 
-                        <div className="flex flex-wrap gap-4 mt-8 justify-center lg:justify-start">
+                        <div className="flex flex-wrap gap-4 mt-8 justify-center @lg:justify-start">
 
                           <button
                             type="button"
                             onClick={() => scrollToSection("projects")}
-                            className="w-40 flex justify-center items-center px-3 py-2 bg-gradient-to-r from-[#06224C] to-[#1A5BBC] text-white rounded-lg text-sm transition transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg outline-none focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06224C]"
+                            className="w-auto min-w-[140px] flex justify-center items-center px-3 py-2 bg-gradient-to-r from-[#06224C] to-[#1A5BBC] text-white rounded-lg text-sm transition transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg outline-none focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06224C] break-words"
                           >
                             View My Works
                           </button>
 
                           <Link
                             href="/page-not-found"
-                            className="w-40 flex justify-center items-center px-3 py-2 bg-gradient-to-r from-[#06224C] to-[#1A5BBC] text-white rounded-lg text-sm transition transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg outline-none focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06224C]"
+                            className="w-auto min-w-[140px] flex justify-center items-center px-3 py-2 bg-gradient-to-r from-[#06224C] to-[#1A5BBC] text-white rounded-lg text-sm transition transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg outline-none focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06224C] break-words"
                           >
                             Download CV
                           </Link>
 
                         </div>
 
-                        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-xl mx-auto lg:mx-0">
+                        <div className="mt-8 grid grid-cols-1 @sm:grid-cols-3 gap-3 max-w-xl mx-auto @lg:mx-0 min-w-0 max-w-full">
                           {["Research-led", "Pixel perfect", "Mobile first"].map((item, i) => (
                             <div
                               key={item}
-                              className="portfolio-mini-card rounded-lg border border-white/80 bg-white/75 px-4 py-3 text-sm font-bold text-gray-800 shadow-sm backdrop-blur"
+                              className="portfolio-mini-card rounded-lg border border-white/80 bg-white/75 px-4 py-3 text-[clamp(0.75rem,2cqi,0.875rem)] font-bold text-gray-800 shadow-sm backdrop-blur break-words min-w-0 max-w-full overflow-hidden"
                               style={{ animationDelay: `${i * 90}ms` }}
                             >
                               {item}
@@ -456,7 +412,7 @@ export default function Portfolioedit() {
                       </div>
 
                       {/* DESKTOP BLOBS */}
-                      <div className="hidden lg:flex lg:w-[45%] xl:w-[40%] items-center justify-center relative min-h-[400px]">
+                      <div className="w-[45%] @xl:w-[40%] items-center justify-center relative min-h-[400px] hidden @lg:flex">
                         <div className="relative w-full max-w-[400px] h-full flex items-center justify-center portfolio-portrait-wrap">
                           <div className="absolute w-[300px] h-[300px] bg-gradient-to-r from-purple-500 via-blue-400 to-cyan-300 opacity-20 blur-2xl rounded-full animate-[float_6s_ease-in-out_infinite]"></div>
                           <div className="absolute w-[200px] h-[150px] right-10 top-10 bg-cyan-300 opacity-20 blur-2xl rounded-full animate-[float_7s_ease-in-out_infinite]"></div>
@@ -474,7 +430,7 @@ export default function Portfolioedit() {
                               boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
                               opacity: heroImageProps.opacity / 100
                             }}>
-                            <Image src={customImages["hero_image_1"] || assetPath("/portfoliologo.webp")} alt="Srinivas Pentakota - UI/UX Designer Portfolio" fill sizes="245px" className="w-full h-full object-cover" unoptimized />
+                            <Image src={assetPath("/portfoliologo.webp")} alt="Srinivas Pentakota - UI/UX Designer Portfolio" fill sizes="245px" className="w-full h-full object-cover" unoptimized />
                           </div>
                         </div>
                       </div>
@@ -483,14 +439,14 @@ export default function Portfolioedit() {
 
                     {/* STATS */}
 
-                    <div ref={statsRef} className="flex flex-col sm:flex-row items-stretch justify-center gap-4 sm:gap-6 lg:gap-8 mt-12 md:mt-15 mb-2 w-full flex-wrap">
+                    <div ref={statsRef} className="flex flex-wrap items-stretch justify-center gap-4 @sm:gap-6 @lg:gap-8 mt-12 @md:mt-15 mb-2 w-full min-w-0 max-w-full">
                       {stats.map((item, i) => (
                         <div
                           key={i}
-                          className="portfolio-stat-card flex-1 min-w-[140px] sm:min-w-[160px] max-w-[280px] mx-auto sm:mx-0 bg-white py-4 min-h-[6rem] px-4 rounded-lg shadow-md flex flex-col items-center justify-center text-gray-700 transition transform hover:-translate-y-2 hover:shadow-xl text-center"
+                          className="portfolio-stat-card flex-1 min-w-[140px] @sm:min-w-[160px] max-w-[280px] mx-auto @sm:mx-0 bg-white py-4 min-h-[6rem] px-4 rounded-lg shadow-md flex flex-col items-center justify-center text-gray-700 transition transform hover:-translate-y-2 hover:shadow-xl text-center min-w-0 break-words overflow-hidden"
                           style={{ animationDelay: `${i * 110}ms` }}
                         >
-                          <h5 className="text-2xl font-bold">
+                          <h5 className="text-[clamp(1.25rem,3.5cqi,1.5rem)] font-bold min-w-0 break-words">
                             {statsInView ? (
                               <AnimatedCount
                                 key={statsInView ? "start" : "reset"} // 👈 important fix
@@ -504,7 +460,7 @@ export default function Portfolioedit() {
                             )}
                           </h5>
 
-                          <span className="text-sm mt-1 break-words">{item.label}</span>
+                          <span className="text-[clamp(0.75rem,2cqi,0.875rem)] mt-1 break-words min-w-0 max-w-full">{item.label}</span>
                         </div>
                       ))}
                     </div>
@@ -606,47 +562,47 @@ export default function Portfolioedit() {
 
 
                 {/* ABOUT SECTION */}
-                {/* <div className="w-full bg-[#F2F2F2] px-6 md:px-12 lg:px-20 py-16 md:py-24"> */}
-                <div id="about" className="w-full bg-[#F2F2F2] px-4 sm:px-6 md:px-12 lg:px-20 py-10 md:py-16">
+                {/* <div className="w-full bg-[#F2F2F2] px-6 @md:px-12 @lg:px-20 py-16 @md:py-24"> */}
+                <div id="about" className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 py-10 @md:py-16">
                   <div className="flex items-center gap-2 mb-4">
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">About</h2>
-                    <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Me</span>
+                    <h2 className="text-3xl @md:text-4xl font-extrabold text-gray-900 tracking-tight">About</h2>
+                    <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @md:text-3xl tracking-tight leading-none">Me</span>
                   </div>
 
-                  <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
+                  <h3 className="text-sm @sm:text-base @md:text-xl @lg:text-2xl font-extrabold text-gray-800 mb-8 @md:mb-16 max-w-full @md:max-w-3xl leading-relaxed break-words text-center @md:text-left">
                     Described Briefly My Professional Background Skills and Accomplishments
                   </h3>
 
-                  {/* <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 border-b border-white pb-6"> */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 border-b border-white pb-6">
+                  {/* <div className="grid grid-cols-1 @lg:grid-cols-12 gap-12 @lg:gap-20 border-b border-white pb-6"> */}
+                  <div className="grid grid-cols-1 @lg:grid-cols-2 gap-8 @md:gap-12 border-b border-white pb-6 min-w-0 max-w-full">
 
                     {/* LEFT → TEXT */}
-                    <div className="flex flex-col justify-center">
+                    <div className="flex flex-col justify-center min-w-0 max-w-full">
 
-                      <p className="font-extrabold text-gray-800 text-lg md:text-2xl mb-4 md:mb-6 leading-snug">
+                      <p className="font-extrabold text-gray-800 text-[clamp(1.125rem,3cqi,1.5rem)] @md:text-2xl mb-4 @md:mb-6 leading-snug min-w-0 break-words">
                         Hello! I&apos;m a UI/UX Designer providing awesome and modern design solutions for clients. My vision is to satisfy my clients.
                       </p>
 
-                      <p className="text-gray-500 mb-6 md:mb-0 leading-relaxed text-sm md:text-lg">
+                      <p className="text-gray-500 mb-6 @md:mb-0 leading-relaxed text-[clamp(0.875rem,2.5cqi,1.125rem)] @md:text-lg min-w-0 break-words">
                         I turn rough ideas into visual systems, interactive prototypes, and responsive layouts that help users move confidently from first impression to final action.
                       </p>
 
                     </div>
 
 
-                    <div ref={skillsRef} className="space-y-6 md:space-y-8">
+                    <div ref={skillsRef} className="space-y-6 @md:space-y-8">
                       {skills.map((skill, index) => (
                         <div key={skill.name}>
-                          <div className="flex justify-between mb-2 md:mb-3">
-                            <span className="font-bold text-gray-800 text-sm md:text-lg">
+                          <div className="flex justify-between mb-2 @md:mb-3">
+                            <span className="font-bold text-gray-800 text-sm @md:text-lg">
                               {skill.name}
                             </span>
-                            <span className="text-gray-500 text-xs md:text-sm">
+                            <span className="text-gray-500 text-xs @md:text-sm">
                               {skill.value}%
                             </span>
                           </div>
 
-                          <div className="w-full bg-gray-300 h-[4px] md:h-[6px] overflow-hidden">
+                          <div className="w-full bg-gray-300 h-[4px] @md:h-[6px] overflow-hidden">
                             <div
                               className="h-full transition-all duration-1000 ease-out"
                               style={{
@@ -664,17 +620,17 @@ export default function Portfolioedit() {
                 </div>
 
                 {/* EDUCATION & EXPERIENCE SECTION */}
-                <div className="w-full bg-[#F2F2F2] px-4 sm:px-6 md:px-12 lg:px-20 pb-12 md:pb-16 lg:pb-24">
+                <div className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-12 @md:pb-16 @lg:pb-24">
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-20">
+                  <div className="grid grid-cols-1 @lg:grid-cols-2 gap-8 @md:gap-12 @lg:gap-20 min-w-0 max-w-full">
 
                     {/* EDUCATION */}
-                    <div>
-                      <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6 border-b border-gray-200 pb-3">
+                    <div className="min-w-0 max-w-full">
+                      <h3 className="text-[clamp(1.125rem,3cqi,1.25rem)] @md:text-xl font-bold text-gray-800 mb-4 @md:mb-6 border-b border-gray-200 pb-3 min-w-0 break-words">
                         Education
                       </h3>
 
-                      <div className="space-y-5 md:space-y-6">
+                      <div className="space-y-5 @md:space-y-6 min-w-0 max-w-full">
 
                         {[
                           { id: "01", date: "March 2013 - 2016", title: "Computer Science" },
@@ -683,19 +639,19 @@ export default function Portfolioedit() {
                         ].map((item) => (
                           <div
                             key={item.id}
-                            className="portfolio-reveal is-visible flex items-start sm:items-center gap-4 sm:gap-6 border-b border-gray-200 pb-4 sm:pb-6"
+                            className="portfolio-reveal is-visible flex items-start @sm:items-center gap-4 @sm:gap-6 border-b border-gray-200 pb-4 @sm:pb-6 min-w-0 max-w-full overflow-hidden break-words"
                           >
                             {/* NUMBER */}
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-[#1a3636] text-white rounded-full flex justify-center items-center font-bold text-xs sm:text-sm">
+                            <div className="w-10 h-10 @sm:w-12 @sm:h-12 shrink-0 bg-[#1a3636] text-white rounded-full flex justify-center items-center font-bold text-xs @sm:text-sm">
                               {item.id}
                             </div>
 
                             {/* TEXT */}
-                            <div className="flex-1">
-                              <p className="text-gray-500 text-xs sm:text-sm mb-1 font-medium break-words">
+                            <div className="flex-1 min-w-0 max-w-full">
+                              <p className="text-gray-500 text-[clamp(0.75rem,2cqi,0.875rem)] @sm:text-sm mb-1 font-medium break-words min-w-0 w-full">
                                 {item.date}
                               </p>
-                              <h4 className="text-base sm:text-lg font-bold text-gray-800 break-words">
+                              <h4 className="text-[clamp(1rem,3cqi,1.125rem)] @sm:text-lg font-bold text-gray-800 break-words min-w-0 w-full">
                                 {item.title}
                               </h4>
                             </div>
@@ -706,12 +662,12 @@ export default function Portfolioedit() {
                     </div>
 
                     {/* EXPERIENCE */}
-                    <div>
-                      <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6 border-b border-gray-200 pb-3">
+                    <div className="min-w-0 max-w-full">
+                      <h3 className="text-[clamp(1.125rem,3cqi,1.25rem)] @md:text-xl font-bold text-gray-800 mb-4 @md:mb-6 border-b border-gray-200 pb-3 min-w-0 break-words">
                         Experience
                       </h3>
 
-                      <div className="space-y-5 md:space-y-6">
+                      <div className="space-y-5 @md:space-y-6 min-w-0 max-w-full">
 
                         {[
                           { id: "01", date: "January 2021 - 2022", title: "Microsoft" },
@@ -719,19 +675,19 @@ export default function Portfolioedit() {
                         ].map((item) => (
                           <div
                             key={item.id}
-                            className="portfolio-reveal is-visible flex items-start sm:items-center gap-4 sm:gap-6 border-b border-gray-200 pb-4 sm:pb-6"
+                            className="portfolio-reveal is-visible flex items-start @sm:items-center gap-4 @sm:gap-6 border-b border-gray-200 pb-4 @sm:pb-6 min-w-0 max-w-full overflow-hidden break-words"
                           >
                             {/* NUMBER */}
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-[#1a3636] text-white rounded-full flex justify-center items-center font-bold text-xs sm:text-sm">
+                            <div className="w-10 h-10 @sm:w-12 @sm:h-12 shrink-0 bg-[#1a3636] text-white rounded-full flex justify-center items-center font-bold text-xs @sm:text-sm">
                               {item.id}
                             </div>
 
                             {/* TEXT */}
-                            <div className="flex-1">
-                              <p className="text-gray-500 text-xs sm:text-sm mb-1 font-medium break-words">
+                            <div className="flex-1 min-w-0 max-w-full">
+                              <p className="text-gray-500 text-[clamp(0.75rem,2cqi,0.875rem)] @sm:text-sm mb-1 font-medium break-words min-w-0 w-full">
                                 {item.date}
                               </p>
-                              <h4 className="text-base sm:text-lg font-bold text-gray-800 break-words">
+                              <h4 className="text-[clamp(1rem,3cqi,1.125rem)] @sm:text-lg font-bold text-gray-800 break-words min-w-0 w-full">
                                 {item.title}
                               </h4>
                             </div>
@@ -746,21 +702,21 @@ export default function Portfolioedit() {
                 {/* </div> */}
 
                 {/* MY SERVICES SECTION */}
-                <div className="w-full bg-[#F2F2F2] px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
+                <div className="w-full bg-[#F2F2F2] px-6 @md:px-12 @lg:px-20 pb-16 @lg:pb-24">
                   <div className="text-center mb-16">
                     {/* <h3 className="text-base font-bold flex items-center justify-center gap-1 mb-4 text-gray-800 tracking-wide"> */}
                     <div className="flex items-center gap-2 mb-4">
-                      <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
-                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Services</span>
+                      <h2 className="text-3xl @md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
+                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @md:text-3xl tracking-tight leading-none">Services</span>
                     </div>
-                    {/* <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
+                    {/* <h3 className="text-3xl @md:text-4xl @lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
 
-                    <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
+                    <h3 className="text-sm @sm:text-base @md:text-xl @lg:text-2xl font-extrabold text-gray-800 mb-8 @md:mb-16 max-w-full @md:max-w-3xl leading-relaxed break-words text-center @md:text-left">
                       Provide Wide Range of  Digital Services
                     </h3>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
+                  <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4 gap-4 @sm:gap-6 max-w-7xl mx-auto min-w-0 max-w-full">
                     {[
                       { id: "01", title: "Web Development", desc: "Responsive, clean websites with purposeful layouts and polished front-end details." },
                       { id: "02", title: "UI / UX DESIGN", desc: "User journeys, wireframes, visual systems, and prototypes that make products easier to use." },
@@ -771,8 +727,8 @@ export default function Portfolioedit() {
                       { id: "07", title: "App Development", desc: "Mobile-first screens, component states, and interaction patterns for product teams." },
                       { id: "08", title: "Marketing", desc: "Campaign visuals, social assets, and creative direction for stronger digital presence." },
                     ].map((service) => (
-                      <div key={service.id} className="portfolio-service-card border border-gray-200 rounded-[20px] p-5 sm:p-6 lg:p-8 flex flex-col items-start transition-all duration-300 hover:-translate-y-2 hover:shadow-xl bg-white group hover:border-gray-300 cursor-pointer h-full" style={{ animationDelay: `${Number(service.id) * 45}ms` }}>
-                        <div className="w-12 h-12 mb-4 sm:mb-6 flex items-center justify-center text-gray-800 shrink-0">
+                      <div key={service.id} className="portfolio-service-card border border-gray-200 rounded-[20px] p-5 @sm:p-6 @lg:p-8 flex flex-col items-start transition-all duration-300 hover:-translate-y-2 hover:shadow-xl bg-white group hover:border-gray-300 cursor-pointer h-full min-w-0 max-w-full break-words overflow-hidden" style={{ animationDelay: `${Number(service.id) * 45}ms` }}>
+                        <div className="w-12 h-12 mb-4 @sm:mb-6 flex items-center justify-center text-gray-800 shrink-0">
                           {service.id === "01" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>}
                           {service.id === "02" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>}
                           {service.id === "03" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>}
@@ -782,15 +738,15 @@ export default function Portfolioedit() {
                           {service.id === "07" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>}
                           {service.id === "08" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h1.76a1 1 0 0 1 .84.45l2.4 3.6a1 1 0 0 1-.84 1.55H11z"></path><path d="M18 10h-2V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4z"></path></svg>}
                         </div>
-                        <h4 className="text-[17px] font-bold text-gray-900 mb-2 sm:mb-3">{service.title}</h4>
-                        <p className="text-gray-500 text-[13px] leading-relaxed mb-6 sm:mb-8 flex-1">
+                        <h4 className="text-[clamp(1rem,3cqi,1.0625rem)] font-bold text-gray-900 mb-2 @sm:mb-3 min-w-0 break-words">{service.title}</h4>
+                        <p className="text-gray-500 text-[13px] leading-relaxed mb-6 @sm:mb-8 flex-1 min-w-0 break-words w-full">
                           {service.desc}
                         </p>
-                        <div className="mt-auto flex items-center gap-1.5 w-full shrink-0">
+                        <div className="mt-auto flex flex-wrap items-center gap-1.5 w-full shrink-0 min-w-0">
                           <div className="w-[30px] h-[30px] rounded-full bg-[#1a3636] text-white flex items-center justify-center text-[11px] font-semibold shrink-0 group-hover:bg-[#63e5ff] group-hover:text-gray-900 transition-colors">
                             {service.id}
                           </div>
-                          <div className="flex items-center text-gray-300 group-hover:text-gray-900 transition-colors">
+                          <div className="flex items-center text-gray-300 group-hover:text-gray-900 transition-colors min-w-0">
                             <span className="w-8 h-[1px] bg-current"></span>
                             <FaArrowRight size={10} className="-ml-[2px]" />
                           </div>
@@ -801,33 +757,33 @@ export default function Portfolioedit() {
                 </div>
 
                 {/* DESIGN PROCESS SECTION */}
-                <div ref={processRef} className="w-full bg-[#F2F2F2] px-4 sm:px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
-                  <div className="overflow-hidden rounded-2xl bg-[#06224C] px-5 py-8 sm:px-8 md:px-10 md:py-12 text-white shadow-xl relative">
+                <div ref={processRef} className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-16 @lg:pb-24">
+                  <div className="overflow-hidden rounded-2xl bg-[#06224C] px-5 py-8 @sm:px-8 @md:px-10 @md:py-12 text-white shadow-xl relative">
                     <div className="absolute right-[-5rem] top-[-5rem] h-56 w-56 rounded-full bg-[#63e5ff]/20 blur-3xl"></div>
                     <div className="absolute left-[-4rem] bottom-[-5rem] h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
-                    <div className="relative grid grid-cols-1 lg:grid-cols-[0.9fr_1.4fr] gap-8 lg:gap-12 items-start">
-                      <div className={`portfolio-reveal ${processInView ? "is-visible" : ""}`}>
-                        <div className="flex items-center gap-2 mb-4">
-                          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Design</h2>
-                          <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Process</span>
+                    <div className="relative grid grid-cols-1 @lg:grid-cols-[0.9fr_1.4fr] gap-8 @lg:gap-12 items-start min-w-0 max-w-full">
+                      <div className={`portfolio-reveal min-w-0 max-w-full break-words ${processInView ? "is-visible" : ""}`}>
+                        <div className="flex flex-wrap items-center gap-2 mb-4 min-w-0 max-w-full">
+                          <h2 className="text-[clamp(1.5rem,4cqi,2.25rem)] @md:text-4xl font-extrabold tracking-tight min-w-0 break-words">Design</h2>
+                          <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-[clamp(1.25rem,3cqi,1.875rem)] @md:text-3xl tracking-tight leading-none min-w-0 break-words">Process</span>
                         </div>
-                        <p className="text-sm md:text-base text-blue-100 leading-relaxed max-w-md">
+                        <p className="text-sm @md:text-base text-blue-100 leading-relaxed max-w-md min-w-0 break-words">
                           A simple workflow keeps every project moving from rough idea to polished launch without losing the user&apos;s needs along the way.
                         </p>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 @lg:grid-cols-3 gap-4 min-w-0 max-w-full">
                         {processSteps.map((item, i) => (
                           <div
                             key={item.step}
-                            className={`portfolio-reveal rounded-xl border border-white/15 bg-white/10 p-5 backdrop-blur transition hover:-translate-y-1 hover:bg-white/15 ${processInView ? "is-visible" : ""}`}
+                            className={`portfolio-reveal rounded-xl border border-white/15 bg-white/10 p-5 backdrop-blur transition hover:-translate-y-1 hover:bg-white/15 min-w-0 max-w-full break-words overflow-hidden ${processInView ? "is-visible" : ""}`}
                             style={{ transitionDelay: `${i * 120}ms` }}
                           >
-                            <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-[#63e5ff] text-sm font-extrabold text-[#06224C]">
+                            <div className="mb-5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#63e5ff] text-sm font-extrabold text-[#06224C]">
                               {item.step}
                             </div>
-                            <h3 className="mb-2 text-lg font-extrabold">{item.title}</h3>
-                            <p className="text-sm leading-relaxed text-blue-100">{item.desc}</p>
+                            <h3 className="mb-2 text-lg font-extrabold min-w-0 break-words">{item.title}</h3>
+                            <p className="text-sm leading-relaxed text-blue-100 min-w-0 break-words">{item.desc}</p>
                           </div>
                         ))}
                       </div>
@@ -837,33 +793,33 @@ export default function Portfolioedit() {
 
                 {/* MY PROJECTS SECTION */}
 
-                <div id="projects" className="w-full bg-[#F2F2F2] px-0 md:px-6 lg:px-12 pb-16 lg:pb-24 relative overflow-hidden">
+                <div id="projects" className="w-full bg-[#F2F2F2] px-0 @md:px-6 @lg:px-12 pb-16 @lg:pb-24 relative overflow-hidden">
 
-                  {/* <div className="px-6 md:px-6 lg:px-8 mb-12">
+                  {/* <div className="px-6 @md:px-6 @lg:px-8 mb-12">
                     <h2 className="text-base font-bold flex items-center gap-1 mb-4 text-gray-800 tracking-wide w-max">
                       My <span className="bg-[#c4ff0b] text-gray-900 px-2 py-0.5 rounded-full text-sm font-extrabold ml-1 leading-none shadow-sm flex items-center h-6">Projects</span>
                     </h2>
-                    <h3 className="text-3xl md:text-4xl lg:text-4xl font-extrabold text-gray-900 max-w-2xl leading-[1.15]">
-                      Showcase Your Talent with Our <br className="hidden md:block" /> Latest Works
+                    <h3 className="text-3xl @md:text-4xl @lg:text-4xl font-extrabold text-gray-900 max-w-2xl leading-[1.15]">
+                      Showcase Your Talent with Our <br className="hidden @md:block" /> Latest Works
                     </h3>
                   </div> */}
                   <div className="text-center mb-16">
                     {/* <h3 className="text-base font-bold flex items-center justify-center gap-1 mb-4 text-gray-800 tracking-wide"> */}
                     <div className="flex items-center gap-2 mb-4">
-                      <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
-                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Projects</span>
+                      <h2 className="text-3xl @md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
+                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @md:text-3xl tracking-tight leading-none">Projects</span>
                     </div>
-                    {/* <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
+                    {/* <h3 className="text-3xl @md:text-4xl @lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
 
-                    <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
-                      Showcase Your Talent with Our <br className="hidden md:block" /> Latest Works
+                    <h3 className="text-sm @sm:text-base @md:text-xl @lg:text-2xl font-extrabold text-gray-800 mb-8 @md:mb-16 max-w-full @md:max-w-3xl leading-relaxed break-words text-center @md:text-left">
+                      Showcase Your Talent with Our <br className="hidden @md:block" /> Latest Works
                     </h3>
                   </div>
 
 
                   <div
                     id="projects-slider"
-                    className="w-full overflow-x-auto flex gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden scroll-smooth"
+                    className="w-full overflow-x-auto flex gap-4 @sm:gap-6 px-4 @sm:px-6 @lg:px-8 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden scroll-smooth"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   >
                     {[
@@ -898,12 +854,10 @@ export default function Portfolioedit() {
                         img: "https://images.unsplash.com/photo-1555421689-491a97ff2040?w=500&h=500&fit=crop"
                       }
                     ].map((proj, i) => (
-                      <div key={i} className="portfolio-project-card flex flex-col flex-none w-[240px] sm:w-[260px] max-w-[80vw] shrink-0 snap-start cursor-pointer group" style={{ animationDelay: `${i * 80}ms` }}>
-                        <div className="w-full aspect-square rounded-[20px] mb-4 sm:mb-5 relative border border-gray-100 shadow-sm">
-                          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors z-10 w-full h-full rounded-[20px] pointer-events-none"></div>
-                          <div className="absolute inset-0 overflow-hidden rounded-[20px]">
-                            <Image src={customImages[`project_image_${i}`] || proj.img} alt={proj.title} fill sizes="260px" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" unoptimized />
-                          </div>
+                      <div key={i} className="portfolio-project-card flex flex-col flex-none w-[240px] @sm:w-[260px] max-w-[80vw] shrink-0 snap-start cursor-pointer group" style={{ animationDelay: `${i * 80}ms` }}>
+                        <div className="w-full aspect-square rounded-[20px] overflow-hidden mb-4 @sm:mb-5 relative border border-gray-100 shadow-sm">
+                          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors z-10 w-full h-full"></div>
+                          <Image src={proj.img} alt={proj.title} fill sizes="260px" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" unoptimized />
                         </div>
                         <div className="flex items-start mb-3">
                           <span className="bg-[#63e5ff] border border-gray-900 text-gray-900 px-3.5 py-1.5 rounded-full text-[11px] font-semibold leading-none">
@@ -916,7 +870,7 @@ export default function Portfolioedit() {
                   </div>
 
 
-                  <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-4 sm:mt-6 w-full relative px-4 sm:px-8">
+                  <div className="flex flex-wrap items-center justify-center gap-4 @sm:gap-6 mt-4 @sm:mt-6 w-full relative px-4 @sm:px-8">
                     <button
                       onClick={() => {
                         const slider = document.getElementById('projects-slider');
@@ -925,7 +879,7 @@ export default function Portfolioedit() {
                       className="flex items-center justify-center p-2 group hover:opacity-70 transition-opacity cursor-pointer"
                       aria-label="Slide Left"
                     >
-                      <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[40px] sm:w-[60px]">
+                      <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[40px] @sm:w-[60px]">
                         <path d="M10 5L5 10L10 15M5 10H55" stroke="#1a3636" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </button>
@@ -937,13 +891,13 @@ export default function Portfolioedit() {
                       className="flex items-center justify-center p-2 group hover:opacity-70 transition-opacity cursor-pointer"
                       aria-label="Slide Right"
                     >
-                      <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[40px] sm:w-[60px]">
+                      <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[40px] @sm:w-[60px]">
                         <path d="M50 5L55 10L50 15M55 10H5" stroke="#1a3636" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </button>
 
                     {/* <button
-                      className="md:absolute right-4 md:right-8 bg-[#1a3636] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:-translate-y-1 transition-transform ml-auto md:ml-0 shrink-0"
+                      className="@md:absolute right-4 @md:right-8 bg-[#1a3636] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:-translate-y-1 transition-transform ml-auto @md:ml-0 shrink-0"
                       aria-label="Scroll to top"
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
@@ -952,34 +906,34 @@ export default function Portfolioedit() {
                 </div>
 
                 {/* TESTIMONIALS SECTION */}
-                <div ref={testimonialsRef} className="w-full bg-[#F2F2F2] px-4 sm:px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
-                  <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-6 lg:gap-10 items-stretch">
-                    <div className={`portfolio-reveal rounded-2xl bg-white p-6 md:p-8 shadow-lg border border-gray-100 ${testimonialsInView ? "is-visible" : ""}`}>
-                      <p className="text-xs font-black uppercase tracking-[0.22em] text-[#1a3636] mb-4">Client Words</p>
-                      <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+                <div ref={testimonialsRef} className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-16 @lg:pb-24">
+                  <div className="grid grid-cols-1 @lg:grid-cols-[0.8fr_1.2fr] gap-6 @lg:gap-10 items-stretch min-w-0 max-w-full">
+                    <div className={`portfolio-reveal rounded-2xl bg-white p-6 @md:p-8 shadow-lg border border-gray-100 min-w-0 max-w-full break-words overflow-hidden ${testimonialsInView ? "is-visible" : ""}`}>
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-[#1a3636] mb-4 min-w-0 break-words">Client Words</p>
+                      <h2 className="text-[clamp(1.5rem,4cqi,2.25rem)] @md:text-4xl font-extrabold text-gray-900 leading-tight mb-4 min-w-0 break-words">
                         Designs that feel clear before they feel clever.
                       </h2>
-                      <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                      <p className="text-gray-600 text-sm @md:text-base leading-relaxed min-w-0 break-words">
                         Strong visuals are only useful when they help people understand, trust, and take action.
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 @lg:grid-cols-2 gap-4 min-w-0 max-w-full">
                       {testimonials.map((item, i) => (
                         <div
                           key={item.name}
-                          className={`portfolio-reveal rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${testimonialsInView ? "is-visible" : ""}`}
+                          className={`portfolio-reveal rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl min-w-0 max-w-full break-words overflow-hidden ${testimonialsInView ? "is-visible" : ""}`}
                           style={{ transitionDelay: `${i * 140}ms` }}
                         >
-                          <div className="mb-5 text-5xl font-black leading-none text-[#63e5ff]">“</div>
-                          <p className="mb-6 text-sm leading-relaxed text-gray-600">{item.quote}</p>
-                          <div className="flex items-center gap-3">
-                            <div className="h-11 w-11 rounded-full bg-[#06224C] text-white flex items-center justify-center text-sm font-black">
+                          <div className="mb-5 text-5xl font-black leading-none text-[#63e5ff] shrink-0">“</div>
+                          <p className="mb-6 text-[clamp(0.875rem,2.5cqi,1rem)] leading-relaxed text-gray-600 min-w-0 break-words">{item.quote}</p>
+                          <div className="flex flex-wrap items-center gap-3 min-w-0">
+                            <div className="h-11 w-11 shrink-0 rounded-full bg-[#06224C] text-white flex items-center justify-center text-sm font-black">
                               {item.name.charAt(0)}
                             </div>
-                            <div>
-                              <p className="font-extrabold text-gray-900">{item.name}</p>
-                              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{item.role}</p>
+                            <div className="min-w-0 break-words flex-1">
+                              <p className="font-extrabold text-gray-900 min-w-0 break-words">{item.name}</p>
+                              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 min-w-0 break-words">{item.role}</p>
                             </div>
                           </div>
                         </div>
@@ -989,19 +943,19 @@ export default function Portfolioedit() {
                 </div>
 
                 {/* CONTACT SECTION */}
-                <div id="contact" className="w-full bg-[#F2F2F2] px-4 sm:px-6 md:px-12 lg:px-20 py-12 sm:py-16 lg:py-24 relative border-t border-gray-100">
-                  <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-start lg:items-center">
+                <div id="contact" className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 py-12 @sm:py-16 @lg:py-24 relative border-t border-gray-100">
+                  <div className="max-w-7xl mx-auto grid grid-cols-1 @lg:grid-cols-2 gap-8 @md:gap-12 @lg:gap-20 items-start @lg:items-center">
 
                     <div>
                       {/* <h2 className="text-base font-bold flex items-center gap-1 mb-4 text-gray-800 tracking-wide w-max">
                         Get In <span className="bg-[#c4ff0b] text-gray-900 px-2 py-0.5 rounded-full text-sm font-extrabold ml-1 leading-none shadow-sm flex items-center h-6">Touch</span>
                       </h2> */}
                       <div className="flex items-center gap-2 mb-4">
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Get In</h2>
-                        <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Touch</span>
+                        <h2 className="text-3xl @md:text-4xl font-extrabold text-gray-900 tracking-tight">Get In</h2>
+                        <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @md:text-3xl tracking-tight leading-none">Touch</span>
                       </div>
-                      <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 max-w-2xl leading-[1.15] mb-6">
-                        Let’s build something <br className="hidden md:block" />  great together.
+                      <h3 className="text-3xl @md:text-4xl @lg:text-5xl font-extrabold text-gray-900 max-w-2xl leading-[1.15] mb-6">
+                        Let’s build something <br className="hidden @md:block" />  great together.
                       </h3>
                       <p className="text-gray-600 mb-8 max-w-md">
                         Fill out the form or reach out via email to discuss how we can work together to bring your ideas to life.
@@ -1029,76 +983,39 @@ export default function Portfolioedit() {
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-6 md:p-8 shadow-xl shadow-gray-200/50 border border-gray-100">
-                      <form className="space-y-4 sm:space-y-5" onSubmit={(e) => e.preventDefault()}>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                          <div>
-                            <label className="block text-xs font-bold text-gray-700 mb-1.5 ml-1">Your Name</label>
-                            <input type="text" placeholder="John Doe" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#63e5ff] focus:border-transparent transition-all" />
+                    <div className="bg-white rounded-2xl p-6 @md:p-8 shadow-xl shadow-gray-200/50 border border-gray-100 min-w-0 max-w-full overflow-hidden">
+                      <form className="space-y-4 @sm:space-y-5 min-w-0 w-full" onSubmit={(e) => e.preventDefault()}>
+                        <div className="grid grid-cols-1 @md:grid-cols-2 gap-4 @sm:gap-5 min-w-0 w-full">
+                          <div className="min-w-0 w-full">
+                            <label className="block text-xs font-bold text-gray-700 mb-1.5 ml-1 break-words">Your Name</label>
+                            <input type="text" placeholder="John Doe" className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#63e5ff] focus:border-transparent transition-all min-w-0" />
                           </div>
-                          <div>
-                            <label className="block text-xs font-bold text-gray-700 mb-1.5 ml-1">Your Email</label>
-                            <input type="email" placeholder="john@example.com" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#63e5ff] focus:border-transparent transition-all" />
+                          <div className="min-w-0 w-full">
+                            <label className="block text-xs font-bold text-gray-700 mb-1.5 ml-1 break-words">Your Email</label>
+                            <input type="email" placeholder="john@example.com" className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#63e5ff] focus:border-transparent transition-all min-w-0" />
                           </div>
                         </div>
-                        <div>
-                          <label className="block text-xs font-bold text-gray-700 mb-1.5 ml-1">Subject</label>
-                          <input type="text" placeholder="Web Design Inquiry" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#63e5ff] focus:border-transparent transition-all" />
+                        <div className="min-w-0 w-full">
+                          <label className="block text-xs font-bold text-gray-700 mb-1.5 ml-1 break-words">Subject</label>
+                          <input type="text" placeholder="Web Design Inquiry" className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#63e5ff] focus:border-transparent transition-all min-w-0" />
                         </div>
-                        <div>
-                          <label className="block text-xs font-bold text-gray-700 mb-1.5 ml-1">Message</label>
-                          <textarea rows={4} placeholder="Tell us about your project..." className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#63e5ff] focus:border-transparent transition-all resize-none"></textarea>
+                        <div className="min-w-0 w-full">
+                          <label className="block text-xs font-bold text-gray-700 mb-1.5 ml-1 break-words">Message</label>
+                          <textarea rows={4} placeholder="Tell us about your project..." className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#63e5ff] focus:border-transparent transition-all resize-none min-w-0"></textarea>
                         </div>
-                        <button className="w-full bg-[#1a3636] hover:bg-gray-900 text-white font-bold rounded-xl px-4 py-3.5 text-sm transition-colors flex items-center justify-center gap-2 group shadow-lg shadow-gray-900/20">
+                        <button className="w-full max-w-full break-words flex-wrap bg-[#1a3636] hover:bg-gray-900 text-white font-bold rounded-xl px-4 py-3.5 text-sm transition-colors flex items-center justify-center gap-2 group shadow-lg shadow-gray-900/20 overflow-hidden">
                           Send Message
-                          <FaPaperPlane className="group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+                          <FaPaperPlane className="group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform shrink-0" />
                         </button>
                       </form>
                     </div>
 
-                  </div>
                 </div>
               </div>
             </div>
-
-            {/* <div className="w-full flex items-center justify-between mt-8 px-4"> */}
-            <div className="w-full flex items-center justify-between px-4 py-3 mt-10 border-t bg-white">
-
-              {/* 
-              <button className="h-10 px-4 rounded-lg flex items-center gap-2 text-blue-800 border border-blue-600 bg-transparent hover:bg-blue-50">
-                Help
-              </button>
-
-
-              <div className="h-10 flex items-center justify-center rounded-lg px-3 gap-3 bg-transparent border border-blue-600">
-                <button className="h-full px-3 rounded flex items-center text-blue-800 hover:bg-blue-50">
-                  <FaLaptop />
-                </button>
-                <button className="h-full px-3 rounded flex items-center text-blue-800 hover:bg-blue-50">
-                  <FaMobileAlt />
-                </button>
-                <button className="h-full px-3 rounded flex items-center text-blue-800 hover:bg-blue-50">
-                  <FaTabletAlt />
-                </button>
-                <button className="h-full px-3 rounded flex items-center text-blue-800 hover:bg-blue-50">
-                  <FaSearch />
-                </button>
-              </div>
-
-
-              <button className="h-10 px-4 rounded-lg flex items-center gap-2 text-blue-800 border border-blue-600 bg-transparent hover:bg-blue-50">
-                Zoom
-              </button> */}
-
-            </div>
           </div>
-
-
         </div>
-
-
-
-
+      </div>
       </div>
       <Footer />
     </main>
