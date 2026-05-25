@@ -4,9 +4,8 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import CreateProjectFlow from "@/components/CreateProjectFlow";
-import AboutPage from "../aboutus/page";
 import { useEffect, useMemo, useState } from "react";
-import { motion, type TargetAndTransition, type Variants } from "framer-motion";
+import { AnimatePresence, LayoutGroup, motion, type TargetAndTransition, type Variants } from "framer-motion";
 import {
   FaArrowRight,
   FaCartShopping,
@@ -35,6 +34,11 @@ type TemplateCategory = "portfolio" | "blog" | "ecommerce" | "business";
 const Footer = dynamic(() => import("@/components/Footer"), {
   ssr: false,
   loading: () => <div className="h-64 bg-[#0A1E3D]" />,
+});
+
+const AboutPage = dynamic(() => import("../aboutus/page"), {
+  ssr: false,
+  loading: () => <div className="min-h-screen bg-[#FFF1F2]" />,
 });
 
 const popularSearches = [
@@ -803,27 +807,36 @@ export default function Home() {
       <section id="templates" className="mx-auto mt-16 max-w-7xl px-4 md:mt-24 md:px-8">
         <SectionHeading>All Templates</SectionHeading>
         <motion.div className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm md:rounded-[2.5rem] md:p-10" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.14 }}>
-          <div className="mb-12 flex flex-wrap justify-center gap-3" aria-label="Template categories">
-            {templateFilters.map((filter) => {
-              const active = activeFilter === filter.value;
-              return (
-                <button
-                  key={filter.value}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => setActiveFilter(filter.value)}
-                  className={`inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-semibold shadow-sm transition hover:scale-[1.03] hover:brightness-105 ${
-                    active
-                      ? "border-[#06224C] bg-[#06224C] text-white"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-blue-400 hover:text-blue-600"
-                  }`}
-                >
-                  {filter.label}
-                  <FaChevronDown className="text-[10px]" />
-                </button>
-              );
-            })}
-          </div>
+          <LayoutGroup id="template-filters">
+            <div className="mb-12 flex flex-wrap justify-center gap-3" aria-label="Template categories">
+              {templateFilters.map((filter) => {
+                const active = activeFilter === filter.value;
+                return (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setActiveFilter(filter.value)}
+                    className={`relative inline-flex items-center gap-2 overflow-hidden rounded-xl border px-5 py-2.5 text-sm font-semibold shadow-sm transition hover:scale-[1.03] ${
+                      active
+                        ? "border-[#06224C] text-white"
+                        : "border-gray-200 bg-white text-gray-600 hover:border-blue-400 hover:text-blue-600"
+                    }`}
+                  >
+                    {active && (
+                      <motion.span
+                        layoutId="filter-pill"
+                        className="absolute inset-0 -z-10 rounded-xl bg-[#06224C]"
+                        transition={{ type: "spring", stiffness: 340, damping: 28 }}
+                      />
+                    )}
+                    <span className="relative">{filter.label}</span>
+                    <FaChevronDown className="relative text-[10px]" />
+                  </button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
 
           <motion.div className="grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3" variants={revealContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.12 }}>
             {visibleTemplates.map((template) => (
@@ -989,7 +1002,20 @@ export default function Home() {
                     <h3 className="text-sm font-bold leading-snug text-[#06224C] md:text-base">{faq.question}</h3>
                     {isOpen ? <FaMinus className="mt-1 flex-shrink-0 text-[#06224C]" /> : <FaPlus className="mt-1 flex-shrink-0 text-[#06224C]" />}
                   </button>
-                  {isOpen && <p className="px-5 pb-5 pt-0 text-sm leading-relaxed text-gray-700 md:px-6 md:pb-6">{faq.answer}</p>}
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        key="answer"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.28, ease: "easeOut" }}
+                        style={{ overflow: "hidden" }}
+                      >
+                        <p className="px-5 pb-5 pt-0 text-sm leading-relaxed text-gray-700 md:px-6 md:pb-6">{faq.answer}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               );
             })}

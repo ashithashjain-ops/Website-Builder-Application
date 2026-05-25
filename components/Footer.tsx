@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, ReactNode, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import {
   FaEnvelope,
   FaFacebookF,
@@ -170,6 +170,26 @@ const socials = [
   ["Website", FaGlobe, "https://www.thestackly.com/", "hover:bg-blue-600"],
 ] as const;
 
+const footerReveal: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+};
+
+const footerItem: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
+};
+
+const socialReveal: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+};
+
+const socialItem: Variants = {
+  hidden: { opacity: 0, scale: 0.7, y: 8 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.32, ease: "easeOut" } },
+};
+
 export default function Footer() {
   const router = useRouter();
   const [activeModal, setActiveModal] = useState<ModalKey | null>(null);
@@ -261,9 +281,15 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="mb-8 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4">
+          <motion.div
+            className="mb-8 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4"
+            variants={footerReveal}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.18 }}
+          >
             {footerGroups.map(([title, links]) => (
-              <div key={title}>
+              <motion.div key={title} variants={footerItem}>
                 <h4 className="mb-4 text-sm font-black uppercase tracking-wider text-white">{title}</h4>
                 <ul className="space-y-3 text-sm font-medium text-white/70">
                   {links.map(([label, key]) => (
@@ -274,10 +300,10 @@ export default function Footer() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </motion.div>
             ))}
 
-            <div className="col-span-2 mt-2 flex flex-col items-start md:col-span-1 md:mt-0">
+            <motion.div className="col-span-2 mt-2 flex flex-col items-start md:col-span-1 md:mt-0" variants={footerItem}>
               <Link href="../landing" className="mb-4 inline-flex aspect-[2/1] min-w-[90px] items-center justify-center rounded-[60%] bg-white px-4 py-3 shadow-[0_14px_32px_rgba(255,255,255,0.16)] transition duration-300 hover:-translate-y-0.5 hover:scale-105">
                 <img src={assetPath("/stackly-logo.webp")} alt="Stackly Logo" className="h-5 w-auto object-contain" />
               </Link>
@@ -285,18 +311,24 @@ export default function Footer() {
                 The <span className="text-blue-400">NO-CODE</span> website builder for everyone. Powered by AWS.
               </p>
               <p className="text-[10px] font-medium uppercase text-white/40">Infrastructure built by the Stackly team.</p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           <div className="border-t border-white/10 pt-5">
             <div className="flex flex-col items-center gap-6 lg:flex-row lg:justify-between">
-              <div className="flex w-full flex-wrap items-center justify-center gap-2 lg:w-auto lg:justify-start">
+              <motion.div
+                className="flex w-full flex-wrap items-center justify-center gap-2 lg:w-auto lg:justify-start"
+                variants={socialReveal}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
                 {socials.map(([label, Icon, href, hoverClass]) => (
-                  <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white text-[#0A1E3D] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:text-white hover:shadow-xl md:h-8 md:w-8 ${hoverClass}`}>
+                  <motion.a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} variants={socialItem} whileHover={{ y: -4, scale: 1.15, transition: { duration: 0.18 } }} className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white text-[#0A1E3D] shadow-sm transition-colors duration-300 hover:text-white hover:shadow-xl md:h-8 md:w-8 ${hoverClass}`}>
                     <Icon className="text-xs md:text-sm" />
-                  </a>
+                  </motion.a>
                 ))}
-              </div>
+              </motion.div>
 
               <div className="flex w-full flex-col items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-white/50 lg:w-auto lg:flex-row lg:gap-6">
                 <button type="button" onClick={() => setActiveModal("terms")} className="stackly-footer-link whitespace-nowrap">Terms of Use</button>

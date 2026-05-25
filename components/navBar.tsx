@@ -2,7 +2,7 @@
  
 import Link from "next/link";
 import { MouseEvent, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion, useScroll } from "framer-motion";
 import {
   FaBookOpen,
   FaBoxOpen,
@@ -238,9 +238,10 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
   const [mobileCategory, setMobileCategory] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const { scrollY } = useScroll();
+  const { scrollYProgress } = useScroll();
   const prefersReducedMotion = useReducedMotion();
   const navRef = useRef<HTMLElement>(null);
+  const prevScrollY = useRef(0);
  
   const scrollLandingSection = (event: MouseEvent<HTMLAnchorElement>, sectionId: string, closeMobile = false) => {
     const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -305,25 +306,44 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useMotionValueEvent(scrollY, "change", (current) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    const shouldStayVisible = mobileOpen || Boolean(activeMenu) || isProfileMenuOpen || Boolean(activePanel);
-
-    setIsScrolled(current > 8);
-    setHidden(!shouldStayVisible && current > previous && current > 150);
-  });
-
   useEffect(() => {
-    let lastBodyScroll = document.body.scrollTop;
-    const onBodyScroll = () => {
-      const current = document.body.scrollTop;
-      const shouldStayVisible = mobileOpen || Boolean(activeMenu) || isProfileMenuOpen || Boolean(activePanel);
+    const handleScroll = (e: Event) => {
+      const target = e.target as Element | Document;
+      const isDocScroll =
+        target === document ||
+        target === document.documentElement ||
+        target === document.body;
+
+      // Ignore scroll events from small elements (dropdowns, sidebars, etc.)
+      if (!isDocScroll && target instanceof HTMLElement) {
+        if (target.clientHeight < window.innerHeight * 0.4) return;
+      }
+
+      const current = isDocScroll
+        ? window.scrollY
+        : (target as HTMLElement).scrollTop;
+
+      const prev = prevScrollY.current;
+      prevScrollY.current = current;
+
       setIsScrolled(current > 8);
-      setHidden(!shouldStayVisible && current > lastBodyScroll && current > 150);
-      lastBodyScroll = current;
+
+      const locked = mobileOpen || Boolean(activeMenu) || isProfileMenuOpen || Boolean(activePanel);
+      if (locked) {
+        setHidden(false);
+        return;
+      }
+
+      if (current > prev && current > 80) {
+        setHidden(true);
+      } else if (current < prev) {
+        setHidden(false);
+      }
     };
-    document.body.addEventListener("scroll", onBodyScroll, { passive: true });
-    return () => document.body.removeEventListener("scroll", onBodyScroll);
+
+    // capture:true catches scroll on any element (scroll does not bubble)
+    document.addEventListener("scroll", handleScroll, { passive: true, capture: true });
+    return () => document.removeEventListener("scroll", handleScroll, { capture: true });
   }, [mobileOpen, activeMenu, isProfileMenuOpen, activePanel]);
 
   const wishlistCount = wishlistCountProp ?? wishlistItems.reduce((total, item) => total + (item.quantity || item.qty || 1), 0);
@@ -374,7 +394,8 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
   };
 
   const navLockedVisible = mobileOpen || Boolean(activeMenu) || isProfileMenuOpen || Boolean(activePanel);
-  const navHidden = hidden && !navLockedVisible && !prefersReducedMotion;
+  // Hide is a functional behaviour — always apply it; only skip the spring animation for reduced-motion users
+  const navHidden = hidden && !navLockedVisible;
  
   return (
     <>
@@ -385,7 +406,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
         y: navHidden ? -120 : 0,
         opacity: navHidden ? 0 : 1,
       }}
-      transition={HEADER_SPRING}
+      transition={prefersReducedMotion ? { duration: 0 } : HEADER_SPRING}
     >
       <nav ref={navRef} className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-2 overflow-visible md:gap-4">
         <div className="flex min-w-0 items-center gap-1 md:gap-8">
@@ -533,25 +554,37 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               <img src={assetPath("/profile.webp")} alt="User Profile Picture" className="h-full w-full object-cover" />
             </motion.button>
  
-            <div className={`${isProfileMenuOpen ? "block" : "hidden"} absolute right-0 top-full z-[100] mt-3 w-48 rounded-xl border border-gray-100 bg-white py-2 text-left shadow-2xl`}>
-              <div className="mb-1 border-b border-gray-50 px-4 py-2">
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">User Menu</p>
-              </div>
-              <Link href="/login" onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                <FaCircleUser className="w-4 opacity-50" />
-                ACCOUNT
-              </Link>
-              <Link href="/login" onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                <FaGear className="w-4 opacity-50" />
-                SETTINGS
-              </Link>
-              <div className="mt-1 border-t border-gray-50">
-                <Link href="/login" onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-red-500 transition-colors hover:bg-red-50">
-                  <FaRightFromBracket className="w-4" />
-                  LOGOUT
-                </Link>
-              </div>
-            </div>
+            <AnimatePresence>
+              {isProfileMenuOpen && (
+                <motion.div
+                  key="profile-dd"
+                  variants={dropdownVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  style={{ transformOrigin: "top right" }}
+                  className="absolute right-0 top-full z-[100] mt-3 w-48 rounded-xl border border-gray-100 bg-white py-2 text-left shadow-2xl"
+                >
+                  <div className="mb-1 border-b border-gray-50 px-4 py-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">User Menu</p>
+                  </div>
+                  <Link href="/login" onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
+                    <FaCircleUser className="w-4 opacity-50" />
+                    ACCOUNT
+                  </Link>
+                  <Link href="/login" onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
+                    <FaGear className="w-4 opacity-50" />
+                    SETTINGS
+                  </Link>
+                  <div className="mt-1 border-t border-gray-50">
+                    <Link href="/login" onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-red-500 transition-colors hover:bg-red-50">
+                      <FaRightFromBracket className="w-4" />
+                      LOGOUT
+                    </Link>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </nav>
@@ -630,6 +663,12 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
         </motion.div>
       )}
       </AnimatePresence>
+      {/* Scroll progress bar */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 left-0 h-[2.5px] w-full origin-left bg-gradient-to-r from-blue-500 via-sky-400 to-cyan-300"
+        style={{ scaleX: scrollYProgress }}
+      />
     </motion.header>
 
     <AnimatePresence>
@@ -647,15 +686,26 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
       )}
     </AnimatePresence>
  
+    <AnimatePresence>
     {activePanel && (
       <>
-        <button
+        <motion.button
           type="button"
           aria-label={`Close ${activePanel}`}
           onClick={() => setActivePanel(null)}
           className="fixed inset-0 z-[9998] bg-black/50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.22 }}
         />
-        <aside className="fixed right-0 top-0 z-[9999] flex h-full w-full flex-col bg-white shadow-2xl sm:w-[400px]">
+        <motion.aside
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "spring", stiffness: 340, damping: 32 }}
+          className="fixed right-0 top-0 z-[9999] flex h-full w-full flex-col bg-white shadow-2xl sm:w-[400px]"
+        >
           <div className="flex items-center justify-between border-b bg-white p-6 text-[#06224C]">
             <h2 className="flex items-center gap-3 text-lg font-black uppercase tracking-widest">
               {activePanel === "wishlist" ? <FaHeart className="text-red-500" /> : <FaCartShopping className="text-blue-600" />}
@@ -780,9 +830,10 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               </p>
             </div>
           )}
-        </aside>
+        </motion.aside>
       </>
     )}
+    </AnimatePresence>
     </>
   );
 }
