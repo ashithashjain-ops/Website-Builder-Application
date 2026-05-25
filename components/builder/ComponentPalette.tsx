@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Contact, GripVertical, Heading1, Home, Image, Images, LayoutTemplate, Menu, Minus, MousePointerSquareDashed, PanelsTopLeft, Search, Sparkles, TextCursorInput, Type } from "lucide-react";
+import { Contact, GripVertical, Heading1, Home, Image, Images, LayoutGrid, LayoutTemplate, Layers, Menu, Minus, MousePointerSquareDashed, PanelsTopLeft, Search, Sparkles, Star, TextCursorInput, Type } from "lucide-react";
 import { useDraggable } from "@dnd-kit/core";
 import type { ComponentType } from "@/types/builder";
 
@@ -14,6 +14,9 @@ const paletteItems: Array<{ type: ComponentType; label: string; group: "Website 
   { type: "heading", label: "Heading", group: "Basic Blocks", icon: Heading1 },
   { type: "text", label: "Text", group: "Basic Blocks", icon: Type },
   { type: "button", label: "Button", group: "Basic Blocks", icon: MousePointerSquareDashed },
+  { type: "icon", label: "Icon", group: "Basic Blocks", icon: Star },
+  { type: "feature-item", label: "Feature Item", group: "Basic Blocks", icon: Layers },
+  { type: "columns", label: "Columns", group: "Basic Blocks", icon: LayoutGrid },
   { type: "image", label: "Image", group: "Basic Blocks", icon: Image },
   { type: "input", label: "Input", group: "Basic Blocks", icon: TextCursorInput },
   { type: "divider", label: "Divider", group: "Basic Blocks", icon: Minus },

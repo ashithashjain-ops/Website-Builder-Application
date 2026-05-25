@@ -2824,7 +2824,7 @@ body.auth-visible {
 }
 
 .stackly-navbar {
-  animation: stackly-slide-down 0.42s ease both;
+  contain: layout style;
 }
 
 .stackly-nav-link {
@@ -2832,7 +2832,7 @@ body.auth-visible {
   display: inline-flex;
   align-items: center;
   color: #ffffff;
-  transition: color 180ms ease, transform 180ms ease;
+  transition: color 180ms ease;
 }
 
 .stackly-nav-link::after {
@@ -2841,6 +2841,7 @@ body.auth-visible {
   left: 0;
   right: 0;
   bottom: -0.5rem;
+  display: none;
   height: 2px;
   border-radius: 999px;
   background: linear-gradient(90deg, #7dd3fc, #ffffff);
@@ -2852,7 +2853,7 @@ body.auth-visible {
 .stackly-nav-link:hover,
 .stackly-nav-link:focus-visible {
   color: #bfdbfe;
-  transform: translateY(-1px);
+  /* lift handled by MotionNavItem */
   outline: none;
 }
 
@@ -2862,12 +2863,11 @@ body.auth-visible {
 }
 
 .stackly-icon-button {
-  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  transition: box-shadow 180ms ease, background-color 180ms ease;
 }
 
 .stackly-icon-button:hover,
 .stackly-icon-button:focus-visible {
-  transform: translateY(-2px);
   background-color: #f8fafc;
   box-shadow: 0 14px 28px rgba(255, 255, 255, 0.16);
   outline: none;

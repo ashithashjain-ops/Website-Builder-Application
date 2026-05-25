@@ -4,6 +4,7 @@ import { MutableRefObject, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Footer from "@/components/Footer";
+import { motion, useMotionValueEvent, useReducedMotion, useScroll } from "framer-motion";
 
 
 import {
@@ -87,8 +88,12 @@ function AnimatedCount({
 
 export default function Portfolioedit() {
   const [innerMobileMenuOpen, setInnerMobileMenuOpen] = useState(false);
+  const [innerNavHidden, setInnerNavHidden] = useState(false);
   const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [isEditMode, setIsEditMode] = useState(false);
+  const canvasScrollRef = useRef<HTMLDivElement | null>(null);
+  const { scrollY: canvasScrollY } = useScroll({ container: canvasScrollRef });
+  const prefersReducedMotion = useReducedMotion();
 
   const [heroImageProps] = useState({
     width: 165,
@@ -170,6 +175,13 @@ export default function Portfolioedit() {
     }
   };
 
+  useMotionValueEvent(canvasScrollY, "change", (current) => {
+    const previous = canvasScrollY.getPrevious() ?? 0;
+    setInnerNavHidden(!innerMobileMenuOpen && current > previous && current > 150);
+  });
+
+  const portfolioNavHidden = innerNavHidden && !innerMobileMenuOpen && !prefersReducedMotion;
+
   return (
     <main className="flex flex-col min-h-screen bg-white">
       {/* ====== MAIN BUILDER LAYOUT ====== */}
@@ -197,7 +209,7 @@ export default function Portfolioedit() {
             </div>
 
             {/* Canvas Box */}
-            <div className={`flex-1 overflow-y-auto min-w-0 relative z-0 transition-colors duration-300 ${deviceMode !== "desktop" ? "bg-gray-200/50 p-2 @sm:p-4 rounded-xl" : ""}`}>
+            <div ref={canvasScrollRef} className={`flex-1 overflow-y-auto min-w-0 relative z-0 transition-colors duration-300 ${deviceMode !== "desktop" ? "bg-gray-200/50 p-2 @sm:p-4 rounded-xl" : ""}`}>
               <div className={`@container mx-auto w-full min-h-[530px] bg-[#F2F2F2] rounded-xl border-2 border-gray-300 flex flex-col relative portfolio-shell overflow-hidden transition-all duration-500 ease-in-out ${
                 deviceMode === "mobile"
                   ? "max-w-[375px] shadow-2xl"
@@ -208,7 +220,14 @@ export default function Portfolioedit() {
 
 
                 {/* <div className="flex w-full flex-wrap items-center justify-between gap-2 @sm:gap-4 px-3 @sm:px-4 py-2 @sm:py-3 @md:px-8 @xl:flex-nowrap border-b border-gray-300 bg-[#06224C] rounded-t-xl"> */}
-                <div className="sticky top-0 z-50 backdrop-blur-md bg-[#06224C]/95 flex w-full flex-wrap items-center justify-between gap-2 @sm:gap-4 px-3 @sm:px-4 py-2 @sm:py-3 @md:px-8 @xl:flex-nowrap border-b border-gray-300 rounded-t-xl">
+                <motion.div
+                  className="sticky top-0 z-50 backdrop-blur-md bg-[#06224C]/95 flex w-full flex-wrap items-center justify-between gap-2 @sm:gap-4 px-3 @sm:px-4 py-2 @sm:py-3 @md:px-8 @xl:flex-nowrap border-b border-gray-300 rounded-t-xl"
+                  animate={{
+                    y: portfolioNavHidden ? -96 : 0,
+                    opacity: portfolioNavHidden ? 0 : 1,
+                  }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
 
                   {/* ✅ MOBILE LAYOUT */}
                   <div className="flex w-full items-center justify-between @lg:hidden relative">
@@ -285,7 +304,7 @@ export default function Portfolioedit() {
                     </div>
                   </div>
 
-                </div>
+                </motion.div>
 
                 {/* MOBILE MENU */}
                 <div className={`transition-all duration-300 ease-in-out overflow-hidden ${innerMobileMenuOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>

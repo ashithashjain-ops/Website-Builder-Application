@@ -83,10 +83,10 @@ function Canvas({
 
       <div
         ref={setNodeRef}
-        className={`flex flex-1 flex-col items-center gap-6 overflow-y-auto px-4 py-6 transition sm:px-6 lg:px-8 ${isOver ? "bg-blue-50/50" : ""}`}
+        className={`flex flex-1 flex-col items-center gap-4 overflow-y-auto px-3 py-4 transition sm:px-4 lg:px-6 ${isOver ? "bg-blue-50/50" : ""}`}
       >
         {components.length === 0 ? (
-          <div className="flex min-h-[420px] w-full max-w-[900px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#dbe3ef] bg-white px-6 text-center shadow-[0_18px_45px_rgba(15,35,75,0.08)] transition">
+          <div className="flex min-h-[280px] w-full max-w-[900px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#dbe3ef] bg-white px-6 text-center shadow-[0_18px_45px_rgba(15,35,75,0.08)] transition">
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#eef4fb] text-[#0B1D40]">
               <ChevronDown className="h-7 w-7" />
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Copy, X } from "lucide-react";
 import { componentRegistry } from "@/lib/componentRegistry";
 import { useBuilderStore } from "@/store/builderStore";
@@ -110,11 +111,15 @@ function CanvasItem({
   );
 
   return (
-    <div
-      className={`flex w-full cursor-pointer flex-col overflow-hidden rounded-xl border bg-white transition-all duration-200 ${isSelected ? "border-blue-500 shadow-[0_0_0_3px_rgba(59,130,246,0.18),0_20px_50px_rgba(15,35,75,0.12)]" : "border-[#dbe3ef] shadow-[0_4px_20px_rgba(15,35,75,0.06)] hover:border-blue-200 hover:shadow-[0_8px_30px_rgba(15,35,75,0.1)]"}`}
+    <motion.div
+      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+      whileHover={isEditing ? {} : { y: -2, boxShadow: "0 12px 32px rgba(15,35,75,0.12)" }}
+      className={`flex w-full cursor-pointer flex-col overflow-hidden rounded-xl border bg-white transition-[border-color,box-shadow] duration-200 ${isSelected ? "border-blue-500 shadow-[0_0_0_3px_rgba(59,130,246,0.18),0_20px_50px_rgba(15,35,75,0.12)]" : "border-[#dbe3ef] shadow-[0_4px_20px_rgba(15,35,75,0.06)] hover:border-blue-200"}`}
       onClick={isEditing ? undefined : handleClick}
     >
-      <div className={`flex items-center justify-between border-b px-5 py-4 transition-colors duration-200 sm:px-6 ${isSelected ? "border-blue-100 bg-blue-50/50" : "border-[#e6edf5] bg-white"}`}>
+      <div className={`flex items-center justify-between border-b px-4 py-3 transition-colors duration-200 sm:px-5 ${isSelected ? "border-blue-100 bg-blue-50/50" : "border-[#e6edf5] bg-white"}`}>
         <h2 className="text-[18px] font-bold capitalize text-[#0B1D40]">{component.type}</h2>
         <div className="flex items-center gap-1">
           <button
@@ -136,10 +141,10 @@ function CanvasItem({
         </div>
       </div>
       <div
-        className={`relative flex w-full flex-1 flex-col items-start overflow-y-auto p-5 pb-8 transition-colors duration-150 sm:p-8 sm:pb-10 ${
+        className={`relative flex w-full flex-1 flex-col items-start overflow-y-auto p-4 pb-5 transition-colors duration-150 sm:p-5 sm:pb-7 ${
           isEditing
             ? "bg-blue-50/30"
-            : isDropTarget && component.type === "container"
+            : isDropTarget && (component.type === "container" || component.type === "columns")
               ? "bg-blue-50/50 ring-2 ring-inset ring-blue-400/50"
               : ""
         } ${isInlineEditable && isSelected && !isEditing ? "cursor-text" : ""}`}
@@ -149,7 +154,7 @@ function CanvasItem({
           {nestedChildren}
         </Renderer>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

@@ -2,13 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 import { DndContext, DragOverlay, PointerSensor, closestCenter, pointerWithin, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
-import { ChevronRight, GripVertical } from "lucide-react";
+import { ChevronRight, GripVertical, SlidersHorizontal } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import Canvas from "./Canvas";
 import ComponentPalette from "./ComponentPalette";
 import PropertyEditor from "./PropertyEditor";
 import { useBuilder } from "@/hooks/useBuilder";
-import type { ComponentType } from "@/types/builder";
+import type { BuilderComponent, ComponentType } from "@/types/builder";
+
+function findByIdDeep(components: BuilderComponent[], id: string): BuilderComponent | null {
+  for (const c of components) {
+    if (c.id === id) return c;
+    const found = findByIdDeep(c.children, id);
+    if (found) return found;
+  }
+  return null;
+}
 
 const collisionDetectionStrategy: CollisionDetection = (args) => {
   const pointerCollisions = pointerWithin(args);
@@ -26,10 +35,11 @@ export default function BuilderLayout() {
   const [activePaletteType, setActivePaletteType] = useState<ComponentType | null>(null);
   const [activeCanvasType, setActiveCanvasType] = useState<ComponentType | null>(null);
   const [isLeftOpen, setIsLeftOpen] = useState(false);
+  const [isRightOpen, setIsRightOpen] = useState(false);
   const searchParams = useSearchParams();
   const hasLoadedRequirements = useRef(false);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 3 } }));
-  const selectedComponent = components.find((component) => component.id === selectedComponentId) || null;
+  const selectedComponent = selectedComponentId ? findByIdDeep(components, selectedComponentId) : null;
 
   useEffect(() => {
     if (hasLoadedRequirements.current) {
@@ -88,7 +98,7 @@ export default function BuilderLayout() {
       } else if (isOverItem) {
         const overComponent = components.find((c) => c.id === overId);
 
-        if (overComponent?.type === "container") {
+        if (overComponent?.type === "container" || overComponent?.type === "columns") {
           addComponent(type, overId);
         } else {
           addComponent(type, null, overId);
@@ -145,6 +155,32 @@ export default function BuilderLayout() {
           />
 
           <PropertyEditor component={selectedComponent} onUpdate={updateComponent} />
+
+          {/* Mobile: floating Edit Properties button when a block is selected */}
+          {selectedComponent && (
+            <button
+              aria-label="Edit properties"
+              className="fixed bottom-6 right-5 z-50 flex items-center gap-2 rounded-full bg-[#0B1D40] px-4 py-3 text-sm font-bold text-white shadow-xl transition-all duration-200 hover:bg-[#152B52] active:scale-95 xl:hidden"
+              onClick={() => setIsRightOpen(true)}
+              type="button"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Edit
+            </button>
+          )}
+
+          {/* Mobile PropertyEditor bottom sheet */}
+          <div className={`fixed inset-0 z-[70] transition-opacity duration-300 xl:hidden ${isRightOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}>
+            <button aria-label="Close properties" className="absolute inset-0 bg-black/60" onClick={() => setIsRightOpen(false)} type="button" />
+            <div className={`absolute bottom-0 left-0 flex h-[72vh] max-h-[740px] w-full transform flex-col overflow-hidden rounded-t-3xl border-t border-[#f4d8cc] bg-[#fff7f4] shadow-2xl transition-transform duration-300 ${isRightOpen ? "translate-y-0" : "translate-y-full"}`}>
+              <PropertyEditor
+                className="relative flex h-full w-full flex-col overflow-hidden bg-[#fff7f4]"
+                component={selectedComponent}
+                onClose={() => setIsRightOpen(false)}
+                onUpdate={updateComponent}
+              />
+            </div>
+          </div>
         </div>
       </div>
 

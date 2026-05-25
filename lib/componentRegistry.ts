@@ -11,6 +11,9 @@ import FeaturesComponent from "@/components/draggable/FeaturesComponent";
 import GalleryComponent from "@/components/draggable/GalleryComponent";
 import ContactComponent from "@/components/draggable/ContactComponent";
 import ContainerComponent from "@/components/draggable/ContainerComponent";
+import IconComponent from "@/components/draggable/IconComponent";
+import FeatureItemComponent from "@/components/draggable/FeatureItemComponent";
+import ColumnsComponent from "@/components/draggable/ColumnsComponent";
 
 export type BuilderRenderer = (props: {
   component: BuilderComponent;
@@ -25,6 +28,9 @@ export const componentRegistry: Record<ComponentType, BuilderRenderer> = {
   heading: HeadingComponent,
   text: TextComponent,
   button: ButtonComponent,
+  icon: IconComponent,
+  "feature-item": FeatureItemComponent,
+  columns: ColumnsComponent,
   image: ImageComponent,
   input: InputComponent,
   divider: DividerComponent,

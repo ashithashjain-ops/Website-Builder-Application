@@ -6,6 +6,9 @@ export type ComponentType =
   | "heading"
   | "text"
   | "button"
+  | "icon"
+  | "feature-item"
+  | "columns"
   | "image"
   | "input"
   | "divider"
@@ -24,6 +27,7 @@ export interface ComponentStyles {
   width?: string;
   height?: string;
   textAlign?: CSSProperties["textAlign"];
+  layoutCols?: string;
 }
 
 export interface BuilderComponent {

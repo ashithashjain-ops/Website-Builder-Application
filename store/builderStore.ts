@@ -32,6 +32,21 @@ const defaults: Record<ComponentType, Pick<BuilderComponent, "content" | "styles
     styles: { color: "#ffffff", backgroundColor: "#0B1D40", fontSize: "15px", padding: "12px 22px", margin: "0 0 12px", borderRadius: "6px", width: "auto", textAlign: "center" },
     children: [],
   },
+  icon: {
+    content: "Star",
+    styles: { color: "#0B1D40", fontSize: "32px", margin: "0 0 12px", textAlign: "center", width: "auto" },
+    children: [],
+  },
+  "feature-item": {
+    content: "Zap|horizontal|Fast Performance|Blazing fast setup with zero configuration needed.|",
+    styles: { color: "#0B1D40", margin: "0 0 12px", width: "100%" },
+    children: [],
+  },
+  columns: {
+    content: "3",
+    styles: { margin: "0 0 16px", width: "100%" },
+    children: [],
+  },
   image: {
     content: "/showcase.webp",
     styles: { width: "100%", height: "220px", borderRadius: "8px", margin: "0 0 12px" },
@@ -197,7 +212,7 @@ const createRequirementComponents = (requirements: BuilderRequirements) => {
       return section as ComponentType;
     })
     .filter((section): section is ComponentType =>
-      ["navigation", "hero", "heading", "text", "button", "image", "input", "divider", "features", "gallery", "contact", "container"].includes(section),
+      ["navigation", "hero", "heading", "text", "button", "icon", "feature-item", "columns", "image", "input", "divider", "features", "gallery", "contact", "container"].includes(section),
     );
 
   return sectionTypes.map((type, index) => {
