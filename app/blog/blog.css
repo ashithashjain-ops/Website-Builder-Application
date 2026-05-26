@@ -26,8 +26,7 @@
   --blog-radius-lg: 1.25rem;
   --blog-safe-inline: clamp(0.75rem, 4vw, 3rem);
 
-  overflow-x: hidden;
-  overflow-y: visible;
+  overflow: visible;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -59,21 +58,23 @@
   height: 100%;
 }
 
-/* Header — full-width bar with gap below Stackly navbar */
+/* Header — sticks below Stackly navbar while the page scrolls (requires no overflow clip on .blog-page) */
 .blog-header {
   background: var(--blog-navy);
   color: var(--blog-white);
   width: 100%;
-  max-width: 100vw;
+  max-width: 100%;
   box-sizing: border-box;
   margin-top: var(--blog-nav-gap);
   margin-bottom: var(--blog-header-content-gap);
   margin-inline: 0;
   padding-inline: 0;
+  position: -webkit-sticky;
   position: sticky;
   top: calc(var(--stackly-nav-height) + var(--blog-nav-gap));
-  z-index: 40;
+  z-index: 4500;
   min-width: 0;
+  flex-shrink: 0;
 }
 
 .blog-header-inner {

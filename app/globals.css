@@ -50,6 +50,10 @@ body > main {
   overflow-y: visible;
 }
 
+body > main.blog-page {
+  overflow: visible;
+}
+
 /* Site shell: navbar + page content grow together (no inner scroll box) */
 .stackly-site-layout {
   display: block;
@@ -88,11 +92,15 @@ body:has(> main.planning-page) {
   background: #ffffff;
 }
 
-main.blog-page,
 main.site-page,
 main.planning-page {
   overflow-x: clip;
   overflow-y: visible;
+}
+
+/* Blog: overflow must stay visible so Blogify sticky header works under Stackly nav */
+main.blog-page {
+  overflow: visible;
 }
 
 main.site-page {
