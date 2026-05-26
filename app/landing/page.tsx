@@ -30,7 +30,7 @@ import {
   FaXTwitter,
   FaYoutube,
 } from "react-icons/fa6";
-import { assetPath, routePath } from "@/lib/paths";
+import { assetPath } from "@/lib/paths";
 type TemplateCategory = "portfolio" | "blog" | "ecommerce" | "business";
 
 const Footer = dynamic(() => import("@/components/Footer"), {
@@ -56,15 +56,15 @@ const popularSearches = [
 ];
 
 const categories = [
-  { title: "Portfolio", image: "/landing-optimized/port.webp", alt: "Portfolio website preview", previewHref: routePath("/portfolio"), editHref: routePath("/blockpages?template=portfolio") },
-  { title: "E-Commerce Templates", image: "/landing-optimized/ecommerce.webp", alt: "E-commerce website preview", previewHref: routePath("/e-commerce"), editHref: routePath("/blockpages?template=ecommerce") },
+  { title: "Portfolio", image: "/landing-optimized/port.webp", alt: "Portfolio website preview", previewHref: "/portfolio", editHref: "/blockpages?template=portfolio" },
+  { title: "E-Commerce Templates", image: "/landing-optimized/ecommerce.webp", alt: "E-commerce website preview", previewHref: "/e-commerce", editHref: "/blockpages?template=ecommerce" },
   { title: "Digital Marketing Templates", image: "/landing-optimized/digital01.webp", alt: "Digital marketing website preview" },
   {
     title: "Blogging",
     image: "/landing-optimized/bloggg.webp",
     alt: "Blogging website preview",
-    previewHref: routePath("/blog"),
-    editHref: routePath("/blockpages?template=blog"),
+    previewHref: "/blog",
+    editHref: "/blockpages?template=blog",
   },
   { title: "Construction Themes", image: "/landing-optimized/construction02.webp", alt: "Construction website preview" },
   { title: "Food Restaurant", image: "/landing-optimized/foodd03.webp", alt: "Food restaurant website preview" },
@@ -865,11 +865,11 @@ export default function Home() {
                     <Link
                       href={
                         template.category === "portfolio"
-                          ? routePath("/portfolio")
+                          ? "/portfolio"
                           : template.category === "ecommerce"
-                            ? routePath("/e-commerce")
+                            ? "/e-commerce"
                             : template.category === "blog"
-                              ? routePath("/blog")
+                              ? "/blog"
                               : "#features"
                       }
                       className="flex-1 rounded-xl border-2 border-dashed border-blue-400 py-2.5 text-center text-sm font-bold text-blue-500 transition hover:scale-[1.03] hover:bg-blue-50 hover:brightness-105"

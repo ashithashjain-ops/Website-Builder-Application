@@ -5,7 +5,10 @@ export function assetPath(path: string) {
   return `${basePath}${normalizedPath}`;
 }
 
-/** App route for Next.js Link (basePath + trailing slash for static export). */
+/**
+ * Prefix basePath for plain <a> tags or window.location (not Next.js Link).
+ * Next.js Link already applies basePath from next.config — do not use routePath there.
+ */
 export function routePath(path: string) {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   if (normalized === "/") {
