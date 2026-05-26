@@ -76,11 +76,26 @@ function clearNextLockFile() {
   }
 }
 
+function configureLocalDevEnv() {
+  /*
+   * GitHub Pages sets NEXT_PUBLIC_BASE_PATH=/Website-Builder-Application in CI.
+   * If that variable is also in your Windows user/shell env, localhost:3000/landing
+   * returns 404 — you must use localhost:3000/Website-Builder-Application/landing.
+   * Local dev clears it unless STACKLY_DEV_WITH_BASE_PATH=1.
+   */
+  if (process.env.STACKLY_DEV_WITH_BASE_PATH === "1") {
+    return;
+  }
+  process.env.NEXT_PUBLIC_BASE_PATH = "";
+}
+
 function startNextDev() {
+  configureLocalDevEnv();
   const nextCli = resolve(PROJECT_ROOT, "node_modules", "next", "dist", "bin", "next");
   const child = spawn(process.execPath, [nextCli, "dev"], {
     cwd: PROJECT_ROOT,
     stdio: "inherit",
+    env: { ...process.env },
   });
 
   child.on("exit", (code, signal) => {

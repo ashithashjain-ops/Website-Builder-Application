@@ -114,6 +114,31 @@ export default function BlogHeader() {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [mobileOpen]);
 
+  /* Keep anchor scroll offsets aligned with Stackly navbar height */
+  useEffect(() => {
+    const stacklyNav = document.querySelector<HTMLElement>(".stackly-navbar");
+    if (!stacklyNav) return;
+
+    const syncStacklyNavHeight = () => {
+      const height = stacklyNav.getBoundingClientRect().height;
+      document.documentElement.style.setProperty(
+        "--stackly-nav-height-measured",
+        `${Math.round(height)}px`
+      );
+    };
+
+    syncStacklyNavHeight();
+    const observer = new ResizeObserver(syncStacklyNavHeight);
+    observer.observe(stacklyNav);
+    window.addEventListener("resize", syncStacklyNavHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", syncStacklyNavHeight);
+      document.documentElement.style.removeProperty("--stackly-nav-height-measured");
+    };
+  }, []);
+
   return (
     <header className="blog-header">
       <div className="blog-header-inner">

@@ -98,7 +98,7 @@ main.planning-page {
   overflow-y: visible;
 }
 
-/* Blog: overflow must stay visible so Blogify sticky header works under Stackly nav */
+/* Blog: visible overflow so fixed Blogify header is not clipped */
 main.blog-page {
   overflow: visible;
 }

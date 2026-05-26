@@ -1,16 +1,23 @@
 /* Blogify — section scale matched to full-page design reference */
+html:has(body > main.blog-page),
 .blog-page {
   --stackly-nav-height: 3.5rem;
   --blog-header-height: 3.25rem;
-  --blog-nav-gap: clamp(0.75rem, 2vw, 1rem);
-  --blog-header-content-gap: clamp(1rem, 2.5vw, 1.5rem);
+  --blog-nav-gap: clamp(1rem, 2.5vw, 1.5rem);
+  --blog-header-content-gap: 0;
   --blog-scroll-offset: calc(
-    var(--stackly-nav-height) +
+    var(--stackly-nav-height-measured, var(--stackly-nav-height)) +
       var(--blog-nav-gap) +
       var(--blog-header-height) +
-      var(--blog-header-content-gap) +
       0.5rem
   );
+}
+
+html:has(body > main.blog-page) {
+  scroll-padding-top: var(--blog-scroll-offset);
+}
+
+.blog-page {
   --blog-navy: #001f3f;
   --blog-navy-muted: #1a3a5c;
   --blog-blue-bg: #eaf2ff;
@@ -58,7 +65,10 @@
   height: 100%;
 }
 
-/* Header — sticks below Stackly navbar while the page scrolls (requires no overflow clip on .blog-page) */
+/*
+ * Blogify bar: sits below Stackly nav and scrolls with page content
+ * (not fixed / not hide-on-scroll like the Stackly navbar).
+ */
 .blog-header {
   background: var(--blog-navy);
   color: var(--blog-white);
@@ -66,15 +76,12 @@
   max-width: 100%;
   box-sizing: border-box;
   margin-top: var(--blog-nav-gap);
-  margin-bottom: var(--blog-header-content-gap);
+  margin-bottom: 0;
   margin-inline: 0;
   padding-inline: 0;
-  position: -webkit-sticky;
-  position: sticky;
-  top: calc(var(--stackly-nav-height) + var(--blog-nav-gap));
-  z-index: 4500;
+  position: relative;
+  z-index: 40;
   min-width: 0;
-  flex-shrink: 0;
 }
 
 .blog-header-inner {
@@ -103,9 +110,10 @@
 }
 
 @media (min-width: 768px) {
+  html:has(body > main.blog-page),
   .blog-page {
     --stackly-nav-height: 3.75rem;
-    --blog-nav-gap: 1rem;
+    --blog-nav-gap: 1.5rem;
   }
 }
 
@@ -572,12 +580,12 @@
   );
   width: 100%;
   min-width: 0;
-  padding-top: 0.25rem;
+  padding-top: 0;
 }
 
 .blog-hero {
   background: transparent;
-  padding-top: clamp(3rem, 6vw, 4.5rem);
+  padding-top: clamp(2rem, 5vw, 3.5rem);
   padding-bottom: 0;
 }
 
