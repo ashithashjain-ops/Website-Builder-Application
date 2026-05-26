@@ -71,7 +71,8 @@ const ContactSection = () => {
   };
  
   return (
-    <section id="contact" className="bg-[#FFF1F2] py-8 md:py-14 px-2 sm:px-8 lg:px-14 w-full overflow-hidden">
+    <main className="site-page bg-[#FFF1F2]">
+    <section id="contact" className="py-8 md:py-14 px-2 sm:px-8 lg:px-14 w-full overflow-hidden">
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
  
         {/* LEFT COLUMN: Contact Information */}
@@ -213,6 +214,7 @@ const ContactSection = () => {
         </div>
       </div>
     </section>
+    </main>
   );
 };
  

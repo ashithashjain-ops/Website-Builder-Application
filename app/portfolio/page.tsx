@@ -183,7 +183,7 @@ export default function Portfolioedit() {
   const portfolioNavHidden = innerNavHidden && !innerMobileMenuOpen && !prefersReducedMotion;
 
   return (
-    <main className="flex flex-col min-h-screen bg-white">
+    <main className="site-page flex flex-col min-h-screen bg-white overflow-x-clip">
       {/* ====== MAIN BUILDER LAYOUT ====== */}
       <div className="flex flex-1">
         {/* MAIN CONTENT */}
