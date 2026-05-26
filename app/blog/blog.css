@@ -2,9 +2,14 @@
 .blog-page {
   --stackly-nav-height: 3.5rem;
   --blog-header-height: 3.25rem;
-  --blog-nav-gap: clamp(0.5rem, 2vw, 1rem);
+  --blog-nav-gap: clamp(0.75rem, 2vw, 1rem);
+  --blog-header-content-gap: clamp(1rem, 2.5vw, 1.5rem);
   --blog-scroll-offset: calc(
-    var(--stackly-nav-height) + var(--blog-nav-gap) + var(--blog-header-height) + 0.5rem
+    var(--stackly-nav-height) +
+      var(--blog-nav-gap) +
+      var(--blog-header-height) +
+      var(--blog-header-content-gap) +
+      0.5rem
   );
   --blog-navy: #001f3f;
   --blog-navy-muted: #1a3a5c;
@@ -61,6 +66,7 @@
   max-width: 100vw;
   box-sizing: border-box;
   margin-top: var(--blog-nav-gap);
+  margin-bottom: var(--blog-header-content-gap);
   margin-inline: 0;
   padding-inline: 0;
   position: sticky;
@@ -564,11 +570,12 @@
   );
   width: 100%;
   min-width: 0;
+  padding-top: 0.25rem;
 }
 
 .blog-hero {
   background: transparent;
-  padding-top: clamp(2.5rem, 6vw, 4rem);
+  padding-top: clamp(3rem, 6vw, 4.5rem);
   padding-bottom: 0;
 }
 

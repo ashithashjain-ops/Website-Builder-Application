@@ -28,11 +28,14 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
-  height: 100%;
   min-height: 100%;
   min-height: 100dvh;
+  min-height: 100svh;
+  height: auto;
   overflow-x: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: auto;
 }
 
 /* Shared layout guard — keeps page output inside the viewport on all routes */
@@ -54,6 +57,18 @@ body:has(> main.landing-page) {
   background: #fff1f2;
   scrollbar-color: #8fb8e8 #071936;
   scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Integrated Stackly pages (navbar + main content) */
+body:has(> main.blog-page),
+body:has(> main.site-page),
+body:has(> main.planning-page),
+body:has(> main.buyscreen-page) {
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: auto;
 }
 
 body:has(> main.landing-page)::-webkit-scrollbar {
@@ -75,6 +90,57 @@ body:has(> main.landing-page)::-webkit-scrollbar-thumb {
 body:has(> main.landing-page)::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #eff6ff 0%, #93c5fd 45%, #2563eb 100%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 24px rgba(96, 165, 250, 0.55);
+}
+
+main.landing-page {
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+/*
+ * Mobile / tablet touch scroll — landing + integrated Stackly pages (iOS & Android).
+ * Document scroll must live on body with height:auto so content taller than the viewport can pan.
+ */
+@media (max-width: 1023px) {
+  html:not(.auth-visible) {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body:not(.auth-visible) {
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    min-height: 100svh;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto;
+    touch-action: pan-y pinch-zoom;
+  }
+
+  body:not(.auth-visible) > main.landing-page {
+    display: block;
+    min-height: auto;
+    overflow: visible;
+    touch-action: pan-y pinch-zoom;
+  }
+
+  body:not(.auth-visible) > main.blog-page,
+  body:not(.auth-visible) > main.site-page,
+  body:not(.auth-visible) > main.planning-page,
+  body:not(.auth-visible) > main.buyscreen-page {
+    overflow-x: hidden;
+    overflow-y: visible;
+    min-height: auto;
+    touch-action: pan-y pinch-zoom;
+  }
+
+  /* Portfolio builder canvas: nested scroll regions need momentum scrolling on iOS */
+  main.site-page .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pinch-zoom;
+  }
 }
 
 /* Plans (/planning): match static index — page bg fills viewport so default white body does not frame the layout */
@@ -1371,8 +1437,10 @@ main.buyscreen-page button.buyscreen-top-header-nav-item--grid,
   html {
     height: -webkit-fill-available;
   }
-  body {
+
+  body:not(.auth-visible) {
     min-height: -webkit-fill-available;
+    height: auto;
   }
 }
 
