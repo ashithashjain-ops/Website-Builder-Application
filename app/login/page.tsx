@@ -16,6 +16,13 @@ import {
 } from "@/lib/authPlaceholderFit";
 import { isApiConnectionError, login as loginApi } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
+import {
+  looksLikeMobileContactInput,
+  MAX_MOBILE_INPUT_LENGTH,
+  mobileContactMaxLengthMessage,
+  isValidMobileContact,
+  validateInternationalMobileContact,
+} from "@/lib/signupPhoneCountries";
 import AuthGoogleButton from "@/components/AuthGoogleButton";
 
 type LoginFormState = {
@@ -23,9 +30,6 @@ type LoginFormState = {
   password: string;
   rememberMe: boolean;
 };
-
-const isMobile = (value: string): boolean =>
-  /^\+?[0-9]{6,15}$/.test(value.trim());
 
 type LoginFormErrors = {
   email?: string;
@@ -174,14 +178,18 @@ export default function LoginPage() {
     const trimmedContact = values.email.trim();
     if (!trimmedContact) {
       newErrors.email = "Email or mobile number is required.";
+    } else if (looksLikeMobileContactInput(trimmedContact)) {
+      const mobileError = validateInternationalMobileContact(trimmedContact);
+      if (mobileError) {
+        newErrors.email = mobileError;
+      }
     } else if (trimmedContact.length > EMAIL_MAX_LENGTH) {
       newErrors.email = EMAIL_MAX_ERROR;
     } else {
       const isEmail = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|in|org|net|edu)$/i.test(
         trimmedContact.toLowerCase(),
       );
-      const isMobileContact = isMobile(trimmedContact);
-      if (!isEmail && !isMobileContact) {
+      if (!isEmail) {
         newErrors.email = "Enter valid email or mobile number.";
       }
     }
@@ -210,17 +218,21 @@ export default function LoginPage() {
       const contactValue =
         field === "email" ? rawValue.replace(/\s+/g, "") : rawValue;
 
-      if (field === "email" && contactValue.length > EMAIL_MAX_LENGTH) {
-        setForm((prev) => ({
-          ...prev,
-          email: contactValue.slice(0, EMAIL_MAX_LENGTH),
-        }));
-        setErrors((prev) => ({
-          ...prev,
-          email: EMAIL_MAX_ERROR,
-          form: undefined,
-        }));
-        return;
+      if (field === "email") {
+        const treatAsMobile = looksLikeMobileContactInput(contactValue);
+        const cap = treatAsMobile ? MAX_MOBILE_INPUT_LENGTH : EMAIL_MAX_LENGTH;
+        if (contactValue.length > cap) {
+          setForm((prev) => ({
+            ...prev,
+            email: contactValue.slice(0, cap),
+          }));
+          setErrors((prev) => ({
+            ...prev,
+            email: treatAsMobile ? mobileContactMaxLengthMessage() : EMAIL_MAX_ERROR,
+            form: undefined,
+          }));
+          return;
+        }
       }
 
       if (field === "password" && rawValue.length > PASSWORD_MAX_LENGTH) {
@@ -244,7 +256,16 @@ export default function LoginPage() {
     };
 
   const handleContactBlur = () => {
-    setForm((prev) => ({ ...prev, email: prev.email.trim() }));
+    const trimmed = form.email.trim();
+    setForm((prev) => ({ ...prev, email: trimmed }));
+    if (trimmed && looksLikeMobileContactInput(trimmed)) {
+      const mobileError = validateInternationalMobileContact(trimmed);
+      setErrors((errs) => ({
+        ...errs,
+        email: mobileError ?? undefined,
+        form: undefined,
+      }));
+    }
   };
 
   const handleLogin = async (event: React.FormEvent) => {
@@ -262,7 +283,7 @@ export default function LoginPage() {
 
       const contact = form.email.trim();
 
-      const isMobileContact = isMobile(contact);
+      const isMobileContact = isValidMobileContact(contact);
       const result = await loginApi({
         ...(isMobileContact ? { mobile: contact } : { email: contact.toLowerCase() }),
         password: form.password,
@@ -341,7 +362,11 @@ export default function LoginPage() {
                               fitInputPlaceholderToWidth(emailInputRef.current)
                             );
                           }}
-                          maxLength={EMAIL_MAX_LENGTH}
+                          maxLength={
+                            looksLikeMobileContactInput(form.email)
+                              ? MAX_MOBILE_INPUT_LENGTH
+                              : EMAIL_MAX_LENGTH
+                          }
                           className="bg-transparent outline-none w-full min-w-0 placeholder-white text-sm login-email-input"
                           aria-invalid={!!errors.email}
                           aria-describedby={

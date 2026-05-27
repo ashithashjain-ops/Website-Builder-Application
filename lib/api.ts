@@ -4,6 +4,7 @@ const API_BASE_URL =
 type ApiErrorBody = {
   message?: string;
   errors?: string[];
+  attemptsLeft?: number;
 };
 
 export type LoginBody = {
@@ -56,7 +57,14 @@ async function apiRequest<T>(path: string, init: RequestInit): Promise<T> {
   const data = (await response.json().catch(() => ({}))) as ApiErrorBody;
 
   if (!response.ok) {
-    throw new Error(data.message || data.errors?.join(", ") || "Request failed");
+    const message =
+      data.message || data.errors?.join(", ") || "Request failed";
+    const err = new Error(message);
+    // OTP verify endpoints may include `attemptsLeft` in error responses.
+    if (typeof data.attemptsLeft === "number") {
+      (err as unknown as { attemptsLeft: number }).attemptsLeft = data.attemptsLeft;
+    }
+    throw err;
   }
 
   return data as T;

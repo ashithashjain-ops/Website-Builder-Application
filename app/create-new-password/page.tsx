@@ -20,6 +20,8 @@ const PASSWORD_MIN_LENGTH = 8;
 const PASSWORD_MAX_LENGTH = 60;
 const PASSWORD_LENGTH_ERROR = "Password must be 8-60 characters.";
 const PASSWORD_MAX_ERROR = "Password cannot exceed 60 characters.";
+const PASSWORD_UPDATE_ERROR =
+  "Cannot update password. Please follow password requirements.";
 
 function CreateNewPasswordContent() {
   const router = useRouter();
@@ -33,6 +35,7 @@ function CreateNewPasswordContent() {
 
   const requirementText =
     "Password must be 8-60 characters and include uppercase, lowercase, number, and symbol.";
+  const isPasswordValidationError = Boolean(error);
 
   const applyPasswordInput = (
     raw: string,
@@ -79,7 +82,7 @@ function CreateNewPasswordContent() {
     const hasNumber = /[0-9]/.test(newPassword);
     const hasSymbol = /[^A-Za-z0-9]/.test(newPassword);
     if (!hasUpper || !hasLower || !hasNumber || !hasSymbol) {
-      setError(requirementText);
+      setError(PASSWORD_UPDATE_ERROR);
       return;
     }
 
@@ -97,8 +100,12 @@ function CreateNewPasswordContent() {
         token,
       });
       window.sessionStorage.removeItem("stackly-reset-token");
-      setMessage(result.message || "Password reset successfully.");
-      router.push("/login");
+      setMessage(
+        result.message || "Password reset successfully."
+      );
+      setTimeout(() => {
+        router.push("/login");
+      }, 2500);
     } catch (err) {
       if (isApiConnectionError(err)) {
         router.push("/backend-error");
@@ -154,8 +161,13 @@ function CreateNewPasswordContent() {
                     aria-describedby={error ? "create-password-error" : undefined}
                     className="w-full h-12 pl-4 pr-12 rounded border text-[14px] outline-none focus:border-white/80 transition bg-transparent"
                     style={{
-                      border: "1px solid rgba(255,255,255,0.5)",
+                      border: isPasswordValidationError
+                        ? "1.5px solid #FFFFFF"
+                        : "1px solid rgba(255,255,255,0.5)",
                       color: "#FFFFFF",
+                      boxShadow: isPasswordValidationError
+                        ? "0 0 0 2px rgba(255,255,255,0.2)"
+                        : "none",
                     }}
                     placeholder="••••••••"
                   />
@@ -195,8 +207,13 @@ function CreateNewPasswordContent() {
                     aria-describedby={error ? "create-password-error" : undefined}
                     className="w-full h-12 pl-4 pr-12 rounded border text-[14px] outline-none focus:border-white/80 transition bg-transparent"
                     style={{
-                      border: "1px solid rgba(255,255,255,0.5)",
+                      border: isPasswordValidationError
+                        ? "1.5px solid #FFFFFF"
+                        : "1px solid rgba(255,255,255,0.5)",
                       color: "#FFFFFF",
+                      boxShadow: isPasswordValidationError
+                        ? "0 0 0 2px rgba(255,255,255,0.2)"
+                        : "none",
                     }}
                     placeholder="••••••••"
                   />
@@ -223,7 +240,7 @@ function CreateNewPasswordContent() {
               {error && (
                 <p
                   id="create-password-error"
-                  className="text-[12px]"
+                  className="text-[12px] mt-2"
                   style={{ color: "#ff6b6b" }}
                   role="alert"
                 >
@@ -231,7 +248,10 @@ function CreateNewPasswordContent() {
                 </p>
               )}
               {message && (
-                <p className="text-[12px]" style={{ color: "#FFFFFF" }}>
+                <p
+                  className="text-[13px] text-left font-medium mt-2"
+                  style={{ color: "#22c55e" }}
+                >
                   {message}
                 </p>
               )}

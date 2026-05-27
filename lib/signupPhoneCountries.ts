@@ -69,6 +69,99 @@ export const MAX_MOBILE_INPUT_LENGTH: number = (() => {
   return 1 + maxDial + maxNational;
 })();
 
+const COUNTRIES_BY_DIAL_DESC = [...SIGNUP_PHONE_COUNTRIES].sort(
+  (a, b) => b.dialCode.length - a.dialCode.length,
+);
+
+/** True when the contact field is being used as a mobile number (digits and optional + only). */
+export function looksLikeMobileContactInput(value: string): boolean {
+  const trimmed = value.trim();
+  return trimmed.length > 0 && /^\+?\d*$/.test(trimmed);
+}
+
+export function mobileContactMaxLengthMessage(): string {
+  return `Mobile number cannot exceed ${MAX_MOBILE_INPUT_LENGTH} characters.`;
+}
+
+/** Returns null when the mobile contact is valid for a supported country length. */
+export function validateInternationalMobileContact(value: string): string | null {
+  const trimmed = value.trim();
+  if (!looksLikeMobileContactInput(trimmed)) {
+    return null;
+  }
+
+  if (trimmed.length > MAX_MOBILE_INPUT_LENGTH) {
+    return mobileContactMaxLengthMessage();
+  }
+
+  const digits = trimmed.replace(/\D/g, "");
+  if (!digits) {
+    return "Enter valid email or mobile number.";
+  }
+
+  for (const country of COUNTRIES_BY_DIAL_DESC) {
+    if (!digits.startsWith(country.dialCode)) {
+      continue;
+    }
+    const national = digits.slice(country.dialCode.length);
+    if (!national) {
+      continue;
+    }
+    const err = validateSignupNationalDigits(national, country);
+    if (!err) {
+      return null;
+    }
+    return err;
+  }
+
+  for (const country of SIGNUP_PHONE_COUNTRIES) {
+    if (validateSignupNationalDigits(digits, country) === null) {
+      return null;
+    }
+  }
+
+  const hint = getDefaultSignupPhoneCountry();
+  return `Enter a valid mobile number (${nationalDigitsMessage(hint)} or include country code).`;
+}
+
+export function isValidMobileContact(value: string): boolean {
+  return (
+    looksLikeMobileContactInput(value) &&
+    validateInternationalMobileContact(value) === null
+  );
+}
+
+/** Returns E.164 (+country+national) for a valid international mobile input. */
+export function normalizeInternationalMobileContact(value: string): string | null {
+  const trimmed = value.trim();
+  if (!isValidMobileContact(trimmed)) {
+    return null;
+  }
+
+  const digits = trimmed.replace(/\D/g, "");
+
+  for (const country of COUNTRIES_BY_DIAL_DESC) {
+    if (!digits.startsWith(country.dialCode)) {
+      continue;
+    }
+    const national = digits.slice(country.dialCode.length);
+    if (!national) {
+      continue;
+    }
+    if (validateSignupNationalDigits(national, country) === null) {
+      return toE164Mobile(country, national);
+    }
+  }
+
+  for (const country of SIGNUP_PHONE_COUNTRIES) {
+    if (validateSignupNationalDigits(digits, country) === null) {
+      return toE164Mobile(country, digits);
+    }
+  }
+
+  return null;
+}
+
 export function getSignupPhoneCountry(id: string): SignupPhoneCountry | undefined {
   return SIGNUP_PHONE_COUNTRIES.find((c) => c.id === id);
 }

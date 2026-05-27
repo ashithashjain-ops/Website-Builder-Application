@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isApiConnectionError, verifyMobileOtp } from "@/lib/api";
 import {
@@ -12,6 +12,16 @@ import { assetPath } from "@/lib/paths";
 import ResetFlowBackButton from "@/components/ResetFlowBackButton";
 
 const MOBILE_OTP_INPUT_PREFIX = "mobile-otp";
+
+const OTP_COOLDOWN_SECONDS = 60;
+const OTP_MAX_ATTEMPTS = 3;
+const MAX_ATTEMPTS_REACHED_MESSAGE = "Maximum attempts reached.";
+
+const VERIFY_OTP_LINK_CLASS =
+  "underline font-semibold cursor-pointer transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none";
+
+const VERIFY_OTP_RESEND_CLASS =
+  "text-[12px] sm:text-[13px] underline font-semibold transition-colors duration-200 enabled:cursor-pointer enabled:hover:text-[#F2B541] focus-visible:outline-none disabled:opacity-60 disabled:cursor-not-allowed disabled:no-underline";
 
 const resetFlowCardStyle = {
   background:
@@ -28,14 +38,72 @@ function VerifyMobileContent() {
   const [error, setError] = useState("");
   const isCodeComplete = code.every((digit) => digit !== "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+
+  const contactKey = useMemo(() => encodeURIComponent(contact.trim()), [contact]);
+  const otpAttemptsUsedKey = `stackly-otp-attempts-used-mobile-${contactKey}`;
+  const otpExpiresAtKey = `stackly-otp-expires-at-mobile-${contactKey}`;
+
+  const [otpAttemptsUsed, setOtpAttemptsUsed] = useState(0);
+  const [cooldownExpiresAt, setCooldownExpiresAt] = useState<number | null>(null);
+  const [cooldownSecondsLeft, setCooldownSecondsLeft] = useState(OTP_COOLDOWN_SECONDS);
 
   const clearError = () => setError("");
+
+  useEffect(() => {
+    // Use sessionStorage so a simple refresh doesn't wipe the timer/attempt count.
+    const now = Date.now();
+    const storedAttempts = Number(sessionStorage.getItem(otpAttemptsUsedKey) || "0");
+    setOtpAttemptsUsed(
+      Number.isFinite(storedAttempts)
+        ? Math.min(storedAttempts, OTP_MAX_ATTEMPTS)
+        : 0,
+    );
+
+    const storedExpiresAt = Number(sessionStorage.getItem(otpExpiresAtKey) || "0");
+    let nextExpiresAt = storedExpiresAt;
+    if (!storedExpiresAt || storedExpiresAt <= now) {
+      nextExpiresAt = now + OTP_COOLDOWN_SECONDS * 1000;
+      sessionStorage.setItem(otpExpiresAtKey, String(nextExpiresAt));
+    }
+
+    setCooldownExpiresAt(nextExpiresAt);
+  }, [otpAttemptsUsedKey, otpExpiresAtKey]);
+
+  useEffect(() => {
+    if (cooldownExpiresAt == null) return;
+
+    const tick = () => {
+      const remaining = Math.ceil((cooldownExpiresAt - Date.now()) / 1000);
+      setCooldownSecondsLeft(Math.max(0, remaining));
+    };
+
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [cooldownExpiresAt]);
+
+  const hasReachedMaxAttempts = otpAttemptsUsed >= OTP_MAX_ATTEMPTS;
+  const canResend =
+    cooldownSecondsLeft <= 0 && !hasReachedMaxAttempts && !isResending;
+  const otpExpiryLabel =
+    cooldownSecondsLeft > 0
+      ? `OTP expires in ${cooldownSecondsLeft}s`
+      : "OTP expired";
 
   const handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!isCodeComplete) {
       setError("Please enter the complete 4-digit code.");
+      return;
+    }
+    if (hasReachedMaxAttempts) {
+      setError(MAX_ATTEMPTS_REACHED_MESSAGE);
+      return;
+    }
+    if (cooldownSecondsLeft <= 0) {
+      setError("OTP expired. Please resend code.");
       return;
     }
     setIsSubmitting(true);
@@ -54,8 +122,32 @@ function VerifyMobileContent() {
         return;
       }
       const message = err instanceof Error
-          ? err.message
-          : "Verification failed. Please try again.";
+        ? err.message
+        : "Verification failed. Please try again.";
+
+      const attemptsLeft =
+        err instanceof Error
+          ? (err as unknown as { attemptsLeft?: number }).attemptsLeft
+          : undefined;
+      if (typeof attemptsLeft === "number") {
+        const nextAttemptsUsed = Math.max(0, OTP_MAX_ATTEMPTS - attemptsLeft);
+        setOtpAttemptsUsed(nextAttemptsUsed);
+        sessionStorage.setItem(otpAttemptsUsedKey, String(nextAttemptsUsed));
+      } else {
+        const normalized = message.toLowerCase();
+        if (normalized.includes("max attempts")) {
+          setOtpAttemptsUsed(OTP_MAX_ATTEMPTS);
+          sessionStorage.setItem(otpAttemptsUsedKey, String(OTP_MAX_ATTEMPTS));
+          setInfo("");
+        }
+        if (normalized.includes("otp expired")) {
+          setOtpAttemptsUsed(0);
+          sessionStorage.setItem(otpAttemptsUsedKey, "0");
+          setCooldownExpiresAt(Date.now());
+          setCooldownSecondsLeft(0);
+          sessionStorage.setItem(otpExpiresAtKey, String(Date.now()));
+        }
+      }
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -134,7 +226,7 @@ function VerifyMobileContent() {
                 onClick={() =>
                   router.push("/forgot-password?changeFrom=verify-mobile")
                 }
-                className="underline font-semibold"
+                className={VERIFY_OTP_LINK_CLASS}
                 style={{ color: "#F2B541" }}
               >
                 Change Here
@@ -143,7 +235,9 @@ function VerifyMobileContent() {
 
             <button
               type="submit"
-              disabled={!isCodeComplete || isSubmitting}
+              disabled={
+                !isCodeComplete || isSubmitting || hasReachedMaxAttempts
+              }
               className="w-full max-w-[260px] mx-auto rounded-[1000px] text-[16px] sm:text-[17px] font-bold shadow-md hover:opacity-95 transition flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
               style={{
                 height: "48px",
@@ -154,38 +248,80 @@ function VerifyMobileContent() {
               {isSubmitting ? "Verifying..." : "Confirm"}
             </button>
 
-            {error && (
-              <p className="text-[12px] mt-1" style={{ color: "#F2B541" }}>
-                {error}
+            <div className="flex flex-col items-center gap-1 -mt-4">
+              <p className="text-[11px] sm:text-[12px]" style={{ color: "#FFFFFF" }}>
+                {otpExpiryLabel}
               </p>
-            )}
 
+              {error && (
+                <p className="text-[12px]" style={{ color: "#F2B541" }}>
+                  {error}
+                </p>
+              )}
+
+              <p className="text-[11px] sm:text-[12px]" style={{ color: "#F2B541" }}>
+                Attempts used: {otpAttemptsUsed}/{OTP_MAX_ATTEMPTS}
+              </p>
+
+              {hasReachedMaxAttempts ? (
+                <p className="text-[12px] sm:text-[13px]" style={{ color: "#F2B541" }}>
+                  {MAX_ATTEMPTS_REACHED_MESSAGE}
+                </p>
+              ) : (
             <button
               type="button"
+              disabled={!canResend}
               onClick={async () => {
+                if (hasReachedMaxAttempts) {
+                  setError(MAX_ATTEMPTS_REACHED_MESSAGE);
+                  return;
+                }
+                if (cooldownSecondsLeft > 0) return;
+
+                setIsResending(true);
                 setInfo("");
                 setError("");
+                setCode(["", "", "", ""]);
                 try {
-                  const result = await verifyMobileOtp({ mobile: contact, action: "resend" });
+                  const result = await verifyMobileOtp({
+                    mobile: contact,
+                    action: "resend",
+                  });
                   setInfo(result.message || "Code resent successfully.");
+
+                  const nextExpiresAt =
+                    Date.now() + OTP_COOLDOWN_SECONDS * 1000;
+                  sessionStorage.setItem(otpExpiresAtKey, String(nextExpiresAt));
+                  setCooldownExpiresAt(nextExpiresAt);
+
+                  setOtpAttemptsUsed(0);
+                  sessionStorage.setItem(otpAttemptsUsedKey, "0");
                 } catch (err) {
                   if (isApiConnectionError(err)) {
                     router.push("/backend-error");
                     return;
                   }
                   setError(err instanceof Error ? err.message : "Could not resend code.");
+                } finally {
+                  setIsResending(false);
                 }
               }}
-              className="text-[12px] sm:text-[13px] underline font-semibold"
+              className={VERIFY_OTP_RESEND_CLASS}
               style={{ color: "#FFFFFF" }}
             >
-              Resend CODE
+              {cooldownSecondsLeft > 0
+                ? `Resend CODE (${cooldownSecondsLeft}s)`
+                : isResending
+                  ? "Resending..."
+                  : "Resend CODE"}
             </button>
-            {info && (
-              <p className="text-[11px] sm:text-[12px] mt-1" style={{ color: "#FFFFFF" }}>
-                {info}
-              </p>
-            )}
+              )}
+              {info && !hasReachedMaxAttempts && (
+                <p className="text-[11px] sm:text-[12px]" style={{ color: "#FFFFFF" }}>
+                  {info}
+                </p>
+              )}
+            </div>
           </form>
         </div>
       </div>

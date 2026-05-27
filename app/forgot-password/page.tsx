@@ -4,22 +4,33 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { forgotPassword, isApiConnectionError } from "@/lib/api";
+import { getEmailValidationError } from "@/lib/emailValidation";
 import { assetPath } from "@/lib/paths";
 import { stripContactWhitespace } from "@/lib/resetFlowValidation";
-import { MAX_MOBILE_INPUT_LENGTH } from "@/lib/signupPhoneCountries";
+import {
+  looksLikeMobileContactInput,
+  MAX_MOBILE_INPUT_LENGTH,
+  mobileContactMaxLengthMessage,
+  normalizeInternationalMobileContact,
+  validateInternationalMobileContact,
+} from "@/lib/signupPhoneCountries";
 
 const EMAIL_MAX_LENGTH = 254;
 const EMAIL_MAX_ERROR = `Email cannot exceed ${EMAIL_MAX_LENGTH} characters.`;
-const MOBILE_MAX_ERROR = `Mobile number cannot exceed ${MAX_MOBILE_INPUT_LENGTH} characters.`;
 
-/** Treat a value as mobile-format when it has digits and only allowed mobile chars. */
-const looksLikeMobile = (value: string): boolean =>
-  value.length > 0 && /^\+?\d*$/.test(value);
+function clearOtpSessionForContact(
+  contact: string,
+  channel: "email" | "mobile",
+) {
+  const contactKey = encodeURIComponent(contact.trim());
+  sessionStorage.removeItem(`stackly-otp-attempts-used-${channel}-${contactKey}`);
+  sessionStorage.removeItem(`stackly-otp-expires-at-${channel}-${contactKey}`);
+}
 
 function ForgotPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState("");
+  const [contactInput, setContactInput] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,57 +43,81 @@ function ForgotPasswordContent() {
         ? "Alternative mobile number"
         : "Email or mobile number";
 
-  const validateEmail = (value: string) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim().toLowerCase());
-
-  const isMobile = (value: string) =>
-    /^\+?[0-9]{6,15}$/.test(value.trim());
+  const treatAsMobile = looksLikeMobileContactInput(contactInput);
+  const inputMaxLength = treatAsMobile ? MAX_MOBILE_INPUT_LENGTH : EMAIL_MAX_LENGTH;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setMessage("");
-    const trimmed = email.trim();
+
+    const trimmed = contactInput.trim();
     if (!trimmed) {
       setError("Enter a valid email or mobile number");
       return;
     }
 
-    if (looksLikeMobile(trimmed) && trimmed.length > MAX_MOBILE_INPUT_LENGTH) {
-      setError(MOBILE_MAX_ERROR);
-      return;
-    }
-    if (!looksLikeMobile(trimmed) && trimmed.length > EMAIL_MAX_LENGTH) {
-      setError(EMAIL_MAX_ERROR);
-      return;
-    }
+    const isMobileFlow = looksLikeMobileContactInput(trimmed);
+    let verifyRoute: "/verify-email" | "/verify-mobile";
+    let apiInput: string;
+    let verifyContact: string;
 
-    const isEmailContact = validateEmail(trimmed);
-    const isMobileContact = isMobile(trimmed);
+    if (isMobileFlow) {
+      const mobileError = validateInternationalMobileContact(trimmed);
+      if (mobileError) {
+        setError(mobileError);
+        return;
+      }
 
-    if (!isEmailContact && !isMobileContact) {
-      setError("Enter a valid email or mobile number");
-      return;
+      const normalizedMobile = normalizeInternationalMobileContact(trimmed);
+      if (!normalizedMobile) {
+        setError("Enter a valid email or mobile number");
+        return;
+      }
+
+      verifyRoute = "/verify-mobile";
+      apiInput = normalizedMobile;
+      verifyContact = normalizedMobile;
+    } else {
+      const emailError = getEmailValidationError(trimmed.toLowerCase());
+      if (emailError) {
+        setError(emailError);
+        return;
+      }
+
+      verifyRoute = "/verify-email";
+      apiInput = trimmed.toLowerCase();
+      verifyContact = apiInput;
     }
-    const targetRoute = isEmailContact ? "/verify-email" : "/verify-mobile";
-    const encodedContact = encodeURIComponent(trimmed);
 
     try {
       setIsSubmitting(true);
       const data = await forgotPassword({
-        input: isEmailContact ? trimmed.toLowerCase() : trimmed,
+        input: apiInput,
         isChange: Boolean(changeFrom),
         primaryUser: searchParams.get("primaryUser") || undefined,
       });
 
       setMessage(data.message || "OTP sent successfully.");
-      router.push(`${targetRoute}?contact=${encodedContact}`);
+
+      clearOtpSessionForContact(
+        verifyContact,
+        verifyRoute === "/verify-email" ? "email" : "mobile",
+      );
+
+      router.push(
+        `${verifyRoute}?contact=${encodeURIComponent(verifyContact)}`,
+      );
     } catch (error) {
       if (isApiConnectionError(error)) {
         router.push("/backend-error");
         return;
       }
-      setMessage(error instanceof Error ? error.message : "Could not send OTP. Try again later.");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Could not send OTP. Try again later.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -129,26 +164,28 @@ function ForgotPasswordContent() {
                     type="text"
                     inputMode="email"
                     placeholder={contactPlaceholder}
-                    value={email}
-                    maxLength={EMAIL_MAX_LENGTH}
+                    value={contactInput}
+                    maxLength={inputMaxLength}
                     onChange={(e) => {
                       const cleaned = stripContactWhitespace(e.target.value);
-                      const treatAsMobile = looksLikeMobile(cleaned);
-                      const cap = treatAsMobile
+                      const mobileInput = looksLikeMobileContactInput(cleaned);
+                      const cap = mobileInput
                         ? MAX_MOBILE_INPUT_LENGTH
                         : EMAIL_MAX_LENGTH;
                       if (cleaned.length > cap) {
-                        setEmail(cleaned.slice(0, cap));
+                        setContactInput(cleaned.slice(0, cap));
                         setError(
-                          treatAsMobile ? MOBILE_MAX_ERROR : EMAIL_MAX_ERROR
+                          mobileInput
+                            ? mobileContactMaxLengthMessage()
+                            : EMAIL_MAX_ERROR,
                         );
                         return;
                       }
-                      setEmail(cleaned);
+                      setContactInput(cleaned);
                       setError("");
                     }}
                     onBlur={() => {
-                      setEmail((prev) => prev.trim());
+                      setContactInput((prev) => prev.trim());
                     }}
                     className="forgot-input w-full h-12 px-5 rounded-[1000px] border text-[14px] text-center outline-none focus:border-white transition bg-transparent"
                     style={{
