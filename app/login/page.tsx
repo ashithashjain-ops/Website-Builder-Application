@@ -17,6 +17,10 @@ import {
 import { isApiConnectionError, login as loginApi } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
 import {
+  getSignupEmailValidationError,
+  shouldValidateSignupEmailLive,
+} from "@/lib/emailValidation";
+import {
   capSimpleMobileContactInput,
   countMobileDigits,
   looksLikeMobileContactInput,
@@ -26,6 +30,10 @@ import {
   validateSimpleMobileContact,
 } from "@/lib/simpleMobileContact";
 import AuthGoogleButton from "@/components/AuthGoogleButton";
+
+function normalizeLoginEmail(raw: string): string {
+  return raw.replace(/\s/g, "").trim().toLowerCase();
+}
 
 type LoginFormState = {
   email: string;
@@ -185,14 +193,15 @@ export default function LoginPage() {
       if (mobileError) {
         newErrors.email = mobileError;
       }
-    } else if (trimmedContact.length > EMAIL_MAX_LENGTH) {
-      newErrors.email = EMAIL_MAX_ERROR;
     } else {
-      const isEmail = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|in|org|net|edu)$/i.test(
-        trimmedContact.toLowerCase(),
-      );
-      if (!isEmail) {
-        newErrors.email = "Enter valid email or mobile number.";
+      const emailNormalized = normalizeLoginEmail(trimmedContact);
+      if (emailNormalized.length > EMAIL_MAX_LENGTH) {
+        newErrors.email = EMAIL_MAX_ERROR;
+      } else {
+        const emailError = getSignupEmailValidationError(emailNormalized);
+        if (emailError) {
+          newErrors.email = emailError;
+        }
       }
     }
 
@@ -266,20 +275,53 @@ export default function LoginPage() {
         ...prev,
         [field]: field === "email" ? contactValue : rawValue,
       }));
-      setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
+
+      if (field === "email") {
+        const trimmed = contactValue.trim();
+        if (looksLikeMobileContactInput(trimmed)) {
+          const mobileError = validateSimpleMobileContact(trimmed);
+          setErrors((prev) => ({
+            ...prev,
+            email: mobileError ?? undefined,
+            form: undefined,
+          }));
+        } else {
+          const emailNormalized = normalizeLoginEmail(trimmed);
+          const emailError = shouldValidateSignupEmailLive(emailNormalized)
+            ? getSignupEmailValidationError(emailNormalized)
+            : undefined;
+          setErrors((prev) => ({
+            ...prev,
+            email: emailError,
+            form: undefined,
+          }));
+        }
+      } else {
+        setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
+      }
     };
 
   const handleContactBlur = () => {
     const trimmed = form.email.trim();
     setForm((prev) => ({ ...prev, email: trimmed }));
-    if (trimmed && looksLikeMobileContactInput(trimmed)) {
+    if (!trimmed) {
+      return;
+    }
+    if (looksLikeMobileContactInput(trimmed)) {
       const mobileError = validateSimpleMobileContact(trimmed);
       setErrors((errs) => ({
         ...errs,
         email: mobileError ?? undefined,
         form: undefined,
       }));
+      return;
     }
+    const emailError = getSignupEmailValidationError(normalizeLoginEmail(trimmed));
+    setErrors((errs) => ({
+      ...errs,
+      email: emailError,
+      form: undefined,
+    }));
   };
 
   const handleLogin = async (event: React.FormEvent) => {
@@ -296,10 +338,11 @@ export default function LoginPage() {
       setErrors((prev) => ({ ...prev, form: undefined }));
 
       const contact = form.email.trim();
-
       const isMobileContact = isValidSimpleMobileContact(contact);
       const result = await loginApi({
-        ...(isMobileContact ? { mobile: contact } : { email: contact.toLowerCase() }),
+        ...(isMobileContact
+          ? { mobile: contact }
+          : { email: normalizeLoginEmail(contact) }),
         password: form.password,
       });
 

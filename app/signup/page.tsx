@@ -18,7 +18,12 @@ import {
   mountAuthAndroidClass,
   mountSignupPhoneStackedClass,
 } from "@/lib/authMobileTouch";
-import { EMAIL_MAX_ERROR, getEmailValidationError } from "@/lib/emailValidation";
+import {
+  EMAIL_MAX_ERROR,
+  getSignupEmailValidationError,
+  shouldValidateSignupEmailLive,
+  SIGNUP_EMAIL_DOMAIN_ERROR,
+} from "@/lib/emailValidation";
 import {
   DEFAULT_SIGNUP_PHONE_COUNTRY_ID,
   SIGNUP_PHONE_COUNTRIES,
@@ -215,7 +220,7 @@ export default function SignupPage() {
     }
 
     const emailNormalized = normalizeSignupEmail(values.email);
-    const emailError = getEmailValidationError(emailNormalized);
+    const emailError = getSignupEmailValidationError(emailNormalized);
     if (emailError) {
       newErrors.email = emailError;
     }
@@ -322,8 +327,18 @@ export default function SignupPage() {
           [field]: passwordWhitespaceRemoved ? PASSWORD_WHITESPACE_ERROR : undefined,
           form: undefined,
         }));
+      } else if (field === "email") {
+        const normalized = normalizeSignupEmail(raw);
+        const emailError = shouldValidateSignupEmailLive(normalized)
+          ? getSignupEmailValidationError(normalized)
+          : undefined;
+        setErrors((prev) => ({
+          ...prev,
+          email: emailError,
+          form: undefined,
+        }));
       } else {
-      setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
+        setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
       }
     };
 
@@ -337,7 +352,7 @@ export default function SignupPage() {
       ...prev,
       email: stripEmailWhitespace(prev.email).trim(),
     }));
-    const emailError = getEmailValidationError(emailNormalized);
+    const emailError = getSignupEmailValidationError(emailNormalized);
     setErrors((prev) => ({
       ...prev,
       email: emailError,
@@ -417,6 +432,26 @@ export default function SignupPage() {
         setErrors((prev) => ({
           ...prev,
           email: "Email is required.",
+          form: undefined,
+        }));
+        return;
+      }
+      const lowerMessage = message.toLowerCase();
+      if (
+        lowerMessage.includes("valid email") ||
+        lowerMessage.includes("gmail") ||
+        lowerMessage.includes("outlook") ||
+        lowerMessage.includes("yahoo") ||
+        lowerMessage.includes("stackly")
+      ) {
+        setErrors((prev) => ({
+          ...prev,
+          email:
+            message === "Enter valid email"
+              ? "Please enter a valid email address."
+              : message.includes("Only Gmail")
+                ? SIGNUP_EMAIL_DOMAIN_ERROR
+                : message,
           form: undefined,
         }));
         return;

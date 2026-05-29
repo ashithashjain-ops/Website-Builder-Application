@@ -35,6 +35,9 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_BASE_PATH: /Website-Builder-Application
+          # Set in repo secrets when Razorpay API is hosted (see .env.example)
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ secrets.NEXT_PUBLIC_RAZORPAY_KEY_ID }}
+          NEXT_PUBLIC_RAZORPAY_API_BASE: ${{ secrets.NEXT_PUBLIC_RAZORPAY_API_BASE }}
 
       - name: Disable Jekyll processing
         run: touch out/.nojekyll

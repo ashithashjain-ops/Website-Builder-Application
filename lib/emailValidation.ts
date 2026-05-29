@@ -211,6 +211,60 @@ export function isValidEmailAddress(email: string): boolean {
   return getEmailValidationError(email) === undefined;
 }
 
+/** Allowed domains for signup (aligned with backend register). */
+export const SIGNUP_ALLOWED_EMAIL_DOMAINS = [
+  "gmail.com",
+  "yahoo.in",
+  "outlook.com",
+  "thestackly.com",
+] as const;
+
+const SIGNUP_ALLOWED_DOMAIN_SET = new Set<string>(
+  SIGNUP_ALLOWED_EMAIL_DOMAINS.map((domain) => domain.toLowerCase()),
+);
+
+export const SIGNUP_EMAIL_DOMAIN_ERROR =
+  "Only Gmail, Yahoo, Outlook, and Stackly email addresses are allowed.";
+
+/**
+ * Signup email: structural checks plus allowed provider domains only.
+ */
+export function getSignupEmailValidationError(
+  email: string,
+  options?: { required?: boolean },
+): string | undefined {
+  const structuralError = getEmailValidationError(email, options);
+  if (structuralError) {
+    return structuralError;
+  }
+
+  if (!email) {
+    return undefined;
+  }
+
+  const atIndex = email.indexOf("@");
+  const domain = email.slice(atIndex + 1).toLowerCase();
+  if (!SIGNUP_ALLOWED_DOMAIN_SET.has(domain)) {
+    return SIGNUP_EMAIL_DOMAIN_ERROR;
+  }
+
+  return undefined;
+}
+
+export function isValidSignupEmailAddress(email: string): boolean {
+  return getSignupEmailValidationError(email) === undefined;
+}
+
+/** Run signup email validation once the address looks complete enough to check. */
+export function shouldValidateSignupEmailLive(email: string): boolean {
+  const atIndex = email.indexOf("@");
+  if (atIndex <= 0) {
+    return false;
+  }
+  const domain = email.slice(atIndex + 1);
+  return domain.includes(".") && domain.indexOf(".") < domain.length - 1;
+}
+
 export function getEmailValidationError(
   email: string,
   options?: { required?: boolean },

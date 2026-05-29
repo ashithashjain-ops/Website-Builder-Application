@@ -5,6 +5,16 @@ import { FaCheckCircle } from "react-icons/fa";
 import Footer from "@/components/Footer";
 import { downloadPlanningInvoiceForEntry } from "@/lib/planningInvoiceHtml";
 import type { PlanningInvoiceContactDefaults } from "@/lib/planningInvoiceHtml";
+import {
+  createRazorpayOrder,
+  formatInrFromDisplayPrice,
+  getRazorpaySetupHint,
+  isRazorpayDemoMode,
+  loadRazorpayCheckoutScript,
+  openRazorpayCheckout,
+  parseDisplayPriceToPaise,
+  verifyRazorpayPayment,
+} from "@/lib/razorpayClient";
 
 /**
  * Shown in the header until session/API provides the real name.
@@ -79,52 +89,6 @@ const plans = [
 
 type Plan = (typeof plans)[number];
 type PlanningView = "plans" | "payment" | "invoice" | "history";
-type PaymentMethodId = "paypal" | "card" | "netbanking" | "online";
-
-const CARD_NUMBER_MAX_LEN = 19;
-const CARD_CVV_MAX_LEN = 4;
-
-function cardDigitsOnly(value: string, maxLen: number) {
-  return value.replace(/\D/g, "").slice(0, maxLen);
-}
-
-/** Digits only, shown as MM/YY after the month (slash is not a digit; typed / is stripped). */
-function formatCardExpiryMmYy(value: string) {
-  const d = value.replace(/\D/g, "").slice(0, 4);
-  if (d.length <= 2) return d;
-  return `${d.slice(0, 2)}/${d.slice(2)}`;
-}
-
-function isValidEmailFormat(value: string) {
-  const t = value.trim();
-  if (!t) return false;
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t);
-}
-
-function isValidCardExpiryMmYy(value: string) {
-  const raw = value.replace(/\D/g, "");
-  if (raw.length !== 4) return false;
-  const month = Number.parseInt(raw.slice(0, 2), 10);
-  if (month < 1 || month > 12) return false;
-  const yy = Number.parseInt(raw.slice(2, 4), 10);
-  const now = new Date();
-  const cy = now.getFullYear() % 100;
-  const cm = now.getMonth() + 1;
-  if (yy > cy) return true;
-  if (yy < cy) return false;
-  return month >= cm;
-}
-
-function isValidCvv(value: string) {
-  const d = value.replace(/\D/g, "");
-  return d.length === 3 || d.length === 4;
-}
-
-function isValidUpiId(value: string) {
-  const t = value.trim();
-  if (t.length < 5) return false;
-  return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(t);
-}
 
 type BillingHistoryEntry = {
   date: string;
@@ -320,52 +284,6 @@ function saveBillingHistoryToStorage(entries: BillingHistoryEntry[]) {
   }
 }
 
-function paymentMethodInvoiceLabel(id: PaymentMethodId): string {
-  switch (id) {
-    case "paypal":
-      return "PayPal";
-    case "card":
-      return "Credit / Debit card";
-    case "netbanking":
-      return "Net banking";
-    case "online":
-      return "UPI / Wallet";
-    default:
-      return "Payment";
-  }
-}
-
-type PaymentMaskParams = {
-  isFree: boolean;
-  method: PaymentMethodId;
-  paypalEmail: string;
-  cardNumber: string;
-  cardExpiry: string;
-  netBank: string;
-  onlineWallet: "gpay" | "phonepe";
-  upiId: string;
-};
-
-function buildPaymentMaskDetail(p: PaymentMaskParams): string {
-  if (p.isFree) return "No charge — complimentary activation.";
-  switch (p.method) {
-    case "paypal":
-      return `PayPal · ${p.paypalEmail.trim()}`;
-    case "card": {
-      const last = p.cardNumber.replace(/\D/g, "").slice(-4) || "****";
-      return `Card payment · ****${last} · exp ${p.cardExpiry || "—"}`;
-    }
-    case "netbanking":
-      return `Net banking · ${p.netBank.trim() || "Selected bank"}`;
-    case "online": {
-      const w = p.onlineWallet === "gpay" ? "Google Pay" : "PhonePe";
-      return `${w} · UPI ${p.upiId.trim()}`;
-    }
-    default:
-      return "Online payment";
-  }
-}
-
 /** Stackly-branded HTML invoice (open file and use browser Print → Save as PDF if needed). */
 async function downloadBillingInvoiceSummary(entry: BillingHistoryEntry) {
   if (typeof window === "undefined") return;
@@ -378,14 +296,6 @@ export default function PlanningPage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [isFreeCheckout, setIsFreeCheckout] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>("card");
-  const [paypalEmail, setPaypalEmail] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCvv, setCardCvv] = useState("");
-  const [netBank, setNetBank] = useState("");
-  const [onlineWallet, setOnlineWallet] = useState<"gpay" | "phonepe">("gpay");
-  const [upiId, setUpiId] = useState("");
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null);
   const [billingHistory, setBillingHistory] = useState<BillingHistoryEntry[]>(DEFAULT_BILLING_HISTORY);
@@ -416,11 +326,6 @@ export default function PlanningPage() {
     if (stored) setBillingHistory(stored);
   }, []);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPaymentError(null);
-  }, [paymentMethod, paypalEmail, cardNumber, cardExpiry, cardCvv, netBank, upiId, onlineWallet]);
-
   function getActivePrice(plan: Plan) {
     return {
       oldPrice: billingYearly ? plan.yearlyOldPrice : plan.oldPrice,
@@ -435,14 +340,7 @@ export default function PlanningPage() {
     setPlanningView("payment");
     setPaymentLoading(false);
     setIsFreeCheckout(freeCheckout);
-    setPaymentMethod("card");
-    setPaypalEmail("");
-    setCardNumber("");
-    setCardExpiry("");
-    setCardCvv("");
-    setNetBank("");
-    setOnlineWallet("gpay");
-    setUpiId("");
+    setPaymentError(null);
   }
 
   function handleBackToPlans() {
@@ -453,111 +351,131 @@ export default function PlanningPage() {
     setIsFreeCheckout(false);
   }
 
-  function getPaymentValidationError(): string | null {
-    if (isFreeCheckout) return null;
-    switch (paymentMethod) {
-      case "paypal":
-        return isValidEmailFormat(paypalEmail) ? null : "Enter a valid PayPal email address.";
-      case "card": {
-        const digits = cardNumber.replace(/\D/g, "");
-        if (digits.length < 13 || digits.length > 19) {
-          return "Enter a complete card number (13–19 digits).";
-        }
-        if (!isValidCardExpiryMmYy(cardExpiry)) {
-          return "Enter a valid expiry date (MM/YY) that is not in the past.";
-        }
-        if (!isValidCvv(cardCvv)) {
-          return "Enter a valid CVV (3 or 4 digits).";
-        }
-        return null;
-      }
-      case "netbanking":
-        return netBank.trim() ? null : "Select your bank.";
-      case "online":
-        return isValidUpiId(upiId) ? null : "Enter a valid UPI ID (for example name@upi or name@okaxis).";
-      default:
-        return null;
-    }
-  }
-
-  function paymentSubtitle() {
-    switch (paymentMethod) {
-      case "paypal":
-        return "Sign in with PayPal to complete your upgrade.";
-      case "card":
-        return "Enter your card details to upgrade.";
-      case "netbanking":
-        return "Choose your bank and authorize payment.";
-      case "online":
-        return "Pay with UPI — open your app or enter your UPI ID.";
-      default:
-        return "Enter your payment details to Upgrade";
-    }
-  }
-
-  function handleCompletePayment() {
+  function finalizeCheckout(opts: {
+    isFree: boolean;
+    paymentMethodLabel: string;
+    paymentDetail: string;
+  }) {
     if (!selectedPlan) return;
-    const err = getPaymentValidationError();
-    if (err) {
-      setPaymentError(err);
+    const now = new Date();
+    const invoiceId = `INV-${Math.floor(100000 + Math.random() * 899999)}`;
+    const active = getActivePrice(selectedPlan);
+    const finalAmount = opts.isFree ? "$0" : active.newPrice;
+    const createdInvoice: InvoiceData = {
+      invoiceId,
+      date: now.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
+      planName: `${selectedPlan.name} ${opts.isFree ? "(Free)" : billingYearly ? "(Yearly)" : "(Monthly)"}`,
+      amount: finalAmount,
+      name: PLANNING_DISPLAY_USER_NAME,
+      email: PLANNING_INVOICE_CONTACT.email,
+      contactNo: PLANNING_INVOICE_CONTACT.phone,
+      address: PLANNING_INVOICE_CONTACT.address,
+    };
+    setInvoiceData(createdInvoice);
+    setBillingHistory((prev) => {
+      const row: BillingHistoryEntry = {
+        date: createdInvoice.date,
+        invoiceId: createdInvoice.invoiceId,
+        amount: createdInvoice.amount,
+        status: opts.isFree ? "Free" : "Paid",
+        planName: createdInvoice.planName,
+        planTier: selectedPlan.name,
+        websiteLabel: "Stackly workspace subscription",
+        paymentMethodLabel: opts.paymentMethodLabel,
+        paymentDetail: opts.paymentDetail,
+        buyerName: createdInvoice.name,
+        buyerEmail: createdInvoice.email,
+        buyerPhone: createdInvoice.contactNo,
+        buyerAddress: createdInvoice.address,
+        generatedAt: now.toISOString(),
+      };
+      const next = [row, ...prev.filter((e) => e.invoiceId !== row.invoiceId)];
+      saveBillingHistoryToStorage(next);
+      return next;
+    });
+    setPaymentLoading(false);
+    setIsFreeCheckout(false);
+    setPlanningView("invoice");
+  }
+
+  async function handlePayWithRazorpay() {
+    if (!selectedPlan) return;
+
+    if (isFreeCheckout) {
+      setPaymentError(null);
+      setPaymentLoading(true);
+      finalizeCheckout({
+        isFree: true,
+        paymentMethodLabel: "Complimentary",
+        paymentDetail: "No charge — complimentary activation.",
+      });
       return;
     }
+
+    if (isRazorpayDemoMode()) {
+      setPaymentError(null);
+      setPaymentLoading(true);
+      await new Promise((r) => window.setTimeout(r, 900));
+      finalizeCheckout({
+        isFree: false,
+        paymentMethodLabel: "Razorpay (demo)",
+        paymentDetail: "Demo payment — add real Razorpay Test keys in .env.local for live checkout.",
+      });
+      return;
+    }
+
     setPaymentError(null);
     setPaymentLoading(true);
-    window.setTimeout(() => {
-      const now = new Date();
-      const invoiceId = `INV-${Math.floor(100000 + Math.random() * 899999)}`;
+
+    try {
+      await loadRazorpayCheckoutScript();
       const active = getActivePrice(selectedPlan);
-      const finalAmount = isFreeCheckout ? "$0" : active.newPrice;
-      const createdInvoice: InvoiceData = {
-        invoiceId,
-        date: now.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
-        planName: `${selectedPlan.name} ${isFreeCheckout ? "(Free)" : billingYearly ? "(Yearly)" : "(Monthly)"}`,
-        amount: finalAmount,
-        name: PLANNING_DISPLAY_USER_NAME,
-        email: "srinu@gmail.com",
-        contactNo: "9848xxxx19",
-        address: "Chennai - 636008",
-      };
-      setInvoiceData(createdInvoice);
-      setBillingHistory((prev) => {
-        const row: BillingHistoryEntry = {
-          date: createdInvoice.date,
-          invoiceId: createdInvoice.invoiceId,
-          amount: createdInvoice.amount,
-          status: isFreeCheckout ? "Free" : "Paid",
-          planName: createdInvoice.planName,
-          planTier: selectedPlan.name,
-          websiteLabel: "Stackly workspace subscription",
-          paymentMethodLabel: paymentMethodInvoiceLabel(paymentMethod),
-          paymentDetail: buildPaymentMaskDetail({
-            isFree: isFreeCheckout,
-            method: paymentMethod,
-            paypalEmail,
-            cardNumber,
-            cardExpiry,
-            netBank,
-            onlineWallet,
-            upiId,
-          }),
-          buyerName: createdInvoice.name,
-          buyerEmail: createdInvoice.email,
-          buyerPhone: createdInvoice.contactNo,
-          buyerAddress: createdInvoice.address,
-          generatedAt: now.toISOString(),
-        };
-        const next = [row, ...prev.filter((e) => e.invoiceId !== row.invoiceId)];
-        saveBillingHistoryToStorage(next);
-        return next;
+      const amountPaise = parseDisplayPriceToPaise(active.newPrice);
+      if (amountPaise < 100) {
+        setPaymentError("Invalid plan amount for payment.");
+        setPaymentLoading(false);
+        return;
+      }
+
+      const order = await createRazorpayOrder({
+        amountPaise,
+        planName: selectedPlan.name,
+        billingPeriod: billingYearly ? "Yearly" : "Monthly",
       });
+
       setPaymentLoading(false);
-      setIsFreeCheckout(false);
-      setPlanningView("invoice");
-    }, 2400);
+
+      openRazorpayCheckout({
+        order,
+        planLabel: `${selectedPlan.name} (${billingYearly ? "Yearly" : "Monthly"})`,
+        customerName: PLANNING_DISPLAY_USER_NAME,
+        customerEmail: PLANNING_INVOICE_CONTACT.email,
+        customerPhone: PLANNING_INVOICE_CONTACT.phone,
+        onDismiss: () => setPaymentLoading(false),
+        onSuccess: async (response) => {
+          setPaymentLoading(true);
+          try {
+            const verified = await verifyRazorpayPayment(response);
+            if (!verified) throw new Error("Payment verification failed");
+            finalizeCheckout({
+              isFree: false,
+              paymentMethodLabel: "Razorpay",
+              paymentDetail: `Payment ${response.razorpay_payment_id} · Order ${response.razorpay_order_id}`,
+            });
+          } catch (e) {
+            setPaymentError(e instanceof Error ? e.message : "Payment failed");
+            setPaymentLoading(false);
+          }
+        },
+      });
+    } catch (e) {
+      setPaymentError(e instanceof Error ? e.message : "Could not start payment");
+      setPaymentLoading(false);
+    }
   }
 
   return (
-    <main className="planning-page flex min-h-[100dvh] w-full flex-col bg-slate-100">
+    <main className="planning-page flex min-h-[100dvh] w-full flex-col overflow-x-hidden bg-slate-100">
       <div className="w-full flex-1">
         <div className="w-full border border-slate-200 bg-white shadow-sm">
           <section
@@ -748,176 +666,56 @@ export default function PlanningPage() {
                     </button>
                   </div>
                   <div className="text-center">
-                    <h2 className="text-2xl font-bold sm:text-3xl">Secure Payment</h2>
-                    <p className="mt-2 text-xs text-white/85 sm:text-sm">{paymentSubtitle()}</p>
+                    <h2 className="text-2xl font-bold sm:text-3xl">
+                      {isFreeCheckout ? "Activate free plan" : "Pay with Razorpay"}
+                    </h2>
+                    <p className="mt-2 text-xs text-white/85 sm:text-sm">
+                      {isFreeCheckout
+                        ? "No payment required — your free plan will be activated immediately."
+                        : "Card, UPI, netbanking, and wallets are supported via Razorpay Checkout."}
+                    </p>
                   </div>
                 </div>
                 <div className="mx-auto w-full px-4 py-6 sm:px-6 sm:py-8" style={{ maxWidth: 500 }}>
-                  <div className="grid gap-3 text-xs sm:grid-cols-2 sm:text-sm">
-                    <label className="planning-payment-option flex cursor-pointer items-start gap-2 rounded-lg border border-white/15 bg-white/10 p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/15">
-                      <input
-                        type="radio"
-                        name="pm"
-                        className="planning-pm-radio mt-0.5 h-4 w-4 shrink-0 accent-white"
-                        checked={paymentMethod === "paypal"}
-                        onChange={() => setPaymentMethod("paypal")}
-                      />
-                      <span className="min-w-0 flex-1 leading-snug">Paypal</span>
-                    </label>
-                    <label className="planning-payment-option flex cursor-pointer items-start gap-2 rounded-lg border border-white/15 bg-white/10 p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/15">
-                      <input
-                        type="radio"
-                        name="pm"
-                        className="planning-pm-radio mt-0.5 h-4 w-4 shrink-0 accent-white"
-                        checked={paymentMethod === "card"}
-                        onChange={() => setPaymentMethod("card")}
-                      />
-                      <span className="min-w-0 flex-1 leading-snug">Credit / Debit Card</span>
-                    </label>
-                    <label className="planning-payment-option flex cursor-pointer items-start gap-2 rounded-lg border border-white/15 bg-white/10 p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/15">
-                      <input
-                        type="radio"
-                        name="pm"
-                        className="planning-pm-radio mt-0.5 h-4 w-4 shrink-0 accent-white"
-                        checked={paymentMethod === "netbanking"}
-                        onChange={() => setPaymentMethod("netbanking")}
-                      />
-                      <span className="min-w-0 flex-1 leading-snug">Net Banking</span>
-                    </label>
-                    <label className="planning-payment-option flex cursor-pointer items-start gap-2 rounded-lg border border-white/15 bg-white/10 p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/15">
-                      <input
-                        type="radio"
-                        name="pm"
-                        className="planning-pm-radio mt-0.5 h-4 w-4 shrink-0 accent-white"
-                        checked={paymentMethod === "online"}
-                        onChange={() => setPaymentMethod("online")}
-                      />
-                      <span className="min-w-0 flex-1 leading-snug">Online (GPay / PhonePe)</span>
-                    </label>
-                  </div>
-
-                  <div className="planning-payment-form-card mt-5 rounded-xl border border-white/15 bg-white/10 p-4 text-xs shadow-lg shadow-blue-950/10 backdrop-blur sm:p-5 sm:text-sm">
-                    {paymentMethod === "paypal" && (
-                      <div className="space-y-3">
-                        <p className="text-white/80">You will be redirected to PayPal to log in and approve this payment.</p>
-                        <input
-                          value={paypalEmail}
-                          onChange={(e) => setPaypalEmail(e.target.value)}
-                          type="email"
-                          inputMode="email"
-                          autoComplete="email"
-                          placeholder="PayPal email"
-                          className="block w-full rounded-lg border border-white/30 bg-white/10 px-3 py-2.5 text-xs text-white shadow-inner placeholder:text-white/70 focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:text-sm"
-                          style={{ width: "100%" }}
-                        />
-                      </div>
-                    )}
-
-                    {paymentMethod === "card" && (
-                      <div>
-                        <input
-                          type="text"
-                          value={cardNumber}
-                          onChange={(e) => setCardNumber(cardDigitsOnly(e.target.value, CARD_NUMBER_MAX_LEN))}
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          autoComplete="cc-number"
-                          placeholder="Card Number"
-                          className="mb-4 block w-full rounded-lg border border-white/30 bg-white/10 px-3 py-2.5 text-xs text-white shadow-inner placeholder:text-white/70 focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:text-sm"
-                          style={{ width: "100%" }}
-                        />
-                        <div
-                          className="planning-payment-card-row grid grid-cols-2 gap-2"
-                          style={{ width: "100%" }}
-                        >
-                          <input
-                            type="text"
-                            value={cardExpiry}
-                            onChange={(e) => setCardExpiry(formatCardExpiryMmYy(e.target.value))}
-                            inputMode="numeric"
-                            pattern="[0-9/]*"
-                            autoComplete="cc-exp"
-                            placeholder="MM/YY"
-                            className="planning-payment-expiry min-w-0 rounded-lg border border-white/30 bg-white/10 px-2 py-2.5 text-xs text-white shadow-inner placeholder:text-white/70 focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:px-3 sm:text-sm"
-                          />
-                          <input
-                            type="text"
-                            value={cardCvv}
-                            onChange={(e) => setCardCvv(cardDigitsOnly(e.target.value, CARD_CVV_MAX_LEN))}
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            autoComplete="cc-csc"
-                            placeholder="Cvv"
-                            className="planning-payment-cvv min-w-0 rounded-lg border border-white/30 bg-white/10 px-2 py-2.5 text-xs text-white shadow-inner placeholder:text-white/70 focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:px-3 sm:text-sm"
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {paymentMethod === "netbanking" && (
-                      <div className="space-y-3">
-                        <label className="block text-white/90">Select your bank</label>
-                        <select
-                          value={netBank}
-                          onChange={(e) => setNetBank(e.target.value)}
-                          className="w-full rounded-lg border border-white/30 bg-[#0a2a5f]/80 px-3 py-2.5 text-xs text-white shadow-inner focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:text-sm"
-                        >
-                          <option value="">Choose bank…</option>
-                          <option value="hdfc">HDFC Bank</option>
-                          <option value="icici">ICICI Bank</option>
-                          <option value="sbi">State Bank of India</option>
-                          <option value="axis">Axis Bank</option>
-                          <option value="kotak">Kotak Mahindra Bank</option>
-                          <option value="other">Other bank</option>
-                        </select>
-                        <p className="text-[11px] leading-snug text-white/75">
-                          You will be taken to your bank&apos;s website to authorize payment, then returned here.
+                  {!isFreeCheckout && isRazorpayDemoMode() ? (
+                    <div
+                      className="mb-4 rounded-lg border border-sky-300/40 bg-sky-500/15 px-3 py-2.5 text-left text-[11px] leading-snug text-sky-50 sm:text-xs"
+                      role="status"
+                    >
+                      <p className="font-semibold">Demo payment mode</p>
+                      <p className="mt-1">{getRazorpaySetupHint()}</p>
+                      <p className="mt-1 text-white/75">
+                        Click the button below to test invoice + billing history. For real Razorpay: add{" "}
+                        <code className="rounded bg-black/20 px-1">NEXT_PUBLIC_RAZORPAY_KEY_ID</code> and{" "}
+                        <code className="rounded bg-black/20 px-1">RAZORPAY_KEY_SECRET</code> in .env.local, restart{" "}
+                        <code className="rounded bg-black/20 px-1">npm run dev</code>, and run{" "}
+                        <code className="rounded bg-black/20 px-1">npm run razorpay-api</code>.
+                      </p>
+                    </div>
+                  ) : null}
+                  <div className="rounded-xl border border-white/15 bg-white/10 p-4 text-xs shadow-lg shadow-blue-950/10 backdrop-blur sm:p-5 sm:text-sm">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-white/70">Order summary</p>
+                    <p className="mt-2 text-lg font-bold text-white">{selectedPlan.name}</p>
+                    <p className="text-white/85">
+                      {billingYearly ? "Yearly billing" : "Monthly billing"}
+                    </p>
+                    {isFreeCheckout ? (
+                      <p className="mt-3 text-2xl font-bold text-white">Free</p>
+                    ) : (
+                      <>
+                        <p className="mt-3 text-2xl font-bold text-white">
+                          {formatInrFromDisplayPrice(getActivePrice(selectedPlan).newPrice)}
                         </p>
-                      </div>
+                        <p className="mt-1 text-[11px] text-white/65">
+                          Plan price {getActivePrice(selectedPlan).newPrice} · paid in INR via Razorpay
+                        </p>
+                      </>
                     )}
-
-                    {paymentMethod === "online" && (
-                      <div className="space-y-4">
-                        <div className="flex flex-wrap gap-3">
-                          <label className="flex cursor-pointer items-center gap-2">
-                            <input
-                              type="radio"
-                              name="onlineWallet"
-                              className="accent-white"
-                              checked={onlineWallet === "gpay"}
-                              onChange={() => setOnlineWallet("gpay")}
-                            />
-                            Google Pay
-                          </label>
-                          <label className="flex cursor-pointer items-center gap-2">
-                            <input
-                              type="radio"
-                              name="onlineWallet"
-                              className="accent-white"
-                              checked={onlineWallet === "phonepe"}
-                              onChange={() => setOnlineWallet("phonepe")}
-                            />
-                            PhonePe
-                          </label>
-                        </div>
-                        <div>
-                          <label className="mb-1.5 block text-white/90">UPI ID</label>
-                          <input
-                            value={upiId}
-                            onChange={(e) => setUpiId(e.target.value)}
-                            placeholder="name@upi"
-                            autoComplete="off"
-                            className="planning-payment-upi block min-w-0 w-full rounded-lg border border-white/30 bg-white/10 px-2 py-2.5 text-xs text-white shadow-inner placeholder:text-white/70 focus:border-white/70 focus:outline-none focus:ring-2 focus:ring-white/20 sm:px-3 sm:text-sm"
-                            style={{ width: "100%" }}
-                          />
-                          <p className="mt-2 text-[11px] leading-snug text-white/75">
-                            {onlineWallet === "gpay"
-                              ? "Open Google Pay and approve the request, or pay with your UPI ID above."
-                              : "Open PhonePe and approve the request, or pay with your UPI ID above."}
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                    {!isFreeCheckout ? (
+                      <p className="mt-2 text-[11px] leading-snug text-white/75">
+                        Secure Razorpay popup — UPI, cards, netbanking, and wallets.
+                      </p>
+                    ) : null}
                   </div>
                 </div>
                 <div className="border-t border-white/20 bg-white/5 px-4 py-5 text-center sm:px-6 sm:py-6">
@@ -928,11 +726,17 @@ export default function PlanningPage() {
                   ) : null}
                   <button
                     type="button"
-                    onClick={handleCompletePayment}
+                    onClick={() => void handlePayWithRazorpay()}
                     disabled={paymentLoading}
                     className="inline-flex min-h-10 min-w-[160px] items-center justify-center rounded-lg bg-white px-5 py-2 text-xs font-semibold text-slate-900 shadow-lg shadow-blue-950/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl disabled:translate-y-0 disabled:opacity-70 sm:min-w-[180px] sm:px-6 sm:text-sm"
                   >
-                    {paymentLoading ? "Processing payment..." : "Complete Payment"}
+                    {paymentLoading
+                      ? "Processing..."
+                      : isFreeCheckout
+                        ? "Activate free plan"
+                        : isRazorpayDemoMode()
+                          ? "Complete demo payment"
+                          : "Pay with Razorpay"}
                   </button>
                 </div>
               </div>
