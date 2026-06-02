@@ -15,6 +15,20 @@ import {
 
 import { FaEye, FaPen } from "react-icons/fa";
 import { assetPath } from "@/lib/paths";
+import { useBuilder } from "../imageblock/BuilderContext";
+import type { BlockData } from "../buttonblock/types";
+import type { SectionStyleConfig } from "./types";
+
+type PortfolioPreviewProps = {
+  isImageEditingMode?: boolean;
+  customImages?: Record<string, string>;
+  onEditImage?: (imageId: string) => void;
+  editingImageId?: string | null;
+  isButtonEditingMode?: boolean;
+  customButtons?: Record<string, BlockData["props"]>;
+  onEditButton?: (buttonId: string) => void;
+  sectionStyles?: Record<string, SectionStyleConfig>;
+};
 
 function useLocalInView<T extends HTMLElement>({
   threshold = 0.3,
@@ -86,23 +100,57 @@ export default function PortfolioPreview({
   isImageEditingMode = false,
   customImages = {},
   onEditImage,
+  editingImageId,
   isButtonEditingMode = false,
   customButtons = {},
-  onEditButton
-}: {
-  isImageEditingMode?: boolean;
-  customImages?: Record<string, string>;
-  onEditImage?: (id: string) => void;
-  isButtonEditingMode?: boolean;
-  customButtons?: Record<string, Record<string, any>>;
-  onEditButton?: (id: string) => void;
-} = {}) {
+  onEditButton,
+  sectionStyles = {}
+}: PortfolioPreviewProps) {
   const [innerMobileMenuOpen, setInnerMobileMenuOpen] = useState(false);
+
+  // Read global builder state for image adjustments
+  const builder = useBuilder();
+  const { imageAdjustments, activeFilter, activeCrop } = builder || {};
+
+  // Helper to generate styles for a specific section
+  const getSpecificSectionStyle = (sectionId: string) => {
+    const styleConfig = sectionStyles[sectionId];
+    if (!styleConfig) return {};
+    const bgImage = styleConfig.backgroundImage ? `url(${styleConfig.backgroundImage})` : '';
+    return {
+      backgroundColor: styleConfig.backgroundColor || undefined,
+      ...(styleConfig.gradientBackground && { background: styleConfig.gradientBackground }),
+      ...(bgImage && { backgroundImage: bgImage, backgroundSize: 'cover', backgroundPosition: 'center' }),
+    };
+  };
+
+  const getPresetFilter = () => {
+    switch (activeFilter) {
+      case 'Vintage': return 'sepia(50%) hue-rotate(-30deg) contrast(120%)';
+      case 'Cinematic': return 'contrast(120%) saturate(120%) brightness(90%)';
+      case 'Black & White': return 'grayscale(100%)';
+      case 'Nature': return 'saturate(150%) contrast(110%)';
+      case 'Creative': return 'hue-rotate(90deg) saturate(150%)';
+      default: return '';
+    }
+  };
+
+  const getCropAspect = () => {
+    switch (activeCrop) {
+      case 'Square': return '1 / 1';
+      case '16:9': return '16 / 9';
+      case '5:4': return '5 / 4';
+      case '4:3': return '4 / 3';
+      case '9:16': return '9 / 16';
+      case '7:5': return '7 / 5';
+      default: return 'auto';
+    }
+  };
 
   const getCustomButtonStyle = (buttonId: string, defaultClassName: string) => {
     const props = customButtons?.[buttonId];
     if (!props) return { className: defaultClassName, style: {} };
-    
+
     const w = (props.width as string) || '';
     const parsedW = (w !== '' && !isNaN(Number(w))) ? `${w}px` : w;
     const h = (props.height as string) || '';
@@ -132,7 +180,7 @@ export default function PortfolioPreview({
       className = className.replace(/bg-gradient-to-r\s+from-\[[^\]]+\]\s+to-\[[^\]]+\]/, '');
       className = className.replace(/bg-\[[^\]]+\]/, '');
     }
-    
+
     return { className: className.trim(), style };
   };
 
@@ -216,9 +264,43 @@ export default function PortfolioPreview({
     }
   };
 
+  useEffect(() => {
+    const handleScrollEvent = (e: CustomEvent) => {
+      scrollToSection(e.detail);
+    };
+    window.addEventListener('scrollToSectionEvent', handleScrollEvent as EventListener);
+    return () => window.removeEventListener('scrollToSectionEvent', handleScrollEvent as EventListener);
+  }, []);
+
   return (
 
-    <main className="flex flex-col min-h-screen bg-white">
+    <main className="flex flex-col min-h-screen bg-white relative">
+      {imageAdjustments && isImageEditingMode && editingImageId && (
+        <style>{`
+          @media (max-width: 1023px) {
+            img[data-image-id="${editingImageId}"] {
+              filter: brightness(${(imageAdjustments.brightness / 60) * 100}%) 
+                      contrast(${(imageAdjustments.contrast / 45) * 100}%) 
+                      saturate(${(imageAdjustments.saturation / 55) * 100}%)
+                      drop-shadow(0 4px ${imageAdjustments.shadows / 2}px rgba(0,0,0,0.3))
+                      hue-rotate(${(imageAdjustments.tint - 30) * 2}deg)
+                      sepia(${imageAdjustments.temperature > 65 ? (imageAdjustments.temperature - 65) : 0}%)
+                      ${getPresetFilter()};
+            }
+            div[data-crop-wrapper-id="${editingImageId}"] {
+              ${activeCrop !== 'Custom' && activeCrop !== 'Original' ? `aspect-ratio: ${getCropAspect()} !important; height: auto !important;` : ''}
+            }
+            div[data-vignette-id="${editingImageId}"]::after {
+              content: '';
+              position: absolute;
+              inset: 0;
+              pointer-events: none;
+              box-shadow: inset 0 0 ${imageAdjustments.vignette * 3}px rgba(0,0,0,0.7);
+              z-index: 20;
+            }
+          }
+        `}</style>
+      )}
       {/* ====== MAIN BUILDER LAYOUT ====== */}
       <div className="flex flex-1">
 
@@ -233,7 +315,7 @@ export default function PortfolioPreview({
 
             {/* <div className="flex-1 overflow-y-auto min-w-0"> */}
             <div className="flex-1 overflow-y-auto min-w-0 relative z-0">
-              <div className="w-full min-h-[530px] bg-[#F2F2F2] rounded-xl border-2 border-gray-300 flex flex-col relative portfolio-shell">
+              <div className="w-full min-h-[530px] rounded-xl border-2 border-gray-300 flex flex-col relative portfolio-shell bg-[#F2F2F2]">
 
 
                 {/* <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 xl:flex-nowrap border-b border-gray-300 bg-[#06224C] rounded-t-xl"> */}
@@ -277,7 +359,7 @@ export default function PortfolioPreview({
                     </div>
 
                     {/* ROW 3 → Actions (NOW VISIBLE ON MOBILE ✅) */}
-                    <div className="flex justify-center">
+                    <div className="flex justify-center" data-builder-chrome="true">
                       <div className="flex flex-wrap justify-center gap-2 w-full max-w-[220px]">
 
                         {/* Save Draft */}
@@ -337,7 +419,7 @@ export default function PortfolioPreview({
                       </div>
 
                       {/* ACTION BUTTONS ✅ */}
-                      <div className="flex border-2 border-gray-300 rounded-md overflow-hidden text-xs text-white font-bold">
+                      <div className="flex border-2 border-gray-300 rounded-md overflow-hidden text-xs text-white font-bold" data-builder-chrome="true">
 
                         <button className="px-2 py-1 hover:bg-white hover:text-black transition">
                           Save Draft
@@ -386,7 +468,7 @@ export default function PortfolioPreview({
 
 
                 {/* HERO SECTION WRAPPER */}
-                <div id="home" className="relative w-full overflow-hidden flex flex-col portfolio-hero">
+                <div id="home" className="relative w-full overflow-hidden flex flex-col portfolio-hero" style={getSpecificSectionStyle('home')}>
 
                   {/* HERO CONTENT */}
 
@@ -426,12 +508,14 @@ export default function PortfolioPreview({
                             </div>
 
                             <div className="relative mx-auto transition-all duration-300"
+                              data-crop-wrapper-id="hero_image_1"
                               style={{
                                 width: `${heroImageProps.width}px`,
                                 height: `${heroImageProps.height}px`,
                                 maxWidth: '100%',
                               }}>
                               <div className="absolute inset-0 overflow-hidden border-4 border-white z-10"
+                                data-vignette-id="hero_image_1"
                                 style={{
                                   borderRadius: `${heroImageProps.borderRadius}%`,
                                   boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
@@ -441,8 +525,8 @@ export default function PortfolioPreview({
                                   src={customImages["hero_image_1"] || assetPath("/portfoliologo.webp")}
                                   alt="Srinivas Pentakota - UI/UX Designer Portfolio"
                                   fill
-                                  sizes="220px"
-                                  className="w-full h-full object-cover"
+                                  data-image-id="hero_image_1"
+                                  className={`w-full h-full object-cover transition duration-700 hover:scale-105`}
                                   unoptimized
                                 />
                               </div>
@@ -529,17 +613,19 @@ export default function PortfolioPreview({
                             <p className="text-sm font-extrabold text-gray-900">Human centered UI</p>
                           </div>
                           <div className="relative z-20 animate-[float_6s_ease-in-out_infinite] transition-all duration-300"
+                            data-crop-wrapper-id="hero_image_1"
                             style={{
                               width: `${heroImageProps.width}px`,
                               height: `${heroImageProps.height}px`,
                             }}>
                             <div className="absolute inset-0 overflow-hidden border-4 border-white"
-                                style={{
-                                  borderRadius: `${heroImageProps.borderRadius}%`,
-                                  boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
-                                  opacity: heroImageProps.opacity / 100
-                                }}>
-                              <Image src={customImages["hero_image_1"] || assetPath("/portfoliologo.webp")} alt="Srinivas Pentakota - UI/UX Designer Portfolio" fill sizes="245px" className="w-full h-full object-cover" unoptimized />
+                              data-vignette-id="hero_image_1"
+                              style={{
+                                borderRadius: `${heroImageProps.borderRadius}%`,
+                                boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
+                                opacity: heroImageProps.opacity / 100
+                              }}>
+                              <Image src={customImages["hero_image_1"] || assetPath("/portfoliologo.webp")} alt="Srinivas Pentakota - UI/UX Designer Portfolio" fill sizes="245px" data-image-id="hero_image_1" className="w-full h-full object-cover" unoptimized />
                             </div>
                             {isImageEditingMode && (
                               <button
@@ -682,7 +768,7 @@ export default function PortfolioPreview({
 
                 {/* ABOUT SECTION */}
                 {/* <div className="w-full bg-[#F2F2F2] px-6 md:px-12 lg:px-20 py-16 md:py-24"> */}
-                <div id="about" className="w-full bg-[#F2F2F2] px-4 sm:px-6 md:px-12 lg:px-20 py-10 md:py-16">
+                <div id="about" className="w-full px-4 sm:px-6 md:px-12 lg:px-20 py-10 md:py-16" style={getSpecificSectionStyle('about')}>
                   <div className="flex items-center gap-2 mb-4">
                     <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">About</h2>
                     <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Me</span>
@@ -880,7 +966,7 @@ export default function PortfolioPreview({
                   <div className="overflow-hidden rounded-2xl bg-[#06224C] px-5 py-8 sm:px-8 md:px-10 md:py-12 text-white shadow-xl relative">
                     <div className="absolute right-[-5rem] top-[-5rem] h-56 w-56 rounded-full bg-[#63e5ff]/20 blur-3xl"></div>
                     <div className="absolute left-[-4rem] bottom-[-5rem] h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
-                    <div className="relative grid grid-cols-1 lg:grid-cols-[0.9fr_1.4fr] gap-8 lg:gap-12 items-start">
+                    <div className="relative grid grid-cols-1 lg:grid-cols-[0.6fr_2fr] gap-8 lg:gap-12 items-start">
                       <div className={`portfolio-reveal ${processInView ? "is-visible" : ""}`}>
                         <div className="flex items-center gap-2 mb-4">
                           <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Design</h2>
@@ -912,7 +998,7 @@ export default function PortfolioPreview({
 
                 {/* MY PROJECTS SECTION */}
 
-                <div id="projects" className="w-full bg-[#F2F2F2] px-0 md:px-6 lg:px-12 pb-16 lg:pb-24 relative overflow-hidden">
+                <div id="projects" className="w-full px-0 md:px-6 lg:px-12 pb-16 lg:pb-24 relative overflow-hidden" style={getSpecificSectionStyle('projects')}>
 
                   {/* <div className="px-6 md:px-6 lg:px-8 mb-12">
                     <h2 className="text-base font-bold flex items-center gap-1 mb-4 text-gray-800 tracking-wide w-max">
@@ -1073,7 +1159,7 @@ export default function PortfolioPreview({
                 </div>
 
                 {/* CONTACT SECTION */}
-                <div id="contact" className="w-full bg-[#F2F2F2] px-4 sm:px-6 md:px-12 lg:px-20 py-12 sm:py-16 lg:py-24 relative border-t border-gray-100">
+                <div id="contact" className="w-full px-4 sm:px-6 md:px-12 lg:px-20 py-12 sm:py-16 lg:py-24 relative border-t border-gray-100" style={getSpecificSectionStyle('contact')}>
                   <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-start lg:items-center">
 
                     <div>
@@ -1134,7 +1220,7 @@ export default function PortfolioPreview({
                           <textarea rows={4} placeholder="Tell us about your project..." className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#63e5ff] focus:border-transparent transition-all resize-none"></textarea>
                         </div>
                         <div className="relative">
-                          <button 
+                          <button
                             className={getCustomButtonStyle("contact_btn", "w-full bg-[#1a3636] hover:bg-gray-900 text-white font-bold rounded-xl px-4 py-3.5 text-sm transition-colors flex items-center justify-center gap-2 group shadow-lg shadow-gray-900/20").className}
                             style={getCustomButtonStyle("contact_btn", "").style}
                           >
@@ -1156,7 +1242,7 @@ export default function PortfolioPreview({
 
                   </div>
                 </div>
-</div>
+              </div>
             </div>
 
             {/* <div className="w-full flex items-center justify-between mt-8 px-4"> */}

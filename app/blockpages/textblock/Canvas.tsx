@@ -1,10 +1,12 @@
 "use client";
  
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { ChevronDown, Eye, Redo2, Save, Send, Undo2 } from "lucide-react";
 import { assetPath } from "@/lib/paths";
 import PortfolioPreview from "./PortfolioPreview";
 import StorefrontPreview from "./StorefrontPreview";
+import type { BlockData } from "../buttonblock/types";
 import type { TextBlockState, TextEditorTarget, TextStyles, TextTemplateType } from "./types";
  
 const TEXTBLOCK_PREVIEW_STORAGE_KEY = "stackly-textblock-preview-html";
@@ -20,8 +22,9 @@ type TextCanvasProps = {
   isImageEditingMode?: boolean;
   customImages?: Record<string, string>;
   onEditImage?: (imageId: string) => void;
+  editingImageId?: string | null;
   isButtonEditingMode?: boolean;
-  customButtons?: Record<string, Record<string, any>>;
+  customButtons?: Record<string, BlockData["props"]>;
   onEditButton?: (buttonId: string) => void;
 };
  
@@ -35,7 +38,7 @@ const rgbToHex = (rgb: string) => {
     .join("")}`;
 };
  
-export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onUndo, onRedo, template = "ecommerce", isImageEditingMode = false, customImages = {}, onEditImage, isButtonEditingMode = false, customButtons = {}, onEditButton }: TextCanvasProps) {
+export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onUndo, onRedo, template = "ecommerce", isImageEditingMode = false, customImages = {}, onEditImage, editingImageId, isButtonEditingMode = false, customButtons = {}, onEditButton }: TextCanvasProps) {
   const isPreviewMode = false;
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -50,9 +53,26 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
     const activeText = canvasRef.current?.querySelector(".editable-text-active") as HTMLElement | null;
     if (!activeText || state.selectedTarget !== "text") return;
  
-    activeText.style.color = state.textStyles.color || "";
-    activeText.style.fontSize = state.textStyles.fontSize ? `${state.textStyles.fontSize}px` : "";
-    activeText.style.fontFamily = state.textStyles.fontFamily || "";
+    if (state.textStyles.color) activeText.style.setProperty("color", state.textStyles.color, "important");
+    else activeText.style.removeProperty("color");
+ 
+    if (state.textStyles.fontSize) activeText.style.setProperty("font-size", `${state.textStyles.fontSize}px`, "important");
+    else activeText.style.removeProperty("font-size");
+ 
+    if (state.textStyles.fontFamily) activeText.style.setProperty("font-family", state.textStyles.fontFamily, "important");
+    else activeText.style.removeProperty("font-family");
+ 
+    if (state.textStyles.lineHeight) activeText.style.setProperty("line-height", state.textStyles.lineHeight, "important");
+    else activeText.style.removeProperty("line-height");
+ 
+    if (state.textStyles.letterSpacing) activeText.style.setProperty("letter-spacing", state.textStyles.letterSpacing, "important");
+    else activeText.style.removeProperty("letter-spacing");
+ 
+    if (state.textStyles.fontWeight) activeText.style.setProperty("font-weight", state.textStyles.fontWeight, "important");
+    else activeText.style.removeProperty("font-weight");
+ 
+    if (state.textStyles.textAlign) activeText.style.setProperty("text-align", state.textStyles.textAlign, "important");
+    else activeText.style.removeProperty("text-align");
   }, [state.selectedTarget, state.textStyles]);
  
   useEffect(() => {
@@ -83,8 +103,19 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
     const makeEditable = (node: Element) => {
       if (node.closest("[data-builder-chrome='true']")) return;
  
+      const isHeader = node.closest(".buyscreen-header, .buyscreen-categories, .portfolio-shell > .sticky") !== null;
+      const isFooter = node.closest("footer, .stackly-footer") !== null;
+      const isMain = !isHeader && !isFooter;
+ 
+      let shouldBeEditable = false;
+      if (isTextEditable && !isPreviewMode) {
+        if (state.selectedTarget === "header" && isHeader) shouldBeEditable = true;
+        else if (state.selectedTarget === "footer" && isFooter) shouldBeEditable = true;
+        else if ((state.selectedTarget === "main" || state.selectedTarget === "text") && isMain) shouldBeEditable = true;
+      }
+ 
       if (textTags.includes(node.tagName)) {
-        if (isTextEditable && !isPreviewMode) {
+        if (shouldBeEditable) {
           node.setAttribute("contenteditable", "true");
           (node as HTMLElement).addEventListener("click", handleTextClick);
         } else {
@@ -149,10 +180,10 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
         data-builder-chrome="true"
         className="flex h-[64px] flex-shrink-0 items-center justify-between gap-4 overflow-x-auto border-b border-[#dbe3ef] bg-white px-3 shadow-[0_1px_0_rgba(15,23,42,0.03)] md:px-5"
       >
-        <button className="flex items-center gap-2 whitespace-nowrap rounded px-2 py-1.5 text-[14px] font-bold text-[#0B1D40] hover:bg-gray-100 md:text-[15px]">
+        <a href="/blockpages?template=portfolio" className="flex items-center gap-2 whitespace-nowrap rounded px-2 py-1.5 text-[14px] font-bold text-[#0B1D40] hover:bg-gray-100 md:text-[15px]">
           My Website
           <ChevronDown className="h-4 w-4 text-gray-600" />
-        </button>
+        </a>
  
         <div className="flex items-center gap-2 md:gap-3">
           <div className="flex flex-shrink-0 overflow-hidden rounded-md border border-gray-300 bg-white shadow-sm">
@@ -220,6 +251,7 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
               `}</style>
             ) : null}
             <style>{`
+ 
               [data-textblock-canvas] .buyscreen-header,
               [data-textblock-canvas] .buyscreen-categories,
               [data-textblock-canvas] .portfolio-shell > .sticky {
@@ -229,7 +261,16 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
               [data-textblock-canvas] .buyscreen-header *,
               [data-textblock-canvas] .buyscreen-categories *,
               [data-textblock-canvas] .portfolio-shell > .sticky * {
-                border-color: ${section.headerText}66;
+                color: inherit !important;
+                border-color: ${section.headerText}66 !important;
+                ${section.headerFontSize ? `font-size: ${section.headerFontSize}px !important;` : ''}
+                ${section.headerFontFamily ? `font-family: ${section.headerFontFamily} !important;` : ''}
+                ${section.headerFontWeight ? `font-weight: ${section.headerFontWeight} !important;` : ''}
+                ${section.headerLineHeight ? `line-height: ${section.headerLineHeight} !important;` : ''}
+                ${section.headerLetterSpacing ? `letter-spacing: ${section.headerLetterSpacing} !important;` : ''}
+              }
+              [data-textblock-canvas] .portfolio-shell > .sticky span.bg-white {
+                background-color: ${section.headerText} !important;
               }
               [data-textblock-canvas] footer,
               [data-textblock-canvas] .stackly-footer {
@@ -247,7 +288,7 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
               className={template === "ecommerce" ? "h-[calc(100vh-160px)] min-h-[560px] overflow-y-auto" : undefined}
             >
               <div ref={contentRef}>
-                {template === "portfolio" ? <PortfolioPreview isImageEditingMode={isImageEditingMode} customImages={customImages} onEditImage={onEditImage} isButtonEditingMode={isButtonEditingMode} customButtons={customButtons} onEditButton={onEditButton} /> : <StorefrontPreview />}
+                {template === "portfolio" ? <PortfolioPreview isImageEditingMode={isImageEditingMode} customImages={customImages} onEditImage={onEditImage} editingImageId={editingImageId} isButtonEditingMode={isButtonEditingMode} customButtons={customButtons} onEditButton={onEditButton} sectionStyles={state.sectionStyles} /> : <StorefrontPreview />}
               </div>
             </div>
           </div>
