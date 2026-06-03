@@ -684,12 +684,12 @@ export default function PlanningPage() {
                     >
                       <p className="font-semibold">Demo payment mode</p>
                       <p className="mt-1">{getRazorpaySetupHint()}</p>
-                      <p className="mt-1 text-white/75">
+                      <p className="mt-1 break-words text-white/75">
                         Click the button below to test invoice + billing history. For real Razorpay: add{" "}
-                        <code className="rounded bg-black/20 px-1">NEXT_PUBLIC_RAZORPAY_KEY_ID</code> and{" "}
-                        <code className="rounded bg-black/20 px-1">RAZORPAY_KEY_SECRET</code> in .env.local, restart{" "}
-                        <code className="rounded bg-black/20 px-1">npm run dev</code>, and run{" "}
-                        <code className="rounded bg-black/20 px-1">npm run razorpay-api</code>.
+                        <code className="break-all rounded bg-black/20 px-1">NEXT_PUBLIC_RAZORPAY_KEY_ID</code> and{" "}
+                        <code className="break-all rounded bg-black/20 px-1">RAZORPAY_KEY_SECRET</code> in .env.local, restart{" "}
+                        <code className="break-all rounded bg-black/20 px-1">npm run dev</code>, and run{" "}
+                        <code className="break-all rounded bg-black/20 px-1">npm run razorpay-api</code>.
                       </p>
                     </div>
                   ) : null}
@@ -728,7 +728,7 @@ export default function PlanningPage() {
                     type="button"
                     onClick={() => void handlePayWithRazorpay()}
                     disabled={paymentLoading}
-                    className="inline-flex min-h-10 min-w-[160px] items-center justify-center rounded-lg bg-white px-5 py-2 text-xs font-semibold text-slate-900 shadow-lg shadow-blue-950/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl disabled:translate-y-0 disabled:opacity-70 sm:min-w-[180px] sm:px-6 sm:text-sm"
+                    className="inline-flex min-h-10 w-full max-w-full items-center justify-center rounded-lg bg-white px-4 py-2 text-xs font-semibold text-slate-900 shadow-lg shadow-blue-950/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl disabled:translate-y-0 disabled:opacity-70 sm:w-auto sm:min-w-[180px] sm:px-6 sm:text-sm"
                   >
                     {paymentLoading
                       ? "Processing..."
