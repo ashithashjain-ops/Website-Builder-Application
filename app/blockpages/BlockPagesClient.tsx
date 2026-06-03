@@ -21,6 +21,8 @@ const initialButtonBlock: BlockData = {
     borderRadius: "18 px",
   },
 };
+
+type ButtonProps = BlockData["props"];
  
 const initialTextBlockState: TextBlockState = {
   selectedTarget: "main",
@@ -35,6 +37,9 @@ const initialTextBlockState: TextBlockState = {
     backgroundColor: "#f8fafc",
     headerBg: "#06224C",
     headerText: "#ffffff",
+    headerFontSize: "",
+    headerFontFamily: "",
+    headerFontWeight: "",
     footerBg: "#06224C",
     footerText: "#ffffff",
     shadow: false,
@@ -62,7 +67,7 @@ export default function BlockPagesClient() {
  
   const [isButtonEditingMode, setIsButtonEditingMode] = useState(false);
   const [editingButtonId, setEditingButtonId] = useState<string | null>(null);
-  const [customButtons, setCustomButtons] = useState<Record<string, Record<string, any>>>({});
+  const [customButtons, setCustomButtons] = useState<Record<string, ButtonProps>>({});
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
  
   useEffect(() => {
@@ -79,7 +84,7 @@ export default function BlockPagesClient() {
             validImages[key] = parsed[key];
           }
         }
-        setCustomImages(validImages);
+        window.setTimeout(() => setCustomImages(validImages), 0);
         if (hasChanges) {
           localStorage.setItem("stackly-custom-images", JSON.stringify(validImages));
         }
@@ -91,7 +96,9 @@ export default function BlockPagesClient() {
     try {
       const storedButtons = localStorage.getItem("stackly-custom-buttons");
       if (storedButtons) {
-        setCustomButtons(JSON.parse(storedButtons));
+        window.setTimeout(() => {
+          setCustomButtons(JSON.parse(storedButtons) as Record<string, ButtonProps>);
+        }, 0);
       }
     } catch (e) {
       console.error("Failed to load custom buttons", e);
@@ -203,6 +210,28 @@ export default function BlockPagesClient() {
             editingImageId={editingImageId}
             isButtonEditingMode={isButtonEditingMode}
             editingButtonId={editingButtonId}
+            activeTextTarget={textBlockState.isTextEditable ? textBlockState.selectedTarget : null}
+            onSelectTextTarget={(target) => {
+              if (activeBlockPage !== "text") {
+                setActiveBlockPage("text");
+                setIsImageEditingMode(false);
+                setIsButtonEditingMode(false);
+                pushTextState({
+                  ...textBlockState,
+                  isTextEditable: true,
+                  selectedTarget: target,
+                });
+              } else {
+                const isSameTargetAndActive = textBlockState.isTextEditable && textBlockState.selectedTarget === target;
+                pushTextState({
+                  ...textBlockState,
+                  isTextEditable: !isSameTargetAndActive,
+                  selectedTarget: !isSameTargetAndActive ? target : textBlockState.selectedTarget,
+                });
+              }
+            }}
+            onUpdateTextStyles={(styles) => pushTextState({...textBlockState, textStyles: {...textBlockState.textStyles, ...styles}})}
+            onUpdateTextSection={(props) => pushTextState({...textBlockState, section: {...textBlockState.section, ...props}})}
             onUpdateButtonStyle={(newProps) => {
               if (selectedButtonBlock) {
                 updateButtonBlock(selectedButtonBlock.id, newProps);
@@ -231,11 +260,20 @@ export default function BlockPagesClient() {
                 setIsImageEditingMode(false);
                 return;
               }
+ 
+              const wasOnText = activeBlockPage === "text";
               setActiveBlockPage(page);
+ 
               if (page === "text") {
-                setTextTemplate("ecommerce");
                 setIsImageEditingMode(false);
                 setIsButtonEditingMode(false);
+ 
+                const nextIsEditable = wasOnText ? !textBlockState.isTextEditable : true;
+                pushTextState({
+                  ...textBlockState,
+                  isTextEditable: nextIsEditable,
+                  selectedTarget: nextIsEditable ? "text" : textBlockState.selectedTarget,
+                });
               }
             }}
           />
@@ -303,6 +341,7 @@ export default function BlockPagesClient() {
               onRedo={redoText}
               template={textTemplate}
               isImageEditingMode={isImageEditingMode}
+              editingImageId={editingImageId}
               customImages={customImages}
               onEditImage={(imageId) => {
                 setEditingImageId(imageId);

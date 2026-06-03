@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Link from "next/link";
 import { ChevronDown, Undo2, Redo2, Eye, Send, X, Image as ImageIcon, Save } from "lucide-react";
 import { useBuilder, BuilderElement } from "./BuilderContext";
  
@@ -10,7 +11,11 @@ export default function MainCanvas({
   editingImageId?: string | null;
   onImageSelected?: (url: string) => void;
 } = {}) {
-  const { elements, activeElementId, setActiveElementId, undo, redo, historyStack, futureStack } = useBuilder();
+  const { elements, activeElementId, setActiveElementId, undo, redo, historyStack, futureStack, imageAdjustments, activeFilter, activeCrop } = useBuilder();
+ 
+  const getFilterStyle = () => {
+    return {};
+  };
  
   const mountainSrc1 = "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80";
   const mountainSrc2 = "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80";
@@ -52,6 +57,29 @@ export default function MainCanvas({
     fileInputRef.current?.click();
   };
  
+  const getPresetFilter = () => {
+    switch (activeFilter) {
+      case 'Vintage': return 'sepia(50%) hue-rotate(-30deg) contrast(120%)';
+      case 'Cinematic': return 'contrast(120%) saturate(120%) brightness(90%)';
+      case 'Black & White': return 'grayscale(100%)';
+      case 'Nature': return 'saturate(150%) contrast(110%)';
+      case 'Creative': return 'hue-rotate(90deg) saturate(150%)';
+      default: return '';
+    }
+  };
+ 
+  const getCropAspect = () => {
+    switch (activeCrop) {
+      case 'Square': return '1 / 1';
+      case '16:9': return '16 / 9';
+      case '5:4': return '5 / 4';
+      case '4:3': return '4 / 3';
+      case '9:16': return '9 / 16';
+      case '7:5': return '7 / 5';
+      default: return 'auto';
+    }
+  };
+ 
   return (
     <main className="relative flex h-full min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-[#dbe3ef] bg-[#f7f9fc] shadow-[0_18px_45px_rgba(15,35,75,0.08)]">
       {/* Hidden File Input */}
@@ -63,15 +91,43 @@ export default function MainCanvas({
         accept="image/*,video/*"
       />
  
+      {imageAdjustments && (
+        <style>{`
+          @media (max-width: 1023px) {
+            .mobile-image-adjust {
+              filter: brightness(${(imageAdjustments.brightness / 60) * 100}%)
+                      contrast(${(imageAdjustments.contrast / 45) * 100}%)
+                      saturate(${(imageAdjustments.saturation / 55) * 100}%)
+                      drop-shadow(0 4px ${imageAdjustments.shadows / 2}px rgba(0,0,0,0.3))
+                      hue-rotate(${(imageAdjustments.tint - 30) * 2}deg)
+                      sepia(${imageAdjustments.temperature > 65 ? (imageAdjustments.temperature - 65) : 0}%)
+                      ${getPresetFilter()};
+            }
+            .mobile-vignette::after {
+              content: '';
+              position: absolute;
+              inset: 0;
+              pointer-events: none;
+              box-shadow: inset 0 0 ${imageAdjustments.vignette * 3}px rgba(0,0,0,0.7);
+            }
+            ${activeCrop !== 'Custom' && activeCrop !== 'Original' ? `
+            .mobile-crop-adjust {
+              aspect-ratio: ${getCropAspect()} !important;
+            }
+            ` : ''}
+          }
+        `}</style>
+      )}
+ 
       {/* Top Bar */}
       <div className="z-10 flex h-[64px] shrink-0 items-center justify-between gap-4 overflow-x-auto border-b border-[#dbe3ef] bg-white px-3 shadow-sm md:px-5">
-        <button
-          onClick={() => handleAction("Switch Website")}
+        <a
+          href="/blockpages?template=portfolio"
           className="flex items-center gap-2 whitespace-nowrap rounded px-2 py-1.5 text-[14px] font-bold text-[#0B1D40] transition-colors hover:bg-gray-100 md:text-[15px]"
         >
           My Website
           <ChevronDown className="h-4 w-4 text-gray-600" />
-        </button>
+        </a>
  
         <div className="flex items-center gap-2 md:gap-3">
           <div className="flex flex-shrink-0 items-center overflow-hidden rounded-md border border-gray-300 bg-white shadow-sm">
@@ -149,7 +205,7 @@ export default function MainCanvas({
               {/* Card 2 - Mountain Image 1 */}
               <div className="bg-white rounded-lg shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-slate-100 p-4 pb-5 flex flex-col items-center">
                 <div
-                  className="w-full aspect-video rounded-lg overflow-hidden mb-4 cursor-pointer hover:opacity-80 transition"
+                  className="w-full aspect-video rounded-lg overflow-hidden mb-4 cursor-pointer hover:opacity-80 transition relative mobile-vignette mobile-crop-adjust"
                   onClick={(e) => {
                     e.stopPropagation();
                     if (onImageSelected) {
@@ -159,7 +215,7 @@ export default function MainCanvas({
                     }
                   }}
                 >
-                  <img src={mountainSrc1} alt="Mountain view" className="w-full h-full object-cover" />
+                  <img src={mountainSrc1} alt="Mountain view" className="w-full h-full object-cover mobile-image-adjust" />
                 </div>
                 <p className="text-slate-600 text-[13px] mb-4 font-medium">Upload izze. Timraes</p>
                 <div className="w-full relative">
@@ -177,7 +233,7 @@ export default function MainCanvas({
               {/* Card 3 - Mountain Image 2 */}
               <div className="bg-white rounded-lg shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-slate-100 p-4 pb-5 flex flex-col items-center">
                 <div
-                  className="w-full aspect-video rounded-lg overflow-hidden mb-4 cursor-pointer hover:opacity-80 transition"
+                  className="w-full aspect-video rounded-lg overflow-hidden mb-4 cursor-pointer hover:opacity-80 transition relative mobile-vignette mobile-crop-adjust"
                   onClick={(e) => {
                     e.stopPropagation();
                     if (onImageSelected) {
@@ -187,7 +243,7 @@ export default function MainCanvas({
                     }
                   }}
                 >
-                  <img src={mountainSrc2} alt="Mountain scenery" className="w-full h-full object-cover" />
+                  <img src={mountainSrc2} alt="Mountain scenery" className="w-full h-full object-cover mobile-image-adjust" />
                 </div>
                 <p className="text-slate-600 text-[13px] mb-4 font-medium">Upload izze. Timraes</p>
                 <div className="w-full relative">
@@ -214,9 +270,9 @@ export default function MainCanvas({
                 onClick={(e) => { e.stopPropagation(); handleAction("Edit Gallery Formatting"); }}
               >
                 <div className="flex gap-2 w-full mb-4 h-32 pointer-events-none">
-                  <div className="flex-[1] rounded-md overflow-hidden"><img src={mountainSrc1} className="w-full h-full object-cover" alt="mountains" /></div>
-                  <div className="flex-[1] rounded-md overflow-hidden"><img src={mountainSrc2} className="w-full h-full object-cover" alt="mountains" /></div>
-                  <div className="flex-[1] rounded-md overflow-hidden"><img src={mountainSrc1} className="w-full h-full object-cover" alt="mountains" /></div>
+                  <div className="flex-[1] rounded-md overflow-hidden relative mobile-vignette mobile-crop-adjust"><img src={mountainSrc1} className="w-full h-full object-cover mobile-image-adjust" alt="mountains" /></div>
+                  <div className="flex-[1] rounded-md overflow-hidden relative mobile-vignette mobile-crop-adjust"><img src={mountainSrc2} className="w-full h-full object-cover mobile-image-adjust" alt="mountains" /></div>
+                  <div className="flex-[1] rounded-md overflow-hidden relative mobile-vignette mobile-crop-adjust"><img src={mountainSrc1} className="w-full h-full object-cover mobile-image-adjust" alt="mountains" /></div>
                 </div>
                 <p className="text-[#0c1b33] font-bold text-[14px]">Add Your Heading Here</p>
               </div>
@@ -227,12 +283,12 @@ export default function MainCanvas({
                 onClick={(e) => { e.stopPropagation(); handleAction("Edit Grid Formatting"); }}
               >
                 <div className="grid grid-cols-6 gap-1.5 mb-6 h-[72px] pointer-events-none">
-                  <div className="rounded-sm overflow-hidden"><img src={mountainSrc1} className="w-full h-full object-cover" alt="mountains" /></div>
-                  <div className="rounded-sm overflow-hidden"><img src={mountainSrc2} className="w-full h-full object-cover" alt="mountains" /></div>
-                  <div className="rounded-sm overflow-hidden"><img src={mountainSrc1} className="w-full h-full object-cover" alt="mountains" /></div>
-                  <div className="rounded-sm overflow-hidden"><img src={mountainSrc2} className="w-full h-full object-cover" alt="mountains" /></div>
-                  <div className="rounded-sm overflow-hidden"><img src={mountainSrc1} className="w-full h-full object-cover" alt="mountains" /></div>
-                  <div className="rounded-sm overflow-hidden"><img src={mountainSrc2} className="w-full h-full object-cover" alt="mountains" /></div>
+                  <div className="rounded-sm overflow-hidden relative mobile-vignette mobile-crop-adjust"><img src={mountainSrc1} className="w-full h-full object-cover mobile-image-adjust" alt="mountains" /></div>
+                  <div className="rounded-sm overflow-hidden relative mobile-vignette mobile-crop-adjust"><img src={mountainSrc2} className="w-full h-full object-cover mobile-image-adjust" alt="mountains" /></div>
+                  <div className="rounded-sm overflow-hidden relative mobile-vignette mobile-crop-adjust"><img src={mountainSrc1} className="w-full h-full object-cover mobile-image-adjust" alt="mountains" /></div>
+                  <div className="rounded-sm overflow-hidden relative mobile-vignette mobile-crop-adjust"><img src={mountainSrc2} className="w-full h-full object-cover mobile-image-adjust" alt="mountains" /></div>
+                  <div className="rounded-sm overflow-hidden relative mobile-vignette mobile-crop-adjust"><img src={mountainSrc1} className="w-full h-full object-cover mobile-image-adjust" alt="mountains" /></div>
+                  <div className="rounded-sm overflow-hidden relative mobile-vignette mobile-crop-adjust"><img src={mountainSrc2} className="w-full h-full object-cover mobile-image-adjust" alt="mountains" /></div>
                 </div>
  
                 {/* Skeleton Text */}

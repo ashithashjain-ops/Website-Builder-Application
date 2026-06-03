@@ -1,6 +1,19 @@
 import React from 'react';
-import { ChevronDown, Undo2, Redo2, Eye, Send, X, Play, Save, Image as ImageIcon } from 'lucide-react';
+import Link from "next/link";
+import { ChevronDown, Undo2, Redo2, Eye, Send, X, Play, Save, Image as ImageIcon, ChevronRight, Download, ShoppingBag } from 'lucide-react';
 import { BlockData } from './types';
+ 
+const renderIcon = (type: string) => {
+  switch (type) {
+    case 'arrow': return <span className="font-light">→</span>;
+    case 'chevron': return <ChevronRight size={16} className="text-current" />;
+    case 'chevron-circle': return <div className="bg-white rounded-full p-[2px] text-current"><ChevronRight size={12} strokeWidth={3} /></div>;
+    case 'play-circle': return <div className="bg-white rounded-full p-[2px] text-current"><Play size={12} strokeWidth={3} fill="currentColor" /></div>;
+    case 'download-circle': return <div className="bg-white rounded-full p-[2px] text-current"><Download size={12} strokeWidth={3} /></div>;
+    case 'shopping-circle': return <div className="bg-white rounded-full p-[2px] text-current"><ShoppingBag size={12} strokeWidth={3} /></div>;
+    default: return <Play className="w-4 h-4 fill-current" />;
+  }
+};
  
 interface CanvasProps {
   blocks: BlockData[];
@@ -12,7 +25,7 @@ interface CanvasProps {
   onUndo?: () => void;
   onRedo?: () => void;
   editingButtonId?: string | null;
-  onButtonSelected?: (props: any) => void;
+  onButtonSelected?: (props: BlockData["props"]) => void;
   onOpenMobileSidebar?: () => void;
 }
  
@@ -44,6 +57,8 @@ export default function Canvas({
         const br = (block.props.borderRadius as string) || '6px';
         const parsedBr = (br !== '' && !isNaN(Number(br))) ? `${br}px` : br;
         const effect = block.props.effect as string;
+        const labelText = (block.props.label as string) || 'Click Me !';
+        const iconType = block.props.iconType as string;
  
         const maxWidthValue = parsedW === 'auto' ? 'none' : parsedW.replace(/\s+/g, '');
         const actualWidth = parsedW === 'auto' ? 'auto' : '100%';
@@ -58,6 +73,11 @@ export default function Canvas({
           boxShadow: block.props.dropShadow ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' : undefined,
           transform: `rotate(${block.props.rotation || 0}deg) scaleX(${block.props.flipH ? -1 : 1}) scaleY(${block.props.flipV ? -1 : 1})`,
           padding: `${block.props.padding !== undefined ? block.props.padding : 16}px`,
+          fontFamily: block.props.fontFamily ? (block.props.fontFamily as string) : undefined,
+          fontSize: block.props.fontSize ? `${block.props.fontSize}px` : undefined,
+          lineHeight: block.props.lineHeight ? (block.props.lineHeight as string) : undefined,
+          letterSpacing: block.props.letterSpacing ? (block.props.letterSpacing as string) : undefined,
+          fontWeight: block.props.fontWeight ? (block.props.fontWeight as string) : undefined,
         };
  
         return (
@@ -75,12 +95,12 @@ export default function Canvas({
                     onButtonSelected({ ...block.props, styleVariant: 'primary' });
                   }
                 }}
-                className="w-full flex items-center justify-center gap-2 text-white py-3.5 font-bold text-[15px] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg active:scale-[0.98]"
-                style={{ ...buttonStyle, background: bg || '#0f3b89' }}
+                className="w-full flex items-center justify-center gap-2 py-3.5 font-bold text-[15px] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg active:scale-[0.98]"
+                style={{ ...buttonStyle, background: bg || '#0f3b89', color: (block.props.color as string) || '#fff' }}
               >
-                {iconPos === 'left' && <Play className="w-4 h-4 fill-current" />}
-                Click Me !
-                {iconPos === 'right' && <Play className="w-4 h-4 fill-current" />}
+                {iconPos === 'left' && iconType !== 'none' && renderIcon(iconType)}
+                {labelText}
+                {iconPos === 'right' && iconType !== 'none' && renderIcon(iconType)}
               </button>
               <button
                 onClick={(e) => {
@@ -94,12 +114,12 @@ export default function Canvas({
                   ...buttonStyle,
                   background: 'transparent',
                   borderColor: bg || '#d1d5db',
-                  color: bg && !bg.includes('gradient') ? bg : '#0f3b89'
+                  color: (block.props.color as string) || (bg && !bg.includes('gradient') ? bg : '#0f3b89')
                 }}
               >
-                {iconPos === 'left' && <Play className="w-4 h-4 fill-current" />}
-                Secondary Button
-                {iconPos === 'right' && <Play className="w-4 h-4 fill-current" />}
+                {iconPos === 'left' && iconType !== 'none' && renderIcon(iconType)}
+                {labelText}
+                {iconPos === 'right' && iconType !== 'none' && renderIcon(iconType)}
               </button>
               <button
                 onClick={(e) => {
@@ -108,12 +128,12 @@ export default function Canvas({
                     onButtonSelected({ ...block.props, styleVariant: 'primary2' });
                   }
                 }}
-                className="w-full flex items-center justify-center gap-2 text-white py-3.5 font-bold text-[15px] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg active:scale-[0.98]"
-                style={{ ...buttonStyle, background: bg || '#0f3b89' }}
+                className="w-full flex items-center justify-center gap-2 py-3.5 font-bold text-[15px] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg active:scale-[0.98]"
+                style={{ ...buttonStyle, background: bg || '#0f3b89', color: (block.props.color as string) || '#fff' }}
               >
-                {iconPos === 'left' && <Play className="w-4 h-4 fill-current" />}
-                Primary Button
-                {iconPos === 'right' && <Play className="w-4 h-4 fill-current" />}
+                {iconPos === 'left' && iconType !== 'none' && renderIcon(iconType)}
+                {labelText}
+                {iconPos === 'right' && iconType !== 'none' && renderIcon(iconType)}
               </button>
               <button
                 onClick={(e) => {
@@ -127,12 +147,12 @@ export default function Canvas({
                   ...buttonStyle,
                   background: 'transparent',
                   borderColor: bg || '#d1d5db',
-                  color: bg && !bg.includes('gradient') ? bg : '#0f3b89'
+                  color: (block.props.color as string) || (bg && !bg.includes('gradient') ? bg : '#0f3b89')
                 }}
               >
-                {iconPos === 'left' && <Play className="w-4 h-4 fill-current" />}
-                Outline Button
-                {iconPos === 'right' && <Play className="w-4 h-4 fill-current" />}
+                {iconPos === 'left' && iconType !== 'none' && renderIcon(iconType)}
+                {labelText}
+                {iconPos === 'right' && iconType !== 'none' && renderIcon(iconType)}
               </button>
             </div>
  
@@ -220,10 +240,10 @@ export default function Canvas({
         className="flex h-[64px] flex-shrink-0 items-center justify-between gap-4 overflow-x-auto border-b border-[#dbe3ef] bg-white px-3 shadow-[0_1px_0_rgba(15,23,42,0.03)] md:px-5"
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="flex items-center gap-2 whitespace-nowrap rounded px-2 py-1.5 text-[14px] font-bold text-[#0B1D40] hover:bg-gray-100 md:text-[15px]">
+        <a href="/blockpages?template=portfolio" className="flex items-center gap-2 whitespace-nowrap rounded px-2 py-1.5 text-[14px] font-bold text-[#0B1D40] hover:bg-gray-100 md:text-[15px]">
           My Website
           <ChevronDown className="h-4 w-4 text-gray-600" />
-        </button>
+        </a>
  
         {/* Mobile Settings Trigger */}
         <button

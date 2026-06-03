@@ -5,19 +5,19 @@ import {
   LayoutTemplate, Columns, Heading, BoxSelect, Search,
   PlayCircle, Plus, Home, Info, FileText, Mail, UserRound,
   Ban, Pipette, AlignLeft, AlignCenter, AlignRight,
-  RotateCw, FlipVertical, FlipHorizontal, ArrowUpDown
+  RotateCw, FlipVertical, FlipHorizontal, ArrowUpDown, Play, Download, ShoppingBag
 } from 'lucide-react';
 import { BlockType } from './types';
  
 interface MobileLeftSidebarProps {
   onAddBlock: (type: BlockType) => void;
   onClose: () => void;
-  selectedBlock?: { id: string; props: Record<string, any> } | null;
-  onUpdateBlock?: (id: string, props: Record<string, any>) => void;
+  selectedBlock?: { id: string; props: Record<string, unknown> } | null;
+  onUpdateBlock?: (id: string, props: Record<string, unknown>) => void;
 }
  
 export default function MobileLeftSidebar({ onAddBlock, onClose, selectedBlock, onUpdateBlock }: MobileLeftSidebarProps) {
-  const [currentView, setCurrentView] = useState<'blocks' | 'button' | 'pages' | 'style'>('blocks');
+  const [currentView, setCurrentView] = useState<'blocks' | 'button' | 'pages'>('blocks');
   const [sections, setSections] = useState({
     basic: true,
     layout: true,
@@ -31,6 +31,11 @@ export default function MobileLeftSidebar({ onAddBlock, onClose, selectedBlock, 
  
   // Button state
   const [isPlaying, setIsPlaying] = useState(false);
+  const [buttonTab, setButtonTab] = useState<'Label' | 'Link'>('Label');
+ 
+  const applyPreset = (props: Record<string, unknown>) => {
+    handleUpdate(props);
+  };
  
   // Style state - initialize from selectedBlock if available
   const [activeColor, setActiveColor] = useState<number | null>(null);
@@ -41,7 +46,7 @@ export default function MobileLeftSidebar({ onAddBlock, onClose, selectedBlock, 
     selectedBlock?.props?.opacity !== undefined ? Math.round((selectedBlock.props.opacity as number) * 100) : 100
   );
  
-  const handleUpdate = (updates: Record<string, any>) => {
+  const handleUpdate = (updates: Record<string, unknown>) => {
     if (selectedBlock && onUpdateBlock) {
       onUpdateBlock(selectedBlock.id, { ...selectedBlock.props, ...updates });
     }
@@ -68,7 +73,7 @@ export default function MobileLeftSidebar({ onAddBlock, onClose, selectedBlock, 
       <div className="w-full h-full flex flex-col bg-[#06183C] text-white rounded-t-3xl overflow-hidden relative">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 bg-[#06183C]">
-          <button onClick={() => setCurrentView('style')} className="p-1 focus:outline-none hover:bg-white/5 rounded transition-all duration-300 hover:-translate-x-1 hover:scale-110">
+          <button onClick={() => setCurrentView('button')} className="p-1 focus:outline-none hover:bg-white/5 rounded transition-all duration-300 hover:-translate-x-1 hover:scale-110">
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
           <span className="font-bold text-[18px]">Pages</span>
@@ -119,7 +124,7 @@ export default function MobileLeftSidebar({ onAddBlock, onClose, selectedBlock, 
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
           <span className="font-bold text-[18px]">Button</span>
-          <button onClick={() => setCurrentView('style')} className="p-1 focus:outline-none hover:bg-white/5 rounded transition-all duration-300 hover:translate-x-1 hover:scale-110">
+          <button onClick={() => setCurrentView('pages')} className="p-1 focus:outline-none hover:bg-white/5 rounded transition-all duration-300 hover:translate-x-1 hover:scale-110">
             <ChevronRight className="w-5 h-5 text-white" />
           </button>
         </div>
@@ -129,112 +134,104 @@ export default function MobileLeftSidebar({ onAddBlock, onClose, selectedBlock, 
         {/* Content */}
         <div className="flex-1 overflow-y-auto pb-20">
  
-          {/* Video Settings */}
-          <div className="px-6 py-4">
-            <button onClick={() => toggleSection('videoSettings')} className="flex items-center justify-between w-full pb-4 text-white text-[15px] font-bold focus:outline-none">
-              Video Settings
-              {sections.videoSettings ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
-            </button>
- 
-            <div className={`transition-all duration-300 overflow-hidden ${sections.videoSettings ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-              <div className="w-full h-[160px] rounded-xl overflow-hidden relative mb-6">
-                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1200&h=800" alt="Mountain" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                  <PlayCircle className="w-12 h-12 text-white stroke-[1.5]" />
-                </div>
-              </div>
- 
-              <div className="flex gap-6 mb-6">
-                {/* Dimensions */}
-                <div className="flex-1">
-                  <span className="block text-[14px] font-bold mb-3">Dimensions</span>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center border border-[#1A2F5A] rounded-md overflow-hidden bg-[#0A1F4D] cursor-pointer">
-                      <span className="px-3 text-[13px] text-gray-300">W</span>
-                      <input
-                        type="text"
-                        className="flex-1 text-center text-[13px] font-medium bg-transparent outline-none w-full"
-                        defaultValue={(selectedBlock?.props?.width as string) || "20 px"}
-                        onBlur={(e) => handleUpdate({ width: e.target.value })}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleUpdate({ width: e.currentTarget.value });
-                        }}
-                      />
-                      <div className="px-2 py-2 border-l border-[#1A2F5A]">
-                        <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-                      </div>
-                    </div>
-                    <div className="flex items-center border border-[#1A2F5A] rounded-md overflow-hidden bg-[#0A1F4D] cursor-pointer">
-                      <span className="px-3 text-[13px] text-gray-300">H</span>
-                      <input
-                        type="text"
-                        className="flex-1 text-center text-[13px] font-medium bg-transparent outline-none w-full"
-                        defaultValue={(selectedBlock?.props?.height as string) || "12 px"}
-                        onBlur={(e) => handleUpdate({ height: e.target.value })}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleUpdate({ height: e.currentTarget.value });
-                        }}
-                      />
-                      <div className="px-2 py-2 border-l border-[#1A2F5A]">
-                        <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
- 
-                {/* Border Radius */}
-                <div className="flex-1">
-                  <span className="block text-[14px] font-bold mb-3">Border Radius</span>
-                  <div className="flex items-center border border-[#1A2F5A] rounded-md overflow-hidden bg-[#0A1F4D] cursor-pointer">
-                    <span className="px-3 text-[13px] text-gray-300">R</span>
-                    <input type="text" className="flex-1 text-center text-[13px] font-medium bg-transparent outline-none w-full" defaultValue="18 px" />
-                    <div className="px-2 py-2 border-l border-[#1A2F5A]">
-                      <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+          {/* Button Label and Link Headers */}
+          <div className="px-6 py-6">
+            <div className="flex items-center gap-8 mb-6">
+              <button
+                onClick={() => setButtonTab('Label')}
+                className={`font-bold text-[15px] transition-colors ${buttonTab === 'Label' ? 'text-white' : 'text-[#8495A5]'}`}
+              >
+                Button Label
+              </button>
+              <button
+                onClick={() => setButtonTab('Link')}
+                className={`font-bold text-[15px] transition-colors ${buttonTab === 'Link' ? 'text-white' : 'text-[#8495A5]'}`}
+              >
+                Button Link
+              </button>
             </div>
-          </div>
  
-          <div className="w-full h-[2px] bg-[#1E88E5]"></div>
+            {buttonTab === 'Label' ? (
+              <div className="grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-left-4 duration-300">
+                {/* Row 1 */}
+                <button onClick={() => applyPreset({ label: 'Create Account', backgroundColor: '#10B981', borderRadius: '12px', color: '#fff', iconType: 'none', iconPosition: 'none', buttonVariant: 'custom', dropShadow: false })} className="bg-[#10B981] hover:bg-[#059669] text-white text-[11px] sm:text-[12px] font-medium py-3.5 px-2 rounded-xl transition-colors">
+                  Create Account
+                </button>
+                <button onClick={() => applyPreset({ label: 'Get Started', iconPosition: 'right', iconType: 'arrow', backgroundColor: '#4F46E5', color: '#fff', borderRadius: '12px', buttonVariant: 'custom', dropShadow: false })} className="bg-[#4F46E5] hover:bg-[#4338CA] text-white text-[11px] sm:text-[12px] font-medium py-3.5 px-2 rounded-xl transition-colors flex items-center justify-center gap-1">
+                  Get Started <span className="font-light">→</span>
+                </button>
+                <button onClick={() => applyPreset({ label: 'Try it for free', iconPosition: 'right', iconType: 'chevron', backgroundColor: '#262626', color: '#fff', borderRadius: '4px', buttonVariant: 'custom', dropShadow: false })} className="bg-[#262626] border border-[#404040] hover:bg-[#404040] text-white text-[11px] sm:text-[12px] font-medium py-3.5 px-2 rounded-sm transition-colors flex items-center justify-center gap-1">
+                  Try it for free <ChevronRight size={12} className="text-[#8495A5]" />
+                </button>
  
-          {/* Play Settings */}
-          <div className="px-6 py-4">
-            <button onClick={() => toggleSection('playSettings')} className="flex items-center justify-between w-full pb-4 text-white text-[15px] font-bold focus:outline-none">
-              Play
-              {sections.playSettings ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
-            </button>
+                {/* Row 2 */}
+                <button onClick={() => applyPreset({ label: 'Sign Up', backgroundColor: '#5B21B6', color: '#fff', buttonVariant: 'pill', iconType: 'none', iconPosition: 'none', dropShadow: false })} className="bg-[#5B21B6] hover:bg-[#4C1D95] text-white text-[11px] sm:text-[12px] font-medium py-3.5 px-2 rounded-full transition-colors">
+                  Sign Up
+                </button>
+                <button onClick={() => applyPreset({ label: 'Click Me', backgroundColor: '#D946EF', color: '#fff', borderRadius: '12px', buttonVariant: 'custom', iconType: 'none', iconPosition: 'none', dropShadow: false })} className="bg-[#D946EF] hover:bg-[#C026D3] text-white text-[11px] sm:text-[12px] font-medium py-3.5 px-2 rounded-xl transition-colors">
+                  Click Me
+                </button>
+                <button onClick={() => applyPreset({ label: 'Get it', backgroundColor: '#EF4444', color: '#fff', buttonVariant: 'pill', iconType: 'none', iconPosition: 'none', dropShadow: false })} className="bg-[#EF4444] hover:bg-[#DC2626] text-white text-[11px] sm:text-[12px] font-medium py-3.5 px-2 rounded-full transition-colors">
+                  Get it
+                </button>
  
-            <div className={`transition-all duration-300 overflow-hidden ${sections.playSettings ? 'max-h-[200px] opacity-100' : 'max-h-0 opacity-0'}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <button className="w-8 h-8 bg-white hover:bg-gray-200 transition-colors rounded-md flex items-center justify-center text-[#0B1D40] focus:outline-none">
-                    <ChevronLeft className="w-5 h-5" />
+                {/* Row 3 */}
+                <button onClick={() => applyPreset({ label: 'Click Me', backgroundColor: '#FFFFFF', color: '#000000', buttonVariant: 'pill', dropShadow: true, iconType: 'none', iconPosition: 'none' })} className="bg-white text-black text-[11px] sm:text-[12px] font-medium py-3.5 px-2 rounded-full transition-transform hover:-translate-y-0.5 shadow-[-4px_4px_0_#262626] ml-1 mb-1">
+                  Click Me
+                </button>
+                <button onClick={() => applyPreset({ label: 'Sign In', backgroundColor: 'linear-gradient(to right, #D946EF, #8B5CF6)', color: '#fff', borderRadius: '12px', buttonVariant: 'custom', dropShadow: false, iconType: 'none', iconPosition: 'none' })} className="bg-gradient-to-r from-[#D946EF] to-[#8B5CF6] hover:opacity-90 text-white text-[11px] sm:text-[12px] font-medium py-3.5 px-2 rounded-xl transition-opacity">
+                  Sign In
+                </button>
+                <button onClick={() => applyPreset({ label: 'Get in touch', backgroundColor: '#F59E0B', color: '#fff', borderRadius: '20px 6px 6px 20px', buttonVariant: 'custom', dropShadow: false, iconType: 'none', iconPosition: 'none' })} className="bg-[#F59E0B] hover:bg-[#D97706] text-white text-[11px] sm:text-[12px] font-medium py-3.5 px-2 rounded-tl-[20px] rounded-br-[20px] rounded-tr-md rounded-bl-md transition-colors">
+                  Get in touch
+                </button>
+ 
+                {/* Row 4 */}
+                <div className="bg-white rounded-xl p-1.5 flex items-center col-span-2 h-[46px]">
+                  <button onClick={() => applyPreset({ label: 'Free trail', backgroundColor: '#262626', color: '#fff', borderRadius: '10px', buttonVariant: 'custom', dropShadow: false, iconType: 'none', iconPosition: 'none' })} className="bg-[#262626] text-white text-[11px] sm:text-[12px] font-medium px-4 rounded-[10px] whitespace-nowrap h-full flex items-center justify-center">
+                    Free trail
                   </button>
-                  <Plus className="w-5 h-5 text-gray-300" />
-                  <button
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    className={`w-12 h-8 rounded-full flex items-center px-1.5 transition-colors focus:outline-none ${isPlaying ? 'bg-[#7BA9FF] justify-end' : 'bg-[#1A2F5A] justify-start'}`}
-                  >
-                    {!isPlaying && <ChevronRight className="w-4 h-4 text-white ml-0.5" />}
-                    <div className="w-5 h-5 bg-white rounded-full transition-transform"></div>
-                    {isPlaying && <ChevronLeft className="w-4 h-4 text-[#7BA9FF] mr-0.5" />}
-                  </button>
-                  <button className="w-8 h-8 bg-white hover:bg-gray-200 transition-colors rounded-md flex items-center justify-center text-[#0B1D40] focus:outline-none">
-                    <ChevronRight className="w-5 h-5" />
+                  <button onClick={() => applyPreset({ label: 'Get Started', iconPosition: 'right', iconType: 'arrow', backgroundColor: 'transparent', color: '#0B182B', buttonVariant: 'custom', dropShadow: false })} className="flex-1 text-[#0B182B] text-[11px] sm:text-[12px] font-medium px-2 flex items-center justify-center gap-1 whitespace-nowrap h-full">
+                    Get Started <span className="font-light">→</span>
                   </button>
                 </div>
- 
-                <div className="border border-[#1A2F5A] bg-[#0A1F4D] rounded-full px-3 py-1.5 flex items-center gap-3">
-                  <button className="focus:outline-none"><div className="w-2.5 h-2.5 bg-white rounded-full"></div></button>
-                  <button className="focus:outline-none hover:opacity-70"><ChevronLeft className="w-4 h-4 text-gray-300" /></button>
-                  <button className="focus:outline-none hover:opacity-70"><Minus className="w-4 h-4 text-gray-300" /></button>
-                  <button className="focus:outline-none hover:opacity-70"><Plus className="w-4 h-4 text-gray-300" /></button>
-                  <button className="focus:outline-none hover:opacity-70"><ChevronRight className="w-4 h-4 text-gray-300" /></button>
-                </div>
+                <button onClick={() => applyPreset({ label: 'Sign up for free', backgroundColor: '#22D3EE', color: '#0B182B', buttonVariant: 'pill', dropShadow: false, iconType: 'none', iconPosition: 'none' })} className="bg-[#22D3EE] hover:bg-[#06B6D4] text-[#0B182B] text-[11px] sm:text-[12px] font-medium py-3.5 px-2 rounded-full transition-colors">
+                  Sign up for free
+                </button>
               </div>
-            </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-right-4 duration-300">
+                <button onClick={() => applyPreset({ label: 'READ MORE', backgroundColor: 'linear-gradient(to right, #D946EF, #7C3AED)', color: '#fff', borderRadius: '10px', iconPosition: 'right', iconType: 'chevron-circle', buttonVariant: 'custom' })} className="bg-gradient-to-r from-[#D946EF] to-[#7C3AED] flex items-center justify-between px-2 py-3.5 rounded-[10px] text-white text-[9px] sm:text-[10px] font-medium transition-transform hover:scale-105 shadow-sm">
+                  <span>READ MORE</span>
+                  <div className="bg-white rounded-full p-[2px] text-[#7C3AED]"><ChevronRight size={10} strokeWidth={3} /></div>
+                </button>
+ 
+                <button onClick={() => applyPreset({ label: 'LEARN MORE', backgroundColor: 'linear-gradient(to right, #22D3EE, #2563EB)', color: '#fff', borderRadius: '10px', iconPosition: 'right', iconType: 'chevron-circle', buttonVariant: 'custom' })} className="bg-gradient-to-r from-[#22D3EE] to-[#2563EB] flex items-center justify-between px-2 py-3.5 rounded-[10px] text-white text-[9px] sm:text-[10px] font-medium transition-transform hover:scale-105 shadow-sm">
+                  <span>LEARN MORE</span>
+                  <div className="bg-white rounded-full p-[2px] text-[#2563EB]"><ChevronRight size={10} strokeWidth={3} /></div>
+                </button>
+ 
+                <button onClick={() => applyPreset({ label: 'WATCH NOW', backgroundColor: 'linear-gradient(to right, #FBBF24, #F59E0B)', color: '#fff', borderRadius: '10px', iconPosition: 'right', iconType: 'play-circle', buttonVariant: 'custom' })} className="bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] flex items-center justify-between px-2 py-3.5 rounded-[10px] text-white text-[9px] sm:text-[10px] font-medium transition-transform hover:scale-105 shadow-sm">
+                  <span>WATCH NOW</span>
+                  <div className="bg-white rounded-full p-[2px] text-[#F59E0B]"><Play size={10} strokeWidth={3} fill="currentColor" /></div>
+                </button>
+ 
+                <button onClick={() => applyPreset({ label: 'BOOK NOW', backgroundColor: 'linear-gradient(to right, #FBBF24, #F59E0B)', color: '#fff', borderRadius: '10px', iconPosition: 'right', iconType: 'chevron-circle', buttonVariant: 'custom' })} className="bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] flex items-center justify-between px-2 py-3.5 rounded-[10px] text-white text-[9px] sm:text-[10px] font-medium transition-transform hover:scale-105 shadow-sm">
+                  <span>BOOK NOW</span>
+                  <div className="bg-white rounded-full p-[2px] text-[#F59E0B]"><ChevronRight size={10} strokeWidth={3} /></div>
+                </button>
+ 
+                <button onClick={() => applyPreset({ label: 'DOWNLOAD', backgroundColor: 'linear-gradient(to right, #D946EF, #7C3AED)', color: '#fff', borderRadius: '10px', iconPosition: 'right', iconType: 'download-circle', buttonVariant: 'custom' })} className="bg-gradient-to-r from-[#D946EF] to-[#7C3AED] flex items-center justify-between px-2 py-3.5 rounded-[10px] text-white text-[9px] sm:text-[10px] font-medium transition-transform hover:scale-105 shadow-sm">
+                  <span>DOWNLOAD</span>
+                  <div className="bg-white rounded-full p-[2px] text-[#7C3AED]"><Download size={10} strokeWidth={3} /></div>
+                </button>
+ 
+                <button onClick={() => applyPreset({ label: 'BUY NOW', backgroundColor: 'linear-gradient(to right, #22D3EE, #2563EB)', color: '#fff', borderRadius: '10px', iconPosition: 'right', iconType: 'shopping-circle', buttonVariant: 'custom' })} className="bg-gradient-to-r from-[#22D3EE] to-[#2563EB] flex items-center justify-between px-2 py-3.5 rounded-[10px] text-white text-[9px] sm:text-[10px] font-medium transition-transform hover:scale-105 shadow-sm">
+                  <span>BUY NOW</span>
+                  <div className="bg-white rounded-full p-[2px] text-[#2563EB]"><ShoppingBag size={10} strokeWidth={3} /></div>
+                </button>
+              </div>
+            )}
           </div>
  
         </div>
@@ -242,133 +239,7 @@ export default function MobileLeftSidebar({ onAddBlock, onClose, selectedBlock, 
     );
   }
  
-  if (currentView === 'style') {
-    return (
-      <div className="w-full h-full flex flex-col bg-[#06183C] text-white rounded-t-3xl overflow-hidden relative border-2 border-[#1E88E5]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5">
-          <button onClick={() => setCurrentView('button')} className="p-1 focus:outline-none hover:bg-white/5 rounded transition-all duration-300 hover:-translate-x-1 hover:scale-110">
-            <ChevronLeft className="w-5 h-5 text-white" />
-          </button>
-          <span className="font-bold text-[18px]">Style</span>
-          <button onClick={() => setCurrentView('pages')} className="p-1 focus:outline-none hover:bg-white/5 rounded transition-all duration-300 hover:translate-x-1 hover:scale-110">
-            <ChevronRight className="w-5 h-5 text-white" />
-          </button>
-        </div>
  
-        <div className="w-full h-[1px] bg-[#1A2F5A]"></div>
- 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
-          {/* Color Palette */}
-          <div className="flex items-center gap-[6px] mb-6">
-            <button onClick={() => { setActiveColor(0); handleUpdate({ bg: 'transparent' }); }} className={`w-[26px] h-[26px] rounded-[4px] border ${activeColor === 0 ? 'border-white' : 'border-[#1A2F5A]'} flex items-center justify-center bg-[#0A1F4D] transition-transform hover:scale-110`}><Ban className="w-4 h-4 text-gray-400" /></button>
-            <button onClick={() => setActiveColor(1)} className={`w-[26px] h-[26px] rounded-[4px] border ${activeColor === 1 ? 'border-white' : 'border-[#1A2F5A]'} flex items-center justify-center bg-[#0A1F4D] transition-transform hover:scale-110`}><Pipette className="w-3.5 h-3.5 text-gray-400" /></button>
-            <button onClick={() => { setActiveColor(2); handleUpdate({ bg: 'linear-gradient(90deg, #94ff24, #ff2f2f)' }); }} className={`w-[26px] h-[26px] rounded-[4px] bg-gradient-to-r from-[#94ff24] via-[#ff2f2f] to-[#ff2f2f] ${activeColor === 2 ? 'ring-2 ring-white' : ''} transition-transform hover:scale-110`}></button>
-            <button onClick={() => { setActiveColor(3); handleUpdate({ bg: '#EF4444' }); }} className={`w-[26px] h-[26px] rounded-[4px] bg-[#EF4444] ${activeColor === 3 ? 'ring-2 ring-white' : ''} transition-transform hover:scale-110`}></button>
-            <button onClick={() => { setActiveColor(4); handleUpdate({ bg: '#22C55E' }); }} className={`w-[26px] h-[26px] rounded-[4px] bg-[#22C55E] ${activeColor === 4 ? 'ring-2 ring-white' : ''} transition-transform hover:scale-110`}></button>
-            <button onClick={() => { setActiveColor(5); handleUpdate({ bg: '#3B82F6' }); }} className={`w-[26px] h-[26px] rounded-[4px] bg-[#3B82F6] ${activeColor === 5 ? 'ring-2 ring-white' : ''} transition-transform hover:scale-110`}></button>
-            <button onClick={() => { setActiveColor(6); handleUpdate({ bg: '#EAB308' }); }} className={`w-[26px] h-[26px] rounded-[4px] bg-[#EAB308] ${activeColor === 6 ? 'ring-2 ring-white' : ''} transition-transform hover:scale-110`}></button>
-            <button onClick={() => { setActiveColor(7); handleUpdate({ bg: '#FCA5A5' }); }} className={`w-[26px] h-[26px] rounded-[4px] bg-[#FCA5A5] ${activeColor === 7 ? 'ring-2 ring-white' : ''} transition-transform hover:scale-110`}></button>
-            <button onClick={() => { setActiveColor(8); handleUpdate({ bg: '#D97706' }); }} className={`w-[26px] h-[26px] rounded-[4px] bg-[#D97706] ${activeColor === 8 ? 'ring-2 ring-white' : ''} transition-transform hover:scale-110`}></button>
-            <button onClick={() => { setActiveColor(9); handleUpdate({ bg: '#D8B4FE' }); }} className={`w-[26px] h-[26px] rounded-[4px] bg-[#D8B4FE] ${activeColor === 9 ? 'ring-2 ring-white' : ''} transition-transform hover:scale-110`}></button>
-            <button onClick={() => { setActiveColor(10); handleUpdate({ bg: '#EC4899' }); }} className={`w-[26px] h-[26px] rounded-[4px] bg-[#EC4899] ${activeColor === 10 ? 'ring-2 ring-white' : ''} transition-transform hover:scale-110`}></button>
-            <button onClick={() => { setActiveColor(11); handleUpdate({ bg: '#ffffff' }); }} className={`w-[26px] h-[26px] rounded-[4px] bg-white ${activeColor === 11 ? 'ring-2 ring-blue-500' : ''} transition-transform hover:scale-110`}></button>
-          </div>
- 
-          {/* Position */}
-          <div className="mb-6">
-            <span className="block text-[13px] text-gray-300 mb-2">Position</span>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center border border-[#1A2F5A] rounded-md overflow-hidden bg-[#0A1F4D]">
-                <button onClick={() => { setActiveAlign('left'); handleUpdate({ align: 'left' }); }} className={`px-[10px] py-[6px] border-r border-[#1A2F5A] focus:outline-none transition-all duration-300 hover:scale-105 ${activeAlign === 'left' ? 'bg-white/10' : 'hover:bg-white/5'}`}><AlignLeft className="w-4 h-4 text-gray-300" /></button>
-                <button onClick={() => { setActiveAlign('center'); handleUpdate({ align: 'center' }); }} className={`px-[10px] py-[6px] border-r border-[#1A2F5A] focus:outline-none transition-all duration-300 hover:scale-105 ${activeAlign === 'center' ? 'bg-white/10' : 'hover:bg-white/5'}`}><AlignCenter className="w-4 h-4 text-gray-300" /></button>
-                <button onClick={() => { setActiveAlign('right'); handleUpdate({ align: 'right' }); }} className={`px-[10px] py-[6px] focus:outline-none transition-all duration-300 hover:scale-105 ${activeAlign === 'right' ? 'bg-white/10' : 'hover:bg-white/5'}`}><AlignRight className="w-4 h-4 text-gray-300" /></button>
-              </div>
- 
-              <div className="flex items-center border border-[#1A2F5A] rounded-full overflow-hidden bg-[#2D4571] px-1 py-1">
-                <button onClick={() => handleUpdate({ rotation: ((selectedBlock?.props?.rotation as number) || 0) + 90 })} className="p-1 hover:bg-white/10 focus:outline-none rounded-full transition-transform hover:scale-110 hover:rotate-90"><RotateCw className="w-3.5 h-3.5 text-white" /></button>
-                <button onClick={() => handleUpdate({ flipV: !(selectedBlock?.props?.flipV as boolean) })} className="p-1 hover:bg-white/10 focus:outline-none rounded-full transition-transform hover:scale-110 hover:-rotate-90"><FlipVertical className="w-3.5 h-3.5 text-white" /></button>
-                <button onClick={() => handleUpdate({ flipH: !(selectedBlock?.props?.flipH as boolean) })} className="p-1 hover:bg-white/10 focus:outline-none rounded-full transition-transform hover:scale-110 hover:rotate-90"><FlipHorizontal className="w-3.5 h-3.5 text-white" /></button>
-              </div>
- 
-              <div className="flex items-center border border-[#1A2F5A] rounded-md overflow-hidden bg-[#0A1F4D] transition-colors focus-within:ring-1 focus-within:ring-white">
-                <div className="flex items-center px-2 py-[6px] border-r border-[#1A2F5A]">
-                  <ArrowUpDown className="w-3.5 h-3.5 text-gray-300 mr-1" />
-                  <input type="text" className="w-[30px] bg-transparent outline-none text-[14px] font-medium" defaultValue="16" />
-                </div>
-                <button className="px-2 py-[6px] hover:bg-white/5 focus:outline-none transition-transform hover:scale-110"><ChevronDown className="w-4 h-4 text-gray-300" /></button>
-              </div>
-            </div>
-          </div>
- 
-          {/* Effects */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[13px] text-gray-300">Effects</span>
-              <button className="focus:outline-none hover:bg-white/5 p-1 rounded"><Plus className="w-4 h-4 text-gray-400" /></button>
-            </div>
-            <button className="w-full flex items-center justify-between border border-[#1A2F5A] rounded-md overflow-hidden bg-[#0A1F4D] px-3 py-2.5 focus:outline-none hover:bg-white/5 transition-colors">
-              <span className="text-[13px] text-gray-300">Background blur</span>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
-            </button>
-          </div>
- 
-          {/* Opacity */}
-          <div className="flex items-center justify-between mb-8 relative group">
-            <span className="text-[13px] text-gray-300 w-16">Opacity</span>
-            <div className="flex-1 mx-4 relative flex items-center">
-              <input
-                type="range"
-                min="0" max="100"
-                value={opacity}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value);
-                  setOpacity(val);
-                  handleUpdate({ opacity: val / 100 });
-                }}
-                className="w-full h-1 bg-[#1A2F5A] rounded-full appearance-none outline-none z-10 cursor-pointer
-                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer"
-                style={{
-                  background: `linear-gradient(to right, white ${opacity}%, #1A2F5A ${opacity}%)`
-                }}
-              />
-            </div>
-            <div className="bg-[#1A2F5A] rounded-md px-3 py-1.5 text-[14px] w-14 text-center font-medium">{opacity}</div>
-          </div>
- 
-          {/* Corner Radius */}
-          <div>
-            <span className="block text-[13px] text-gray-300 mb-2">Corner Radius</span>
-            <div className="flex items-center gap-3">
-              {[0, 1, 2, 3].map((val, i) => (
-                <div key={i} className="flex items-center gap-2 border border-[#1A2F5A] rounded-md bg-[#0A1F4D] px-2.5 py-1.5 flex-1 justify-center focus-within:border-blue-500 transition-colors">
-                  <div className="w-3.5 h-3.5 border border-dashed border-gray-500 rounded-sm relative shrink-0">
-                    {i === 0 && <div className="absolute top-[-1px] left-[-1px] w-[6px] h-[6px] border-t-[1.5px] border-l-[1.5px] border-white rounded-tl-[2px]"></div>}
-                    {i === 1 && <div className="absolute top-[-1px] right-[-1px] w-[6px] h-[6px] border-t-[1.5px] border-r-[1.5px] border-white rounded-tr-[2px]"></div>}
-                    {i === 2 && <div className="absolute bottom-[-1px] right-[-1px] w-[6px] h-[6px] border-b-[1.5px] border-r-[1.5px] border-white rounded-br-[2px]"></div>}
-                    {i === 3 && <div className="absolute bottom-[-1px] left-[-1px] w-[6px] h-[6px] border-b-[1.5px] border-l-[1.5px] border-white rounded-bl-[2px]"></div>}
-                  </div>
-                  <input
-                    type="text"
-                    defaultValue="0"
-                    className="w-full bg-transparent outline-none text-[14px] text-center"
-                    onBlur={(e) => handleUpdate({ borderRadius: `${e.target.value}px` })}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleUpdate({ borderRadius: `${e.currentTarget.value}px` });
-                      }
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
- 
-        </div>
-      </div>
-    );
-  }
  
   const blocksContent = [
     { label: 'Text', icon: <Type className="w-5 h-5" />, type: 'text' as BlockType },

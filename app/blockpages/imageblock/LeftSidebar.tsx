@@ -7,6 +7,7 @@ import {
   ChevronDown, Circle, ChevronLeft, ChevronRight, Plus, AlignLeft, AlignCenter, AlignRight, Ban, Pipette,
   Play, Download, ShoppingBag, FlipHorizontal, FlipVertical, RotateCcw, ArrowUpDown, SlidersHorizontal, Filter, Crop
 } from 'lucide-react';
+import { useBuilder } from './BuilderContext';
 
 export type BlockPageType = 'image' | 'button' | 'text';
 
@@ -17,9 +18,13 @@ type LeftSidebarProps = {
   editingImageId?: string | null;
   isButtonEditingMode?: boolean;
   editingButtonId?: string | null;
-  onUpdateButtonStyle?: (props: Record<string, any>) => void;
+  onUpdateButtonStyle?: (props: Record<string, unknown>) => void;
   onImageSelected?: (url: string) => void;
   onCloseMobileImageSelect?: () => void;
+  activeTextTarget?: "main" | "text" | "header" | "footer" | null;
+  onSelectTextTarget?: (target: "text" | "header") => void;
+  onUpdateTextStyles?: (styles: Record<string, string>) => void;
+  onUpdateTextSection?: (props: Record<string, string | boolean>) => void;
 };
 
 const styleColors = [
@@ -71,26 +76,19 @@ function LeftSidebar({
   editingButtonId,
   onUpdateButtonStyle,
   onImageSelected,
-  onCloseMobileImageSelect
+  onCloseMobileImageSelect,
+  activeTextTarget,
+  onSelectTextTarget,
+  onUpdateTextStyles,
+  onUpdateTextSection
 }: LeftSidebarProps) {
   const [activeTab, setActiveTab] = useState('Blocks');
   const [openCategories, setOpenCategories] = useState<number[]>([0, 1, 2]);
   const [subTab, setSubTab] = useState<'all' | 'next'>('all');
   const [isOpen, setIsOpen] = useState(false);
   const [mobileOverlayTab, setMobileOverlayTab] = useState('Typography');
-  const [mobileView, setMobileView] = useState<'Blocks' | 'Blocks Adjust' | 'Pages' | 'Button' | 'Style'>('Blocks');
+  const [mobileView, setMobileView] = useState<'Blocks' | 'Blocks Adjust' | 'Pages' | 'Button'>('Blocks');
   const [activeAdjustSection, setActiveAdjustSection] = useState<string | null>(null);
-  const [adjustBasic, setAdjustBasic] = useState({
-    brightness: 60,
-    contrast: 45,
-    saturation: 55,
-    vignette: 20,
-    shadows: 40,
-    temperature: 65,
-    tint: 30
-  });
-  const [activeFilter, setActiveFilter] = useState('Original');
-  const [activeCrop, setActiveCrop] = useState('Custom');
   const [buttonTab, setButtonTab] = useState<'Label' | 'Link'>('Label');
   const [activeMobilePage, setActiveMobilePage] = useState('Home Page');
   const [activeSwatch, setActiveSwatch] = useState(0);
@@ -104,16 +102,39 @@ function LeftSidebar({
 
   // Typography local states
   const [activeLanguage, setActiveLanguage] = useState('English');
-  const [activeFont, setActiveFont] = useState('All Fonts');
+  const [activeFont, setActiveFont] = useState('New Font Name');
   const [activeFontSize1, setActiveFontSize1] = useState('16');
-  const [activeLineHeight, setActiveLineHeight] = useState('Height');
-  const [activeLetterSpacing, setActiveLetterSpacing] = useState('Spacing');
+  const [activeLineHeight, setActiveLineHeight] = useState('Auto');
+  const [activeLetterSpacing, setActiveLetterSpacing] = useState('Normal');
+  const [activeFontWeight, setActiveFontWeight] = useState('normal');
 
   // Style local states
   const [mobileStyleColor, setMobileStyleColor] = useState<number | null>(0);
-  const [mobileStyleSize, setMobileStyleSize] = useState(50);
   const [mobileStyleOpacity, setMobileStyleOpacity] = useState(100);
+  const [mobileStyleSize, setMobileStyleSize] = useState(50);
   const [mobileCornerRadii, setMobileCornerRadii] = useState([0, 0, 0, 0]);
+
+  const handlePageClick = (pageName: string, id: string) => {
+    setActiveMobilePage(pageName);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('scrollToSectionEvent', { detail: id }));
+    }
+  };
+
+  // Builder Context for Image Block
+  const { activeElementId, updateElement, imageAdjustments, setImageAdjustments, activeFilter, setActiveFilter, activeCrop, setActiveCrop } = useBuilder();
+
+  const fontOptions = [
+    { label: 'New Font Name', value: '' },
+    { label: 'Arial', value: 'Arial, sans-serif' },
+    { label: 'Times New Roman', value: "'Times New Roman', serif" },
+    { label: 'Courier New', value: "'Courier New', monospace" },
+    { label: 'Georgia', value: 'Georgia, serif' },
+    { label: 'Verdana', value: 'Verdana, sans-serif' },
+    { label: 'Inter', value: 'Inter, sans-serif' },
+    { label: 'Roboto', value: 'Roboto, sans-serif' },
+    { label: 'Open Sans', value: "'Open Sans', sans-serif" }
+  ];
 
   const updateCornerRadius = (idx: number) => {
     const val = prompt('Enter corner radius value:', mobileCornerRadii[idx].toString());
@@ -128,6 +149,7 @@ function LeftSidebar({
 
   const toggleDropdown = (name: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
     setActiveDropdown(prev => prev === name ? null : name);
   };
 
@@ -136,16 +158,24 @@ function LeftSidebar({
   };
 
   useEffect(() => {
-    const closeDropdown = () => setActiveDropdown(null);
+    const closeDropdown = (e: Event) => {
+      setActiveDropdown(null);
+    };
     document.addEventListener('click', closeDropdown);
-    return () => document.removeEventListener('click', closeDropdown);
+    document.addEventListener('touchstart', closeDropdown);
+    return () => {
+      document.removeEventListener('click', closeDropdown);
+      document.removeEventListener('touchstart', closeDropdown);
+    };
   }, []);
 
   useEffect(() => {
     if (editingImageId && typeof window !== 'undefined' && window.innerWidth < 1024) {
-      setIsOpen(true);
-      setMobileView('Blocks');
-      setMobileOverlayTab('Images');
+      window.setTimeout(() => {
+        setIsOpen(true);
+        setMobileView('Blocks');
+        setMobileOverlayTab('Images');
+      }, 0);
     }
   }, [editingImageId]);
 
@@ -173,8 +203,13 @@ function LeftSidebar({
       return;
     }
 
-    if (type === 'Text' || type === 'Header') {
-      onSelectBlockPage?.('text');
+    if (type === 'Text') {
+      onSelectTextTarget?.('text');
+      return;
+    }
+
+    if (type === 'Header') {
+      onSelectTextTarget?.('header');
       return;
     }
 
@@ -185,6 +220,31 @@ function LeftSidebar({
     setOpenCategories(prev =>
       prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
     );
+  };
+
+  const handleUpdateText = (key: string, value: string) => {
+    if (activeBlockPage === 'button' || isButtonEditingMode) {
+      if (onUpdateButtonStyle) {
+        onUpdateButtonStyle({ [key]: value });
+      }
+    }
+
+    if (activeTextTarget === 'header') {
+      if (key === 'fontFamily') onUpdateTextSection?.({ headerFontFamily: value });
+      else if (key === 'fontSize') onUpdateTextSection?.({ headerFontSize: value });
+      else if (key === 'fontWeight') onUpdateTextSection?.({ headerFontWeight: value });
+      else if (key === 'color') onUpdateTextSection?.({ headerText: value });
+      else if (key === 'lineHeight') onUpdateTextSection?.({ headerLineHeight: value });
+      else if (key === 'letterSpacing') onUpdateTextSection?.({ headerLetterSpacing: value });
+      else if (key === 'textAlign') onUpdateTextSection?.({ alignment: value as 'left' | 'center' | 'right' }); // Assuming alignment is shared or mapped to alignment
+    } else if (activeTextTarget === 'main') {
+      if (key === 'color') onUpdateTextSection?.({ backgroundColor: value });
+      else if (key === 'textAlign') onUpdateTextSection?.({ alignment: value as 'left' | 'center' | 'right' });
+
+      onUpdateTextStyles?.({ [key]: value });
+    } else {
+      onUpdateTextStyles?.({ [key]: value });
+    }
   };
 
   return (
@@ -215,30 +275,28 @@ function LeftSidebar({
           />
 
           {/* Overlay Content */}
-          <div className="relative bg-[#0B182B] rounded-t-3xl w-full flex flex-col shadow-[0_-4px_20px_rgba(0,0,0,0.3)] animate-in slide-in-from-bottom-full duration-300 max-h-[50vh] overflow-y-auto no-scrollbar pb-6">
+          <div className="relative bg-[#0B182B] rounded-t-3xl w-full flex flex-col shadow-[0_-4px_20px_rgba(0,0,0,0.3)] animate-in slide-in-from-bottom-full duration-300 max-h-[50vh] overflow-y-auto no-scrollbar pb-32">
             {/* Header */}
             <div className={`flex items-center justify-between px-5 pt-5 pb-4 ${mobileView !== 'Blocks' ? 'border-b border-[#203354]' : ''}`}>
               <button
                 onClick={() => {
-                  if (mobileView === 'Style') setMobileView('Button');
-                  else if (mobileView === 'Button') setMobileView('Pages');
+                  if (mobileView === 'Button') setMobileView('Pages');
                   else if (mobileView === 'Pages') setMobileView('Blocks Adjust');
                   else if (mobileView === 'Blocks Adjust') setMobileView('Blocks');
-                  else setMobileView('Style');
+                  else setMobileView('Button');
                 }}
                 className="text-white p-1 cursor-pointer transition-transform hover:-translate-x-1 focus:outline-none"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <h2 className="text-white font-bold text-base">
-                {mobileView === 'Blocks' || mobileView === 'Blocks Adjust' ? 'Blocks' : mobileView === 'Pages' ? 'Pages' : mobileView === 'Button' ? 'Button' : 'Style'}
+                {mobileView === 'Blocks' || mobileView === 'Blocks Adjust' ? 'Blocks' : mobileView === 'Pages' ? 'Pages' : 'Button'}
               </h2>
               <button
                 onClick={() => {
                   if (mobileView === 'Blocks') setMobileView('Blocks Adjust');
                   else if (mobileView === 'Blocks Adjust') setMobileView('Pages');
                   else if (mobileView === 'Pages') setMobileView('Button');
-                  else if (mobileView === 'Button') setMobileView('Style');
                   else setMobileView('Blocks');
                 }}
                 className="text-white p-1 cursor-pointer transition-transform hover:translate-x-1 focus:outline-none"
@@ -287,12 +345,6 @@ function LeftSidebar({
                     Images
                   </button>
                   <button
-                    onClick={() => setMobileOverlayTab('Button')}
-                    className={`font-semibold text-[14px] whitespace-nowrap transition-colors ${mobileOverlayTab === 'Button' ? 'text-white' : 'text-[#8495A5]'}`}
-                  >
-                    Button
-                  </button>
-                  <button
                     onClick={() => setMobileOverlayTab('Video')}
                     className={`font-semibold text-[14px] whitespace-nowrap transition-colors ${mobileOverlayTab === 'Video' ? 'text-white' : 'text-[#8495A5]'}`}
                   >
@@ -303,45 +355,21 @@ function LeftSidebar({
                 {/* Typography Content */}
                 {mobileOverlayTab === 'Typography' && (
                   <div className="animate-in fade-in slide-in-from-left-4 duration-300">
-                    {/* Fonts Row 1 */}
-                    <div className="flex items-center gap-3 px-5 mb-5">
-                      <div className="relative">
-                        <button onClick={(e) => toggleDropdown('language', e)} className="bg-[#203354]/50 hover:bg-[#203354] text-[#8495A5] text-[13px] px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer">
-                          {activeLanguage}
-                        </button>
-                        {activeDropdown === 'language' && (
-                          <div className="absolute top-full left-0 mt-1 bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1 w-28 max-h-40 overflow-y-auto">
-                            {['English', 'Spanish', 'French', 'German'].map(lang => (
-                              <div key={lang} onClick={() => { setActiveLanguage(lang); setActiveDropdown(null); }} className="px-3 py-1.5 text-xs text-white hover:bg-[#203354] cursor-pointer">{lang}</div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => {
-                          const fontName = prompt('Enter the name of the font to add (or URL):', 'New Font Name');
-                          if (fontName) {
-                            alert(`Font "${fontName}" added successfully!`);
-                            setActiveFont(fontName);
-                          }
-                        }}
-                        className="bg-[#203354]/50 hover:bg-[#203354] text-[#8495A5] text-[13px] px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-1 cursor-pointer"
-                      >
-                        <Plus size={14} /> Add Font
-                      </button>
-                    </div>
-
-                    {/* Fonts Row 2 */}
-                    <div className="flex items-center gap-2 px-5 mb-5 overflow-visible pb-2">
+                    {/* Fonts Row 1 (Removed) */}                    {/* Fonts Row 2 */}
+                    <div className="flex items-center gap-2 px-5 mb-5 overflow-visible pb-2 relative z-20">
                       <div className="relative shrink-0">
                         <div onClick={(e) => toggleDropdown('fonts', e)} className="flex items-center justify-between bg-transparent border border-[#203354] rounded-full px-3 py-1.5 min-w-[100px] cursor-pointer hover:border-[#517AA5] transition-colors">
                           <span className="text-[#8495A5] text-[12px]">{activeFont}</span>
                           <ChevronDown size={14} className={`text-[#8495A5] transition-transform duration-200 ${activeDropdown === 'fonts' ? 'rotate-180' : ''}`} />
                         </div>
                         {activeDropdown === 'fonts' && (
-                          <div className="absolute top-full left-0 mt-1 bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1 w-32 max-h-40 overflow-y-auto">
-                            {['All Fonts', 'Inter', 'Roboto', 'Open Sans'].map(f => (
-                              <div key={f} onClick={() => { setActiveFont(f); setActiveDropdown(null); }} className="px-3 py-1.5 text-xs text-white hover:bg-[#203354] cursor-pointer">{f}</div>
+                          <div
+                            className="absolute top-full left-0 mt-1 bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1 w-40 max-h-48 overflow-y-auto"
+                            onClick={(e) => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}
+                            onTouchStart={(e) => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}
+                          >
+                            {fontOptions.map(f => (
+                              <div key={f.label} onClick={() => { setActiveFont(f.label); setActiveDropdown(null); handleUpdateText('fontFamily', f.value); }} className="px-3 py-1.5 text-xs text-white hover:bg-[#203354] cursor-pointer whitespace-nowrap">{f.label}</div>
                             ))}
                           </div>
                         )}
@@ -353,9 +381,13 @@ function LeftSidebar({
                           <ChevronDown size={14} className={`text-[#8495A5] transition-transform duration-200 ${activeDropdown === 'fontSize1' ? 'rotate-180' : ''}`} />
                         </div>
                         {activeDropdown === 'fontSize1' && (
-                          <div className="absolute top-full left-0 mt-1 bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1 w-20 max-h-40 overflow-y-auto">
+                          <div
+                            className="absolute top-full left-0 mt-1 bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1 w-20 max-h-40 overflow-y-auto"
+                            onClick={(e) => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}
+                            onTouchStart={(e) => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}
+                          >
                             {['12', '14', '16', '18', '24'].map(s => (
-                              <div key={s} onClick={() => { setActiveFontSize1(s); setActiveDropdown(null); }} className="px-3 py-1.5 text-xs text-white hover:bg-[#203354] cursor-pointer text-center">{s}</div>
+                              <div key={s} onClick={() => { setActiveFontSize1(s); setActiveDropdown(null); handleUpdateText('fontSize', s); }} className="px-3 py-1.5 text-xs text-white hover:bg-[#203354] cursor-pointer text-center">{s}</div>
                             ))}
                           </div>
                         )}
@@ -367,9 +399,13 @@ function LeftSidebar({
                           <span className="text-[#8495A5] text-[12px]">{activeLineHeight}</span>
                         </div>
                         {activeDropdown === 'lineHeight' && (
-                          <div className="absolute top-full left-0 mt-1 bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1 w-24 max-h-40 overflow-y-auto">
+                          <div
+                            className="absolute top-full left-0 mt-1 bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1 w-24 max-h-40 overflow-y-auto"
+                            onClick={(e) => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}
+                            onTouchStart={(e) => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}
+                          >
                             {['Auto', '1.2', '1.4', '1.6', '1.8', '2.0'].map(h => (
-                              <div key={h} onClick={() => { setActiveLineHeight(h); setActiveDropdown(null); }} className="px-3 py-1.5 text-xs text-white hover:bg-[#203354] cursor-pointer text-center">{h}</div>
+                              <div key={h} onClick={() => { setActiveLineHeight(h); setActiveDropdown(null); handleUpdateText('lineHeight', h === 'Auto' ? 'normal' : h); }} className="px-3 py-1.5 text-xs text-white hover:bg-[#203354] cursor-pointer text-center">{h}</div>
                             ))}
                           </div>
                         )}
@@ -385,9 +421,13 @@ function LeftSidebar({
                           <span className="text-[#8495A5] text-[12px]">{activeLetterSpacing}</span>
                         </div>
                         {activeDropdown === 'letterSpacing' && (
-                          <div className="absolute top-full left-0 mt-1 bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1 w-24 max-h-40 overflow-y-auto">
+                          <div
+                            className="absolute top-full left-0 mt-1 bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1 w-24 max-h-40 overflow-y-auto"
+                            onClick={(e) => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}
+                            onTouchStart={(e) => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}
+                          >
                             {['Normal', '1px', '2px', '3px', '4px', '5px'].map(sp => (
-                              <div key={sp} onClick={() => { setActiveLetterSpacing(sp); setActiveDropdown(null); }} className="px-3 py-1.5 text-xs text-white hover:bg-[#203354] cursor-pointer text-center">{sp}</div>
+                              <div key={sp} onClick={() => { setActiveLetterSpacing(sp); setActiveDropdown(null); handleUpdateText('letterSpacing', sp === 'Normal' ? 'normal' : sp); }} className="px-3 py-1.5 text-xs text-white hover:bg-[#203354] cursor-pointer text-center">{sp}</div>
                             ))}
                           </div>
                         )}
@@ -396,10 +436,20 @@ function LeftSidebar({
 
                     {/* Align Row */}
                     <div className="flex items-center gap-3 px-5 mb-8">
+                      <div
+                        className={`flex items-center justify-center border border-[#203354] rounded-full w-[28px] h-[28px] cursor-pointer hover:border-[#517AA5] transition-colors ${activeFontWeight === 'bold' ? 'bg-[#203354]' : ''}`}
+                        onClick={() => {
+                          const newWeight = activeFontWeight === 'bold' ? 'normal' : 'bold';
+                          setActiveFontWeight(newWeight);
+                          handleUpdateText('fontWeight', newWeight);
+                        }}
+                      >
+                        <span className="font-bold text-white text-[13px]">N</span>
+                      </div>
                       <div className="flex items-center border border-[#203354] rounded-full px-2 py-1 gap-1">
-                        <button onClick={() => setActiveTypographyAlign('left')} className={`p-1 transition-colors ${activeTypographyAlign === 'left' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignLeft size={16} /></button>
-                        <button onClick={() => setActiveTypographyAlign('center')} className={`p-1 transition-colors ${activeTypographyAlign === 'center' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignCenter size={16} /></button>
-                        <button onClick={() => setActiveTypographyAlign('right')} className={`p-1 transition-colors ${activeTypographyAlign === 'right' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignRight size={16} /></button>
+                        <button onClick={() => { setActiveTypographyAlign('left'); handleUpdateText('textAlign', 'left'); }} className={`p-1 transition-colors ${activeTypographyAlign === 'left' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignLeft size={16} /></button>
+                        <button onClick={() => { setActiveTypographyAlign('center'); handleUpdateText('textAlign', 'center'); }} className={`p-1 transition-colors ${activeTypographyAlign === 'center' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignCenter size={16} /></button>
+                        <button onClick={() => { setActiveTypographyAlign('right'); handleUpdateText('textAlign', 'right'); }} className={`p-1 transition-colors ${activeTypographyAlign === 'right' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignRight size={16} /></button>
                       </div>
                       <div className="flex items-center border border-[#203354] rounded-full px-2 py-1 gap-1">
                         <button onClick={() => setActiveTypographyAlign2('left')} className={`p-1 transition-colors ${activeTypographyAlign2 === 'left' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignLeft size={16} className="-rotate-90" /></button>
@@ -410,9 +460,19 @@ function LeftSidebar({
 
                     {/* Blocks Grid */}
                     <div className="flex justify-between items-center gap-2 px-5 pb-4 overflow-x-auto no-scrollbar">
-                      <div onClick={() => mobileAddBlock('Text')} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                      <div onClick={() => {
+                        setIsOpen(false);
+                        addBlock('Text');
+                      }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
                         <Type className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                         <span className="text-[10px] font-semibold text-[#0B182B]">Text</span>
+                      </div>
+                      <div onClick={() => {
+                        setIsOpen(false);
+                        addBlock('Header');
+                      }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                        <Heading className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
+                        <span className="text-[10px] font-semibold text-[#0B182B]">Header</span>
                       </div>
                       <div onClick={() => {
                         setIsOpen(false);
@@ -480,6 +540,7 @@ function LeftSidebar({
                             if (isButtonEditingMode && onUpdateButtonStyle) {
                               onUpdateButtonStyle({ backgroundColor: colorObj.value });
                             }
+                            handleUpdateText('color', colorObj.value);
                           }}
                           className={`w-8 h-8 rounded-lg shrink-0 ${colorObj.class} shadow-sm transition-transform ${mobileStyleColor === idx ? 'ring-2 ring-white ring-offset-2 ring-offset-[#0B182B] scale-110' : 'hover:scale-110'}`}
                         ></button>
@@ -503,6 +564,10 @@ function LeftSidebar({
                             if (isButtonEditingMode && onUpdateButtonStyle) {
                               // Map 0-100 to 100px-600px width
                               onUpdateButtonStyle({ width: `${100 + (val * 5)}px` });
+                            } else if (activeBlockPage === 'image' && activeElementId) {
+                              updateElement(activeElementId, { position: val.toString() });
+                            } else if (activeBlockPage === 'text') {
+                              handleUpdateText('fontSize', String(10 + Math.floor(val / 2)));
                             }
                           }}
                           className="flex-1 h-[2px] bg-[#517AA5] rounded-lg appearance-none cursor-pointer accent-white"
@@ -520,6 +585,13 @@ function LeftSidebar({
                             setMobileStyleOpacity(val);
                             if (isButtonEditingMode && onUpdateButtonStyle) {
                               onUpdateButtonStyle({ opacity: val });
+                            } else if (activeBlockPage === 'image' && activeElementId) {
+                              updateElement(activeElementId, { opacity: val });
+                            } else if (activeBlockPage === 'text') {
+                              const activeText = document.querySelector('.editable-text-active') as HTMLElement;
+                              if (activeText) {
+                                activeText.style.setProperty('opacity', `${val / 100}`, 'important');
+                              }
                             }
                           }}
                           className="flex-1 h-[2px] bg-[#517AA5] rounded-lg appearance-none cursor-pointer accent-white"
@@ -542,7 +614,7 @@ function LeftSidebar({
                           min="50" max="600"
                           defaultValue="200"
                           onChange={(e) => {
-                            if (isButtonEditingMode && onUpdateButtonStyle) {
+                            if ((isButtonEditingMode || activeBlockPage === 'button') && onUpdateButtonStyle) {
                               onUpdateButtonStyle({ width: `${e.target.value}px` });
                             }
                           }}
@@ -558,7 +630,7 @@ function LeftSidebar({
                           min="30" max="200"
                           defaultValue="50"
                           onChange={(e) => {
-                            if (isButtonEditingMode && onUpdateButtonStyle) {
+                            if ((isButtonEditingMode || activeBlockPage === 'button') && onUpdateButtonStyle) {
                               onUpdateButtonStyle({ height: `${e.target.value}px` });
                             }
                           }}
@@ -574,7 +646,7 @@ function LeftSidebar({
                           min="0" max="100"
                           defaultValue="6"
                           onChange={(e) => {
-                            if (isButtonEditingMode && onUpdateButtonStyle) {
+                            if ((isButtonEditingMode || activeBlockPage === 'button') && onUpdateButtonStyle) {
                               onUpdateButtonStyle({ borderRadius: `${e.target.value}px`, buttonVariant: 'default' });
                             }
                           }}
@@ -722,10 +794,10 @@ function LeftSidebar({
                           <input
                             type="range"
                             min="0" max="100"
-                            value={adjustBasic[slider.id as keyof typeof adjustBasic]}
-                            onChange={(e) => setAdjustBasic({ ...adjustBasic, [slider.id]: parseInt(e.target.value) })}
+                            value={imageAdjustments[slider.id as keyof typeof imageAdjustments]}
+                            onChange={(e) => setImageAdjustments({ ...imageAdjustments, [slider.id]: parseInt(e.target.value) })}
                             className="w-full h-[2px] rounded-lg appearance-none cursor-pointer accent-white"
-                            style={{ background: `linear-gradient(to right, white ${adjustBasic[slider.id as keyof typeof adjustBasic]}%, #4E627C ${adjustBasic[slider.id as keyof typeof adjustBasic]}%)` }}
+                            style={{ background: `linear-gradient(to right, white ${imageAdjustments[slider.id as keyof typeof imageAdjustments]}%, #4E627C ${imageAdjustments[slider.id as keyof typeof imageAdjustments]}%)` }}
                           />
                         </div>
                       ))}
@@ -867,144 +939,36 @@ function LeftSidebar({
                 {/* Pages Content for Mobile */}
                 <div className="flex flex-col gap-3">
                   <div
-                    onClick={() => setActiveMobilePage('Home Page')}
+                    onClick={() => handlePageClick('Home Page', 'home')}
                     className={`border rounded-lg p-3 cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ${activeMobilePage === 'Home Page' ? 'bg-[#1f345c] border-[#517AA5]' : 'bg-[#1A2B4C] border-[#4E627C]'}`}>
                     <span className={`text-sm font-medium ${activeMobilePage === 'Home Page' ? 'text-white' : 'text-[#8495A5]'}`}>Home Page</span>
                   </div>
                   <div
-                    onClick={() => setActiveMobilePage('About Us')}
+                    onClick={() => handlePageClick('About Us', 'about')}
                     className={`border rounded-lg p-3 cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ${activeMobilePage === 'About Us' ? 'bg-[#1f345c] border-[#517AA5]' : 'bg-[#1A2B4C] border-[#4E627C]'}`}>
                     <span className={`text-sm font-medium ${activeMobilePage === 'About Us' ? 'text-white' : 'text-[#8495A5]'}`}>About Us</span>
                   </div>
                   <div
-                    onClick={() => setActiveMobilePage('Contact')}
+                    onClick={() => handlePageClick('Projects', 'projects')}
+                    className={`border rounded-lg p-3 cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ${activeMobilePage === 'Projects' ? 'bg-[#1f345c] border-[#517AA5]' : 'bg-[#1A2B4C] border-[#4E627C]'}`}>
+                    <span className={`text-sm font-medium ${activeMobilePage === 'Projects' ? 'text-white' : 'text-[#8495A5]'}`}>Projects</span>
+                  </div>
+                  <div
+                    onClick={() => handlePageClick('Contact', 'contact')}
                     className={`border rounded-lg p-3 cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ${activeMobilePage === 'Contact' ? 'bg-[#1f345c] border-[#517AA5]' : 'bg-[#1A2B4C] border-[#4E627C]'}`}>
                     <span className={`text-sm font-medium ${activeMobilePage === 'Contact' ? 'text-white' : 'text-[#8495A5]'}`}>Contact</span>
                   </div>
-                  <button
+
+                  {/* <button
                     onClick={() => console.log('Add New Page')}
                     className="text-sm font-semibold text-[#517AA5] border border-dashed border-[#517AA5] rounded-lg py-2 mt-4 hover:bg-[#517AA5]/10 hover:shadow-sm active:scale-95 transition-all duration-300">
                     + Add New Page
-                  </button>
+                  </button> */}
                 </div>
               </div>
             )}
 
-            {mobileView === 'Style' && (
-              <div className="p-5 min-h-[400px] animate-in slide-in-from-right-8 duration-300">
-                {/* Swatches Row */}
-                <div className="flex items-center gap-2.5 mb-8 overflow-x-auto no-scrollbar px-1 pb-2">
-                  <button onClick={() => setActiveSwatch(-1)} className={`w-[30px] h-[30px] rounded-[6px] border border-[#203354] flex items-center justify-center shrink-0 transition-all duration-200 ${activeSwatch === -1 ? 'ring-2 ring-white ring-offset-2 ring-offset-[#0B182B]' : 'hover:bg-[#203354]/50'}`}>
-                    <Ban size={14} className="text-[#8495A5]" />
-                  </button>
-                  <button onClick={() => mobileAddBlock('Pipette Tool')} className="w-[30px] h-[30px] rounded-[6px] border border-[#203354] flex items-center justify-center shrink-0 hover:bg-[#203354]/50 transition-colors">
-                    <Pipette size={14} className="text-white" />
-                  </button>
-                  {colors.map((color, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveSwatch(idx)}
-                      className={`w-[30px] h-[30px] rounded-[6px] shrink-0 ${color} transition-all duration-200 ${activeSwatch === idx ? 'ring-2 ring-white ring-offset-2 ring-offset-[#0B182B]' : 'hover:scale-105'}`}
-                    ></button>
-                  ))}
-                </div>
 
-                {/* Position Section */}
-                <div className="mb-8 px-1">
-                  <h3 className="text-white text-[13px] font-medium mb-3">Position</h3>
-                  <div className="flex items-center justify-between gap-2">
-                    {/* Align Group */}
-                    <div className="flex items-center border border-[#203354] rounded-[10px] overflow-hidden h-[34px]">
-                      <button onClick={() => setActiveAlign('left')} className={`px-3 h-full border-r border-[#203354] flex items-center justify-center transition-colors ${activeAlign === 'left' ? 'bg-[#203354]' : 'hover:bg-[#203354]/50'}`}><AlignLeft size={16} className={activeAlign === 'left' ? 'text-white' : 'text-[#8495A5]'} /></button>
-                      <button onClick={() => setActiveAlign('center')} className={`px-3 h-full border-r border-[#203354] flex items-center justify-center transition-colors ${activeAlign === 'center' ? 'bg-[#203354]' : 'hover:bg-[#203354]/50'}`}><AlignCenter size={16} className={activeAlign === 'center' ? 'text-white' : 'text-[#8495A5]'} /></button>
-                      <button onClick={() => setActiveAlign('right')} className={`px-3 h-full flex items-center justify-center transition-colors ${activeAlign === 'right' ? 'bg-[#203354]' : 'hover:bg-[#203354]/50'}`}><AlignRight size={16} className={activeAlign === 'right' ? 'text-white' : 'text-[#8495A5]'} /></button>
-                    </div>
-
-                    {/* Transform Group */}
-                    <div className="flex items-center bg-[#203354] rounded-full px-3 h-[34px] gap-3">
-                      <button onClick={() => setTransformState(p => ({ ...p, rotate: !p.rotate }))} className={`hover:opacity-80 flex items-center justify-center transition-colors ${transformState.rotate ? 'text-white' : 'text-[#8495A5]'}`}><RotateCcw size={14} /></button>
-                      <button onClick={() => setTransformState(p => ({ ...p, flipV: !p.flipV }))} className={`hover:opacity-80 flex items-center justify-center transition-colors ${transformState.flipV ? 'text-white' : 'text-[#8495A5]'}`}><FlipVertical size={14} /></button>
-                      <button onClick={() => setTransformState(p => ({ ...p, flipH: !p.flipH }))} className={`hover:opacity-80 flex items-center justify-center transition-colors ${transformState.flipH ? 'text-white' : 'text-[#8495A5]'}`}><FlipHorizontal size={14} /></button>
-                    </div>
-
-                    {/* Size Group */}
-                    <div className="relative shrink-0">
-                      <div onClick={(e) => toggleDropdown('fontSize2', e)} className="flex items-center border border-[#203354] rounded-[10px] h-[34px] cursor-pointer hover:border-[#517AA5] overflow-hidden transition-colors">
-                        <div className="flex items-center px-2.5 h-full border-r border-[#203354]">
-                          <ArrowUpDown size={14} className="text-white mr-1.5" />
-                          <span className="text-white text-[13px]">16</span>
-                        </div>
-                        <button className="px-2 h-full hover:bg-[#203354]/50 flex items-center justify-center pointer-events-none">
-                          <ChevronDown size={14} className={`text-white transition-transform duration-200 ${activeDropdown === 'fontSize2' ? 'rotate-180' : ''}`} />
-                        </button>
-                      </div>
-                      {activeDropdown === 'fontSize2' && (
-                        <div className="absolute top-full right-0 mt-1 bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1 w-20 max-h-40 overflow-y-auto">
-                          {['12', '14', '16', '18', '24'].map(s => (
-                            <div key={s} onClick={() => setActiveDropdown(null)} className="px-3 py-1.5 text-xs text-white hover:bg-[#203354] cursor-pointer text-center">{s}</div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Effects Section */}
-                <div className="mb-8 px-1 relative">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-white text-[13px] font-medium">Effects</h3>
-                    <button className="text-[#8495A5] hover:text-white transition-colors"><Plus size={16} /></button>
-                  </div>
-                  <div className="relative">
-                    <div onClick={(e) => toggleDropdown('effects', e)} className="border border-[#203354] rounded-[10px] h-[38px] flex items-center justify-between px-3 cursor-pointer hover:border-[#517AA5] transition-colors">
-                      <span className="text-[#8495A5] text-[12px]">Background blur</span>
-                      <ChevronDown size={16} className={`text-[#8495A5] transition-transform duration-200 ${activeDropdown === 'effects' ? 'rotate-180' : ''}`} />
-                    </div>
-                    {activeDropdown === 'effects' && (
-                      <div className="absolute top-full left-0 mt-1 w-full bg-[#1A2B4C] border border-[#203354] rounded-lg shadow-lg z-[100] py-1">
-                        {['Background blur', 'Drop shadow', 'Inner shadow'].map(e => (
-                          <div key={e} onClick={() => setActiveDropdown(null)} className="px-3 py-2 text-xs text-white hover:bg-[#203354] cursor-pointer">{e}</div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Opacity Section */}
-                <div className="mb-8 px-1 flex items-center gap-4">
-                  <h3 className="text-white text-[13px] font-medium w-[60px]">Opacity</h3>
-                  <input
-                    type="range"
-                    min="0" max="100"
-                    value={opacity}
-                    onChange={(e) => setOpacity(parseInt(e.target.value))}
-                    className="flex-1 h-[2px] bg-[#203354] rounded-lg appearance-none cursor-pointer accent-white"
-                  />
-                  <div className="bg-[#203354] rounded-[8px] px-3 py-1.5 min-w-[48px] flex items-center justify-center">
-                    <span className="text-white text-[13px]">{opacity}</span>
-                  </div>
-                </div>
-
-                {/* Corner Radius Section */}
-                <div className="px-1">
-                  <h3 className="text-white text-[13px] font-medium mb-3">Corner Radius</h3>
-                  <div className="flex items-center gap-2.5">
-                    {/* 4 Inputs */}
-                    {mobileCornerRadii.map((radius, idx) => (
-                      <div onClick={() => updateCornerRadius(idx)} key={idx} className="flex items-center justify-center gap-1.5 border border-[#203354] rounded-[8px] px-2 py-1.5 w-14 cursor-pointer hover:border-[#517AA5] transition-colors">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#8495A5]">
-                          <path d="M8 4H6a2 2 0 0 0-2 2v2"></path>
-                          <path d="M16 4h2a2 2 0 0 1 2 2v2"></path>
-                          <path d="M8 20H6a2 2 0 0 1-2-2v-2"></path>
-                          <path d="M16 20h2a2 2 0 0 0 2-2v-2"></path>
-                        </svg>
-                        <span className="text-white text-[13px]">{radius}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
 
             {mobileView === 'Button' && (
               <div className="p-5 min-h-[400px] animate-in slide-in-from-right-8 duration-300">
@@ -1173,8 +1137,8 @@ function LeftSidebar({
                               const isActive =
                                 (block.name === 'Image' && (activeBlockPage === 'image' || isImageEditingMode)) ||
                                 (block.name === 'Button' && (activeBlockPage === 'button' || isButtonEditingMode)) ||
-                                (block.name === 'Text' && activeBlockPage === 'text' && !isImageEditingMode && !isButtonEditingMode) ||
-                                (block.name === 'Header' && activeBlockPage === 'text' && !isImageEditingMode && !isButtonEditingMode);
+                                (block.name === 'Text' && activeTextTarget === 'text') ||
+                                (block.name === 'Header' && activeTextTarget === 'header');
 
                               return (
                                 <div
@@ -1214,18 +1178,29 @@ function LeftSidebar({
             ) : (
               /* Pages Content */
               <div className="flex flex-col gap-3">
-                <div className="bg-[#1A2B4C] border border-[#4E627C] rounded-lg p-3 cursor-pointer hover:bg-[#1f345c] hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
-                  <span className="text-sm font-medium text-white">Home Page</span>
+                <div
+                  onClick={() => handlePageClick('Home Page', 'home')}
+                  className={`border rounded-lg p-3 cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ${activeMobilePage === 'Home Page' ? 'bg-[#1f345c] border-[#517AA5]' : 'bg-[#1A2B4C] border-[#4E627C]'}`}>
+                  <span className={`text-sm font-medium ${activeMobilePage === 'Home Page' ? 'text-white' : 'text-[#8495A5]'}`}>Home Page</span>
                 </div>
-                <div className="bg-[#1A2B4C] border border-[#4E627C] rounded-lg p-3 cursor-pointer hover:bg-[#1f345c] hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
-                  <span className="text-sm font-medium text-[#8495A5]">About Us</span>
+                <div
+                  onClick={() => handlePageClick('About Us', 'about')}
+                  className={`border rounded-lg p-3 cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ${activeMobilePage === 'About Us' ? 'bg-[#1f345c] border-[#517AA5]' : 'bg-[#1A2B4C] border-[#4E627C]'}`}>
+                  <span className={`text-sm font-medium ${activeMobilePage === 'About Us' ? 'text-white' : 'text-[#8495A5]'}`}>About Us</span>
                 </div>
-                <div className="bg-[#1A2B4C] border border-[#4E627C] rounded-lg p-3 cursor-pointer hover:bg-[#1f345c] hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
-                  <span className="text-sm font-medium text-[#8495A5]">Contact</span>
+                <div
+                  onClick={() => handlePageClick('Projects', 'projects')}
+                  className={`border rounded-lg p-3 cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ${activeMobilePage === 'Projects' ? 'bg-[#1f345c] border-[#517AA5]' : 'bg-[#1A2B4C] border-[#4E627C]'}`}>
+                  <span className={`text-sm font-medium ${activeMobilePage === 'Projects' ? 'text-white' : 'text-[#8495A5]'}`}>Projects</span>
                 </div>
-                <button className="text-sm font-semibold text-[#517AA5] border border-dashed border-[#517AA5] rounded-lg py-2 mt-4 hover:bg-[#517AA5]/10 hover:shadow-sm active:scale-95 transition-all duration-300">
+                <div
+                  onClick={() => handlePageClick('Contact', 'contact')}
+                  className={`border rounded-lg p-3 cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ${activeMobilePage === 'Contact' ? 'bg-[#1f345c] border-[#517AA5]' : 'bg-[#1A2B4C] border-[#4E627C]'}`}>
+                  <span className={`text-sm font-medium ${activeMobilePage === 'Contact' ? 'text-white' : 'text-[#8495A5]'}`}>Contact</span>
+                </div>
+                {/* <button className="text-sm font-semibold text-[#517AA5] border border-dashed border-[#517AA5] rounded-lg py-2 mt-4 hover:bg-[#517AA5]/10 hover:shadow-sm active:scale-95 transition-all duration-300">
                   + Add New Page
-                </button>
+                </button> */}
               </div>
             )}
           </div>
