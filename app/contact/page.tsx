@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from 'react';
+import Footer from '@/components/Footer';
+import { motion, type Variants } from 'framer-motion';
 import {
   FaFacebookF,
   FaEnvelope,
@@ -8,10 +10,26 @@ import {
   FaLinkedinIn,
   FaLocationDot,
   FaPhoneVolume,
+  FaPaperPlane,
   FaWhatsapp,
   FaXTwitter,
   FaYoutube,
 } from 'react-icons/fa6';
+
+const revealContainer: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.08 } },
+};
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
+};
+
+const slideIn: Variants = {
+  hidden: { opacity: 0, x: 36 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.65, ease: "easeOut" } },
+};
  
 const ContactSection = () => {
   // Form State
@@ -71,13 +89,24 @@ const ContactSection = () => {
   };
  
   return (
-    <main className="site-page bg-[#FFF1F2]">
-    <section id="contact" className="py-8 md:py-14 px-2 sm:px-8 lg:px-14 w-full overflow-hidden">
-      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
+    <main className="site-page flex min-h-screen flex-col bg-[#FFF1F2]">
+    <motion.section
+      id="contact"
+      className="relative w-full overflow-hidden px-2 py-8 sm:px-8 md:py-14 lg:px-14"
+      variants={revealContainer}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div
+        className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-blue-300/20 blur-3xl"
+        animate={{ scale: [1, 1.12, 1], opacity: [0.25, 0.5, 0.25] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-10 lg:flex-row lg:gap-16">
  
         {/* LEFT COLUMN: Contact Information */}
-        <div className="w-full lg:w-5/12 space-y-8 flex flex-col justify-center">
-          <div className="space-y-4">
+        <motion.div className="flex w-full flex-col justify-center space-y-8 lg:w-5/12" variants={revealContainer}>
+          <motion.div className="space-y-4" variants={fadeUp}>
             <div className="flex items-center gap-2 text-[#06224C] font-black">
               <FaPhoneVolume className="text-xl" aria-hidden="true" />
               <span className="uppercase tracking-[0.2em] text-xs">Contact</span>
@@ -88,11 +117,11 @@ const ContactSection = () => {
             <p className="text-gray-600 text-base sm:text-lg font-medium">
               Or simply reach out directly to
             </p>
-          </div>
+          </motion.div>
  
-          <div className="space-y-6">
+          <motion.div className="space-y-6" variants={revealContainer}>
             {/* Email Detail */}
-            <div className="flex items-center gap-4">
+            <motion.div className="flex items-center gap-4" variants={fadeUp} whileHover={{ x: 6 }}>
               <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
                 <FaEnvelope className="text-[#EA4335] text-2xl" aria-hidden="true" />
               </div>
@@ -100,10 +129,10 @@ const ContactSection = () => {
                 <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest">Email</p>
                 <p className="text-[#06224C] font-bold text-sm truncate">thestackly@gmail.com</p>
               </div>
-            </div>
+            </motion.div>
  
             {/* Location Detail */}
-            <div className="flex items-start gap-4">
+            <motion.div className="flex items-start gap-4" variants={fadeUp} whileHover={{ x: 6 }}>
               <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
                 <FaLocationDot className="text-[#EA4335] text-2xl" aria-hidden="true" />
               </div>
@@ -113,10 +142,10 @@ const ContactSection = () => {
                   MMR Complex, Chinna Thirupathi, Salem, Tamil Nadu 636008.
                 </p>
               </div>
-            </div>
+            </motion.div>
  
             {/* WhatsApp Detail */}
-            <div className="flex items-center gap-4">
+            <motion.div className="flex items-center gap-4" variants={fadeUp} whileHover={{ x: 6 }}>
               <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
                 <FaWhatsapp className="text-[#25D366] text-2xl" aria-hidden="true" />
               </div>
@@ -124,28 +153,33 @@ const ContactSection = () => {
                 <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest">Whatsapp</p>
                 <p className="text-[#06224C] font-bold text-sm">+91 7010792745</p>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
  
           {/* Social Links */}
-          <div className="pt-4">
+          <motion.div className="pt-4" variants={fadeUp}>
             <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-4">Social Media hereby :</p>
             <div className="flex flex-wrap gap-3">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
                 return (
-                  <a key={social.label} href={social.url} target="_blank" rel="noopener noreferrer" aria-label={social.label}
+                  <motion.a key={social.label} href={social.url} target="_blank" rel="noopener noreferrer" aria-label={social.label}
                     className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white shadow-md flex items-center justify-center hover:scale-110 transition-all border border-gray-100">
                     <Icon className={`${social.color} text-lg`} aria-hidden="true" />
-                  </a>
+                  </motion.a>
                 );
               })}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
  
         {/* RIGHT COLUMN: Form Card */}
-        <div className="w-full lg:w-7/12 bg-white rounded-[2.5rem] p-6 sm:p-10 md:p-12 shadow-2xl border border-white relative z-10">
+        <motion.div
+          className="relative z-10 w-full rounded-[2.5rem] border border-white bg-white p-6 shadow-2xl sm:p-10 md:p-12 lg:w-7/12"
+          variants={slideIn}
+          whileHover={{ y: -5, boxShadow: "0 30px 70px rgba(6,34,76,0.16)" }}
+          transition={{ duration: 0.25 }}
+        >
           <h3 className="text-2xl sm:text-3xl font-black text-[#06224C] mb-1">Send a Message</h3>
           <p className="text-xs sm:text-sm text-gray-400 font-bold mb-8 uppercase tracking-wide">we will get back to you within 48 hours.</p>
  
@@ -207,13 +241,14 @@ const ContactSection = () => {
               <textarea name="message" rows={4} value={formData.message} onChange={handleInputChange} placeholder="Tell me about your project..." className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-sm focus:border-blue-400 focus:bg-white outline-none resize-none transition-all"></textarea>
             </div>
  
-            <button type="submit" className="w-full bg-[#06224C] text-white py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-blue-900 transition-all shadow-lg active:scale-[0.98]">
-              Send Message <i className="fa-solid fa-paper-plane text-[10px]"></i>
-            </button>
+            <motion.button type="submit" className="w-full bg-[#06224C] text-white py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-blue-900 transition-all shadow-lg" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              Send Message <FaPaperPlane className="text-[10px]" aria-hidden="true" />
+            </motion.button>
           </form>
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
+    <Footer />
     </main>
   );
 };

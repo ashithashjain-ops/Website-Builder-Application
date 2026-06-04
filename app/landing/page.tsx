@@ -5,7 +5,6 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import CreateProjectFlow from "@/components/CreateProjectFlow";
-import AboutPage from "../aboutus/page";
 import { useEffect, useMemo, useState } from "react";
 import { motion, type TargetAndTransition, type Variants, AnimatePresence } from "framer-motion";
 import {
@@ -388,7 +387,6 @@ function LandingContactSection() {
 
 export default function Home() {
   const router = useRouter(); // Added router for navigation intercepts
-  const [currentPage, setCurrentPage] = useState<"home" | "about">("home");
   const [activeFilter, setActiveFilter] = useState<(typeof templateFilters)[number]["value"]>("all");
   const [activeFeature, setActiveFeature] = useState(0);
   const [openFaq, setOpenFaq] = useState(0);
@@ -514,19 +512,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const handleOpenAbout = () => {
-      setCurrentPage("about");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    window.addEventListener("stackly-open-about", handleOpenAbout);
-
-    return () => {
-      window.removeEventListener("stackly-open-about", handleOpenAbout);
-    };
-  }, []);
-
-  useEffect(() => {
     if (!isSearchOpen) {
       return;
     }
@@ -595,10 +580,6 @@ export default function Home() {
     window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
     showWishlistToast(`${product.title} added to cart!`);
   };
-
-  if (currentPage === "about") {
-    return <AboutPage onBack={() => setCurrentPage("home")} />;
-  }
 
   const submitSearch = (query: string) => {
     const nextQuery = query.trim();
@@ -844,10 +825,7 @@ export default function Home() {
           </motion.p>
           
           <motion.button
-            onClick={() => {
-              setCurrentPage("about");
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
+            onClick={() => router.push("/aboutus")}
             className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#0A2357] px-8 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg transition hover:bg-blue-900 active:scale-95"
             variants={fadeUp}
             whileHover={{ scale: 1.04, filter: "brightness(1.08)" }}
@@ -962,7 +940,7 @@ export default function Home() {
                     type="button"
                     onClick={() => addToCart(product)}
                     aria-label={`Add ${product.title} to cart`}
-                    className="flex h-10 w-12 items-center justify-center rounded-xl border-2 border-dashed border-blue-400 text-blue-50 transition hover:bg-blue-50"
+                    className="flex h-10 w-12 items-center justify-center rounded-xl border-2 border-dashed border-blue-400 text-blue-500 transition hover:bg-blue-50"
                   >
                     <FaCartShopping />
                   </button>
