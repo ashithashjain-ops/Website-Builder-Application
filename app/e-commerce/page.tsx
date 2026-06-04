@@ -805,6 +805,29 @@ export default function ECommercePage() {
 
   return (
     <main className="buyscreen-page min-h-[100dvh] overflow-x-hidden bg-[#f5f7fb] text-[#111827]">
+
+      {isEmbeddedPreview && (
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            /* Hide the Global Layout Navbar inside the preview iframe */
+            header:not(.buyscreen-header),
+            nav:not(.buyscreen-categories) {
+              display: none !important;
+            }
+
+            /* Hide the internal scrollbar in the preview window */
+            ::-webkit-scrollbar {
+              display: none !important;
+              width: 0 !important;
+              background: transparent !important;
+            }
+            html, body {
+              -ms-overflow-style: none !important;  /* IE and Edge */
+              scrollbar-width: none !important;  /* Firefox */
+            }
+          `
+        }} />
+      )}
       <style dangerouslySetInnerHTML={{
         __html: `
           @media (max-width: 1024px) {
@@ -1087,277 +1110,10 @@ export default function ECommercePage() {
         </div>
       ) : null}
 
-      <section className="hidden">
-        <div ref={topHeaderBarRef}>
-          <div className="buyscreen-top-header-inner mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            {/* Mobile / tablet / desktop-zoom: hamburger + logo + actions (cart/search/profile stay right) */}
-            <div className="buyscreen-top-header-row buyscreen-top-header-mobile-row flex min-w-0 flex-wrap items-center justify-between gap-2 py-2.5 lg:hidden">
-              <div className="flex min-w-0 shrink-0 flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsTopHeaderMenuOpen((v) => !v)}
-                  className="inline-flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-md border border-white/25 text-white transition-colors hover:bg-white/15 planning-zoom-show-hamburger"
-                  aria-label="Toggle top navigation menu"
-                  aria-expanded={isTopHeaderMenuOpen}
-                >
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
-                    <path d="M3 5.5H17M3 10H17M3 14.5H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                </button>
-                <div className="flex h-7 min-w-[70px] sm:h-9 sm:min-w-[92px] shrink-0 items-center justify-center overflow-hidden rounded-[50%] bg-white px-2 sm:px-3">
-                  <Image src={assetPath("/stackly-logo.webp")} alt="Stackly logo" width={160} height={40} className="h-[14px] w-auto sm:h-[20px]" unoptimized />
-                </div>
-              </div>
 
-              <div className="buyscreen-top-header-actions flex shrink-0 items-center gap-1.5 sm:gap-2">
-                <button
-                  type="button"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/80 text-white transition-colors hover:bg-white/15 hover:text-[#fef3c7] sm:h-8 sm:w-8"
-                  aria-label="Cart"
-                  onClick={() => router.push("/page-not-found")}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-                    <path d="M3 4h2l1.6 9.2a1 1 0 0 0 1 .8H18a1 1 0 0 0 1-.8L20.6 7H7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="10" cy="19" r="1.4" fill="currentColor" />
-                    <circle cx="17" cy="19" r="1.4" fill="currentColor" />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-[#06224C] transition-colors hover:bg-[#fef3c7] hover:text-[#06224C] sm:h-8 sm:w-8"
-                  aria-label="Search"
-                  aria-expanded={isTopHeaderSearchOpen}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsTopHeaderSearchOpen((v) => !v);
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-                    <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
-                    <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-                  </svg>
-                </button>
-                <div data-top-header-profile-wrap className="buyscreen-user-menu-wrap relative shrink-0">
-                  <button
-                    type="button"
-                    className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/40 transition-colors hover:border-[#fef3c7] hover:bg-white/10 sm:h-8 sm:w-8"
-                    aria-label="Profile"
-                    aria-expanded={isTopHeaderProfileMenuOpen}
-                    aria-haspopup="menu"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsTopHeaderProfileMenuOpen((prev) => !prev);
-                    }}
-                  >
-                    <Image src={assetPath("/photo.webp")} alt="Profile" width={36} height={36} className="block h-full w-full object-cover" unoptimized />
-                  </button>
-                  <div
-                    className={`buyscreen-user-menu-dropdown ${isTopHeaderProfileMenuOpen ? "buyscreen-user-menu-dropdown--open" : ""}`}
-                    role="menu"
-                    aria-hidden={!isTopHeaderProfileMenuOpen}
-                  >
-                    <button
-                      type="button"
-                      role="menuitem"
-                      className="buyscreen-user-menu-item"
-                      onClick={() => {
-                        setIsTopHeaderProfileMenuOpen(false);
-                        router.push("/login");
-                      }}
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <div ref={contentStartRef} className="w-full bg-white pb-12">
 
-            {/* Desktop: equal space between each segment — logo … nav links … actions (cart stays right with inner icon gaps) */}
-            <div className="buyscreen-top-header-row buyscreen-top-header-desktop-row hidden w-full min-w-0 items-center py-3 lg:flex">
-              <nav
-                className="flex w-full min-w-0 flex-nowrap items-center justify-between gap-0 text-[13px] font-semibold text-white"
-                aria-label="Main"
-              >
-                <div className="flex h-9 min-w-[104px] shrink-0 items-center justify-center overflow-hidden rounded-[50%] bg-white px-3">
-                  <Image src={assetPath("/stackly-logo.webp")} alt="Stackly logo" width={160} height={40} className="h-[20px] w-auto" unoptimized />
-                </div>
-                <button
-                  type="button"
-                  className={`buyscreen-top-header-nav-item shrink-0 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Home" ? " buyscreen-top-header-nav-item--active" : ""}`}
-                  onClick={() => handleTopHeaderItemClick("Home")}
-                >
-                  Home
-                </button>
-                <button
-                  type="button"
-                  className={`buyscreen-top-header-nav-item shrink-0 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "About Us" ? " buyscreen-top-header-nav-item--active" : ""}`}
-                  onClick={() => handleTopHeaderItemClick("About Us")}
-                >
-                  About Us
-                </button>
-                <button
-                  type="button"
-                  className={`buyscreen-top-header-nav-item inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Our Products" ? " buyscreen-top-header-nav-item--active" : ""}`}
-                  onClick={() => handleTopHeaderItemClick("Our Products")}
-                >
-                  Our Products
-                  <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden className="shrink-0">
-                    <path d="m5.5 7.5 4.5 5 4.5-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  className={`buyscreen-top-header-nav-item inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Categories" ? " buyscreen-top-header-nav-item--active" : ""}`}
-                  onClick={() => handleTopHeaderItemClick("Categories")}
-                >
-                  Categories
-                  <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden className="shrink-0">
-                    <path d="m5.5 7.5 4.5 5 4.5-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  className={`buyscreen-top-header-nav-item shrink-0 whitespace-nowrap text-[13px] font-semibold${activeTopHeaderItem === "Contact" ? " buyscreen-top-header-nav-item--active" : ""}`}
-                  onClick={() => handleTopHeaderItemClick("Contact")}
-                >
-                  Contact
-                </button>
-                <div className="buyscreen-top-header-actions flex shrink-0 items-center gap-3 sm:gap-4">
-                  <button
-                    type="button"
-                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/90 px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-white/15 hover:text-[#fef3c7]"
-                    aria-label="Cart"
-                    onClick={() => router.push("/page-not-found")}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-                      <path d="M3 4h2l1.6 9.2a1 1 0 0 0 1 .8H18a1 1 0 0 0 1-.8L20.6 7H7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                      <circle cx="10" cy="19" r="1.4" fill="currentColor" />
-                      <circle cx="17" cy="19" r="1.4" fill="currentColor" />
-                    </svg>
-                    Cart
-                  </button>
-                  <button
-                    type="button"
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#06224C] transition-colors hover:bg-[#fef3c7] hover:text-[#06224C]"
-                    aria-label="Search"
-                    aria-expanded={isTopHeaderSearchOpen}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsTopHeaderSearchOpen((v) => !v);
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-                      <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
-                      <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-                    </svg>
-                  </button>
-                  <div data-top-header-profile-wrap className="buyscreen-user-menu-wrap relative shrink-0">
-                    <button
-                      type="button"
-                      className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/40 transition-colors hover:border-[#fef3c7] hover:bg-white/10"
-                      aria-label="Profile"
-                      aria-expanded={isTopHeaderProfileMenuOpen}
-                      aria-haspopup="menu"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsTopHeaderProfileMenuOpen((prev) => !prev);
-                      }}
-                    >
-                      <Image src={assetPath("/photo.webp")} alt="Profile" width={36} height={36} className="block h-full w-full object-cover" unoptimized />
-                    </button>
-                    <div
-                      className={`buyscreen-user-menu-dropdown ${isTopHeaderProfileMenuOpen ? "buyscreen-user-menu-dropdown--open" : ""}`}
-                      role="menu"
-                      aria-hidden={!isTopHeaderProfileMenuOpen}
-                    >
-                      <button
-                        type="button"
-                        role="menuitem"
-                        className="buyscreen-user-menu-item"
-                        onClick={() => {
-                          setIsTopHeaderProfileMenuOpen(false);
-                          router.push("/login");
-                        }}
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </nav>
-            </div>
-          </div>
-          {isTopHeaderSearchOpen ? (
-            <div className="border-t border-white/20">
-              <div className="mx-auto w-full max-w-7xl px-4 pb-3 pt-2 sm:px-6 lg:px-8">
-                <label className="flex h-10 w-full items-center gap-2 rounded-md border-2 border-[#cbd5e1] bg-white px-3 text-sm text-[#4b5563]">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#374151]" aria-hidden>
-                    <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
-                    <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-                  </svg>
-                  <input
-                    ref={topHeaderSearchInputRef}
-                    type="search"
-                    value={topHeaderSearchQuery}
-                    onChange={(e) => {
-                      setTopHeaderSearchQuery(e.target.value);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key !== "Enter") return;
-                      e.preventDefault();
-                      setIsTopHeaderSearchOpen(false);
-                      router.push("/page-not-found");
-                    }}
-                    placeholder="Search..."
-                    className="min-w-0 flex-1 bg-transparent text-[#4b5563] outline-none placeholder:text-[#4b5563] placeholder:opacity-100"
-                    aria-label="Search products"
-                  />
-                </label>
-              </div>
-            </div>
-          ) : null}
-        </div>
-        {isTopHeaderMenuOpen ? (
-          <div className="border-t border-white/20 lg:hidden planning-zoom-show-mobile-menu">
-            <div className="mx-auto w-full max-w-7xl px-4 pb-3 pt-2 sm:px-6 lg:px-8">
-              <div className="grid grid-cols-2 gap-2">
-                {["Home", "About Us", "Our Products", "Categories", "Contact"].map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    className={`buyscreen-top-header-nav-item buyscreen-top-header-nav-item--grid px-2 py-2 text-left text-xs${activeTopHeaderItem === item ? " buyscreen-top-header-nav-item--active" : ""}`}
-                    onClick={() => handleTopHeaderItemClick(item)}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : null}
-      </section>
-
-      <div ref={contentStartRef} className="mx-auto w-full max-w-7xl px-4 pb-8 pt-5 sm:px-6 sm:pb-10 sm:pt-7 lg:px-8 lg:pb-12">
-        <div className="buyscreen-promo-strip mb-5 flex flex-col gap-3 rounded-2xl border border-white/70 bg-white/85 px-4 py-3 shadow-[0_18px_45px_rgba(15,35,75,0.08)] backdrop-blur sm:mb-7 sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4 sm:px-5">
-          <div className="min-w-0">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-[#2563eb]">
-              Stackly marketplace preview
-            </p>
-            <p className="mt-1 text-sm font-semibold text-[#334155]">
-              Explore electronics with cart, favorites, search, and category filtering.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            className="inline-flex w-full shrink-0 items-center justify-center rounded-full bg-[#06224C] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(6,34,76,0.24)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#0f3b89] sm:w-auto"
-            onClick={() => router.push("/page-not-found")}
-          >
-            Buy Now
-          </button>
-        </div>
-
-        <section className="buyscreen-shell overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_28px_90px_rgba(15,35,75,0.13)]">
+        <section className="buyscreen-shell overflow-hidden bg-white">
           {!isEmbeddedPreview && isPreviewOpen ? (
             <div className="space-y-10 px-4 py-8 sm:space-y-12 sm:px-8 sm:py-10 lg:py-12">
               <section className="overflow-hidden rounded-[1.75rem] border border-[#dbe3ef] bg-[linear-gradient(180deg,#f8fbff_0%,#eaf1f8_100%)] p-3 shadow-[0_20px_60px_rgba(15,35,75,0.12)] sm:p-5">
