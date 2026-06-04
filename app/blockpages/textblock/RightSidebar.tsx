@@ -108,11 +108,17 @@ export default function TextRightSidebar({ state, onStateChange, onClose }: Text
                     <h5 className="mb-2 text-[13px] font-bold text-[#0B1D40]">Select Section</h5>
                     <select
                       value={activeSectionId}
-                      onChange={(e) => onStateChange({ ...state, activeSectionId: e.target.value })}
+                      onChange={(e) => {
+                        const targetId = e.target.value;
+                        onStateChange({ ...state, activeSectionId: targetId });
+                        if (typeof window !== "undefined") {
+                          window.dispatchEvent(new CustomEvent('scrollToSectionEvent', { detail: targetId }));
+                        }
+                      }}
                       className="w-full rounded-xl border border-[#0B1D40] bg-transparent px-3 py-2.5 text-[14px] font-bold text-[#0B1D40] outline-none mb-4"
                     >
                       <option value="home">Home</option>
-                      <option value="about">About Us</option>
+                      <option value="about">About Me</option>
                       <option value="projects">Projects</option>
                       <option value="contact">Contact</option>
                     </select>
@@ -133,7 +139,7 @@ export default function TextRightSidebar({ state, onStateChange, onClose }: Text
                         className="w-full rounded bg-[#F4F6FA] p-2 text-[#06224C] border border-[#06224C]/20 text-xs"
                       />
                     </div>
-                    <div className="mt-3">
+                    {/* <div className="mt-3">
                       <p className="mb-1 text-xs text-[#06224C]/70">Background Image URL</p>
                       <input
                         value={activeStyle.backgroundImage || ""}
@@ -142,7 +148,7 @@ export default function TextRightSidebar({ state, onStateChange, onClose }: Text
                         type="text"
                         className="w-full rounded bg-[#F4F6FA] p-2 text-[#06224C] border border-[#06224C]/20 text-xs"
                       />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               );
@@ -219,7 +225,6 @@ export default function TextRightSidebar({ state, onStateChange, onClose }: Text
     </aside>
   );
 }
- 
 function ColorInput({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
     <div>

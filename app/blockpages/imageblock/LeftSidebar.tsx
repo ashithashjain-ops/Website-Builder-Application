@@ -5,7 +5,8 @@ import {
   Search, Mic, Type, Image as ImageIcon, MousePointer2,
   Video, Minus, AppWindow, Columns, Heading,
   ChevronDown, Circle, ChevronLeft, ChevronRight, Plus, AlignLeft, AlignCenter, AlignRight, Ban, Pipette,
-  Play, Download, ShoppingBag, FlipHorizontal, FlipVertical, RotateCcw, ArrowUpDown, SlidersHorizontal, Filter, Crop
+  Play, Download, ShoppingBag, FlipHorizontal, FlipVertical, RotateCcw, ArrowUpDown, SlidersHorizontal, Filter, Crop,
+  Section
 } from 'lucide-react';
 import { useBuilder } from './BuilderContext';
 
@@ -22,7 +23,7 @@ type LeftSidebarProps = {
   onImageSelected?: (url: string) => void;
   onCloseMobileImageSelect?: () => void;
   activeTextTarget?: "main" | "text" | "header" | "footer" | null;
-  onSelectTextTarget?: (target: "text" | "header") => void;
+  onSelectTextTarget?: (target: "main" | "text" | "header" | "footer") => void;
   onUpdateTextStyles?: (styles: Record<string, string>) => void;
   onUpdateTextSection?: (props: Record<string, string | boolean>) => void;
 };
@@ -173,7 +174,7 @@ function LeftSidebar({
     if (editingImageId && typeof window !== 'undefined' && window.innerWidth < 1024) {
       window.setTimeout(() => {
         setIsOpen(true);
-        setMobileView('Blocks');
+        setMobileView('Blocks Adjust');
         setMobileOverlayTab('Images');
       }, 0);
     }
@@ -210,6 +211,11 @@ function LeftSidebar({
 
     if (type === 'Header') {
       onSelectTextTarget?.('header');
+      return;
+    }
+
+    if (type === 'Section') {
+      onSelectTextTarget?.('main');
       return;
     }
 
@@ -451,11 +457,7 @@ function LeftSidebar({
                         <button onClick={() => { setActiveTypographyAlign('center'); handleUpdateText('textAlign', 'center'); }} className={`p-1 transition-colors ${activeTypographyAlign === 'center' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignCenter size={16} /></button>
                         <button onClick={() => { setActiveTypographyAlign('right'); handleUpdateText('textAlign', 'right'); }} className={`p-1 transition-colors ${activeTypographyAlign === 'right' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignRight size={16} /></button>
                       </div>
-                      <div className="flex items-center border border-[#203354] rounded-full px-2 py-1 gap-1">
-                        <button onClick={() => setActiveTypographyAlign2('left')} className={`p-1 transition-colors ${activeTypographyAlign2 === 'left' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignLeft size={16} className="-rotate-90" /></button>
-                        <button onClick={() => setActiveTypographyAlign2('center')} className={`p-1 transition-colors ${activeTypographyAlign2 === 'center' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignCenter size={16} className="-rotate-90" /></button>
-                        <button onClick={() => setActiveTypographyAlign2('right')} className={`p-1 transition-colors ${activeTypographyAlign2 === 'right' ? 'text-white' : 'text-[#8495A5] hover:text-white'}`}><AlignRight size={16} className="-rotate-90" /></button>
-                      </div>
+
                     </div>
 
                     {/* Blocks Grid */}
@@ -467,13 +469,7 @@ function LeftSidebar({
                         <Type className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                         <span className="text-[10px] font-semibold text-[#0B182B]">Text</span>
                       </div>
-                      <div onClick={() => {
-                        setIsOpen(false);
-                        addBlock('Header');
-                      }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
-                        <Heading className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
-                        <span className="text-[10px] font-semibold text-[#0B182B]">Header</span>
-                      </div>
+
                       <div onClick={() => {
                         setIsOpen(false);
                         onSelectBlockPage?.('image');
@@ -494,14 +490,40 @@ function LeftSidebar({
                         <Video className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                         <span className="text-[10px] font-semibold text-[#0B182B]">Video</span>
                       </div>
+                      <div onClick={() => setMobileOverlayTab('Video')} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                        <ImageIcon className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
+                        <span className="text-[10px] font-semibold text-[#0B182B]">Cenh</span>
+                      </div>
                       <div onClick={() => mobileAddBlock('Divider')} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
                         <Minus className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                         <span className="text-[10px] font-semibold text-[#0B182B]">Divider</span>
                       </div>
-                      <div onClick={() => mobileAddBlock('Layout')} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+
+                      {/* <div onClick={() => {
+                        setIsOpen(false);
+                        addBlock('Section');
+                      }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                        <AppWindow className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
+                        <span className="text-[10px] font-semibold text-[#0B182B]">Section</span>
+                      </div> */}
+
+                      <div onClick={() => {
+                        setIsOpen(false);
+                        addBlock('Columns');
+                      }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
                         <Columns className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
-                        <span className="text-[10px] font-semibold text-[#0B182B]">Layout</span>
+                        <span className="text-[10px] font-semibold text-[#0B182B]">Columns</span>
                       </div>
+
+                      <div onClick={() => {
+                        setIsOpen(false);
+                        addBlock('Header');
+                      }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                        <Heading className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
+                        <span className="text-[10px] font-semibold text-[#0B182B]">Header</span>
+                      </div>
+
+
                     </div>
                   </div>
                 )}
@@ -537,10 +559,13 @@ function LeftSidebar({
                           key={idx}
                           onClick={() => {
                             setMobileStyleColor(idx);
-                            if (isButtonEditingMode && onUpdateButtonStyle) {
-                              onUpdateButtonStyle({ backgroundColor: colorObj.value });
+                            if (activeBlockPage === 'button' || isButtonEditingMode) {
+                              if (onUpdateButtonStyle) {
+                                onUpdateButtonStyle({ backgroundColor: colorObj.value });
+                              }
+                            } else {
+                              handleUpdateText('color', colorObj.value);
                             }
-                            handleUpdateText('color', colorObj.value);
                           }}
                           className={`w-8 h-8 rounded-lg shrink-0 ${colorObj.class} shadow-sm transition-transform ${mobileStyleColor === idx ? 'ring-2 ring-white ring-offset-2 ring-offset-[#0B182B] scale-110' : 'hover:scale-110'}`}
                         ></button>
@@ -824,7 +849,7 @@ function LeftSidebar({
                           { id: 'Original', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop' },
                           { id: 'Vintage', img: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=150&h=150&fit=crop&grayscale' },
                           { id: 'Cinematic', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop' },
-                          { id: 'Black & White', img: 'https://images.unsplash.com/photo-1505028105985-aa85b633519a?w=150&h=150&fit=crop&grayscale' },
+                          { id: 'Black & White', img: 'https://placebear.com/g/150/150' },
                           { id: 'Nature', img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=150&h=150&fit=crop' },
                           { id: 'Creative', img: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=150&h=150&fit=crop' }
                         ].map(filter => (
@@ -1138,7 +1163,8 @@ function LeftSidebar({
                                 (block.name === 'Image' && (activeBlockPage === 'image' || isImageEditingMode)) ||
                                 (block.name === 'Button' && (activeBlockPage === 'button' || isButtonEditingMode)) ||
                                 (block.name === 'Text' && activeTextTarget === 'text') ||
-                                (block.name === 'Header' && activeTextTarget === 'header');
+                                (block.name === 'Header' && activeTextTarget === 'header') ||
+                                (block.name === 'Section' && activeTextTarget === 'main');
 
                               return (
                                 <div
