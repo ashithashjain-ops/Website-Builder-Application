@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Footer from "@/components/Footer";
-import { assetPath } from "@/lib/paths";
+import { assetPath, routePath } from "@/lib/paths";
 import { FaEye, FaLaptop, FaTabletAlt, FaMobileAlt } from "react-icons/fa";
 
 const buyCategories = [
@@ -724,7 +724,9 @@ export default function ECommercePage() {
   const previewParams = new URLSearchParams(searchParams.toString());
   previewParams.set(BUY_PREVIEW_QUERY_KEY, "embed");
   const previewQuery = previewParams.toString();
-  const previewSrc = previewQuery ? `${pathname}?${previewQuery}` : pathname;
+  const previewSrc = routePath(
+    previewQuery ? `${pathname}?${previewQuery}` : pathname,
+  );
   const activePreviewFrame = buyPreviewFrames[previewDevice];
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
