@@ -102,7 +102,7 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
     const makeEditable = (node: Element) => {
       if (node.closest("[data-builder-chrome='true']")) return;
  
-      const isHeader = node.closest(".buyscreen-header, .buyscreen-categories, .portfolio-shell > .sticky") !== null;
+      const isHeader = node.closest(".buyscreen-header, .buyscreen-categories, .portfolio-shell > .sticky, .portfolio-mobile-menu") !== null;
       const isFooter = node.closest("footer, .stackly-footer") !== null;
       const isMain = !isHeader && !isFooter;
  
@@ -110,7 +110,8 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
       if (isTextEditable && !isPreviewMode) {
         if (state.selectedTarget === "header" && isHeader) shouldBeEditable = true;
         else if (state.selectedTarget === "footer" && isFooter) shouldBeEditable = true;
-        else if ((state.selectedTarget === "main" || state.selectedTarget === "text") && isMain) shouldBeEditable = true;
+        else if (state.selectedTarget === "main" && isMain) shouldBeEditable = true;
+        else if (state.selectedTarget === "text") shouldBeEditable = true;
       }
  
       if (textTags.includes(node.tagName)) {
@@ -253,13 +254,15 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
  
               [data-textblock-canvas] .buyscreen-header,
               [data-textblock-canvas] .buyscreen-categories,
-              [data-textblock-canvas] .portfolio-shell > .sticky {
+              [data-textblock-canvas] .portfolio-shell > .sticky,
+              [data-textblock-canvas] .portfolio-mobile-menu > div {
                 background-color: ${section.headerBg} !important;
                 color: ${section.headerText} !important;
               }
               [data-textblock-canvas] .buyscreen-header *,
               [data-textblock-canvas] .buyscreen-categories *,
-              [data-textblock-canvas] .portfolio-shell > .sticky * {
+              [data-textblock-canvas] .portfolio-shell > .sticky *,
+              [data-textblock-canvas] .portfolio-mobile-menu * {
                 color: inherit !important;
                 border-color: ${section.headerText}66 !important;
                 ${section.headerFontSize ? `font-size: ${section.headerFontSize}px !important;` : ''}

@@ -234,6 +234,8 @@ export default function BlockPagesClient() {
             }}
             onUpdateTextStyles={(styles) => pushTextState({...textBlockState, textStyles: {...textBlockState.textStyles, ...styles}})}
             onUpdateTextSection={(props) => pushTextState({...textBlockState, section: {...textBlockState.section, ...props}})}
+            textBlockState={textBlockState}
+            onUpdateTextBlockState={pushTextState}
             onUpdateButtonStyle={(newProps) => {
               if (selectedButtonBlock) {
                 updateButtonBlock(selectedButtonBlock.id, newProps);

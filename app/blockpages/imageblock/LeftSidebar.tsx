@@ -12,6 +12,8 @@ import { useBuilder } from './BuilderContext';
 
 export type BlockPageType = 'image' | 'button' | 'text';
 
+import type { TextBlockState, TextSectionProps } from "../textblock/types";
+
 type LeftSidebarProps = {
   activeBlockPage?: BlockPageType;
   onSelectBlockPage?: (page: BlockPageType) => void;
@@ -26,8 +28,9 @@ type LeftSidebarProps = {
   onSelectTextTarget?: (target: "main" | "text" | "header" | "footer") => void;
   onUpdateTextStyles?: (styles: Record<string, string>) => void;
   onUpdateTextSection?: (props: Record<string, string | boolean>) => void;
+  textBlockState?: TextBlockState;
+  onUpdateTextBlockState?: (state: TextBlockState) => void;
 };
-
 const styleColors = [
   { class: 'bg-gradient-to-r from-[#22C55E] to-[#EF4444]', value: 'linear-gradient(90deg, #22C55E, #EF4444)' },
   { class: 'bg-[#EF4444]', value: '#EF4444' },
@@ -68,8 +71,8 @@ const blockCategories = [
   }
 ];
 
-function LeftSidebar({
-  activeBlockPage,
+export default function LeftSidebar({
+  activeBlockPage = 'text',
   onSelectBlockPage,
   isImageEditingMode,
   editingImageId,
@@ -81,7 +84,9 @@ function LeftSidebar({
   activeTextTarget,
   onSelectTextTarget,
   onUpdateTextStyles,
-  onUpdateTextSection
+  onUpdateTextSection,
+  textBlockState,
+  onUpdateTextBlockState
 }: LeftSidebarProps) {
   const [activeTab, setActiveTab] = useState('Blocks');
   const [openCategories, setOpenCategories] = useState<number[]>([0, 1, 2]);
@@ -345,6 +350,12 @@ function LeftSidebar({
                     Size
                   </button>
                   <button
+                    onClick={() => setMobileOverlayTab('Section')}
+                    className={`font-semibold text-[14px] whitespace-nowrap transition-colors ${mobileOverlayTab === 'Section' ? 'text-white' : 'text-[#8495A5]'}`}
+                  >
+                    Section
+                  </button>
+                  <button
                     onClick={() => setMobileOverlayTab('Images')}
                     className={`font-semibold text-[14px] whitespace-nowrap transition-colors ${mobileOverlayTab === 'Images' ? 'text-white' : 'text-[#8495A5]'}`}
                   >
@@ -463,24 +474,21 @@ function LeftSidebar({
                     {/* Blocks Grid */}
                     <div className="flex justify-between items-center gap-2 px-5 pb-4 overflow-x-auto no-scrollbar">
                       <div onClick={() => {
-                        setIsOpen(false);
                         addBlock('Text');
-                      }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                      }} className={`bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border hover:border-[#0B182B]/20 ${activeTextTarget === 'text' ? 'ring-2 ring-[#517AA5] border-[#517AA5]' : 'border-transparent'}`}>
                         <Type className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                         <span className="text-[10px] font-semibold text-[#0B182B]">Text</span>
                       </div>
 
                       <div onClick={() => {
-                        setIsOpen(false);
                         onSelectBlockPage?.('image');
-                      }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                      }} className={`bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border hover:border-[#0B182B]/20 ${(activeBlockPage === 'image' || isImageEditingMode) ? 'ring-2 ring-[#517AA5] border-[#517AA5]' : 'border-transparent'}`}>
                         <ImageIcon className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                         <span className="text-[10px] font-semibold text-[#0B182B]">Images</span>
                       </div>
                       <div onClick={() => {
-                        setIsOpen(false);
                         onSelectBlockPage?.('button');
-                      }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                      }} className={`bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border hover:border-[#0B182B]/20 ${(activeBlockPage === 'button' || isButtonEditingMode) ? 'ring-2 ring-[#517AA5] border-[#517AA5]' : 'border-transparent'}`}>
                         <div className="w-5 h-5 border-[1.5px] border-[#0B182B] rounded-md flex items-center justify-center mb-1">
                           <div className="w-2.5 h-[1.5px] bg-[#0B182B]"></div>
                         </div>
@@ -500,7 +508,6 @@ function LeftSidebar({
                       </div>
 
                       {/* <div onClick={() => {
-                        setIsOpen(false);
                         addBlock('Section');
                       }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
                         <AppWindow className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
@@ -508,7 +515,6 @@ function LeftSidebar({
                       </div> */}
 
                       <div onClick={() => {
-                        setIsOpen(false);
                         addBlock('Columns');
                       }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
                         <Columns className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
@@ -516,9 +522,8 @@ function LeftSidebar({
                       </div>
 
                       <div onClick={() => {
-                        setIsOpen(false);
                         addBlock('Header');
-                      }} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                      }} className={`bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border hover:border-[#0B182B]/20 ${activeTextTarget === 'header' ? 'ring-2 ring-[#517AA5] border-[#517AA5]' : 'border-transparent'}`}>
                         <Heading className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                         <span className="text-[10px] font-semibold text-[#0B182B]">Header</span>
                       </div>
@@ -678,6 +683,109 @@ function LeftSidebar({
                           className="flex-1 h-[2px] bg-[#517AA5] rounded-lg appearance-none cursor-pointer accent-white"
                         />
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Section Content */}
+                {mobileOverlayTab === 'Section' && textBlockState && onUpdateTextBlockState && (
+                  <div className="animate-in fade-in slide-in-from-right-4 duration-300 px-5 space-y-6">
+                    <div>
+                      <h4 className="mb-2 text-[14px] font-bold text-white">Editable Text</h4>
+                      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#203354] bg-[#11213A] px-3 py-2 text-sm font-semibold text-white transition-colors hover:border-[#517AA5]">
+                        <input
+                          type="checkbox"
+                          checked={textBlockState.isTextEditable}
+                          onChange={(event) => onUpdateTextBlockState({ ...textBlockState, isTextEditable: event.target.checked })}
+                          className="accent-[#517AA5]"
+                        />
+                        Enable text editing
+                      </label>
+                    </div>
+
+                    <div>
+                      <h4 className="mb-2 text-[14px] font-bold text-white">Alignment</h4>
+                      <select
+                        value={textBlockState.section.alignment}
+                        onChange={(event) => onUpdateTextBlockState({ ...textBlockState, section: { ...textBlockState.section, alignment: event.target.value as TextSectionProps["alignment"] } })}
+                        className="w-full rounded-xl border border-[#203354] bg-[#11213A] px-3 py-2.5 text-[14px] font-bold text-white outline-none focus:border-[#517AA5]"
+                      >
+                        <option value="left">Left</option>
+                        <option value="center">Center</option>
+                        <option value="right">Right</option>
+                      </select>
+                    </div>
+
+                    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#203354] bg-[#11213A] px-3 py-2 text-sm font-semibold text-white transition-colors hover:border-[#517AA5]">
+                      <input
+                        type="checkbox"
+                        checked={textBlockState.section.shadow}
+                        onChange={(event) => onUpdateTextBlockState({ ...textBlockState, section: { ...textBlockState.section, shadow: event.target.checked } })}
+                        className="accent-[#517AA5]"
+                      />
+                      Enable card shadows
+                    </label>
+
+                    <div className="w-full h-[1px] bg-[#203354]"></div>
+
+                    <div>
+                      <h4 className="mb-2 text-[14px] font-bold text-white">Select Section</h4>
+                      <select
+                        value={textBlockState.activeSectionId || "home"}
+                        onChange={(e) => {
+                          const targetId = e.target.value;
+                          onUpdateTextBlockState({ ...textBlockState, activeSectionId: targetId });
+                          if (typeof window !== "undefined") {
+                            window.dispatchEvent(new CustomEvent('scrollToSectionEvent', { detail: targetId }));
+                          }
+                        }}
+                        className="w-full rounded-xl border border-[#203354] bg-[#11213A] px-3 py-2.5 text-[14px] font-bold text-white outline-none mb-4 focus:border-[#517AA5]"
+                      >
+                        <option value="home">Home</option>
+                        <option value="about">About Me</option>
+                        <option value="projects">Projects</option>
+                        <option value="contact">Contact</option>
+                      </select>
+
+                      <h4 className="mb-2 text-[14px] font-bold text-white">Background Color</h4>
+                      <div className="flex items-center gap-2 mb-4">
+                        <input
+                          type="color"
+                          value={textBlockState.sectionStyles?.[textBlockState.activeSectionId || "home"]?.backgroundColor || "#ffffff"}
+                          onChange={(e) => {
+                            const currentId = textBlockState.activeSectionId || "home";
+                            const currentStyles = textBlockState.sectionStyles || {};
+                            onUpdateTextBlockState({
+                              ...textBlockState,
+                              sectionStyles: {
+                                ...currentStyles,
+                                [currentId]: { ...(currentStyles[currentId] || {}), backgroundColor: e.target.value }
+                              }
+                            });
+                          }}
+                          className="h-10 w-10 cursor-pointer border-0 bg-transparent p-0"
+                        />
+                        <span className="font-mono text-xs text-[#8495A5]">{textBlockState.sectionStyles?.[textBlockState.activeSectionId || "home"]?.backgroundColor || "#ffffff"}</span>
+                      </div>
+
+                      <h4 className="mb-2 text-[14px] font-bold text-white">Gradient Background</h4>
+                      <input
+                        type="text"
+                        placeholder="e.g. linear-gradient(to right, red, blue)"
+                        value={textBlockState.sectionStyles?.[textBlockState.activeSectionId || "home"]?.gradientBackground || ""}
+                        onChange={(e) => {
+                          const currentId = textBlockState.activeSectionId || "home";
+                          const currentStyles = textBlockState.sectionStyles || {};
+                          onUpdateTextBlockState({
+                            ...textBlockState,
+                            sectionStyles: {
+                              ...currentStyles,
+                              [currentId]: { ...(currentStyles[currentId] || {}), gradientBackground: e.target.value }
+                            }
+                          });
+                        }}
+                        className="w-full rounded-xl border border-[#203354] bg-[#11213A] px-3 py-2.5 text-[14px] text-white outline-none focus:border-[#517AA5] mb-8"
+                      />
                     </div>
                   </div>
                 )}
@@ -1260,5 +1368,3 @@ function LeftSidebar({
     </>
   );
 };
-
-export default LeftSidebar;
