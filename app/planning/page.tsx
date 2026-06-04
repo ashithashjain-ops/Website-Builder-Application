@@ -326,6 +326,18 @@ export default function PlanningPage() {
     if (stored) setBillingHistory(stored);
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+    scrollToTop();
+    const frame = requestAnimationFrame(scrollToTop);
+    return () => cancelAnimationFrame(frame);
+  }, [planningView]);
+
   function getActivePrice(plan: Plan) {
     return {
       oldPrice: billingYearly ? plan.yearlyOldPrice : plan.oldPrice,
