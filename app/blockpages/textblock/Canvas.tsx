@@ -1,7 +1,6 @@
 "use client";
  
 import { useEffect, useRef } from "react";
-import Link from "next/link";
 import { ChevronDown, Eye, Redo2, Save, Send, Undo2 } from "lucide-react";
 import { assetPath } from "@/lib/paths";
 import PortfolioPreview from "./PortfolioPreview";
@@ -288,7 +287,7 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
               className={template === "ecommerce" ? "h-[calc(100vh-160px)] min-h-[560px] overflow-y-auto" : undefined}
             >
               <div ref={contentRef}>
-                {template === "portfolio" ? <PortfolioPreview isImageEditingMode={isImageEditingMode} customImages={customImages} onEditImage={onEditImage} editingImageId={editingImageId} isButtonEditingMode={isButtonEditingMode} customButtons={customButtons} onEditButton={onEditButton} sectionStyles={state.sectionStyles} /> : <StorefrontPreview />}
+                {template === "portfolio" ? <PortfolioPreview isImageEditingMode={isImageEditingMode} customImages={customImages} onEditImage={onEditImage} editingImageId={editingImageId} isButtonEditingMode={isButtonEditingMode} customButtons={customButtons} onEditButton={onEditButton} sectionStyles={state.sectionStyles} onPreview={openPreviewPage} /> : <StorefrontPreview />}
               </div>
             </div>
           </div>

@@ -10,11 +10,26 @@ export default function BlockPreviewPage() {
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
 
   useEffect(() => {
-    const frameId = window.requestAnimationFrame(() => {
+    const loadPreview = () => {
       setPreviewHtml(window.localStorage.getItem(TEXTBLOCK_PREVIEW_STORAGE_KEY) ?? "");
+    };
+
+    const frameId = window.requestAnimationFrame(() => {
+      loadPreview();
     });
 
-    return () => window.cancelAnimationFrame(frameId);
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === TEXTBLOCK_PREVIEW_STORAGE_KEY) {
+        setPreviewHtml(event.newValue ?? "");
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("storage", handleStorage);
+    };
   }, []);
 
   if (previewHtml === null) {

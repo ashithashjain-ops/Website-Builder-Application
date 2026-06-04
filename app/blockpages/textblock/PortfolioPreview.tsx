@@ -28,6 +28,7 @@ type PortfolioPreviewProps = {
   customButtons?: Record<string, BlockData["props"]>;
   onEditButton?: (buttonId: string) => void;
   sectionStyles?: Record<string, SectionStyleConfig>;
+  onPreview?: () => void;
 };
 
 function useLocalInView<T extends HTMLElement>({
@@ -104,7 +105,8 @@ export default function PortfolioPreview({
   isButtonEditingMode = false,
   customButtons = {},
   onEditButton,
-  sectionStyles = {}
+  sectionStyles = {},
+  onPreview,
 }: PortfolioPreviewProps) {
   const [innerMobileMenuOpen, setInnerMobileMenuOpen] = useState(false);
 
@@ -367,9 +369,9 @@ export default function PortfolioPreview({
                         </button>
 
                         {/* Preview */}
-                        <a href="preview.html" className="px-3 py-1 text-xs font-semibold flex items-center gap-1 border border-gray-300 rounded-md text-white hover:bg-white hover:text-black transition">
+                        <button type="button" onClick={onPreview} className="px-3 py-1 text-xs font-semibold flex items-center gap-1 border border-gray-300 rounded-md text-white hover:bg-white hover:text-black transition">
                           Preview <FaEye className="text-[10px]" />
-                        </a>
+                        </button>
 
                       </div>
                     </div>
@@ -426,9 +428,9 @@ export default function PortfolioPreview({
 
                         <div className="w-px border-1 border-gray-300"></div>
 
-                        <a href="preview.html" className="px-2 py-1 flex items-center gap-1 hover:bg-white hover:text-black transition">
+                        <button type="button" onClick={onPreview} className="px-2 py-1 flex items-center gap-1 hover:bg-white hover:text-black transition">
                           Preview <FaEye className="text-[10px]" />
-                        </a>
+                        </button>
 
                       </div>
 

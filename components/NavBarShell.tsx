@@ -5,7 +5,6 @@ import NavBar from "@/components/navBar";
 
 const navbarHiddenRoutes = new Set([
   "/",
-  "/aboutus",
   "/login",
   "/signup",
   "/backend-error",
@@ -25,5 +24,5 @@ export default function NavBarShell() {
     return null;
   }
 
-  return <NavBar />;
+  return <NavBar keepVisible={normalizedPathname.startsWith("/blockpages")} />;
 }
