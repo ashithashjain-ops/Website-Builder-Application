@@ -178,6 +178,7 @@ function AnimatedHamburger({ open }: { open: boolean }) {
 type NavBarProps = {
   wishlistCount?: number;
   onWishlistClick?: () => void;
+  keepVisible?: boolean;
 };
  
 type StoredCommerceItem = {
@@ -227,7 +228,7 @@ function normalizeStoredItem(item: StoredCommerceItem) {
   };
 }
  
-export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistClick }: NavBarProps) {
+export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistClick, keepVisible = false }: NavBarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [wishlistItems, setWishlistItems] = useState<StoredCommerceItem[]>([]);
   const [cartItems, setCartItems] = useState<StoredCommerceItem[]>([]);
@@ -242,6 +243,11 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
   const prefersReducedMotion = useReducedMotion();
   const navRef = useRef<HTMLElement>(null);
   const prevScrollY = useRef(0);
+  const keepVisibleRef = useRef(keepVisible);
+
+  useEffect(() => {
+    keepVisibleRef.current = keepVisible;
+  });
  
   const scrollLandingSection = (event: MouseEvent<HTMLAnchorElement>, sectionId: string, closeMobile = false) => {
     const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -337,7 +343,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
       setScrollProgress(scrollHeight > 0 ? Math.min(current / scrollHeight, 1) : 0);
 
       const locked = mobileOpen || Boolean(activeMenu) || isProfileMenuOpen || Boolean(activePanel);
-      if (locked) {
+      if (locked || keepVisibleRef.current) {
         setHidden(false);
         return;
       }
@@ -403,7 +409,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
 
   const navLockedVisible = mobileOpen || Boolean(activeMenu) || isProfileMenuOpen || Boolean(activePanel);
   // Hide is a functional behaviour — always apply it; only skip the spring animation for reduced-motion users
-  const navHidden = hidden && !navLockedVisible;
+  const navHidden = hidden && !navLockedVisible && !keepVisible;
  
   return (
     <>
@@ -437,7 +443,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
  
           <div className="hidden items-center justify-center gap-12 text-[13px] font-bold uppercase tracking-wide text-white lg:flex">
             <Link href="/landing" className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300"><MotionNavItem>HOME</MotionNavItem></Link>
-            <Link href="/landing#about" onClick={(event) => scrollLandingSection(event, "about")} className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300"><MotionNavItem>ABOUT US</MotionNavItem></Link>
+            <Link href="/aboutus" className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300"><MotionNavItem>ABOUT US</MotionNavItem></Link>
  
             <div className="relative">
               <button
@@ -618,7 +624,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
         >
           <div className="flex flex-col">
             <motion.div variants={mobileItemVariants} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 500, damping: 28 }}><Link href="/landing" onClick={() => setMobileOpen(false)} className="block border-b border-white/5 px-6 py-4">Home</Link></motion.div>
-            <motion.div variants={mobileItemVariants} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 500, damping: 28 }}><Link href="/landing#about" onClick={(event) => scrollLandingSection(event, "about", true)} className="block border-b border-white/5 px-6 py-4">About Us</Link></motion.div>
+            <motion.div variants={mobileItemVariants} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 500, damping: 28 }}><Link href="/aboutus" onClick={() => setMobileOpen(false)} className="block border-b border-white/5 px-6 py-4">About Us</Link></motion.div>
  
             <motion.div variants={mobileItemVariants} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 500, damping: 28 }}>
               <button

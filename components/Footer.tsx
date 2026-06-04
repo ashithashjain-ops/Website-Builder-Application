@@ -221,8 +221,7 @@ export default function Footer() {
 
   const openFooterItem = (key: string) => {
     if (key === "about") {
-      // Dispatches the event caught by the Home component to open About Us
-      window.dispatchEvent(new Event("stackly-open-about"));
+      router.push("/aboutus");
       return;
     }
 
