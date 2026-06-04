@@ -9,7 +9,6 @@ import BlogHeader from "@/components/blog/BlogHeader";
 import BlogHeroTrendArrow from "@/components/blog/BlogHeroTrendArrow";
 import { blogCategories } from "@/lib/blogCategories";
 import { assetPath } from "@/lib/paths";
-import "./blog.css";
 
 const START_BLOGGING_HREF = "/page-not-found";
 

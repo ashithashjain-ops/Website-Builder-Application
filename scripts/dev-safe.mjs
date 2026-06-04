@@ -86,7 +86,7 @@ function configureLocalDevEnv() {
   if (process.env.STACKLY_DEV_WITH_BASE_PATH === "1") {
     return;
   }
-  process.env.NEXT_PUBLIC_BASE_PATH = "";
+  delete process.env.NEXT_PUBLIC_BASE_PATH;
 }
 
 function startNextDev() {

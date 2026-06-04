@@ -41,7 +41,7 @@ body {
   overflow: visible;
 }
 
-body > main {
+.stackly-site-layout > main {
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -50,7 +50,7 @@ body > main {
   overflow-y: visible;
 }
 
-body > main.blog-page {
+.stackly-site-layout > main.blog-page {
   overflow: visible;
 }
 
@@ -64,15 +64,15 @@ body > main.blog-page {
 }
 
 /* Landing page */
-html:has(body > main.landing-page),
-body:has(> main.landing-page) {
+html:has(main.landing-page),
+body:has(main.landing-page) {
   background: #fff1f2;
 }
 
-html:has(body > main.landing-page),
-html:has(body > main.blog-page),
-html:has(body > main.site-page),
-html:has(body > main.planning-page) {
+html:has(main.landing-page),
+html:has(main.blog-page),
+html:has(main.site-page),
+html:has(main.planning-page) {
   scrollbar-color: #8fb8e8 #071936;
   scrollbar-width: thin;
 }
@@ -86,9 +86,9 @@ main.landing-page {
 }
 
 /* Stackly navbar pages — one body scroll, no nested page scroll */
-body:has(> main.blog-page),
-body:has(> main.site-page),
-body:has(> main.planning-page) {
+body:has(main.blog-page),
+body:has(main.site-page),
+body:has(main.planning-page) {
   background: #ffffff;
 }
 
@@ -107,24 +107,24 @@ main.site-page {
   min-height: calc(100dvh - 3.5rem);
 }
 
-html:has(body > main.landing-page)::-webkit-scrollbar,
-html:has(body > main.blog-page)::-webkit-scrollbar,
-html:has(body > main.site-page)::-webkit-scrollbar,
-html:has(body > main.planning-page)::-webkit-scrollbar {
+html:has(main.landing-page)::-webkit-scrollbar,
+html:has(main.blog-page)::-webkit-scrollbar,
+html:has(main.site-page)::-webkit-scrollbar,
+html:has(main.planning-page)::-webkit-scrollbar {
   width: 12px;
 }
 
-html:has(body > main.landing-page)::-webkit-scrollbar-track,
-html:has(body > main.blog-page)::-webkit-scrollbar-track,
-html:has(body > main.site-page)::-webkit-scrollbar-track,
-html:has(body > main.planning-page)::-webkit-scrollbar-track {
+html:has(main.landing-page)::-webkit-scrollbar-track,
+html:has(main.blog-page)::-webkit-scrollbar-track,
+html:has(main.site-page)::-webkit-scrollbar-track,
+html:has(main.planning-page)::-webkit-scrollbar-track {
   background: linear-gradient(180deg, #071936 0%, #0a2357 52%, #071936 100%);
 }
 
-html:has(body > main.landing-page)::-webkit-scrollbar-thumb,
-html:has(body > main.blog-page)::-webkit-scrollbar-thumb,
-html:has(body > main.site-page)::-webkit-scrollbar-thumb,
-html:has(body > main.planning-page)::-webkit-scrollbar-thumb {
+html:has(main.landing-page)::-webkit-scrollbar-thumb,
+html:has(main.blog-page)::-webkit-scrollbar-thumb,
+html:has(main.site-page)::-webkit-scrollbar-thumb,
+html:has(main.planning-page)::-webkit-scrollbar-thumb {
   min-height: 64px;
   border: 3px solid #071936;
   border-radius: 999px;
@@ -132,17 +132,17 @@ html:has(body > main.planning-page)::-webkit-scrollbar-thumb {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 18px rgba(96, 165, 250, 0.35);
 }
 
-html:has(body > main.landing-page)::-webkit-scrollbar-thumb:hover,
-html:has(body > main.blog-page)::-webkit-scrollbar-thumb:hover,
-html:has(body > main.site-page)::-webkit-scrollbar-thumb:hover,
-html:has(body > main.planning-page)::-webkit-scrollbar-thumb:hover {
+html:has(main.landing-page)::-webkit-scrollbar-thumb:hover,
+html:has(main.blog-page)::-webkit-scrollbar-thumb:hover,
+html:has(main.site-page)::-webkit-scrollbar-thumb:hover,
+html:has(main.planning-page)::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #eff6ff 0%, #93c5fd 45%, #2563eb 100%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 24px rgba(96, 165, 250, 0.55);
 }
 
 /* Plans (/planning): match static index — page bg fills viewport so default white body does not frame the layout */
-html:has(body > main.planning-page),
-body:has(> main.planning-page) {
+html:has(main.planning-page),
+body:has(main.planning-page) {
   background-color: #f1f5f9;
 }
 
@@ -263,8 +263,8 @@ body:has(> main.planning-page) {
 }
 
 /* E-Commerce page (/e-commerce): keep page background pure white */
-html:has(body > main.buyscreen-page),
-body:has(> main.buyscreen-page) {
+html:has(main.buyscreen-page),
+body:has(main.buyscreen-page) {
   background-color: #ffffff;
 }
 

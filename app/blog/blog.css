@@ -1,5 +1,5 @@
 /* Blogify — section scale matched to full-page design reference */
-html:has(body > main.blog-page),
+html:has(main.blog-page),
 .blog-page {
   --stackly-nav-height: 3.5rem;
   --blog-header-height: 3.25rem;
@@ -13,7 +13,7 @@ html:has(body > main.blog-page),
   );
 }
 
-html:has(body > main.blog-page) {
+html:has(main.blog-page) {
   scroll-padding-top: var(--blog-scroll-offset);
 }
 
@@ -110,7 +110,7 @@ html:has(body > main.blog-page) {
 }
 
 @media (min-width: 768px) {
-  html:has(body > main.blog-page),
+  html:has(main.blog-page),
   .blog-page {
     --stackly-nav-height: 3.75rem;
     --blog-nav-gap: 1.5rem;

@@ -597,8 +597,8 @@ export default function LoginPage() {
             }}
           >
             <motion.img
-              src={assetPath("/login-animation.gif")}
-              alt="Secure login animation"
+              src={assetPath("/login.webp")}
+              alt="Secure login illustration"
               className="auth-image w-[80%] sm:w-[70%] lg:w-[90%] max-w-[550px] object-contain"
               whileHover={{ scale: 1.02, transition: { duration: 0.24 } }}
             />
