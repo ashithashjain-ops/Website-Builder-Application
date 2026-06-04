@@ -1,5 +1,5 @@
 "use client";
- 
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import ButtonCanvas from "./buttonblock/Canvas";
@@ -223,6 +223,8 @@ export default function BlockPagesClient() {
                 });
               } else {
                 const isSameTargetAndActive = textBlockState.isTextEditable && textBlockState.selectedTarget === target;
+                setIsImageEditingMode(false);
+                setIsButtonEditingMode(false);
                 pushTextState({
                   ...textBlockState,
                   isTextEditable: !isSameTargetAndActive,
@@ -253,11 +255,13 @@ export default function BlockPagesClient() {
               if (page === "image" && activeBlockPage === "text") {
                 setIsImageEditingMode((prev) => !prev);
                 setIsButtonEditingMode(false);
+                pushTextState({ ...textBlockState, isTextEditable: false });
                 return;
               }
               if (page === "button" && activeBlockPage === "text") {
                 setIsButtonEditingMode((prev) => !prev);
                 setIsImageEditingMode(false);
+                pushTextState({ ...textBlockState, isTextEditable: false });
                 return;
               }
  
