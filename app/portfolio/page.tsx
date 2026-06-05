@@ -183,16 +183,16 @@ export default function Portfolioedit() {
   const portfolioNavHidden = innerNavHidden && !innerMobileMenuOpen && !prefersReducedMotion;
 
   return (
-    <main className="site-page flex flex-col min-h-screen bg-white">
+    <main className="site-page flex flex-col min-h-screen bg-white w-full max-w-full overflow-x-hidden">
       {/* ====== MAIN BUILDER LAYOUT ====== */}
       <div className="flex flex-1">
         {/* MAIN CONTENT */}
         <div className="flex-1 bg-white p-4 @md:p-7 flex justify-center min-w-0">
           <div className="w-full max-w-[1200px] relative flex flex-col min-w-0">
-            {/* FLOATING DEVICE TOOLBAR */}
-            <div className="fixed z-[100] transition-all duration-500 ease-in-out shrink-0 bottom-6 left-1/2 -translate-x-1/2"
+             {/* FLOATING DEVICE TOOLBAR */}
+            <div className="fixed z-[100] transition-all duration-500 ease-in-out shrink-0 bottom-6 left-1/2 -translate-x-1/2 max-w-[90vw]"
             >
-              <div className="flex items-center gap-2 bg-white rounded-full border border-[#E5E7EB] shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-3 py-1.5">
+              <div className="flex items-center gap-2 bg-white rounded-full border border-[#E5E7EB] shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-3 py-1.5 w-full overflow-x-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                  <Link href="/landing#templates" className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-100 shadow-sm hover:shadow-md text-[#06224C] transition" title="Preview">
                     <FaEye size={14} />
                  </Link>
@@ -231,7 +231,7 @@ export default function Portfolioedit() {
                 >
 
                   {/* ✅ MOBILE LAYOUT */}
-                  <div className="flex w-full items-center justify-between @lg:hidden relative">
+                  <div className="flex w-full items-center justify-between @3xl:hidden relative">
 
                     {/* LEFT → Logo */}
                     <Link
@@ -266,7 +266,7 @@ export default function Portfolioedit() {
                   </div>
 
                   {/* ✅ DESKTOP */}
-                  <div className="w-full items-center justify-between hidden @lg:flex relative">
+                  <div className="w-full items-center justify-between hidden @3xl:flex relative">
 
                     {/* LEFT: Logo */}
                     <div className="flex shrink-0 items-center justify-start z-10">
@@ -284,7 +284,7 @@ export default function Portfolioedit() {
                     <div className="flex shrink-0 items-center gap-x-6 z-10">
 
                       {/* NAV LINKS */}
-                      <div className="flex gap-x-6">
+                      <div className="flex flex-wrap gap-x-6 justify-end">
                         {[
                           { name: "Home", id: "home" },
                           { name: "About Me", id: "about" },
@@ -345,7 +345,7 @@ export default function Portfolioedit() {
                     <div className="flex flex-col @lg:flex-row items-center @lg:items-stretch justify-between w-full gap-8">
 
                       <div className="w-full @xl:w-[55%] shrink-0 flex flex-col relative z-30 text-center @lg:w-[50%] @lg:text-left">
-                        <div className="mx-auto mb-4 inline-flex w-max items-center gap-2 rounded-full border border-[#63e5ff]/60 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#06224C] shadow-sm @lg:mx-0">
+                        <div className="mx-auto mb-4 inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-[#63e5ff]/60 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#06224C] shadow-sm @lg:mx-0">
                           <span className="h-2 w-2 rounded-full bg-[#63e5ff] animate-pulse"></span>
                           Available for freelance work
                         </div>
@@ -379,7 +379,8 @@ export default function Portfolioedit() {
                             <div className="relative overflow-hidden border-4 border-white z-10 transition-all duration-300 mx-auto"
                               style={{
                                 width: `${heroImageProps.width}px`,
-                                height: `${heroImageProps.height}px`,
+                                height: 'auto',
+                                aspectRatio: `${heroImageProps.width} / ${heroImageProps.height}`,
                                 maxWidth: '100%',
                                 borderRadius: `${heroImageProps.borderRadius}%`,
                                 boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
@@ -439,14 +440,16 @@ export default function Portfolioedit() {
                           <div className="absolute w-[200px] h-[150px] right-10 top-10 bg-cyan-300 opacity-20 blur-2xl rounded-full animate-[float_7s_ease-in-out_infinite]"></div>
                           <div className="absolute w-[100px] h-[100px] left-17 bottom-22 bg-pink-400 opacity-20 rounded-full animate-[float_5s_ease-in-out_infinite]"></div>
                           <div className="absolute w-[140px] h-[230px] bg-white/70 rounded-[80px] rotate-[-30deg] shadow-md animate-[float_6s_ease-in-out_infinite]"></div>
-                          <div className="absolute -right-2 bottom-14 z-30 rounded-xl border border-white/80 bg-white/90 px-4 py-3 text-left shadow-xl portfolio-floating-badge">
+                          <div className="absolute right-4 bottom-14 z-30 rounded-xl border border-white/80 bg-white/90 px-4 py-3 text-left shadow-xl portfolio-floating-badge">
                             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">Focus</p>
                             <p className="text-sm font-extrabold text-gray-900">Human centered UI</p>
                           </div>
                           <div className="relative overflow-hidden border-4 border-white z-20 animate-[float_6s_ease-in-out_infinite] transition-all duration-300"
                             style={{
                               width: `${heroImageProps.width}px`,
-                              height: `${heroImageProps.height}px`,
+                              height: 'auto',
+                              aspectRatio: `${heroImageProps.width} / ${heroImageProps.height}`,
+                              maxWidth: '100%',
                               borderRadius: `${heroImageProps.borderRadius}%`,
                               boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
                               opacity: heroImageProps.opacity / 100
