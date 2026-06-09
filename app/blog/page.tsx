@@ -7,11 +7,8 @@ import BlogHeroTrendArrow from "@/components/blog/BlogHeroTrendArrow";
 import Footer from "@/components/Footer";
 import { blogCategories } from "@/lib/blogCategories";
 import { assetPath } from "@/lib/paths";
-
-
 import { FaEye, FaLaptop, FaTabletAlt, FaMobileAlt } from "react-icons/fa";
-
-
+import "./blog.css";
 
 const START_BLOGGING_HREF = "/page-not-found";
 

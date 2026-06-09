@@ -940,7 +940,7 @@ export default function PortfolioPreview({
                       </h3>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
                       {[
                         { id: "01", title: "Web Development", desc: "Responsive, clean websites with purposeful layouts and polished front-end details." },
                         { id: "02", title: "UI / UX DESIGN", desc: "User journeys, wireframes, visual systems, and prototypes that make products easier to use." },
@@ -985,9 +985,9 @@ export default function PortfolioPreview({
                     <div className="overflow-hidden rounded-2xl bg-[#06224C] px-5 py-8 sm:px-8 md:px-10 md:py-12 text-white shadow-xl relative">
                       <div className="absolute right-[-5rem] top-[-5rem] h-56 w-56 rounded-full bg-[#63e5ff]/20 blur-3xl"></div>
                       <div className="absolute left-[-4rem] bottom-[-5rem] h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
-                      <div className="relative grid grid-cols-1 lg:grid-cols-[0.6fr_2fr] gap-8 lg:gap-12 items-start">
-                        <div className={`portfolio-reveal flex flex-col items-center lg:items-start text-center lg:text-left ${processInView ? "is-visible" : ""}`}>
-                          <div className="flex items-center justify-center lg:justify-start gap-2 mb-4">
+                      <div className="relative grid grid-cols-1 xl:grid-cols-[0.6fr_2fr] gap-8 lg:gap-12 items-start">
+                        <div className={`portfolio-reveal flex flex-col items-center xl:items-start text-center xl:text-left ${processInView ? "is-visible" : ""}`}>
+                          <div className="flex items-center justify-center xl:justify-start gap-2 mb-4">
                             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Design</h2>
                             <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Process</span>
                           </div>
