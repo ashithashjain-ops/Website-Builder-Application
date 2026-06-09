@@ -6,6 +6,7 @@ import { assetPath } from "@/lib/paths";
 import PortfolioPreview from "./PortfolioPreview";
 import StorefrontPreview from "./StorefrontPreview";
 import type { BlockData } from "../buttonblock/types";
+import type { VideoBlockData } from "../videoblock/types";
 import type { TextBlockState, TextEditorTarget, TextStyles, TextTemplateType } from "./types";
  
 const TEXTBLOCK_PREVIEW_STORAGE_KEY = "stackly-textblock-preview-html";
@@ -25,6 +26,9 @@ type TextCanvasProps = {
   isButtonEditingMode?: boolean;
   customButtons?: Record<string, BlockData["props"]>;
   onEditButton?: (buttonId: string) => void;
+  videoBlocks?: VideoBlockData[];
+  isVideoEditingMode?: boolean;
+  onEditVideo?: (videoId: string) => void;
 };
  
 const rgbToHex = (rgb: string) => {
@@ -37,7 +41,12 @@ const rgbToHex = (rgb: string) => {
     .join("")}`;
 };
  
-export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onUndo, onRedo, template = "ecommerce", isImageEditingMode = false, customImages = {}, onEditImage, editingImageId, isButtonEditingMode = false, customButtons = {}, onEditButton }: TextCanvasProps) {
+export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onUndo, onRedo, template = "ecommerce", isImageEditingMode = false, customImages = {}, onEditImage, editingImageId, isButtonEditingMode = false, customButtons = {},
+  onEditButton,
+  videoBlocks = [],
+  isVideoEditingMode = false,
+  onEditVideo
+}: TextCanvasProps) {
   const isPreviewMode = false;
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -102,7 +111,7 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
     const makeEditable = (node: Element) => {
       if (node.closest("[data-builder-chrome='true']")) return;
  
-      const isHeader = node.closest(".buyscreen-header, .buyscreen-categories, .portfolio-shell > .sticky") !== null;
+      const isHeader = node.closest(".buyscreen-header, .buyscreen-categories, .portfolio-shell > .sticky, .portfolio-mobile-menu") !== null;
       const isFooter = node.closest("footer, .stackly-footer") !== null;
       const isMain = !isHeader && !isFooter;
  
@@ -110,7 +119,8 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
       if (isTextEditable && !isPreviewMode) {
         if (state.selectedTarget === "header" && isHeader) shouldBeEditable = true;
         else if (state.selectedTarget === "footer" && isFooter) shouldBeEditable = true;
-        else if ((state.selectedTarget === "main" || state.selectedTarget === "text") && isMain) shouldBeEditable = true;
+        else if (state.selectedTarget === "main" && isMain) shouldBeEditable = true;
+        else if (state.selectedTarget === "text") shouldBeEditable = true;
       }
  
       if (textTags.includes(node.tagName)) {
@@ -194,8 +204,8 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
             </button>
           </div>
           <button className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 py-2 text-[13px] font-bold text-[#0B1D40] shadow-sm hover:bg-gray-50" title="Save Draft">
-            <Save className="h-4 w-4 text-gray-600 lg:hidden" />
-            <span className="hidden lg:inline">Save Draft</span>
+            <Save className="h-4 w-4 text-gray-600 xl:hidden" />
+            <span className="hidden xl:inline">Save Draft</span>
           </button>
           <button
             className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 py-2 text-[13px] font-bold text-[#0B1D40] shadow-sm hover:bg-gray-50"
@@ -203,16 +213,16 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
             title="Preview"
           >
             <Eye className="h-4 w-4" />
-            <span className="hidden lg:inline">Preview</span>
+            <span className="hidden xl:inline">Preview</span>
           </button>
           <button className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#0B1D40] px-3 py-2 text-[13px] font-bold text-white shadow-[0_2px_4px_rgba(11,29,64,0.3)] hover:bg-[#152B52]" title="Publish">
-            <span className="hidden lg:inline">Publish</span>
+            <span className="hidden xl:inline">Publish</span>
             <Send className="h-[14px] w-[14px]" />
           </button>
         </div>
       </div>
  
-      <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 xl:px-8">
         <div className="mx-auto w-full max-w-[1280px] overflow-hidden rounded-xl border border-[#dbe3ef] bg-white shadow-[0_18px_45px_rgba(15,35,75,0.08)]">
           <div data-builder-chrome="true" className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e6edf5] px-5 py-4 sm:px-6">
             <h2 className="text-[18px] font-bold text-[#0B1D40]">
@@ -253,15 +263,16 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
  
               [data-textblock-canvas] .buyscreen-header,
               [data-textblock-canvas] .buyscreen-categories,
-              [data-textblock-canvas] .portfolio-shell > .sticky {
-                background-color: ${section.headerBg} !important;
-                color: ${section.headerText} !important;
+              [data-textblock-canvas] .portfolio-shell > .sticky,
+              [data-textblock-canvas] .portfolio-mobile-menu > div {
+                ${section.headerBg ? `background-color: ${section.headerBg} !important;` : ''}
+                ${section.headerText ? `color: ${section.headerText} !important;` : ''}
               }
               [data-textblock-canvas] .buyscreen-header *,
               [data-textblock-canvas] .buyscreen-categories *,
-              [data-textblock-canvas] .portfolio-shell > .sticky * {
-                color: inherit !important;
-                border-color: ${section.headerText}66 !important;
+              [data-textblock-canvas] .portfolio-shell > .sticky *,
+              [data-textblock-canvas] .portfolio-mobile-menu * {
+                ${section.headerText ? `color: inherit !important; border-color: ${section.headerText}66 !important;` : ''}
                 ${section.headerFontSize ? `font-size: ${section.headerFontSize}px !important;` : ''}
                 ${section.headerFontFamily ? `font-family: ${section.headerFontFamily} !important;` : ''}
                 ${section.headerFontWeight ? `font-weight: ${section.headerFontWeight} !important;` : ''}
@@ -269,17 +280,15 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
                 ${section.headerLetterSpacing ? `letter-spacing: ${section.headerLetterSpacing} !important;` : ''}
               }
               [data-textblock-canvas] .portfolio-shell > .sticky span.bg-white {
-                background-color: ${section.headerText} !important;
+                ${section.headerText ? `background-color: ${section.headerText} !important;` : ''}
               }
               [data-textblock-canvas] footer,
               [data-textblock-canvas] .stackly-footer {
-                background-color: ${section.footerBg} !important;
-                color: ${section.footerText} !important;
+                ${section.footerText ? `color: ${section.footerText} !important;` : ''}
               }
               [data-textblock-canvas] footer *,
               [data-textblock-canvas] .stackly-footer * {
-                color: inherit;
-                border-color: ${section.footerText}33;
+                ${section.footerText ? `color: inherit !important; border-color: ${section.footerText}33 !important;` : ''}
               }
             `}</style>
             <div
@@ -287,7 +296,7 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
               className={template === "ecommerce" ? "h-[calc(100vh-160px)] min-h-[560px] overflow-y-auto" : undefined}
             >
               <div ref={contentRef}>
-                {template === "portfolio" ? <PortfolioPreview isImageEditingMode={isImageEditingMode} customImages={customImages} onEditImage={onEditImage} editingImageId={editingImageId} isButtonEditingMode={isButtonEditingMode} customButtons={customButtons} onEditButton={onEditButton} sectionStyles={state.sectionStyles} onPreview={openPreviewPage} /> : <StorefrontPreview />}
+                {template === "portfolio" ? <PortfolioPreview isImageEditingMode={isImageEditingMode} customImages={customImages} onEditImage={onEditImage} editingImageId={editingImageId} isButtonEditingMode={isButtonEditingMode} customButtons={customButtons} onEditButton={onEditButton} videoBlocks={videoBlocks} isVideoEditingMode={isVideoEditingMode} onEditVideo={onEditVideo} sectionStyles={state.sectionStyles} onPreview={openPreviewPage} /> : <StorefrontPreview />}
               </div>
             </div>
           </div>

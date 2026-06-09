@@ -343,20 +343,57 @@ export default function SignupPage() {
     };
 
   const handleNameBlur = () => {
-    setForm((prev) => ({ ...prev, name: prev.name.trim() }));
+    const trimmedName = form.name.trim();
+    setForm((prev) => ({ ...prev, name: trimmedName }));
+    const fieldErrors = validate({ ...form, name: trimmedName });
+    setErrors((prev) => ({
+      ...prev,
+      name: fieldErrors.name,
+      form: fieldErrors.name ? undefined : prev.form,
+    }));
   };
 
   const handleEmailBlur = () => {
-    const emailNormalized = normalizeSignupEmail(form.email);
+    const trimmedEmail = stripEmailWhitespace(form.email).trim();
     setForm((prev) => ({
       ...prev,
-      email: stripEmailWhitespace(prev.email).trim(),
+      email: trimmedEmail,
     }));
-    const emailError = getSignupEmailValidationError(emailNormalized);
+    const fieldErrors = validate({
+      ...form,
+      email: trimmedEmail,
+    });
     setErrors((prev) => ({
       ...prev,
-      email: emailError,
-      form: emailError ? undefined : prev.form,
+      email: fieldErrors.email,
+      form: fieldErrors.email ? undefined : prev.form,
+    }));
+  };
+
+  const handleMobileBlur = () => {
+    const fieldErrors = validate(form);
+    setErrors((prev) => ({
+      ...prev,
+      mobileNumber: fieldErrors.mobileNumber,
+      form: fieldErrors.mobileNumber ? undefined : prev.form,
+    }));
+  };
+
+  const handlePasswordBlur = () => {
+    const fieldErrors = validate(form);
+    setErrors((prev) => ({
+      ...prev,
+      password: fieldErrors.password,
+      form: fieldErrors.password ? undefined : prev.form,
+    }));
+  };
+
+  const handleConfirmPasswordBlur = () => {
+    const fieldErrors = validate(form);
+    setErrors((prev) => ({
+      ...prev,
+      confirmPassword: fieldErrors.confirmPassword,
+      form: fieldErrors.confirmPassword ? undefined : prev.form,
     }));
   };
 
@@ -617,6 +654,7 @@ export default function SignupPage() {
                         placeholder="Mobile number"
                         value={form.mobileNumber}
                         onChange={handleChange("mobileNumber")}
+                          onBlur={handleMobileBlur}
                           className="signup-mobile-input min-h-5 min-w-0 flex-1 border-0 bg-transparent py-0 text-sm leading-5 text-white outline-none placeholder-white/90"
                         aria-invalid={!!errors.mobileNumber}
                         aria-describedby={errors.mobileNumber ? "mobile-error" : undefined}
@@ -638,6 +676,7 @@ export default function SignupPage() {
                         placeholder="Password"
                         value={form.password}
                         onChange={handleChange("password")}
+                          onBlur={handlePasswordBlur}
                           onKeyDown={handlePasswordKeyDown}
                           maxLength={PASSWORD_MAX_LENGTH}
                         className="bg-transparent outline-none w-full placeholder-white/90 text-sm text-white pr-9"
@@ -672,6 +711,7 @@ export default function SignupPage() {
                         placeholder="Confirm Password"
                         value={form.confirmPassword}
                         onChange={handleChange("confirmPassword")}
+                          onBlur={handleConfirmPasswordBlur}
                           onKeyDown={handlePasswordKeyDown}
                           maxLength={PASSWORD_MAX_LENGTH}
                         className="bg-transparent outline-none w-full placeholder-white/90 text-sm text-white pr-9 signup-confirm-input"

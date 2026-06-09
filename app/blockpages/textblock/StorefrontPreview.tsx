@@ -9,6 +9,7 @@ const buyCategories = [
   { label: "All Categories" },
   { label: "Products" },
   { label: "Blog" },
+  { label: "Video Block" },
   { label: "Contact" },
   { label: "Limited Sale" },
   { label: "Best Seller" },
@@ -1252,7 +1253,7 @@ export default function StorefrontPreview() {
           <div className="border-t border-white/20 lg:hidden planning-zoom-show-mobile-menu">
             <div className="mx-auto w-full max-w-7xl px-4 pb-3 pt-2 sm:px-6 lg:px-8">
               <div className="grid grid-cols-2 gap-2">
-                {["Home", "About Us", "Our Products", "Categories", "Contact"].map((item) => (
+                {["Home", "About Us", "Our Products", "Categories", "Video Block", "Contact"].map((item) => (
                   <button
                     key={item}
                     type="button"

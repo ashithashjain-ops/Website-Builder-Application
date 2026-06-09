@@ -150,22 +150,22 @@ export default function MainCanvas({
           </div>
  
           <button onClick={() => handleAction("Save Draft")} className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 py-2 text-[13px] font-bold text-[#0B1D40] shadow-sm transition-colors hover:bg-gray-50" title="Save Draft">
-            <Save className="h-4 w-4 text-gray-600 lg:hidden" />
-            <span className="hidden lg:inline">Save Draft</span>
+            <Save className="h-4 w-4 text-gray-600 xl:hidden" />
+            <span className="hidden xl:inline">Save Draft</span>
           </button>
           <button onClick={() => handleAction("Preview")} className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 py-2 text-[13px] font-bold text-[#0B1D40] shadow-sm transition-colors hover:bg-gray-50" title="Preview">
             <Eye className="h-4 w-4" />
-            <span className="hidden lg:inline">Preview</span>
+            <span className="hidden xl:inline">Preview</span>
           </button>
           <button onClick={() => handleAction("Publish")} className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#0B1D40] px-3 py-2 text-[13px] font-bold text-white shadow-[0_2px_4px_rgba(11,29,64,0.3)] transition-colors hover:bg-[#152B52]" title="Publish">
-            <span className="hidden lg:inline">Publish</span>
+            <span className="hidden xl:inline">Publish</span>
             <Send className="h-[14px] w-[14px]" />
           </button>
         </div>
       </div>
  
       {/* Canvas Area */}
-      <div className="custom-scrollbar flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8" onClick={() => setActiveElementId(null)}>
+      <div className="custom-scrollbar flex-1 overflow-y-auto px-4 py-5 sm:px-6 xl:px-8" onClick={() => setActiveElementId(null)}>
         {/* Editor Container */}
         <div className="min-h-full rounded-xl border border-[#dbe3ef] bg-white p-5 shadow-[0_18px_45px_rgba(15,35,75,0.08)] sm:p-8" onClick={(e) => e.stopPropagation()}>
           {/* Image Blocks Section */}
@@ -262,7 +262,7 @@ export default function MainCanvas({
  
             {/* Image Gallery */}
             <h3 className="text-[#0c1b33] font-bold text-[14px] mb-4">Image Gallery</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 border border-slate-200 rounded-lg p-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 border border-slate-200 rounded-lg p-6">
  
               {/* Gallery Format 1 */}
               <div
@@ -308,3 +308,4 @@ export default function MainCanvas({
     </main>
   );
 }
+ 

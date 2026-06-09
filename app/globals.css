@@ -1481,6 +1481,17 @@ body.auth-visible {
     overflow-x: hidden !important;
     overflow-y: auto !important;
     overscroll-behavior: auto !important;
+    /* Desktop: white page — avoids blue strip in scrollbar gutter / right edge */
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    scrollbar-gutter: auto;
+  }
+
+  .stackly-site-layout:has(.auth-page) {
+    background: #ffffff;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
   }
 
   .login-page.auth-page,
@@ -1490,6 +1501,9 @@ body.auth-visible {
     min-height: 100dvh;
     height: auto;
     max-height: none;
+    width: 100%;
+    max-width: 100%;
+    background: #ffffff !important;
   }
 
   .login-page.auth-page .auth-form-card,

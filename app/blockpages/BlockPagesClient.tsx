@@ -1,5 +1,5 @@
 "use client";
-
+ 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import ButtonCanvas from "./buttonblock/Canvas";
@@ -12,6 +12,24 @@ import ImageRightSidebar from "./imageblock/RightSidebar";
 import TextCanvas from "./textblock/Canvas";
 import TextRightSidebar from "./textblock/RightSidebar";
 import type { TextBlockState, TextTemplateType } from "./textblock/types";
+import VideoCanvas from "./videoblock/Canvas";
+import VideoRightSidebar from "./videoblock/RightSidebar";
+import type { VideoBlockData } from "./videoblock/types";
+ 
+const initialVideoBlock: VideoBlockData = {
+  id: "video-default",
+  type: "video",
+  props: {
+    sourceType: "upload",
+    uploadUrl: "https://cdn.pixabay.com/video/2015/09/04/529-137258380_tiny.mp4",
+    uploadFileName: "Nature -travel.mp4",
+    uploadFileSize: "24.5 MB",
+    autoplay: false,
+    loop: false,
+    muted: false,
+    showControls: true
+  },
+};
  
 const initialButtonBlock: BlockData = {
   id: "button-default",
@@ -21,7 +39,7 @@ const initialButtonBlock: BlockData = {
     borderRadius: "18 px",
   },
 };
-
+ 
 type ButtonProps = BlockData["props"];
  
 const initialTextBlockState: TextBlockState = {
@@ -60,6 +78,13 @@ export default function BlockPagesClient() {
   const [textBlockState, setTextBlockState] = useState<TextBlockState>(initialTextBlockState);
   const [pastTextStates, setPastTextStates] = useState<TextBlockState[]>([]);
   const [futureTextStates, setFutureTextStates] = useState<TextBlockState[]>([]);
+ 
+  const [videoBlocks, setVideoBlocks] = useState<VideoBlockData[]>([initialVideoBlock]);
+  const [selectedVideoBlockId, setSelectedVideoBlockId] = useState<string | null>(initialVideoBlock.id);
+  const [pastVideoStates, setPastVideoStates] = useState<VideoBlockData[][]>([]);
+  const [futureVideoStates, setFutureVideoStates] = useState<VideoBlockData[][]>([]);
+  const [isVideoEditingMode, setIsVideoEditingMode] = useState(false);
+  const [editingVideoId, setEditingVideoId] = useState<string | null>(null);
  
   const [isImageEditingMode, setIsImageEditingMode] = useState(false);
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
@@ -168,6 +193,52 @@ export default function BlockPagesClient() {
   const selectedButtonBlock =
     buttonBlocks.find((block) => block.id === selectedButtonBlockId) ?? buttonBlocks[0] ?? null;
  
+  const pushVideoState = (nextBlocks: VideoBlockData[]) => {
+    setPastVideoStates((current) => [...current, videoBlocks]);
+    setFutureVideoStates([]);
+    setVideoBlocks(nextBlocks);
+  };
+ 
+  const undoVideo = () => {
+    setPastVideoStates((currentPast) => {
+      if (currentPast.length === 0) return currentPast;
+      const previous = currentPast[currentPast.length - 1];
+      setFutureVideoStates((currentFuture) => [videoBlocks, ...currentFuture]);
+      setVideoBlocks(previous);
+      setSelectedVideoBlockId(previous[0]?.id ?? null);
+      return currentPast.slice(0, -1);
+    });
+  };
+ 
+  const redoVideo = () => {
+    setFutureVideoStates((currentFuture) => {
+      if (currentFuture.length === 0) return currentFuture;
+      const [next, ...remaining] = currentFuture;
+      setPastVideoStates((currentPast) => [...currentPast, videoBlocks]);
+      setVideoBlocks(next);
+      setSelectedVideoBlockId(next[0]?.id ?? null);
+      return remaining;
+    });
+  };
+ 
+  const updateVideoBlock = (id: string, props: Partial<VideoBlockData['props']>) => {
+    if (!id) return;
+    pushVideoState(
+      videoBlocks.map((block) =>
+        block.id === id ? { ...block, props: { ...block.props, ...props } } : block
+      )
+    );
+  };
+ 
+  const removeVideoBlock = (id: string) => {
+    const nextBlocks = videoBlocks.filter((block) => block.id !== id);
+    pushVideoState(nextBlocks);
+    setSelectedVideoBlockId(nextBlocks[0]?.id ?? null);
+  };
+ 
+  const selectedVideoBlock =
+    videoBlocks.find((block) => block.id === selectedVideoBlockId) ?? videoBlocks[0] ?? null;
+ 
   const pushTextState = (nextState: TextBlockState) => {
     setPastTextStates((current) => [...current, textBlockState]);
     setFutureTextStates([]);
@@ -203,13 +274,21 @@ export default function BlockPagesClient() {
   return (
     <BuilderProvider>
       <section className="flex min-h-[calc(100vh-64px)] flex-1 gap-4 overflow-hidden bg-[#e9eef6] p-4">
-        <div className="contents lg:block lg:overflow-hidden lg:rounded-xl lg:shadow-[0_18px_45px_rgba(11,29,64,0.12)]">
+        <div className="contents xl:block xl:overflow-hidden xl:rounded-xl xl:shadow-[0_18px_45px_rgba(11,29,64,0.12)]">
           <LeftSidebar
             activeBlockPage={activeBlockPage}
             isImageEditingMode={isImageEditingMode}
             editingImageId={editingImageId}
             isButtonEditingMode={isButtonEditingMode}
             editingButtonId={editingButtonId}
+            isVideoEditingMode={isVideoEditingMode}
+            onUpdateVideoStyle={(props) => {
+              if (selectedVideoBlockId) {
+                updateVideoBlock(selectedVideoBlockId, props);
+              } else if (videoBlocks.length > 0) {
+                updateVideoBlock(videoBlocks[0].id, props);
+              }
+            }}
             activeTextTarget={textBlockState.isTextEditable ? textBlockState.selectedTarget : null}
             onSelectTextTarget={(target) => {
               if (activeBlockPage !== "text") {
@@ -231,9 +310,22 @@ export default function BlockPagesClient() {
                   selectedTarget: !isSameTargetAndActive ? target : textBlockState.selectedTarget,
                 });
               }
+              if (typeof window !== "undefined") {
+                if (target === "footer") {
+                  setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent("scrollToSectionEvent", { detail: "footer" }));
+                  }, 50);
+                } else if (target === "header") {
+                  setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent("scrollToSectionEvent", { detail: "home" }));
+                  }, 50);
+                }
+              }
             }}
-            onUpdateTextStyles={(styles) => pushTextState({...textBlockState, textStyles: {...textBlockState.textStyles, ...styles}})}
-            onUpdateTextSection={(props) => pushTextState({...textBlockState, section: {...textBlockState.section, ...props}})}
+            onUpdateTextStyles={(styles) => pushTextState({ ...textBlockState, textStyles: { ...textBlockState.textStyles, ...styles } })}
+            onUpdateTextSection={(props) => pushTextState({ ...textBlockState, section: { ...textBlockState.section, ...props } })}
+            textBlockState={textBlockState}
+            onUpdateTextBlockState={pushTextState}
             onUpdateButtonStyle={(newProps) => {
               if (selectedButtonBlock) {
                 updateButtonBlock(selectedButtonBlock.id, newProps);
@@ -261,7 +353,20 @@ export default function BlockPagesClient() {
               if (page === "button" && activeBlockPage === "text") {
                 setIsButtonEditingMode((prev) => !prev);
                 setIsImageEditingMode(false);
+                setIsVideoEditingMode(false);
                 pushTextState({ ...textBlockState, isTextEditable: false });
+                return;
+              }
+              if (page === "video" && activeBlockPage === "text") {
+                setIsVideoEditingMode((prev) => !prev);
+                setIsImageEditingMode(false);
+                setIsButtonEditingMode(false);
+                pushTextState({ ...textBlockState, isTextEditable: false });
+                if (typeof window !== "undefined") {
+                  setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent("scrollToSectionEvent", { detail: "video" }));
+                  }, 50);
+                }
                 return;
               }
  
@@ -271,6 +376,7 @@ export default function BlockPagesClient() {
               if (page === "text") {
                 setIsImageEditingMode(false);
                 setIsButtonEditingMode(false);
+                setIsVideoEditingMode(false);
  
                 const nextIsEditable = wasOnText ? !textBlockState.isTextEditable : true;
                 pushTextState({
@@ -315,7 +421,7 @@ export default function BlockPagesClient() {
             {/* Mobile/Tablet Backdrop */}
             {showMobileSidebar && (
               <div
-                className="fixed inset-0 bg-black/50 z-[90] lg:hidden"
+                className="fixed inset-0 bg-black/50 z-[90] xl:hidden"
                 onClick={() => setShowMobileSidebar(false)}
               />
             )}
@@ -324,8 +430,8 @@ export default function BlockPagesClient() {
             <div className={`
               fixed bottom-0 left-0 w-full h-[60vh] z-[100] transition-transform duration-300
               ${showMobileSidebar ? "translate-y-0" : "translate-y-full"}
-              lg:translate-y-0 lg:static lg:h-auto lg:w-[286px] lg:shrink-0 lg:block
-              bg-white lg:bg-transparent rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)] lg:shadow-none lg:rounded-none overflow-hidden
+              xl:translate-y-0 xl:static xl:h-auto xl:w-[286px] xl:shrink-0 xl:block
+              bg-white xl:bg-transparent rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)] xl:shadow-none xl:rounded-none overflow-hidden
             `}>
               <ButtonRightSidebar
                 selectedBlock={selectedButtonBlock}
@@ -359,12 +465,18 @@ export default function BlockPagesClient() {
                 setEditingButtonId(buttonId);
                 setActiveBlockPage("button");
               }}
+              videoBlocks={videoBlocks}
+              isVideoEditingMode={isVideoEditingMode}
+              onEditVideo={(videoId) => {
+                setEditingVideoId(videoId);
+                setActiveBlockPage("video");
+              }}
             />
-            <div className="hidden w-[286px] shrink-0 lg:block">
+            <div className="hidden w-[286px] shrink-0 xl:block">
               <TextRightSidebar state={textBlockState} onStateChange={pushTextState} />
             </div>
           </div>
-        ) : (
+        ) : activeBlockPage === "image" ? (
           <div className="flex min-w-0 flex-1 gap-4">
             <ImageMainCanvas
               editingImageId={editingImageId}
@@ -381,11 +493,50 @@ export default function BlockPagesClient() {
                 setIsImageEditingMode(false);
               }}
             />
-            <div className="hidden w-[286px] shrink-0 lg:block">
+            <div className="hidden w-[286px] shrink-0 xl:block">
               <ImageRightSidebar />
             </div>
           </div>
-        )}
+        ) : activeBlockPage === "video" ? (
+          <div className="flex min-w-0 flex-1 gap-4 relative">
+            <div className="flex-1 min-w-0">
+              <VideoCanvas
+                blocks={videoBlocks}
+                selectedBlockId={selectedVideoBlockId}
+                onSelectBlock={setSelectedVideoBlockId}
+                onRemoveBlock={removeVideoBlock}
+                canUndo={pastVideoStates.length > 0}
+                canRedo={futureVideoStates.length > 0}
+                onUndo={undoVideo}
+                onRedo={redoVideo}
+                onOpenMobileSidebar={() => setShowMobileSidebar(true)}
+                onApplyVideo={() => {
+                  setActiveBlockPage("text");
+                  setIsVideoEditingMode(false);
+                  setEditingVideoId(null);
+                }}
+              />
+            </div>
+            {showMobileSidebar && (
+              <div
+                className="fixed inset-0 bg-black/50 z-[90] xl:hidden"
+                onClick={() => setShowMobileSidebar(false)}
+              />
+            )}
+            <div className={`
+              fixed bottom-0 left-0 w-full h-[60vh] z-[100] transition-transform duration-300
+              ${showMobileSidebar ? "translate-y-0" : "translate-y-full"}
+              xl:translate-y-0 xl:static xl:h-auto xl:w-[286px] xl:shrink-0 xl:block
+              bg-white xl:bg-transparent rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)] xl:shadow-none xl:rounded-none overflow-hidden
+            `}>
+              <VideoRightSidebar
+                selectedBlock={selectedVideoBlock}
+                onUpdateBlock={updateVideoBlock}
+                onClose={() => setShowMobileSidebar(false)}
+              />
+            </div>
+          </div>
+        ) : null}
       </section>
     </BuilderProvider>
   );

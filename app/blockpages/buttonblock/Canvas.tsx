@@ -247,7 +247,7 @@ export default function Canvas({
  
         {/* Mobile Settings Trigger */}
         <button
-          className="lg:hidden ml-auto mr-2 flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#0f3b89] px-3 py-2 text-[13px] font-bold text-white shadow-sm hover:bg-[#0c2e6b]"
+          className="xl:hidden ml-auto mr-2 flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#0f3b89] px-3 py-2 text-[13px] font-bold text-white shadow-sm hover:bg-[#0c2e6b]"
           onClick={() => onOpenMobileSidebar?.()}
         >
           Edit Styles
@@ -278,8 +278,8 @@ export default function Canvas({
             onClick={() => alert("Draft saved locally!")}
             title="Save Draft"
           >
-            <Save className="h-4 w-4 text-gray-600 lg:hidden" />
-            <span className="hidden lg:inline">Save Draft</span>
+            <Save className="h-4 w-4 text-gray-600 xl:hidden" />
+            <span className="hidden xl:inline">Save Draft</span>
           </button>
           <button
             className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 py-2 text-[13px] font-bold text-[#0B1D40] shadow-sm hover:bg-gray-50"
@@ -287,21 +287,21 @@ export default function Canvas({
             title="Preview"
           >
             <Eye className="h-4 w-4" />
-            <span className="hidden lg:inline">Preview</span>
+            <span className="hidden xl:inline">Preview</span>
           </button>
           <button
             className="flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#0B1D40] px-3 py-2 text-[13px] font-bold text-white shadow-[0_2px_4px_rgba(11,29,64,0.3)] hover:bg-[#152B52]"
             onClick={() => alert("Publish sequence initiated!")}
             title="Publish"
           >
-            <span className="hidden lg:inline">Publish</span>
+            <span className="hidden xl:inline">Publish</span>
             <Send className="h-[14px] w-[14px]" />
           </button>
         </div>
       </div>
  
       {/* Canvas Fixed Area */}
-      <div className="flex flex-1 flex-col items-center gap-6 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex flex-1 flex-col items-center gap-6 overflow-y-auto px-4 py-6 sm:px-6 xl:px-8">
         {blocks.length === 0 ? (
           <div
             className="flex max-h-full w-full max-w-[900px] cursor-pointer flex-col overflow-hidden rounded-xl border border-[#dbe3ef] bg-white shadow-[0_18px_45px_rgba(15,35,75,0.08)] transition hover:border-blue-300"

@@ -11,12 +11,17 @@ import {
   FaMobileAlt,
   FaEnvelope,
   FaPaperPlane,
+  FaEye,
+  FaPen,
+  FaPlay,
+  FaMapMarkerAlt,
+  FaLinkedin,
+  FaGithub
 } from "react-icons/fa";
-
-import { FaEye, FaPen } from "react-icons/fa";
 import { assetPath } from "@/lib/paths";
 import { useBuilder } from "../imageblock/BuilderContext";
 import type { BlockData } from "../buttonblock/types";
+import type { VideoBlockData } from "../videoblock/types";
 import type { SectionStyleConfig } from "./types";
 
 type PortfolioPreviewProps = {
@@ -27,6 +32,9 @@ type PortfolioPreviewProps = {
   isButtonEditingMode?: boolean;
   customButtons?: Record<string, BlockData["props"]>;
   onEditButton?: (buttonId: string) => void;
+  videoBlocks?: VideoBlockData[];
+  isVideoEditingMode?: boolean;
+  onEditVideo?: (videoId: string) => void;
   sectionStyles?: Record<string, SectionStyleConfig>;
   onPreview?: () => void;
 };
@@ -105,11 +113,16 @@ export default function PortfolioPreview({
   isButtonEditingMode = false,
   customButtons = {},
   onEditButton,
+  videoBlocks = [],
+  isVideoEditingMode = false,
+  onEditVideo,
   sectionStyles = {},
   onPreview,
 }: PortfolioPreviewProps) {
   const [innerMobileMenuOpen, setInnerMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
 
+  const videoBlockProps = videoBlocks[0]?.props;
   // Read global builder state for image adjustments
   const builder = useBuilder();
   const { imageAdjustments, activeFilter, activeCrop } = builder || {};
@@ -310,17 +323,18 @@ export default function PortfolioPreview({
         {/* <div className="flex-1 bg-white p-4 md:p-7 flex justify-center min-w-0 overflow-hidden"> */}
         <div className="flex-1 bg-white p-4 md:p-7 flex justify-center min-w-0">
 
-          <div className="w-full max-w-[1200px] relative flex flex-col h-[calc(100vh-80px)] min-w-0">
-
+          {/* <div className="w-full max-w-[1200px] relative flex flex-col h-[calc(100vh-80px)] min-w-0"> */}
+          <div className="w-full max-w-[1200px] relative flex flex-col min-w-0">
             {/* Canvas Box */}
 
             {/* <div className="flex-1 overflow-y-auto min-w-0"> */}
-            <div className="flex-1 overflow-y-auto min-w-0 relative z-0">
+            {/* <div className="flex-1 overflow-y-auto min-w-0 relative z-0"> */}
+            <div className="flex-1 min-w-0 relative z-0">
               <div className="w-full min-h-[530px] rounded-xl border-2 border-gray-300 flex flex-col relative portfolio-shell bg-[#F2F2F2]">
 
 
-                {/* <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 xl:flex-nowrap border-b border-gray-300 bg-[#06224C] rounded-t-xl"> */}
-                <div className="sticky top-0 z-50 backdrop-blur-md bg-[#06224C]/95 flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 xl:flex-nowrap border-b border-gray-300 rounded-t-xl">
+                {/* <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 lg:flex-nowrap border-b border-gray-300 bg-[#06224C] rounded-t-xl"> */}
+                <div className="sticky top-0 z-50 backdrop-blur-md bg-[#06224C]/95 flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 lg:flex-nowrap border-b border-gray-300 rounded-t-xl">
 
                   {/* ✅ MOBILE LAYOUT */}
                   <div className="flex flex-col w-full lg:hidden gap-2">
@@ -351,6 +365,7 @@ export default function PortfolioPreview({
 
                       {/* RIGHT → Menu */}
                       <button
+                        data-builder-chrome="true"
                         onClick={() => setInnerMobileMenuOpen((v) => !v)}
                         className="h-8 w-8 border border-white/25 text-white rounded-md hover:bg-white/10 transition flex items-center justify-center shrink-0"
                       >
@@ -406,6 +421,7 @@ export default function PortfolioPreview({
                           { name: "Home", id: "home" },
                           { name: "About Me", id: "about" },
                           { name: "Projects", id: "projects" },
+                          { name: "Video Block", id: "video" },
                           { name: "Contacts", id: "contact" },
                         ].map((item, i) => (
                           <button
@@ -440,7 +456,7 @@ export default function PortfolioPreview({
                 </div>
 
                 {/* MOBILE MENU */}
-                <div className={`transition-all duration-300 ease-in-out overflow-hidden ${innerMobileMenuOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
+                <div className={`portfolio-mobile-menu transition-all duration-300 ease-in-out overflow-hidden ${innerMobileMenuOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
                   <div className="px-3 pb-3 pt-2 bg-[#06224C] grid grid-cols-2 gap-2">
                     {/* {["Home", "About Us", "Projects", "Contact"].map((item, i) => (
                       <button key={i} onClick={() => setInnerMobileMenuOpen(false)} className="border border-white/25 px-3 py-2 text-xs text-white rounded-md hover:bg-white/10 transition hover:scale-105">
@@ -449,7 +465,7 @@ export default function PortfolioPreview({
                     ))} */}
                     {[
                       { name: "Home", id: "home" },
-                      { name: "About Us", id: "about" },
+                      { name: "About Me", id: "about" },
                       { name: "Projects", id: "projects" },
                       { name: "Contact", id: "contact" },
                     ].map((item, i) => (
@@ -476,8 +492,8 @@ export default function PortfolioPreview({
                   <div className="flex-1 flex flex-col px-4 sm:px-6 md:px-8 lg:px-12 py-6 md:py-8 relative z-10">
                     <div className="flex flex-col lg:flex-row items-center lg:items-stretch justify-between w-full gap-8">
 
-                      <div className="w-full lg:w-[50%] xl:w-[55%] shrink-0 flex flex-col relative z-30 text-center lg:text-left portfolio-hero-copy">
-                        <div className="mx-auto lg:mx-0 mb-4 inline-flex w-max items-center gap-2 rounded-full border border-[#63e5ff]/60 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#06224C] shadow-sm">
+                      <div className="w-full lg:w-[50%] lg:w-[55%] shrink-0 flex flex-col relative z-30 text-center lg:text-left portfolio-hero-copy">
+                        <div className="mx-auto lg:mx-0 mb-4 inline-flex max-w-full flex-wrap justify-center text-center items-center gap-2 rounded-full border border-[#63e5ff]/60 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#06224C] shadow-sm">
                           <span className="h-2 w-2 rounded-full bg-[#63e5ff] animate-pulse"></span>
                           Available for freelance work
                         </div>
@@ -604,7 +620,7 @@ export default function PortfolioPreview({
                       </div>
 
                       {/* DESKTOP BLOBS */}
-                      <div className="hidden lg:flex lg:w-[45%] xl:w-[40%] items-center justify-center relative min-h-[400px]">
+                      <div className="hidden lg:flex lg:w-[45%] lg:w-[40%] items-center justify-center relative min-h-[400px]">
                         <div className="relative w-full max-w-[400px] h-full flex items-center justify-center portfolio-portrait-wrap">
                           <div className="absolute w-[300px] h-[300px] bg-gradient-to-r from-purple-500 via-blue-400 to-cyan-300 opacity-20 blur-2xl rounded-full animate-[float_6s_ease-in-out_infinite]"></div>
                           <div className="absolute w-[200px] h-[150px] right-10 top-10 bg-cyan-300 opacity-20 blur-2xl rounded-full animate-[float_7s_ease-in-out_infinite]"></div>
@@ -771,406 +787,486 @@ export default function PortfolioPreview({
                 {/* ABOUT SECTION */}
                 {/* <div className="w-full bg-[#F2F2F2] px-6 md:px-12 lg:px-20 py-16 md:py-24"> */}
                 <div className="relative w-full overflow-hidden portfolio-hero" style={{ backgroundColor: '#F2F2F2', ...getSpecificSectionStyle('about') }}>
-                <div id="about" className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-20 py-10 md:py-16">
-                  <div className="flex items-center gap-2 mb-4">
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">About</h2>
-                    <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Me</span>
-                  </div>
-
-                  <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
-                    Described Briefly My Professional Background Skills and Accomplishments
-                  </h3>
-
-                  {/* <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 border-b border-white pb-6"> */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 border-b border-white pb-6">
-
-                    {/* LEFT → TEXT */}
-                    <div className="flex flex-col justify-center">
-
-                      <p className="font-extrabold text-gray-800 text-lg md:text-2xl mb-4 md:mb-6 leading-snug">
-                        Hello! I&apos;m a UI/UX Designer providing awesome and modern design solutions for clients. My vision is to satisfy my clients.
-                      </p>
-
-                      <p className="text-gray-500 mb-6 md:mb-0 leading-relaxed text-sm md:text-lg">
-                        I turn rough ideas into visual systems, interactive prototypes, and responsive layouts that help users move confidently from first impression to final action.
-                      </p>
-
+                  <div id="about" className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-20 py-10 md:py-16">
+                    <div className="flex items-center gap-2 mb-4">
+                      <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">About</h2>
+                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Me</span>
                     </div>
 
+                    <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
+                      Described Briefly My Professional Background Skills and Accomplishments
+                    </h3>
 
-                    <div ref={skillsRef} className="space-y-6 md:space-y-8">
-                      {skills.map((skill, index) => (
-                        <div key={skill.name}>
-                          <div className="flex justify-between mb-2 md:mb-3">
-                            <span className="font-bold text-gray-800 text-sm md:text-lg">
-                              {skill.name}
-                            </span>
-                            <span className="text-gray-500 text-xs md:text-sm">
-                              {skill.value}%
-                            </span>
+                    {/* <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 border-b border-white pb-6"> */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 border-b border-white pb-6">
+
+                      {/* LEFT → TEXT */}
+                      <div className="flex flex-col justify-center">
+
+                        <p className="font-extrabold text-gray-800 text-lg md:text-2xl mb-4 md:mb-6 leading-snug">
+                          Hello! I&apos;m a UI/UX Designer providing awesome and modern design solutions for clients. My vision is to satisfy my clients.
+                        </p>
+
+                        <p className="text-gray-500 mb-6 md:mb-0 leading-relaxed text-sm md:text-lg">
+                          I turn rough ideas into visual systems, interactive prototypes, and responsive layouts that help users move confidently from first impression to final action.
+                        </p>
+
+                      </div>
+
+
+                      <div ref={skillsRef} className="space-y-6 md:space-y-8">
+                        {skills.map((skill, index) => (
+                          <div key={skill.name}>
+                            <div className="flex justify-between mb-2 md:mb-3">
+                              <span className="font-bold text-gray-800 text-sm md:text-lg">
+                                {skill.name}
+                              </span>
+                              <span className="text-gray-500 text-xs md:text-sm">
+                                {skill.value}%
+                              </span>
+                            </div>
+
+                            <div className="w-full bg-gray-300 h-[4px] md:h-[6px] overflow-hidden">
+                              <div
+                                className="h-full transition-all duration-1000 ease-out"
+                                style={{
+                                  width: skillsInView ? `${skill.value}%` : "0%",
+                                  transitionDelay: `${index * 150}ms`,
+                                  backgroundColor: skill.color
+                                }}
+                              />
+                            </div>
                           </div>
+                        ))}
+                      </div>
 
-                          <div className="w-full bg-gray-300 h-[4px] md:h-[6px] overflow-hidden">
+                    </div>
+                  </div>
+
+                  {/* EDUCATION & EXPERIENCE SECTION */}
+                  <div className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-12 md:pb-16 lg:pb-24">
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-20">
+
+                      {/* EDUCATION */}
+                      <div>
+                        <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6 border-b border-gray-200 pb-3">
+                          Education
+                        </h3>
+
+                        <div className="space-y-5 md:space-y-6">
+
+                          {[
+                            { id: "01", date: "March 2013 - 2016", title: "Computer Science" },
+                            { id: "02", date: "March 2017 - 2018", title: "Graphic Design" },
+                            { id: "03", date: "June 2019 - 2021", title: "Web Development" },
+                          ].map((item) => (
                             <div
-                              className="h-full transition-all duration-1000 ease-out"
-                              style={{
-                                width: skillsInView ? `${skill.value}%` : "0%",
-                                transitionDelay: `${index * 150}ms`,
-                                backgroundColor: skill.color
-                              }}
-                            />
+                              key={item.id}
+                              className="portfolio-reveal is-visible flex items-start sm:items-center gap-4 sm:gap-6 border-b border-gray-200 pb-4 sm:pb-6"
+                            >
+                              {/* NUMBER */}
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-[#1a3636] text-white rounded-full flex justify-center items-center font-bold text-xs sm:text-sm">
+                                {item.id}
+                              </div>
+
+                              {/* TEXT */}
+                              <div className="flex-1">
+                                <p className="text-gray-500 text-xs sm:text-sm mb-1 font-medium break-words">
+                                  {item.date}
+                                </p>
+                                <h4 className="text-base sm:text-lg font-bold text-gray-800 break-words">
+                                  {item.title}
+                                </h4>
+                              </div>
+                            </div>
+                          ))}
+
+                        </div>
+                      </div>
+
+                      {/* EXPERIENCE */}
+                      <div>
+                        <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6 border-b border-gray-200 pb-3">
+                          Experience
+                        </h3>
+
+                        <div className="space-y-5 md:space-y-6">
+
+                          {[
+                            { id: "01", date: "January 2021 - 2022", title: "Microsoft" },
+                            { id: "02", date: "March 2022 - 2023", title: "Google Inc" },
+                          ].map((item) => (
+                            <div
+                              key={item.id}
+                              className="portfolio-reveal is-visible flex items-start sm:items-center gap-4 sm:gap-6 border-b border-gray-200 pb-4 sm:pb-6"
+                            >
+                              {/* NUMBER */}
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-[#1a3636] text-white rounded-full flex justify-center items-center font-bold text-xs sm:text-sm">
+                                {item.id}
+                              </div>
+
+                              {/* TEXT */}
+                              <div className="flex-1">
+                                <p className="text-gray-500 text-xs sm:text-sm mb-1 font-medium break-words">
+                                  {item.date}
+                                </p>
+                                <h4 className="text-base sm:text-lg font-bold text-gray-800 break-words">
+                                  {item.title}
+                                </h4>
+                              </div>
+                            </div>
+                          ))}
+
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  {/* </div> */}
+
+                  {/* MY SERVICES SECTION */}
+                  <div className="relative z-10 w-full px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
+                    <div className="text-center mb-16">
+                      {/* <h3 className="text-base font-bold flex items-center justify-center gap-1 mb-4 text-gray-800 tracking-wide"> */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
+                        <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Services</span>
+                      </div>
+                      {/* <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
+
+                      <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
+                        Provide Wide Range of  Digital Services
+                      </h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
+                      {[
+                        { id: "01", title: "Web Development", desc: "Responsive, clean websites with purposeful layouts and polished front-end details." },
+                        { id: "02", title: "UI / UX DESIGN", desc: "User journeys, wireframes, visual systems, and prototypes that make products easier to use." },
+                        { id: "03", title: "eCommerce Solution", desc: "Storefront experiences built around discovery, trust, and smooth checkout flows." },
+                        { id: "04", title: "CMS Development", desc: "Editable content structures for teams that need control after launch." },
+                        { id: "05", title: "Web Design", desc: "Landing pages and brand sites with strong hierarchy, spacing, and conversion focus." },
+                        { id: "06", title: "3D Printing", desc: "Product visuals and concept presentations that help technical ideas feel tangible." },
+                        { id: "07", title: "App Development", desc: "Mobile-first screens, component states, and interaction patterns for product teams." },
+                        { id: "08", title: "Marketing", desc: "Campaign visuals, social assets, and creative direction for stronger digital presence." },
+                      ].map((service) => (
+                        <div key={service.id} className="portfolio-service-card border border-gray-200 rounded-[20px] p-5 sm:p-6 lg:p-8 flex flex-col items-start transition-all duration-300 hover:-translate-y-2 hover:shadow-xl bg-white group hover:border-gray-300 cursor-pointer h-full" style={{ animationDelay: `${Number(service.id) * 45}ms` }}>
+                          <div className="w-12 h-12 mb-4 sm:mb-6 flex items-center justify-center text-gray-800 shrink-0">
+                            {service.id === "01" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>}
+                            {service.id === "02" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>}
+                            {service.id === "03" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>}
+                            {service.id === "04" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line><circle cx="12" cy="10" r="2"></circle></svg>}
+                            {service.id === "05" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path></svg>}
+                            {service.id === "06" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>}
+                            {service.id === "07" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>}
+                            {service.id === "08" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h1.76a1 1 0 0 1 .84.45l2.4 3.6a1 1 0 0 1-.84 1.55H11z"></path><path d="M18 10h-2V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4z"></path></svg>}
+                          </div>
+                          <h4 className="text-[17px] font-bold text-gray-900 mb-2 sm:mb-3">{service.title}</h4>
+                          <p className="text-gray-500 text-[13px] leading-relaxed mb-6 sm:mb-8 flex-1">
+                            {service.desc}
+                          </p>
+                          <div className="mt-auto flex items-center gap-1.5 w-full shrink-0">
+                            <div className="w-[30px] h-[30px] rounded-full bg-[#1a3636] text-white flex items-center justify-center text-[11px] font-semibold shrink-0 group-hover:bg-[#63e5ff] group-hover:text-gray-900 transition-colors">
+                              {service.id}
+                            </div>
+                            <div className="flex items-center text-gray-300 group-hover:text-gray-900 transition-colors">
+                              <span className="w-8 h-[1px] bg-current"></span>
+                              <FaArrowRight size={10} className="-ml-[2px]" />
+                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
-
                   </div>
-                </div>
 
-                {/* EDUCATION & EXPERIENCE SECTION */}
-                <div className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-12 md:pb-16 lg:pb-24">
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-20">
-
-                    {/* EDUCATION */}
-                    <div>
-                      <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6 border-b border-gray-200 pb-3">
-                        Education
-                      </h3>
-
-                      <div className="space-y-5 md:space-y-6">
-
-                        {[
-                          { id: "01", date: "March 2013 - 2016", title: "Computer Science" },
-                          { id: "02", date: "March 2017 - 2018", title: "Graphic Design" },
-                          { id: "03", date: "June 2019 - 2021", title: "Web Development" },
-                        ].map((item) => (
-                          <div
-                            key={item.id}
-                            className="portfolio-reveal is-visible flex items-start sm:items-center gap-4 sm:gap-6 border-b border-gray-200 pb-4 sm:pb-6"
-                          >
-                            {/* NUMBER */}
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-[#1a3636] text-white rounded-full flex justify-center items-center font-bold text-xs sm:text-sm">
-                              {item.id}
-                            </div>
-
-                            {/* TEXT */}
-                            <div className="flex-1">
-                              <p className="text-gray-500 text-xs sm:text-sm mb-1 font-medium break-words">
-                                {item.date}
-                              </p>
-                              <h4 className="text-base sm:text-lg font-bold text-gray-800 break-words">
-                                {item.title}
-                              </h4>
-                            </div>
+                  {/* DESIGN PROCESS SECTION */}
+                  <div ref={processRef} className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
+                    <div className="overflow-hidden rounded-2xl bg-[#06224C] px-5 py-8 sm:px-8 md:px-10 md:py-12 text-white shadow-xl relative">
+                      <div className="absolute right-[-5rem] top-[-5rem] h-56 w-56 rounded-full bg-[#63e5ff]/20 blur-3xl"></div>
+                      <div className="absolute left-[-4rem] bottom-[-5rem] h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
+                      <div className="relative grid grid-cols-1 lg:grid-cols-[0.6fr_2fr] gap-8 lg:gap-12 items-start">
+                        <div className={`portfolio-reveal flex flex-col items-center lg:items-start text-center lg:text-left ${processInView ? "is-visible" : ""}`}>
+                          <div className="flex items-center justify-center lg:justify-start gap-2 mb-4">
+                            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Design</h2>
+                            <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Process</span>
                           </div>
-                        ))}
-
-                      </div>
-                    </div>
-
-                    {/* EXPERIENCE */}
-                    <div>
-                      <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6 border-b border-gray-200 pb-3">
-                        Experience
-                      </h3>
-
-                      <div className="space-y-5 md:space-y-6">
-
-                        {[
-                          { id: "01", date: "January 2021 - 2022", title: "Microsoft" },
-                          { id: "02", date: "March 2022 - 2023", title: "Google Inc" },
-                        ].map((item) => (
-                          <div
-                            key={item.id}
-                            className="portfolio-reveal is-visible flex items-start sm:items-center gap-4 sm:gap-6 border-b border-gray-200 pb-4 sm:pb-6"
-                          >
-                            {/* NUMBER */}
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-[#1a3636] text-white rounded-full flex justify-center items-center font-bold text-xs sm:text-sm">
-                              {item.id}
-                            </div>
-
-                            {/* TEXT */}
-                            <div className="flex-1">
-                              <p className="text-gray-500 text-xs sm:text-sm mb-1 font-medium break-words">
-                                {item.date}
-                              </p>
-                              <h4 className="text-base sm:text-lg font-bold text-gray-800 break-words">
-                                {item.title}
-                              </h4>
-                            </div>
-                          </div>
-                        ))}
-
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-                {/* </div> */}
-
-                {/* MY SERVICES SECTION */}
-                <div className="relative z-10 w-full px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
-                  <div className="text-center mb-16">
-                    {/* <h3 className="text-base font-bold flex items-center justify-center gap-1 mb-4 text-gray-800 tracking-wide"> */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
-                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Services</span>
-                    </div>
-                    {/* <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
-
-                    <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
-                      Provide Wide Range of  Digital Services
-                    </h3>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
-                    {[
-                      { id: "01", title: "Web Development", desc: "Responsive, clean websites with purposeful layouts and polished front-end details." },
-                      { id: "02", title: "UI / UX DESIGN", desc: "User journeys, wireframes, visual systems, and prototypes that make products easier to use." },
-                      { id: "03", title: "eCommerce Solution", desc: "Storefront experiences built around discovery, trust, and smooth checkout flows." },
-                      { id: "04", title: "CMS Development", desc: "Editable content structures for teams that need control after launch." },
-                      { id: "05", title: "Web Design", desc: "Landing pages and brand sites with strong hierarchy, spacing, and conversion focus." },
-                      { id: "06", title: "3D Printing", desc: "Product visuals and concept presentations that help technical ideas feel tangible." },
-                      { id: "07", title: "App Development", desc: "Mobile-first screens, component states, and interaction patterns for product teams." },
-                      { id: "08", title: "Marketing", desc: "Campaign visuals, social assets, and creative direction for stronger digital presence." },
-                    ].map((service) => (
-                      <div key={service.id} className="portfolio-service-card border border-gray-200 rounded-[20px] p-5 sm:p-6 lg:p-8 flex flex-col items-start transition-all duration-300 hover:-translate-y-2 hover:shadow-xl bg-white group hover:border-gray-300 cursor-pointer h-full" style={{ animationDelay: `${Number(service.id) * 45}ms` }}>
-                        <div className="w-12 h-12 mb-4 sm:mb-6 flex items-center justify-center text-gray-800 shrink-0">
-                          {service.id === "01" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>}
-                          {service.id === "02" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>}
-                          {service.id === "03" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>}
-                          {service.id === "04" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line><circle cx="12" cy="10" r="2"></circle></svg>}
-                          {service.id === "05" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path></svg>}
-                          {service.id === "06" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>}
-                          {service.id === "07" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>}
-                          {service.id === "08" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h1.76a1 1 0 0 1 .84.45l2.4 3.6a1 1 0 0 1-.84 1.55H11z"></path><path d="M18 10h-2V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4z"></path></svg>}
+                          <p className="text-sm md:text-base text-blue-100 leading-relaxed max-w-md">
+                            A simple workflow keeps every project moving from rough idea to polished launch without losing the user&apos;s needs along the way.
+                          </p>
                         </div>
-                        <h4 className="text-[17px] font-bold text-gray-900 mb-2 sm:mb-3">{service.title}</h4>
-                        <p className="text-gray-500 text-[13px] leading-relaxed mb-6 sm:mb-8 flex-1">
-                          {service.desc}
-                        </p>
-                        <div className="mt-auto flex items-center gap-1.5 w-full shrink-0">
-                          <div className="w-[30px] h-[30px] rounded-full bg-[#1a3636] text-white flex items-center justify-center text-[11px] font-semibold shrink-0 group-hover:bg-[#63e5ff] group-hover:text-gray-900 transition-colors">
-                            {service.id}
-                          </div>
-                          <div className="flex items-center text-gray-300 group-hover:text-gray-900 transition-colors">
-                            <span className="w-8 h-[1px] bg-current"></span>
-                            <FaArrowRight size={10} className="-ml-[2px]" />
-                          </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {processSteps.map((item, i) => (
+                            <div
+                              key={item.step}
+                              className={`portfolio-reveal rounded-xl border border-white/15 bg-white/10 p-5 backdrop-blur transition hover:-translate-y-1 hover:bg-white/15 text-center flex flex-col items-center ${processInView ? "is-visible" : ""}`}
+                              style={{ transitionDelay: `${i * 120}ms` }}
+                            >
+                              <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-[#63e5ff] text-sm font-extrabold text-[#06224C]">
+                                {item.step}
+                              </div>
+                              <h3 className="mb-2 text-lg font-extrabold">{item.title}</h3>
+                              <p className="text-sm leading-relaxed text-blue-100">{item.desc}</p>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* DESIGN PROCESS SECTION */}
-                <div ref={processRef} className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
-                  <div className="overflow-hidden rounded-2xl bg-[#06224C] px-5 py-8 sm:px-8 md:px-10 md:py-12 text-white shadow-xl relative">
-                    <div className="absolute right-[-5rem] top-[-5rem] h-56 w-56 rounded-full bg-[#63e5ff]/20 blur-3xl"></div>
-                    <div className="absolute left-[-4rem] bottom-[-5rem] h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
-                    <div className="relative grid grid-cols-1 lg:grid-cols-[0.6fr_2fr] gap-8 lg:gap-12 items-start">
-                      <div className={`portfolio-reveal ${processInView ? "is-visible" : ""}`}>
-                        <div className="flex items-center gap-2 mb-4">
-                          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Design</h2>
-                          <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Process</span>
-                        </div>
-                        <p className="text-sm md:text-base text-blue-100 leading-relaxed max-w-md">
-                          A simple workflow keeps every project moving from rough idea to polished launch without losing the user&apos;s needs along the way.
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {processSteps.map((item, i) => (
-                          <div
-                            key={item.step}
-                            className={`portfolio-reveal rounded-xl border border-white/15 bg-white/10 p-5 backdrop-blur transition hover:-translate-y-1 hover:bg-white/15 ${processInView ? "is-visible" : ""}`}
-                            style={{ transitionDelay: `${i * 120}ms` }}
-                          >
-                            <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-[#63e5ff] text-sm font-extrabold text-[#06224C]">
-                              {item.step}
-                            </div>
-                            <h3 className="mb-2 text-lg font-extrabold">{item.title}</h3>
-                            <p className="text-sm leading-relaxed text-blue-100">{item.desc}</p>
-                          </div>
-                        ))}
-                      </div>
                     </div>
                   </div>
-                </div>
 
                 </div>
                 {/* MY PROJECTS SECTION */}
 
                 <div className="relative w-full overflow-hidden portfolio-hero" style={{ backgroundColor: '#FFFFFF', ...getSpecificSectionStyle('projects') }}>
-                <div id="projects" className="w-full px-0 md:px-6 lg:px-12 pb-16 lg:pb-24 relative z-10 overflow-hidden">
+                  <div id="projects" className="w-full px-0 md:px-6 lg:px-12 pb-16 lg:pb-24 relative z-10 overflow-hidden">
 
-                  {/* <div className="px-6 md:px-6 lg:px-8 mb-12">
-                    <h2 className="text-base font-bold flex items-center gap-1 mb-4 text-gray-800 tracking-wide w-max">
+                    {/* <div className="px-6 md:px-6 lg:px-8 mb-12">
+                    <h2 className="text-base font-bold flex items-center gap-1 mb-4 text-gray-800 tracking-wide max-w-full w-fit">
                       My <span className="bg-[#c4ff0b] text-gray-900 px-2 py-0.5 rounded-full text-sm font-extrabold ml-1 leading-none shadow-sm flex items-center h-6">Projects</span>
                     </h2>
                     <h3 className="text-3xl md:text-4xl lg:text-4xl font-extrabold text-gray-900 max-w-2xl leading-[1.15]">
                       Showcase Your Talent with Our <br className="hidden md:block" /> Latest Works
                     </h3>
                   </div> */}
-                  <div className="text-center mb-16">
-                    {/* <h3 className="text-base font-bold flex items-center justify-center gap-1 mb-4 text-gray-800 tracking-wide"> */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
-                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Projects</span>
-                    </div>
-                    {/* <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
-
-                    <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
-                      Showcase Your Talent with Our <br className="hidden md:block" /> Latest Works
-                    </h3>
-                  </div>
-
-
-                  <div
-                    id="projects-slider"
-                    className="w-full overflow-x-auto flex gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden scroll-smooth"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                  >
-                    {[
-                      {
-                        tag: "Graphics Design",
-                        title: "UI / UX Mobile App Design",
-                        img: "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=500&h=500&fit=crop"
-                      },
-                      {
-                        tag: "UI UX Design",
-                        title: "Website Template Design",
-                        img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&h=500&fit=crop"
-                      },
-                      {
-                        tag: "Programming",
-                        title: "ISO App Development",
-                        img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&h=500&fit=crop"
-                      },
-                      {
-                        tag: "Graphics Design",
-                        title: "Handcraft With Palm Fan",
-                        img: "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=500&h=500&fit=crop"
-                      },
-                      {
-                        tag: "Marketing",
-                        title: "Social Media Marketing",
-                        img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&h=500&fit=crop"
-                      },
-                      {
-                        tag: "Development",
-                        title: "Full Stack Web Application",
-                        img: "https://images.unsplash.com/photo-1555421689-491a97ff2040?w=500&h=500&fit=crop"
-                      }
-                    ].map((proj, i) => (
-                      <div key={i} className="portfolio-project-card flex flex-col flex-none w-[240px] sm:w-[260px] max-w-[80vw] shrink-0 snap-start cursor-pointer group" style={{ animationDelay: `${i * 80}ms` }}>
-                        <div className="w-full aspect-square rounded-[20px] mb-4 sm:mb-5 relative border border-gray-100 shadow-sm" data-crop-wrapper-id={`project_image_${i}`}>
-                          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors z-10 w-full h-full rounded-[20px] pointer-events-none"></div>
-                          <div className="absolute inset-0 overflow-hidden rounded-[20px]" data-vignette-id={`project_image_${i}`}>
-                            <Image src={customImages[`project_image_${i}`] || proj.img} alt={proj.title} fill sizes="260px" data-image-id={`project_image_${i}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" style={getFilterStyle(`project_image_${i}`)} unoptimized />
-                          </div>
-                          {isImageEditingMode && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); onEditImage?.(`project_image_${i}`); }}
-                              className="absolute top-3 right-3 bg-white/90 text-gray-800 p-2 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-transform z-50 flex items-center justify-center cursor-pointer border border-gray-200"
-                              title="Edit Image"
-                            >
-                              <FaPen size={14} />
-                            </button>
-                          )}
-                        </div>
-                        <div className="flex items-start mb-3">
-                          <span className="bg-[#63e5ff] border border-gray-900 text-gray-900 px-3.5 py-1.5 rounded-full text-[11px] font-semibold leading-none">
-                            {proj.tag}
-                          </span>
-                        </div>
-                        <h4 className="font-bold text-[15px] text-gray-900 leading-snug group-hover:text-[#1a3636] transition-colors mt-1">{proj.title}</h4>
+                    <div className="text-center mb-16">
+                      {/* <h3 className="text-base font-bold flex items-center justify-center gap-1 mb-4 text-gray-800 tracking-wide"> */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
+                        <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Projects</span>
                       </div>
-                    ))}
-                  </div>
+                      {/* <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
+
+                      <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
+                        Showcase Your Talent with Our <br className="hidden md:block" /> Latest Works
+                      </h3>
+                    </div>
 
 
-                  <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-4 sm:mt-6 w-full relative px-4 sm:px-8">
-                    <button
-                      onClick={() => {
-                        const slider = document.getElementById('projects-slider');
-                        if (slider) slider.scrollBy({ left: -280, behavior: 'smooth' });
-                      }}
-                      className="flex items-center justify-center p-2 group hover:opacity-70 transition-opacity cursor-pointer"
-                      aria-label="Slide Left"
+                    <div
+                      id="projects-slider"
+                      className="w-full overflow-x-auto flex gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden scroll-smooth"
+                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
-                      <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[40px] sm:w-[60px]">
-                        <path d="M10 5L5 10L10 15M5 10H55" stroke="#1a3636" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => {
-                        const slider = document.getElementById('projects-slider');
-                        if (slider) slider.scrollBy({ left: 280, behavior: 'smooth' });
-                      }}
-                      className="flex items-center justify-center p-2 group hover:opacity-70 transition-opacity cursor-pointer"
-                      aria-label="Slide Right"
-                    >
-                      <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[40px] sm:w-[60px]">
-                        <path d="M50 5L55 10L50 15M55 10H5" stroke="#1a3636" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
+                      {[
+                        {
+                          tag: "Graphics Design",
+                          title: "UI / UX Mobile App Design",
+                          img: "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=500&h=500&fit=crop"
+                        },
+                        {
+                          tag: "UI UX Design",
+                          title: "Website Template Design",
+                          img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&h=500&fit=crop"
+                        },
+                        {
+                          tag: "Programming",
+                          title: "ISO App Development",
+                          img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&h=500&fit=crop"
+                        },
+                        {
+                          tag: "Graphics Design",
+                          title: "Handcraft With Palm Fan",
+                          img: "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=500&h=500&fit=crop"
+                        },
+                        {
+                          tag: "Marketing",
+                          title: "Social Media Marketing",
+                          img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&h=500&fit=crop"
+                        },
+                        {
+                          tag: "Development",
+                          title: "Full Stack Web Application",
+                          img: "https://images.unsplash.com/photo-1555421689-491a97ff2040?w=500&h=500&fit=crop"
+                        }
+                      ].map((proj, i) => (
+                        <div key={i} className="portfolio-project-card flex flex-col flex-none w-[240px] sm:w-[260px] max-w-[80vw] shrink-0 snap-start cursor-pointer group" style={{ animationDelay: `${i * 80}ms` }}>
+                          <div className="w-full aspect-square rounded-[20px] mb-4 sm:mb-5 relative border border-gray-100 shadow-sm" data-crop-wrapper-id={`project_image_${i}`}>
+                            <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors z-10 w-full h-full rounded-[20px] pointer-events-none"></div>
+                            <div className="absolute inset-0 overflow-hidden rounded-[20px]" data-vignette-id={`project_image_${i}`}>
+                              <Image src={customImages[`project_image_${i}`] || proj.img} alt={proj.title} fill sizes="260px" data-image-id={`project_image_${i}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" style={getFilterStyle(`project_image_${i}`)} unoptimized />
+                            </div>
+                            {isImageEditingMode && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); onEditImage?.(`project_image_${i}`); }}
+                                className="absolute top-3 right-3 bg-white/90 text-gray-800 p-2 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-transform z-50 flex items-center justify-center cursor-pointer border border-gray-200"
+                                title="Edit Image"
+                              >
+                                <FaPen size={14} />
+                              </button>
+                            )}
+                          </div>
+                          <div className="flex items-start mb-3">
+                            <span className="bg-[#63e5ff] border border-gray-900 text-gray-900 px-3.5 py-1.5 rounded-full text-[11px] font-semibold leading-none">
+                              {proj.tag}
+                            </span>
+                          </div>
+                          <h4 className="font-bold text-[15px] text-gray-900 leading-snug group-hover:text-[#1a3636] transition-colors mt-1">{proj.title}</h4>
+                        </div>
+                      ))}
+                    </div>
 
-                    {/* <button
+
+                    <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-4 sm:mt-6 w-full relative px-4 sm:px-8">
+                      <button
+                        onClick={() => {
+                          const slider = document.getElementById('projects-slider');
+                          if (slider) slider.scrollBy({ left: -280, behavior: 'smooth' });
+                        }}
+                        className="flex items-center justify-center p-2 group hover:opacity-70 transition-opacity cursor-pointer"
+                        aria-label="Slide Left"
+                      >
+                        <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[40px] sm:w-[60px]">
+                          <path d="M10 5L5 10L10 15M5 10H55" stroke="#1a3636" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => {
+                          const slider = document.getElementById('projects-slider');
+                          if (slider) slider.scrollBy({ left: 280, behavior: 'smooth' });
+                        }}
+                        className="flex items-center justify-center p-2 group hover:opacity-70 transition-opacity cursor-pointer"
+                        aria-label="Slide Right"
+                      >
+                        <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[40px] sm:w-[60px]">
+                          <path d="M50 5L55 10L50 15M55 10H5" stroke="#1a3636" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+
+                      {/* <button
                       className="md:absolute right-4 md:right-8 bg-[#1a3636] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:-translate-y-1 transition-transform ml-auto md:ml-0 shrink-0"
                       aria-label="Scroll to top"
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
                     </button> */}
-                  </div>
-                </div>
-
-                {/* TESTIMONIALS SECTION */}
-                <div ref={testimonialsRef} className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
-                  <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-6 lg:gap-10 items-stretch">
-                    <div className={`portfolio-reveal rounded-2xl bg-white p-6 md:p-8 shadow-lg border border-gray-100 ${testimonialsInView ? "is-visible" : ""}`}>
-                      <p className="text-xs font-black uppercase tracking-[0.22em] text-[#1a3636] mb-4">Client Words</p>
-                      <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">
-                        Designs that feel clear before they feel clever.
-                      </h2>
-                      <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-                        Strong visuals are only useful when they help people understand, trust, and take action.
-                      </p>
                     </div>
+                  </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {testimonials.map((item, i) => (
-                        <div
-                          key={item.name}
-                          className={`portfolio-reveal rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${testimonialsInView ? "is-visible" : ""}`}
-                          style={{ transitionDelay: `${i * 140}ms` }}
-                        >
-                          <div className="mb-5 text-5xl font-black leading-none text-[#63e5ff]">“</div>
-                          <p className="mb-6 text-sm leading-relaxed text-gray-600">{item.quote}</p>
-                          <div className="flex items-center gap-3">
-                            <div className="h-11 w-11 rounded-full bg-[#06224C] text-white flex items-center justify-center text-sm font-black">
-                              {item.name.charAt(0)}
-                            </div>
-                            <div>
-                              <p className="font-extrabold text-gray-900">{item.name}</p>
-                              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{item.role}</p>
+                  {/* TESTIMONIALS SECTION */}
+                  <div ref={testimonialsRef} className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
+                    <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-6 lg:gap-10 items-stretch">
+                      <div className={`portfolio-reveal rounded-2xl bg-white p-6 md:p-8 shadow-lg border border-gray-100 ${testimonialsInView ? "is-visible" : ""}`}>
+                        <p className="text-xs font-black uppercase tracking-[0.22em] text-[#1a3636] mb-4">Client Words</p>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+                          Designs that feel clear before they feel clever.
+                        </h2>
+                        <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                          Strong visuals are only useful when they help people understand, trust, and take action.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {testimonials.map((item, i) => (
+                          <div
+                            key={item.name}
+                            className={`portfolio-reveal rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${testimonialsInView ? "is-visible" : ""}`}
+                            style={{ transitionDelay: `${i * 140}ms` }}
+                          >
+                            <div className="mb-5 text-5xl font-black leading-none text-[#63e5ff]">“</div>
+                            <p className="mb-6 text-sm leading-relaxed text-gray-600">{item.quote}</p>
+                            <div className="flex items-center gap-3">
+                              <div className="h-11 w-11 rounded-full bg-[#06224C] text-white flex items-center justify-center text-sm font-black">
+                                {item.name.charAt(0)}
+                              </div>
+                              <div>
+                                <p className="font-extrabold text-gray-900">{item.name}</p>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{item.role}</p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
 
                 </div>
 
+                {/* VIDEO SECTION */}
+                <div id="video" className="w-full px-4 sm:px-6 md:px-12 lg:px-20 py-16 lg:py-24 relative overflow-hidden portfolio-hero" style={{ backgroundColor: '#0B1D40', ...getSpecificSectionStyle('video') }}>
+                  <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col-reverse lg:flex-row items-center justify-between gap-12 lg:gap-8">
+
+                    {/* LEFT COLUMN: Text Content */}
+                    <div className="flex w-full flex-col justify-center space-y-6 lg:w-5/12 relative z-10">
+                      <div>
+                        <p className="text-[#38BDF8] font-bold tracking-widest uppercase text-sm md:text-base mb-4">
+                          Creative Marketing
+                        </p>
+                        <h2 className="text-[clamp(2rem,5cqi,4.5rem)] font-black text-white leading-[1.1] tracking-tight mb-6">
+                          Showreel 2026
+                        </h2>
+                        <p className="text-gray-300 text-base sm:text-lg md:text-xl font-medium max-w-md leading-relaxed mb-8">
+                          We Create digital experience that drives results.
+                        </p>
+                      </div>
+
+                      <div>
+                        <button
+                          type="button"
+                          className="group flex items-center gap-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-4 rounded-full font-bold uppercase text-sm tracking-wider hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/30 max-w-full w-fit"
+                        >
+                          Watch Now
+                          <div className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <FaPlay className="text-xs ml-0.5" aria-hidden="true" />
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* RIGHT COLUMN: Image/Video */}
+                    <div className="relative w-full lg:w-7/12 flex justify-center lg:justify-end">
+                      <div className="relative w-full max-w-[640px] aspect-video rounded-[2rem] overflow-hidden shadow-2xl" data-crop-wrapper-id="video_block_bg">
+                        {videoBlockProps?.sourceType === 'embed' && videoBlockProps.embedCode ? (
+                          <div className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full" dangerouslySetInnerHTML={{ __html: videoBlockProps.embedCode }} />
+                        ) : videoBlockProps?.sourceType === 'upload' && videoBlockProps.uploadUrl ? (
+                          <video
+                            src={videoBlockProps.uploadUrl}
+                            poster={videoBlockProps.posterImage || customImages?.["video_block_bg"] || assetPath("/video_block_bg.png")}
+                            className="w-full h-full object-cover"
+                            autoPlay={videoBlockProps.autoplay}
+                            loop={videoBlockProps.loop}
+                            muted={videoBlockProps.muted}
+                            controls={videoBlockProps.showControls}
+                          />
+                        ) : (
+                          <img
+                            src={videoBlockProps?.posterImage || customImages?.["video_block_bg"] || assetPath("/video_block_bg.png")}
+                            alt="Workspace Desk"
+                            className="w-full h-full object-cover"
+                            data-image-id="video_block_bg"
+                            style={getFilterStyle("video_block_bg")}
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-blue-900/10 mix-blend-overlay pointer-events-none"></div>
+                      </div>
+                    </div>
+
+                    {/* CENTER: Edit Button Overlay */}
+                    {isVideoEditingMode && (
+                      <button
+                        onClick={() => onEditVideo?.("video_block")}
+                        className="absolute top-4 right-4 bg-white/90 text-gray-800 p-2 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-transform z-50 flex items-center justify-center cursor-pointer border border-gray-200"
+                        title="Edit Video"
+                      >
+                        <FaPen size={14} />
+                      </button>
+                    )}
+                    {isImageEditingMode && (
+                      <button
+                        onClick={() => onEditImage?.("video_block_bg")}
+                        className="absolute top-4 right-4 bg-white/90 text-gray-800 p-2 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-transform z-50 flex items-center justify-center cursor-pointer border border-gray-200"
+                        title="Edit Image"
+                      >
+                        <FaPen size={14} />
+                      </button>
+                    )}
+                  </div>
+                </div>
                 {/* CONTACT SECTION */}
                 <div id="contact" className="w-full px-4 sm:px-6 md:px-12 lg:px-20 py-12 sm:py-16 lg:py-24 relative overflow-hidden border-t border-gray-100 portfolio-hero" style={getSpecificSectionStyle('contact')}>
                   <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-start lg:items-center">
 
                     <div>
-                      {/* <h2 className="text-base font-bold flex items-center gap-1 mb-4 text-gray-800 tracking-wide w-max">
+                      {/* <h2 className="text-base font-bold flex items-center gap-1 mb-4 text-gray-800 tracking-wide max-w-full w-fit">
                         Get In <span className="bg-[#c4ff0b] text-gray-900 px-2 py-0.5 rounded-full text-sm font-extrabold ml-1 leading-none shadow-sm flex items-center h-6">Touch</span>
                       </h2> */}
                       <div className="flex items-center gap-2 mb-4">
@@ -1249,6 +1345,101 @@ export default function PortfolioPreview({
 
                   </div>
                 </div>
+
+                {/* FOOTER SECTION */}
+                <footer id="footer" className="stackly-footer w-full px-4 sm:px-6 md:px-12 lg:px-20 py-12 lg:py-20 rounded-b-xl" style={{ backgroundColor: '#06224C', ...getSpecificSectionStyle('footer') }}>
+                  <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+                      {/* Brand Column */}
+                      <div className="flex flex-col items-start lg:col-span-1">
+                        <Link
+                          href="/landing"
+                          className="flex h-10 min-w-[92px] items-center justify-center rounded-[50%] bg-white px-3 mb-8"
+                        >
+                          <Image
+                            src={assetPath("/stackly-logo.webp")}
+                            alt="Stackly logo"
+                            width={92}
+                            height={28}
+                            className="h-[18px] w-auto"
+                            unoptimized
+                          />
+                        </Link>
+                        <h2 className="text-[22px] font-bold text-white mb-4 leading-snug">
+                          Turning Ideas Into <br /> Meaningful Experiences.
+                        </h2>
+                        <p className="text-[#8B9DB1] text-sm mb-8 leading-relaxed max-w-[280px]">
+                          Im a UI/UX Designer & Frontend Developer who craft clean, user-focused digital experience.
+                        </p>
+                        <button className="px-5 py-2 border border-white/20 text-white text-sm font-semibold rounded-md flex items-center gap-2 hover:bg-white/10 transition group">
+                          Let's work together <FaArrowRight className="-rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </button>
+                      </div>
+
+                      {/* Navigation Column */}
+                      <div>
+                        <h3 className="text-white font-bold text-sm mb-8 tracking-wider uppercase">Navigation</h3>
+                        <ul className="space-y-5">
+                          {['Home', 'About', 'Projects', 'Skills', 'Experience', 'Contact'].map(link => (
+                            <li key={link}><a href={`#${link.toLowerCase()}`} className="text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">{link}</a></li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Services Column */}
+                      <div>
+                        <h3 className="text-white font-bold text-sm mb-8 tracking-wider uppercase">Services</h3>
+                        <ul className="space-y-5">
+                          {['UI/UX Design', 'Web Development', 'Responsive Design', 'Prototyping', 'Design Systems'].map(link => (
+                            <li key={link}><a href="#" className="text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">{link}</a></li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Connect Column */}
+                      <div>
+                        <h3 className="text-white font-bold text-sm mb-8 tracking-wider uppercase">Let's Connect</h3>
+                        <ul className="space-y-5">
+                          <li>
+                            <a href="mailto:@thestackly.com" className="flex items-center gap-3 text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">
+                              <span className="flex items-center justify-center text-red-500 w-5"><FaEnvelope size={18} /></span>
+                              @thestackly.com
+                            </a>
+                          </li>
+                          <li>
+                            <a href="tel:+9956796541" className="flex items-center gap-3 text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">
+                              <span className="flex items-center justify-center text-[#517AA5] w-5"><FaMobileAlt size={18} /></span>
+                              +9956796541
+                            </a>
+                          </li>
+                          <li>
+                            <span className="flex items-center gap-3 text-[#8B9DB1] text-[15px] font-medium">
+                              <span className="flex items-center justify-center text-green-500 w-5"><FaMapMarkerAlt size={18} /></span>
+                              Bengaluru, India
+                            </span>
+                          </li>
+                          <li>
+                            <a href="https://linkedin.com/in/stackly" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">
+                              <span className="flex items-center justify-center text-blue-500 w-5"><FaLinkedin size={18} /></span>
+                              linkedin.com/in/stackly
+                            </a>
+                          </li>
+                          <li>
+                            <a href="https://github.com/stackly" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">
+                              <span className="flex items-center justify-center text-white w-5"><FaGithub size={18} /></span>
+                              github.com/stackly
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-white/10 mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                      <p className="text-[#8B9DB1] text-[15px] font-medium">© 2026 Stackly. All rights reserved.</p>
+                      <p className="text-[#8B9DB1] text-[15px] font-medium flex items-center gap-1.5">Designed & Built with <span className="text-red-500 text-lg leading-none">❤️</span> and lots of coffee ☕</p>
+                    </div>
+                  </div>
+                </footer>
               </div>
             </div>
 

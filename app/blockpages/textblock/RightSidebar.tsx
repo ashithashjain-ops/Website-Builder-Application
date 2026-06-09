@@ -120,7 +120,9 @@ export default function TextRightSidebar({ state, onStateChange, onClose }: Text
                       <option value="home">Home</option>
                       <option value="about">About Me</option>
                       <option value="projects">Projects</option>
+                      <option value="video">Video Block</option>
                       <option value="contact">Contact</option>
+                      <option value="footer">Footer</option>
                     </select>
  
                     <h5 className="mb-2 text-[13px] font-bold text-[#0B1D40]">Background</h5>
@@ -208,7 +210,6 @@ export default function TextRightSidebar({ state, onStateChange, onClose }: Text
  
             {selectedTarget === "footer" && (
               <>
-                <ColorInput label="Footer Background" value={section.footerBg} onChange={(footerBg) => updateSection({ footerBg })} />
                 <ColorInput label="Footer Text Color" value={section.footerText} onChange={(footerText) => updateSection({ footerText })} />
               </>
             )}

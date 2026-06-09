@@ -72,7 +72,7 @@ export default function Page() {
     <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#e9eef6] font-sans">
       <div className="relative flex min-h-[calc(100vh-64px)] w-full flex-1 flex-shrink-0 gap-4 overflow-hidden p-4">
         <button
-          className="absolute left-0 top-5 z-40 flex h-11 w-8 items-center justify-center rounded-r-md border border-l-0 border-[#152B52] bg-[#0B1D40] text-white shadow-lg transition-all duration-300 hover:bg-[#152B52] active:scale-95 lg:hidden"
+          className="absolute left-0 top-5 z-40 flex h-11 w-8 items-center justify-center rounded-r-md border border-l-0 border-[#152B52] bg-[#0B1D40] text-white shadow-lg transition-all duration-300 hover:bg-[#152B52] active:scale-95 xl:hidden"
           onClick={() => setIsLeftOpen(true)}
           aria-label="Open left sidebar"
         >
@@ -80,12 +80,12 @@ export default function Page() {
         </button>
        
         {/* Left Sidebar (Desktop Only) */}
-        <div className="hidden lg:flex lg:relative lg:translate-x-0 inset-y-0 left-0">
+        <div className="hidden xl:flex xl:relative xl:translate-x-0 inset-y-0 left-0">
           <LeftSidebar onAddBlock={(type) => { handleAddBlock(type); }} />
         </div>
  
         {/* Mobile Left Sidebar Overlay (Bottom Sheet) */}
-        <div className={`fixed inset-0 z-[60] lg:hidden transition-opacity duration-300 ${isLeftOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`fixed inset-0 z-[60] xl:hidden transition-opacity duration-300 ${isLeftOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
           <div className="absolute inset-0 bg-black/60" onClick={() => setIsLeftOpen(false)}></div>
           <div className={`absolute bottom-0 left-0 w-full h-[65vh] max-h-[800px] bg-[#0A193A] rounded-t-3xl transform transition-transform duration-300 ${isLeftOpen ? 'translate-y-0' : 'translate-y-full'} overflow-hidden flex flex-col shadow-2xl`}>
             <MobileLeftSidebar
@@ -121,4 +121,3 @@ export default function Page() {
     </div>
   );
 }
- 

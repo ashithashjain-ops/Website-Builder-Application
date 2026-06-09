@@ -104,7 +104,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
   };
  
   return (
-    <aside className={`relative flex h-full w-full lg:w-[286px] flex-shrink-0 flex-col overflow-hidden rounded-xl border shadow-[0_18px_45px_rgba(113,63,18,0.10)] transition-colors duration-300 ${activeTab === 'styles' ? 'bg-[#0B1D40] border-[#0B1D40]' : 'bg-[#fff7f4] border-[#f4d8cc]'}`}>
+    <aside className={`relative flex h-full w-full xl:w-[286px] flex-shrink-0 flex-col overflow-hidden rounded-xl border shadow-[0_18px_45px_rgba(113,63,18,0.10)] transition-colors duration-300 ${activeTab === 'styles' ? 'bg-[#0B1D40] border-[#0B1D40]' : 'bg-[#fff7f4] border-[#f4d8cc]'}`}>
       {activeTab === 'button' ? (
         <>
           {/* Mobile Close Button */}

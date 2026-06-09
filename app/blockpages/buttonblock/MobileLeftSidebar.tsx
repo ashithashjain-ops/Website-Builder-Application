@@ -87,12 +87,13 @@ export default function MobileLeftSidebar({ onAddBlock, onClose, selectedBlock, 
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
           <div className="flex flex-col">
-            {['Home', 'About Us', 'Our Products', 'Categories', 'Conatct'].map((page, idx) => {
+            {['Home', 'About Me', 'Our Products', 'Categories', 'Video Block', 'Get in Touch (Contact)'].map((page, idx) => {
               const icons = [
                 <Home key="home" className="w-5 h-5 text-white" />,
                 <Info key="info" className="w-5 h-5 text-white" />,
                 <FileText key="file" className="w-5 h-5 text-white" />,
                 <Mail key="mail" className="w-5 h-5 text-white" />,
+                <MonitorPlay key="video" className="w-5 h-5 text-white" />,
                 <UserRound key="user" className="w-5 h-5 text-white" />,
               ];
               return (
