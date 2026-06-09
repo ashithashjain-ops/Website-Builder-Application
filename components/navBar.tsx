@@ -39,7 +39,7 @@ const navCategories = [
     title: "LANDING PAGE",
     label: "TYPES",
     icon: FaBookOpen,
-    items: ["Lead Generating Page", "Click-through Page", "Sales Page", "Product Page", "App Page", "Pre-launch Page", "Event Page", "Splash Page", "Video Block", "Others..."],
+    items: ["Lead Generating Page", "Click-through Page", "Sales Page", "Product Page", "App Page", "Pre-launch Page", "Event Page", "Splash Page", "Others..."],
   },
   {
     title: "DASHBOARD",
@@ -426,7 +426,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
         <div className="flex min-w-0 items-center gap-1 md:gap-8">
           <button
             type="button"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md p-1 text-white transition hover:bg-white/10 active:scale-95 xl:hidden"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md p-1 text-white transition hover:bg-white/10 active:scale-95 lg:hidden"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             onClick={() => setMobileOpen((value) => !value)}
           >
@@ -441,7 +441,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
             <img src={assetPath("/stackly-logo.webp")} alt="Stackly" className="h-3 w-auto object-contain md:h-5" />
           </Link>
  
-          <div className="hidden items-center justify-center gap-12 text-[13px] font-bold uppercase tracking-wide text-white xl:flex">
+          <div className="hidden items-center justify-center gap-12 text-[13px] font-bold uppercase tracking-wide text-white lg:flex">
             <Link href="/landing" className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300"><MotionNavItem>HOME</MotionNavItem></Link>
             <Link href="/aboutus" className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300"><MotionNavItem>ABOUT US</MotionNavItem></Link>
  
@@ -487,7 +487,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
                     <div className="invisible absolute left-full top-0 z-[110] min-h-full w-[220px] rounded-r-xl border border-gray-100 bg-gray-50 opacity-0 shadow-[10px_0_30px_rgba(0,0,0,0.10)] transition group-hover/category:visible group-hover/category:opacity-100 group-focus-within/category:visible group-focus-within/category:opacity-100">
                       <div className="border-b border-gray-200 bg-white px-5 py-3 text-[11px] font-black text-blue-600">{label}</div>
                       {items.map((categoryItem) => (
-                        <Link key={`${title}-${categoryItem}`} href={categoryItem === "Video Block" ? "/video-block" : "/landing#categories"} onClick={(event) => { closeMenus(); if (categoryItem !== "Video Block") scrollLandingSection(event, "categories"); }} className="block border-b border-black/[0.03] px-5 py-2.5 text-[10px] font-extrabold uppercase text-slate-700 transition hover:bg-blue-50 hover:pl-6 hover:text-blue-600">
+                        <Link key={`${title}-${categoryItem}`} href="/landing#categories" onClick={(event) => { closeMenus(); scrollLandingSection(event, "categories"); }} className="block border-b border-black/[0.03] px-5 py-2.5 text-[10px] font-extrabold uppercase text-slate-700 transition hover:bg-blue-50 hover:pl-6 hover:text-blue-600">
                           {categoryItem}
                         </Link>
                       ))}
@@ -497,7 +497,6 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               </motion.div>)}</AnimatePresence>
             </div>
  
-
             <Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact")} className="stackly-nav-link whitespace-nowrap transition hover:text-blue-300"><MotionNavItem>CONTACT</MotionNavItem></Link>
           </div>
         </div>
@@ -617,7 +616,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
       <AnimatePresence>
       {mobileOpen && (
         <motion.div
-          className="stackly-mobile-menu mt-3 bg-[#06224C] pb-5 pt-3 text-[11px] font-bold uppercase tracking-widest text-white shadow-[inset_0_10px_24px_-12px_rgba(0,0,0,0.55)] xl:hidden"
+          className="stackly-mobile-menu mt-3 bg-[#06224C] pb-5 pt-3 text-[11px] font-bold uppercase tracking-widest text-white shadow-[inset_0_10px_24px_-12px_rgba(0,0,0,0.55)] lg:hidden"
           variants={mobileMenuVariants}
           initial="closed"
           animate="open"
@@ -671,7 +670,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
                       {mobileCategory === title && (
                         <div className="border-b border-white/5 bg-[#051a3d] py-2">
                           {items.map((item) => (
-                            <Link key={`mobile-${title}-${item}`} href={item === "Video Block" ? "/video-block" : "/landing#categories"} onClick={(event) => { if (item !== "Video Block") scrollLandingSection(event, "categories", true); else setMobileOpen(false); }} className="block px-14 py-3 text-[10px] text-gray-300">
+                            <Link key={`mobile-${title}-${item}`} href="/landing#categories" onClick={(event) => scrollLandingSection(event, "categories", true)} className="block px-14 py-3 text-[10px] text-gray-300">
                               {item}
                             </Link>
                           ))}
@@ -683,7 +682,6 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               )}
             </motion.div>
  
-            <motion.div variants={mobileItemVariants} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 500, damping: 28 }}><Link href="/video-block" onClick={() => setMobileOpen(false)} className="block px-6 py-4">Video Block</Link></motion.div>
             <motion.div variants={mobileItemVariants} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 500, damping: 28 }}><Link href="/landing#contact" onClick={(event) => scrollLandingSection(event, "contact", true)} className="block px-6 py-4">Contact</Link></motion.div>
           </div>
         </motion.div>
@@ -703,7 +701,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
           type="button"
           aria-label="Close menu"
           onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 z-[4990] bg-black/45 backdrop-blur-sm xl:hidden"
+          className="fixed inset-0 z-[4990] bg-black/45 backdrop-blur-sm lg:hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
