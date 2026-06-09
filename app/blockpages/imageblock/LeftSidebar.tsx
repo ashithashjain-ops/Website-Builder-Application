@@ -16,7 +16,6 @@ export type BlockPageType = 'image' | 'button' | 'text' | 'video';
 
 import type { TextBlockState, TextSectionProps } from "../textblock/types";
 
-import type { TextBlockState, TextSectionProps } from "../textblock/types";
 
 type LeftSidebarProps = {
   activeBlockPage?: BlockPageType;
