@@ -104,7 +104,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
   };
  
   return (
-    <aside className={`relative flex h-full w-full xl:w-[286px] flex-shrink-0 flex-col overflow-hidden rounded-xl border shadow-[0_18px_45px_rgba(113,63,18,0.10)] transition-colors duration-300 ${activeTab === 'styles' ? 'bg-[#0B1D40] border-[#0B1D40]' : 'bg-[#fff7f4] border-[#f4d8cc]'}`}>
+    <aside className={`relative flex h-full w-full xl:w-[210px] flex-shrink-0 flex-col overflow-hidden rounded-xl border shadow-[0_18px_45px_rgba(113,63,18,0.10)] transition-colors duration-300 ${activeTab === 'styles' ? 'bg-[#0B1D40] border-[#0B1D40]' : 'bg-[#fff7f4] border-[#f4d8cc]'}`}>
       {activeTab === 'button' ? (
         <>
           {/* Mobile Close Button */}
@@ -118,7 +118,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
           )}
  
           {/* Tabs */}
-          <div className="flex border-b border-[#f2d8cf] bg-white/45 px-6 pt-5">
+          <div className="flex border-b border-[#f2d8cf] bg-white/45 px-3 pt-5">
             <button
               className="flex-1 border-b-[2px] pb-4 text-base font-bold transition-colors border-[#0B1D40] text-[#0B1D40]"
               onClick={() => setActiveTab('button')}
@@ -133,7 +133,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
             </button>
           </div>
  
-          <div className="flex-1 space-y-4 overflow-y-auto px-6 pb-8 pt-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex-1 space-y-4 overflow-y-auto px-3 pb-8 pt-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {/* Settings Accordion Header */}
             <button
               className="w-full flex items-center justify-between text-[15px] font-bold text-[#0B1D40] hover:bg-black/5 p-1 rounded -ml-1 transition"
@@ -193,27 +193,27 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
                 <div>
                   <h4 className="text-[#0B1D40] text-[15px] font-bold mb-3">Border Radius</h4>
                   <div className="w-full border border-[#0B1D40] bg-transparent rounded-xl flex items-center overflow-hidden focus-within:ring-2 focus-within:ring-blue-100 transition-colors">
-                     <input
-                       type="text"
-                       className="w-full text-center py-2.5 text-[15px] text-[#0B1D40] font-bold bg-transparent focus:outline-none"
-                       value={localButtonRadius}
-                       onChange={(e) => {
-                         setLocalButtonRadius(e.target.value);
-                         onUpdateBlock(id, { ...props, buttonVariant: 'default', borderRadius: e.target.value });
-                       }}
-                       onKeyDown={handleKeyDown}
-                       onBlur={() => {
-                         const formatted = formatSize(localButtonRadius, '0px');
-                         setLocalButtonRadius(formatted);
-                         const val = parseInt(formatted) || 0;
-                         onUpdateBlock(id, {
-                           ...props,
-                           buttonVariant: 'default', // Disable pill mode so radius applies
-                           borderRadius: formatted,
-                           cornerRadiusValues: { tl: val, tr: val, br: val, bl: val }
-                         });
-                       }}
-                     />
+                    <input
+                      type="text"
+                      className="w-full text-center py-2.5 text-[15px] text-[#0B1D40] font-bold bg-transparent focus:outline-none"
+                      value={localButtonRadius}
+                      onChange={(e) => {
+                        setLocalButtonRadius(e.target.value);
+                        onUpdateBlock(id, { ...props, buttonVariant: 'default', borderRadius: e.target.value });
+                      }}
+                      onKeyDown={handleKeyDown}
+                      onBlur={() => {
+                        const formatted = formatSize(localButtonRadius, '0px');
+                        setLocalButtonRadius(formatted);
+                        const val = parseInt(formatted) || 0;
+                        onUpdateBlock(id, {
+                          ...props,
+                          buttonVariant: 'default', // Disable pill mode so radius applies
+                          borderRadius: formatted,
+                          cornerRadiusValues: { tl: val, tr: val, br: val, bl: val }
+                        });
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -221,74 +221,74 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
  
             {/* Play Controls */}
             <div className="pt-2">
-               <button
-                 className="w-full flex items-center justify-between text-[15px] font-bold text-[#0B1D40] mb-4 hover:bg-black/5 p-1 rounded -ml-1 transition"
-                 onClick={() => setShowPlay(!showPlay)}
-               >
-                  <span>Play</span>
-                  <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${showPlay ? '' : '-rotate-90'}`} />
-               </button>
+              <button
+                className="w-full flex items-center justify-between text-[15px] font-bold text-[#0B1D40] mb-4 hover:bg-black/5 p-1 rounded -ml-1 transition"
+                onClick={() => setShowPlay(!showPlay)}
+              >
+                <span>Play</span>
+                <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${showPlay ? '' : '-rotate-90'}`} />
+              </button>
  
-                {showPlay && (
-                 <>
-                   <div className="flex items-center justify-between px-2 mt-3 mb-5">
-                     <button
-                       className={`w-10 h-10 rounded-xl bg-[#0B1D40] text-white flex items-center justify-center shadow-sm hover:bg-[#152B52] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md ${props.iconPosition === 'left' ? 'ring-2 ring-white/50' : ''}`}
-                       onClick={() => onUpdateBlock(id, { ...props, iconPosition: props.iconPosition === 'left' ? 'none' : 'left' })}
-                     >
-                       <ChevronLeft className="w-6 h-6" />
-                     </button>
-                     
-                     <span className="text-[#0B1D40] font-semibold text-[26px] leading-none">+</span>
-                     
-                     <button
-                       className={`h-10 px-5 rounded-full bg-[#0B1D40] text-white flex items-center justify-center shadow-sm gap-2 hover:bg-[#152B52] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md ${props.buttonVariant === 'pill' ? 'ring-2 ring-white/50' : ''}`}
-                       onClick={() => onUpdateBlock(id, { ...props, buttonVariant: props.buttonVariant === 'pill' ? 'default' : 'pill' })}
-                     >
-                       <div className="w-[12px] h-[12px] rounded-full bg-white flex-shrink-0"></div>
-                       <ChevronRight className="w-6 h-6" />
-                     </button>
+              {showPlay && (
+                <>
+                  <div className="flex items-center justify-between px-2 mt-3 mb-5">
+                    <button
+                      className={`w-10 h-10 rounded-xl bg-[#0B1D40] text-white flex items-center justify-center shadow-sm hover:bg-[#152B52] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md ${props.iconPosition === 'left' ? 'ring-2 ring-white/50' : ''}`}
+                      onClick={() => onUpdateBlock(id, { ...props, iconPosition: props.iconPosition === 'left' ? 'none' : 'left' })}
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
  
-                     <button
-                       className={`w-10 h-10 rounded-xl bg-[#0B1D40] text-white flex items-center justify-center shadow-sm hover:bg-[#152B52] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md ${props.iconPosition === 'right' ? 'ring-2 ring-white/50' : ''}`}
-                       onClick={() => onUpdateBlock(id, { ...props, iconPosition: props.iconPosition === 'right' ? 'none' : 'right' })}
-                     >
-                       <ChevronRight className="w-6 h-6" />
-                     </button>
-                   </div>
+                    <span className="text-[#0B1D40] font-semibold text-[26px] leading-none">+</span>
  
-                   <div className="w-full border border-[#0B1D40] bg-transparent rounded-[14px] flex flex-row items-center justify-between px-6 py-2.5 hover:bg-black/5 transition-colors">
-                     <button
-                       className="text-[#0B1D40] hover:text-black font-semibold text-2xl leading-[0] flex items-center justify-center transition-transform hover:scale-110"
-                       onClick={() => handleWidthChange(-20)}
-                       title="Decrease Width"
-                     >
-                       –
-                     </button>
-                     <button
-                       className="text-[#0B1D40] hover:text-black font-semibold text-[26px] leading-[0] flex items-center justify-center transition-transform hover:scale-110"
-                       onClick={() => handleWidthChange(20)}
-                       title="Increase Width"
-                     >
-                       +
-                     </button>
-                     <button
-                       className="text-[#0B1D40] hover:text-black flex justify-center items-center font-medium leading-[0] transition-transform hover:translate-x-1"
-                       onClick={() => onUpdateBlock(id, { ...props, width: 'auto' })}
-                       title="Auto Width"
-                     >
-                       <ChevronRight className="w-[24px] h-[24px]" strokeWidth={2.5}/>
-                     </button>
-                     <button
-                       className="text-[#0B1D40] hover:text-black flex items-center justify-center leading-[0]"
-                       onClick={() => onUpdateBlock(id, { ...props, width: '100%' })}
-                       title="Maximize Width"
-                     >
-                       <LogOut className="w-[20px] h-[20px]" strokeWidth={2.5} />
-                     </button>
-                   </div>
-                 </>
-                )}
+                    <button
+                      className={`h-10 px-5 rounded-full bg-[#0B1D40] text-white flex items-center justify-center shadow-sm gap-2 hover:bg-[#152B52] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md ${props.buttonVariant === 'pill' ? 'ring-2 ring-white/50' : ''}`}
+                      onClick={() => onUpdateBlock(id, { ...props, buttonVariant: props.buttonVariant === 'pill' ? 'default' : 'pill' })}
+                    >
+                      <div className="w-[12px] h-[12px] rounded-full bg-white flex-shrink-0"></div>
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+ 
+                    <button
+                      className={`w-10 h-10 rounded-xl bg-[#0B1D40] text-white flex items-center justify-center shadow-sm hover:bg-[#152B52] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md ${props.iconPosition === 'right' ? 'ring-2 ring-white/50' : ''}`}
+                      onClick={() => onUpdateBlock(id, { ...props, iconPosition: props.iconPosition === 'right' ? 'none' : 'right' })}
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+                  </div>
+ 
+                  <div className="w-full border border-[#0B1D40] bg-transparent rounded-[14px] flex flex-row items-center justify-between px-3 py-2.5 hover:bg-black/5 transition-colors">
+                    <button
+                      className="text-[#0B1D40] hover:text-black font-semibold text-2xl leading-[0] flex items-center justify-center transition-transform hover:scale-110"
+                      onClick={() => handleWidthChange(-20)}
+                      title="Decrease Width"
+                    >
+                      –
+                    </button>
+                    <button
+                      className="text-[#0B1D40] hover:text-black font-semibold text-[26px] leading-[0] flex items-center justify-center transition-transform hover:scale-110"
+                      onClick={() => handleWidthChange(20)}
+                      title="Increase Width"
+                    >
+                      +
+                    </button>
+                    <button
+                      className="text-[#0B1D40] hover:text-black flex justify-center items-center font-medium leading-[0] transition-transform hover:translate-x-1"
+                      onClick={() => onUpdateBlock(id, { ...props, width: 'auto' })}
+                      title="Auto Width"
+                    >
+                      <ChevronRight className="w-[24px] h-[24px]" strokeWidth={2.5} />
+                    </button>
+                    <button
+                      className="text-[#0B1D40] hover:text-black flex items-center justify-center leading-[0]"
+                      onClick={() => onUpdateBlock(id, { ...props, width: '100%' })}
+                      title="Maximize Width"
+                    >
+                      <LogOut className="w-[20px] h-[20px]" strokeWidth={2.5} />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </>
@@ -304,7 +304,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
-         
+ 
           {/* Styles Content */}
           <div className="flex-1 space-y-7 overflow-y-auto px-5 py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {/* Colors */}
@@ -349,14 +349,14 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
                     <AlignRight className="w-4 h-4 text-white" />
                   </button>
                 </div>
-               
+ 
                 {/* Rotate Group */}
                 <div className="flex border border-white/10 rounded-lg overflow-hidden bg-white/5 flex-1 justify-center">
                   <button
                     className="flex-1 py-1.5 flex justify-center hover:bg-white/10 border-r border-white/10"
                     onClick={() => {
-                       const currentRot = (props.rotation as number) || 0;
-                       onUpdateBlock(id, { ...props, rotation: (currentRot + 90) % 360 });
+                      const currentRot = (props.rotation as number) || 0;
+                      onUpdateBlock(id, { ...props, rotation: (currentRot + 90) % 360 });
                     }}
                   >
                     <RotateCcw className="w-4 h-4 text-white" />
@@ -365,13 +365,13 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
                     className="flex-1 py-1.5 flex justify-center hover:bg-white/10 border-r border-white/10"
                     onClick={() => onUpdateBlock(id, { ...props, flipH: !props.flipH })}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 20v-16"/><path d="M8 4l-6 8 6 8"/><path d="M16 4l6 8-6 8"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 20v-16" /><path d="M8 4l-6 8 6 8" /><path d="M16 4l6 8-6 8" /></svg>
                   </button>
                   <button
                     className="flex-1 py-1.5 flex justify-center hover:bg-white/10"
                     onClick={() => onUpdateBlock(id, { ...props, flipV: !props.flipV })}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M4 12h16"/><path d="M4 8l8-6 8 6"/><path d="M4 16l8 6 8-6"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M4 12h16" /><path d="M4 8l8-6 8 6" /><path d="M4 16l8 6 8-6" /></svg>
                   </button>
                 </div>
  
@@ -380,17 +380,17 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
                   <div className="flex flex-1 items-center justify-center py-1.5 border-r border-white/10">
                     <ArrowUpDown className="w-3.5 h-3.5 text-white mr-1" />
                     <input
-                       type="text"
-                       className="w-8 bg-transparent text-white text-[13px] text-center focus:outline-none"
-                       value={localPadding}
-                       onChange={(e) => setLocalPadding(e.target.value)}
-                       onKeyDown={handleKeyDown}
-                       onBlur={() => {
-                          let val = parseInt(localPadding);
-                          if (isNaN(val)) val = 0;
-                          setLocalPadding(val.toString());
-                          onUpdateBlock(id, { ...props, padding: val });
-                       }}
+                      type="text"
+                      className="w-8 bg-transparent text-white text-[13px] text-center focus:outline-none"
+                      value={localPadding}
+                      onChange={(e) => setLocalPadding(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      onBlur={() => {
+                        let val = parseInt(localPadding);
+                        if (isNaN(val)) val = 0;
+                        setLocalPadding(val.toString());
+                        onUpdateBlock(id, { ...props, padding: val });
+                      }}
                     />
                   </div>
                   <button className="px-1.5 hover:bg-white/10"><ChevronDown className="w-3.5 h-3.5 text-white" /></button>
@@ -446,12 +446,12 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
                   onChange={(e) => setLocalOpacity(e.target.value)}
                   onKeyDown={handleKeyDown}
                   onBlur={() => {
-                     let val = parseInt(localOpacity);
-                     if (isNaN(val)) val = 0;
-                     if (val < 0) val = 0;
-                     if (val > 100) val = 100;
-                     setLocalOpacity(val.toString());
-                     onUpdateBlock(id, { ...props, opacity: val });
+                    let val = parseInt(localOpacity);
+                    if (isNaN(val)) val = 0;
+                    if (val < 0) val = 0;
+                    if (val > 100) val = 100;
+                    setLocalOpacity(val.toString());
+                    onUpdateBlock(id, { ...props, opacity: val });
                   }}
                 />
               </div>
@@ -471,17 +471,17 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
                       onChange={(e) => setLocalRadii({ ...localRadii, [corner]: e.target.value })}
                       onKeyDown={handleKeyDown}
                       onBlur={() => {
-                         let val = parseInt(localRadii[corner]);
-                         if (isNaN(val)) val = 0;
-                         
-                         setLocalRadii({ ...localRadii, [corner]: val.toString() });
-                         const newRadius = { ...cornerRadiusValues, [corner]: val };
-                         onUpdateBlock(id, {
-                           ...props,
-                           buttonVariant: 'default', // Disable pill mode so radius applies
-                           cornerRadiusValues: newRadius,
-                           borderRadius: `${newRadius.tl}px ${newRadius.tr}px ${newRadius.br}px ${newRadius.bl}px`
-                         });
+                        let val = parseInt(localRadii[corner]);
+                        if (isNaN(val)) val = 0;
+ 
+                        setLocalRadii({ ...localRadii, [corner]: val.toString() });
+                        const newRadius = { ...cornerRadiusValues, [corner]: val };
+                        onUpdateBlock(id, {
+                          ...props,
+                          buttonVariant: 'default', // Disable pill mode so radius applies
+                          cornerRadiusValues: newRadius,
+                          borderRadius: `${newRadius.tl}px ${newRadius.tr}px ${newRadius.br}px ${newRadius.bl}px`
+                        });
                       }}
                     />
                   </div>
@@ -494,3 +494,5 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
     </aside>
   );
 }
+ 
+ 

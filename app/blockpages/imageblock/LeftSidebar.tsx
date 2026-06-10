@@ -1246,22 +1246,21 @@ export default function LeftSidebar({
       )}
 
       {/* Desktop Sidebar Container (Hidden on mobile) */}
-      <aside className="relative z-50 hidden h-full w-[185px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#203b66] bg-[#1A2B4C] text-white shadow-[0_18px_45px_rgba(11,29,64,0.14)] xl:flex">
+      <aside className="relative z-50 hidden h-full w-[210px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#203b66] bg-[#1A2B4C] text-white shadow-[0_18px_45px_rgba(11,29,64,0.14)] xl:flex">
 
         <div className="flex flex-col h-full w-full pl-4 pr-4">
 
           {/* Tabs */}
-          <div className="flex items-center pt-8 pb-4">
+          <div className="flex border-b border-[#4E627C] pt-8 mb-4">
             <button
               onClick={() => setActiveTab('Blocks')}
-              className={`pb-1 text-sm font-semibold cursor-pointer ${activeTab === 'Blocks' ? 'text-white border-b-2 border-white' : 'text-[#8495A5] border-b-2 border-transparent hover:text-white'}`}
+              className={`flex-1 border-b-[2px] pb-3 text-sm font-bold transition-colors ${activeTab === 'Blocks' ? 'border-white text-white' : 'border-transparent text-[#8495A5] hover:text-white'}`}
             >
               Blocks
             </button>
-            <span className="text-[#4E627C] mx-2 mb-1">|</span>
             <button
               onClick={() => setActiveTab('Pages')}
-              className={`pb-1 text-sm font-medium cursor-pointer ${activeTab === 'Pages' ? 'text-white border-b border-[#4E627C]' : 'text-[#8495A5] border-b border-[#4E627C] hover:text-white'}`}
+              className={`flex-1 border-b-[2px] pb-3 text-sm font-bold transition-colors ${activeTab === 'Pages' ? 'border-white text-white' : 'border-transparent text-[#8495A5] hover:text-white'}`}
             >
               Pages
             </button>

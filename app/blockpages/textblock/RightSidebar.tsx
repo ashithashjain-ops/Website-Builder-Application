@@ -38,32 +38,32 @@ export default function TextRightSidebar({ state, onStateChange, onClose }: Text
   };
  
   return (
-    <aside className="relative flex h-full w-[286px] flex-shrink-0 flex-col overflow-hidden rounded-xl border border-[#f4d8cc] bg-[#fff7f4] shadow-[0_18px_45px_rgba(113,63,18,0.10)]">
+    <aside className="relative z-50 hidden h-full w-[210px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#f4d8cc] bg-[#fff7f4] shadow-[0_18px_45px_rgba(113,63,18,0.10)] xl:flex">
       {onClose && (
         <button className="absolute right-4 top-4 z-10 rounded-md border border-gray-200 bg-white p-1.5 text-gray-600 shadow-sm xl:hidden" onClick={onClose}>
           <X className="h-4 w-4" />
         </button>
       )}
  
-      <div className="flex border-b border-[#f2d8cf] bg-white/45 px-6 pt-5">
-        <button className={`flex-1 border-b-[2px] pb-4 text-base font-bold transition-colors ${activeTab === "properties" ? "border-[#0B1D40] text-[#0B1D40]" : "border-gray-300 text-[#566583] hover:text-[#0B1D40]"}`} onClick={() => setActiveTab("properties")}>
+      <div className="flex border-b border-[#f2d8cf] bg-white/45 px-3 pt-4">
+        <button className={`flex-1 border-b-[2px] pb-3 text-sm font-bold transition-colors ${activeTab === "properties" ? "border-[#0B1D40] text-[#0B1D40]" : "border-gray-300 text-[#566583] hover:text-[#0B1D40]"}`} onClick={() => setActiveTab("properties")}>
           Properties
         </button>
-        <button className={`flex-1 border-b-[2px] pb-4 text-base font-bold transition-colors ${activeTab === "styles" ? "border-[#0B1D40] text-[#0B1D40]" : "border-gray-300 text-[#566583] hover:text-[#0B1D40]"}`} onClick={() => setActiveTab("styles")}>
+        <button className={`flex-1 border-b-[2px] pb-3 text-sm font-bold transition-colors ${activeTab === "styles" ? "border-[#0B1D40] text-[#0B1D40]" : "border-gray-300 text-[#566583] hover:text-[#0B1D40]"}`} onClick={() => setActiveTab("styles")}>
           Styles
         </button>
       </div>
  
-      <div className="flex-1 space-y-5 overflow-y-auto px-6 pb-8 pt-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="flex-1 space-y-4 overflow-y-auto px-3 pb-8 pt-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <div className="grid grid-cols-2 gap-2">
           {(["main", "text", "header", "footer"] as TextEditorTarget[]).map((target) => (
-            <button key={target} onClick={() => setTarget(target)} className={`rounded-lg border px-3 py-2 text-xs font-bold ${selectedTarget === target ? "border-[#0B1D40] bg-[#0B1D40] text-white" : "border-[#0B1D40]/20 bg-white text-[#0B1D40]"}`}>
+            <button key={target} onClick={() => setTarget(target)} className={`rounded-lg border px-1 py-1.5 text-[11px] font-bold ${selectedTarget === target ? "border-[#0B1D40] bg-[#0B1D40] text-white" : "border-[#0B1D40]/20 bg-white text-[#0B1D40]"}`}>
               {targetLabels[target]}
             </button>
           ))}
         </div>
  
-        <button className="flex w-full items-center justify-between rounded p-1 text-[15px] font-bold text-[#0B1D40] hover:bg-black/5" onClick={() => setShowSection((current) => !current)}>
+        <button className="flex w-full items-center justify-between rounded p-1 text-[13px] font-bold text-[#0B1D40] hover:bg-black/5" onClick={() => setShowSection((current) => !current)}>
           <span>{activeTab === "properties" ? "Section Settings" : `${targetLabels[selectedTarget]} Style Settings`}</span>
           <ChevronDown className={`h-4 w-4 text-gray-600 transition-transform ${showSection ? "" : "-rotate-90"}`} />
         </button>
@@ -237,3 +237,4 @@ function ColorInput({ label, value, onChange }: { label: string; value: string; 
     </div>
   );
 }
+ 

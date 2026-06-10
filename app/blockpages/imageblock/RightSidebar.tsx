@@ -40,10 +40,10 @@ export default function RightSidebar() {
  
   return (
     <>
-      <aside className="relative z-30 hidden h-full w-[286px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#efd9ce] bg-[#fff7f4] shadow-[0_18px_45px_rgba(110,60,35,0.10)] transition-transform duration-300 xl:flex">
+      <aside className="relative z-30 hidden h-full w-[210px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#efd9ce] bg-[#fff7f4] shadow-[0_18px_45px_rgba(110,60,35,0.10)] transition-transform duration-300 xl:flex">
         <div className="custom-scrollbar flex h-full flex-col overflow-y-auto bg-[#fff7f4]">
       {/* Tabs */}
-      <div className="flex shrink-0 border-b border-[#f2d8cf] bg-white/45 px-6 pt-5">
+      <div className="flex shrink-0 border-b border-[#f2d8cf] bg-white/45 px-3 pt-5">
         <button
           className={`flex-1 border-b-[2px] pb-4 text-base font-bold transition-colors ${activeTab === "Button" ? "border-[#0B1D40] text-[#0B1D40]" : "border-gray-300 text-[#566583] hover:text-[#0B1D40]"}`}
           onClick={() => setActiveTab("Button")}
@@ -204,3 +204,5 @@ export default function RightSidebar() {
     </>
   );
 }
+ 
+ 

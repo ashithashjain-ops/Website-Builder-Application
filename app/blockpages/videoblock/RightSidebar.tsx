@@ -41,7 +41,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
   };
  
   return (
-    <aside className="relative flex h-full w-full xl:w-[286px] flex-shrink-0 flex-col overflow-hidden rounded-xl border shadow-[0_18px_45px_rgba(113,63,18,0.10)] transition-colors duration-300 bg-[#fff7f4] border-[#f4d8cc]">
+    <aside className="relative flex h-full w-full xl:w-[210px] flex-shrink-0 flex-col overflow-hidden rounded-xl border shadow-[0_18px_45px_rgba(113,63,18,0.10)] transition-colors duration-300 bg-[#fff7f4] border-[#f4d8cc]">
       {/* Mobile Close Button */}
       {onClose && (
         <button
@@ -53,7 +53,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
       )}
  
       {/* Tabs */}
-      <div className="flex border-b border-[#f2d8cf] bg-white/45 px-6 pt-5">
+      <div className="flex border-b border-[#f2d8cf] bg-white/45 px-4 pt-5">
         <button
           className={`flex-1 border-b-[2px] pb-4 text-base font-bold transition-colors ${activeTab === 'video' ? 'border-[#0B1D40] text-[#0B1D40]' : 'border-gray-300 text-[#566583] hover:text-[#0B1D40]'}`}
           onClick={() => setActiveTab('video')}
@@ -68,7 +68,7 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
         </button>
       </div>
  
-      <div className="flex-1 space-y-4 overflow-y-auto px-6 pb-8 pt-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {activeTab === 'video' ? (
           <>
             {/* Video Settings Accordion Header */}
@@ -208,3 +208,5 @@ export default function RightSidebar({ selectedBlock, onUpdateBlock, onClose }: 
     </aside>
   );
 }
+ 
+ 

@@ -130,6 +130,10 @@ export default function BlockPagesClient() {
     }
   }, []);
  
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [activeBlockPage]);
+ 
   const pushButtonState = (nextBlocks: BlockData[]) => {
     setPastButtonStates((current) => [...current, buttonBlocks]);
     setFutureButtonStates([]);
@@ -430,7 +434,7 @@ export default function BlockPagesClient() {
             <div className={`
               fixed bottom-0 left-0 w-full h-[60vh] z-[100] transition-transform duration-300
               ${showMobileSidebar ? "translate-y-0" : "translate-y-full"}
-              xl:translate-y-0 xl:static xl:h-auto xl:w-[286px] xl:shrink-0 xl:block
+              xl:translate-y-0 xl:static xl:h-auto xl:w-[210px] xl:shrink-0 xl:block
               bg-white xl:bg-transparent rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)] xl:shadow-none xl:rounded-none overflow-hidden
             `}>
               <ButtonRightSidebar
@@ -472,7 +476,7 @@ export default function BlockPagesClient() {
                 setActiveBlockPage("video");
               }}
             />
-            <div className="hidden w-[286px] shrink-0 xl:block">
+            <div className="hidden w-[210px] shrink-0 xl:block">
               <TextRightSidebar state={textBlockState} onStateChange={pushTextState} />
             </div>
           </div>
@@ -493,7 +497,7 @@ export default function BlockPagesClient() {
                 setIsImageEditingMode(false);
               }}
             />
-            <div className="hidden w-[286px] shrink-0 xl:block">
+            <div className="hidden w-[210px] shrink-0 xl:block">
               <ImageRightSidebar />
             </div>
           </div>
@@ -526,7 +530,7 @@ export default function BlockPagesClient() {
             <div className={`
               fixed bottom-0 left-0 w-full h-[60vh] z-[100] transition-transform duration-300
               ${showMobileSidebar ? "translate-y-0" : "translate-y-full"}
-              xl:translate-y-0 xl:static xl:h-auto xl:w-[286px] xl:shrink-0 xl:block
+              xl:translate-y-0 xl:static xl:h-auto xl:w-[210px] xl:shrink-0 xl:block
               bg-white xl:bg-transparent rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)] xl:shadow-none xl:rounded-none overflow-hidden
             `}>
               <VideoRightSidebar
@@ -541,3 +545,5 @@ export default function BlockPagesClient() {
     </BuilderProvider>
   );
 }
+ 
+ 

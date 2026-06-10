@@ -132,11 +132,22 @@ export default function PortfolioPreview({
     const styleConfig = sectionStyles[sectionId];
     if (!styleConfig) return {};
     const bgImage = styleConfig.backgroundImage ? `url(${styleConfig.backgroundImage})` : '';
-    return {
-      backgroundColor: styleConfig.backgroundColor || undefined,
-      ...(styleConfig.gradientBackground && { background: styleConfig.gradientBackground }),
-      ...(bgImage && { backgroundImage: bgImage, backgroundSize: 'cover', backgroundPosition: 'center' }),
-    };
+
+    const style: React.CSSProperties = {};
+
+    if (styleConfig.gradientBackground) {
+      style.background = styleConfig.gradientBackground;
+    } else if (styleConfig.backgroundColor) {
+      style.background = styleConfig.backgroundColor;
+    }
+
+    if (bgImage) {
+      style.backgroundImage = bgImage;
+      style.backgroundSize = 'cover';
+      style.backgroundPosition = 'center';
+    }
+
+    return style;
   };
 
   const getPresetFilter = () => {
@@ -334,7 +345,7 @@ export default function PortfolioPreview({
 
 
                 {/* <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 lg:flex-nowrap border-b border-gray-300 bg-[#06224C] rounded-t-xl"> */}
-                <div className="sticky top-0 z-50 backdrop-blur-md bg-[#06224C]/95 flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 lg:flex-nowrap border-b border-gray-300 rounded-t-xl">
+                <div className="sticky top-0 z-50 backdrop-blur-md bg-[#06224C]/95 flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 border-b border-gray-300 rounded-t-xl">
 
                   {/* ✅ MOBILE LAYOUT */}
                   <div className="flex flex-col w-full lg:hidden gap-2">
@@ -359,7 +370,7 @@ export default function PortfolioPreview({
                       </Link>
 
                       {/* CENTER → Title */}
-                      <span className="text-base sm:text-lg font-semibold text-white text-center flex-1 min-w-[100px]">
+                      <span className="text-base sm:text-lg font-semibold text-white text-center flex-1 min-w-0 truncate">
                         Portfolio
                       </span>
 
@@ -394,7 +405,7 @@ export default function PortfolioPreview({
                   </div>
 
                   {/* ✅ DESKTOP (unchanged) */}
-                  <div className="hidden lg:flex w-full items-center justify-between">
+                  <div className="hidden lg:flex w-full items-center justify-between flex-nowrap gap-2">
 
                     <div className="flex shrink-0 justify-start">
                       <Link href="/landing" className="flex h-10 min-w-[92px] items-center justify-center rounded-[50%] bg-white px-3">
@@ -403,14 +414,13 @@ export default function PortfolioPreview({
                     </div>
 
                     <div className="flex flex-1 justify-center px-4">
-                      <span className="text-lg font-semibold text-white">Portfolio</span>
+                      <span className="text-lg font-semibold text-white truncate">Portfolio</span>
                     </div>
 
-
-                    <div className="flex shrink-0 items-center gap-x-6">
+                    <div className="flex items-center gap-2 xl:gap-6 flex-nowrap justify-end shrink-0">
 
                       {/* NAV LINKS */}
-                      <div className="flex gap-x-6">
+                      <div className="flex gap-3 xl:gap-6 flex-nowrap justify-end">
                         {/* {["Home", "About Me", "Projects", "Contacts"].map((item, i) => (
                           <button key={i} className="relative text-white text-sm group">
                             {item}
@@ -421,13 +431,12 @@ export default function PortfolioPreview({
                           { name: "Home", id: "home" },
                           { name: "About Me", id: "about" },
                           { name: "Projects", id: "projects" },
-                          { name: "Video Block", id: "video" },
                           { name: "Contacts", id: "contact" },
                         ].map((item, i) => (
                           <button
                             key={i}
                             onClick={() => scrollToSection(item.id)}
-                            className="relative text-white text-sm group"
+                            className="relative text-white text-sm group whitespace-nowrap"
                           >
                             {item.name}
                             <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
@@ -436,7 +445,7 @@ export default function PortfolioPreview({
                       </div>
 
                       {/* ACTION BUTTONS ✅ */}
-                      <div className="flex border-2 border-gray-300 rounded-md overflow-hidden text-xs text-white font-bold" data-builder-chrome="true">
+                      <div className="flex border-2 border-gray-300 rounded-md overflow-hidden text-xs text-white font-bold whitespace-nowrap" data-builder-chrome="true">
 
                         <button className="px-2 py-1 hover:bg-white hover:text-black transition">
                           Save Draft
@@ -785,8 +794,7 @@ export default function PortfolioPreview({
 
 
                 {/* ABOUT SECTION */}
-                {/* <div className="w-full bg-[#F2F2F2] px-6 md:px-12 lg:px-20 py-16 md:py-24"> */}
-                <div className="relative w-full overflow-hidden portfolio-hero" style={{ backgroundColor: '#F2F2F2', ...getSpecificSectionStyle('about') }}>
+                <div className="relative w-full overflow-hidden portfolio-hero bg-[#F2F2F2]" style={getSpecificSectionStyle('about')}>
                   <div id="about" className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-20 py-10 md:py-16">
                     <div className="flex items-center gap-2 mb-4">
                       <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">About</h2>
@@ -1347,7 +1355,7 @@ export default function PortfolioPreview({
                 </div>
 
                 {/* FOOTER SECTION */}
-                <footer id="footer" className="stackly-footer w-full px-4 sm:px-6 md:px-12 lg:px-20 py-12 lg:py-20 rounded-b-xl" style={{ backgroundColor: '#06224C', ...getSpecificSectionStyle('footer') }}>
+                <footer id="footer" className="stackly-footer w-full px-4 sm:px-6 md:px-12 lg:px-20 py-12 lg:py-20 rounded-b-xl bg-[#06224C]" style={getSpecificSectionStyle('footer')}>
                   <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
                       {/* Brand Column */}
@@ -1378,10 +1386,10 @@ export default function PortfolioPreview({
 
                       {/* Navigation Column */}
                       <div>
-                        <h3 className="text-white font-bold text-sm mb-8 tracking-wider uppercase">Navigation</h3>
+                        <h3 className="text-white font-bold text-sm mb-8 ml-6 tracking-wider uppercase">Navigation</h3>
                         <ul className="space-y-5">
-                          {['Home', 'About', 'Projects', 'Skills', 'Experience', 'Contact'].map(link => (
-                            <li key={link}><a href={`#${link.toLowerCase()}`} className="text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">{link}</a></li>
+                          {['Home', 'About', 'Projects', 'Contact'].map(link => (
+                            <li key={link}><a href={`#${link.toLowerCase()}`} className="ml-6 text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">{link}</a></li>
                           ))}
                         </ul>
                       </div>
@@ -1444,9 +1452,9 @@ export default function PortfolioPreview({
             </div>
 
             {/* <div className="w-full flex items-center justify-between mt-8 px-4"> */}
-            <div className="w-full flex items-center justify-between px-4 py-3 mt-10 border-t bg-white">
+            {/* <div className="w-full flex items-center justify-between px-4 py-3 mt-10 border-t bg-white"> */}
 
-              {/* 
+            {/* 
               <button className="h-10 px-4 rounded-lg flex items-center gap-2 text-blue-800 border border-blue-600 bg-transparent hover:bg-blue-50">
                 Help
               </button>
@@ -1472,7 +1480,7 @@ export default function PortfolioPreview({
                 Zoom
               </button> */}
 
-            </div>
+            {/* </div> */}
           </div>
 
 
