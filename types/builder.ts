@@ -29,6 +29,21 @@ export interface ComponentStyles {
   height?: string;
   textAlign?: CSSProperties["textAlign"];
   layoutCols?: string;
+  /* ── Effects (added to replace the Advanced tab) ───────────────── */
+  opacity?: string;
+  boxShadow?: string;
+  border?: string;
+  overflow?: string;
+  cursor?: string;
+  transform?: string;
+  transition?: string;
+  /* ── Freeform positioning (Wix-style editor) ────────────────────── */
+  position?: string;
+  left?: string;
+  top?: string;
+  zIndex?: string;
+  minWidth?: string;
+  minHeight?: string;
 }
 
 /**
@@ -221,6 +236,14 @@ export interface VideoProps {
   aspectRatio?: "16/9" | "4/3" | "1/1";
 }
 
+/**
+ * Component types that act as full-width vertical-flow "sections".
+ * These stay in the sortable vertical list; inner elements may be freeform.
+ */
+export const SECTION_TYPES: ReadonlySet<ComponentType> = new Set([
+  "navigation", "hero", "features", "gallery", "contact", "container", "columns",
+]);
+
 export interface BuilderComponent {
   id: string;
   type: ComponentType;
@@ -234,6 +257,8 @@ export interface BuilderComponent {
   styles: ComponentStyles;
   children: BuilderComponent[];
   order: number;
+  /** Whether the element is locked from editing/moving. */
+  locked?: boolean;
 }
 
 /* ─── Viewport / responsive editing ────────────────────────────────── */
@@ -268,6 +293,7 @@ export interface BuilderState {
   components: BuilderComponent[];
   selectedComponentId: string | null;
   addComponent: (type: ComponentType, parentId?: string | null, afterId?: string | null) => void;
+  insertComponentBefore: (type: ComponentType, beforeId: string) => void;
   updateComponent: (id: string, updates: Partial<Omit<BuilderComponent, "id" | "children">> & { styles?: ComponentStyles }) => void;
   duplicateComponent: (id: string) => void;
   deleteComponent: (id: string) => void;
@@ -292,4 +318,27 @@ export interface BuilderState {
   /** Active editing viewport. */
   viewport: Viewport;
   setViewport: (v: Viewport) => void;
+
+  /* ── Wix-style freeform editing ─────────────────────────────────── */
+
+  /** IDs of currently selected components (multi-select via Shift+Click). */
+  selectedComponentIds: string[];
+  /** Toggle a component in/out of the multi-selection. */
+  toggleSelectComponent: (id: string) => void;
+
+  /** Clipboard for copy/paste. */
+  clipboard: BuilderComponent[] | null;
+  /** Copy selected components to clipboard. */
+  copyComponents: () => void;
+  /** Paste clipboard components onto the canvas. */
+  pasteComponents: (parentId?: string | null) => void;
+
+  /** Move a component's layer order (z-index). */
+  moveLayer: (id: string, direction: "front" | "back" | "forward" | "backward") => void;
+  /** Freeform-move a component to (x, y) within its parent. */
+  moveComponent: (id: string, x: number, y: number) => void;
+  /** Resize a component to width × height (px). */
+  resizeComponent: (id: string, width: number, height: number) => void;
+  /** Toggle the locked state of a component. */
+  toggleLock: (id: string) => void;
 }

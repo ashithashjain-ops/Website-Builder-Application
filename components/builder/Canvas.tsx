@@ -1,14 +1,15 @@
 "use client";
 
-import { memo, useEffect, useRef, useState, useMemo } from "react";
+import { memo, useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { Check, ChevronDown, Eye, FolderOpen, Images, Layers, Monitor, Pencil, Redo2, Save, Smartphone, Sparkles, Tablet, Trash2, Undo2 } from "lucide-react";
 import { AssetManager } from "@/components/assets/AssetManager";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import SortableItem from "./SortableItem";
+import QuickInsertBar from "./QuickInsertBar";
 import ExportButton from "./ExportButton";
 import { useBuilderStore } from "@/store/builderStore";
-import type { BuilderComponent } from "@/types/builder";
+import type { BuilderComponent, ComponentType } from "@/types/builder";
 
 function Canvas({
   components,
@@ -39,6 +40,30 @@ function Canvas({
   const loadFromLocalStorage = useBuilderStore((s) => s.loadFromLocalStorage);
   const viewport = useBuilderStore((s) => s.viewport);
   const setViewport = useBuilderStore((s) => s.setViewport);
+  const storeAddComponent = useBuilderStore((s) => s.addComponent);
+  const insertComponentBefore = useBuilderStore((s) => s.insertComponentBefore);
+
+  /* ── Quick-insert helpers ── */
+  const handleQuickInsertBefore = useCallback(
+    (type: ComponentType, beforeId: string) => {
+      insertComponentBefore(type, beforeId);
+    },
+    [insertComponentBefore],
+  );
+
+  const handleQuickInsertAfter = useCallback(
+    (type: ComponentType, afterId: string) => {
+      storeAddComponent(type, null, afterId);
+    },
+    [storeAddComponent],
+  );
+
+  const handleQuickInsertEnd = useCallback(
+    (type: ComponentType) => {
+      storeAddComponent(type);
+    },
+    [storeAddComponent],
+  );
 
   /* ── Project name (local state, persisted via save) ── */
   const [projectName, setProjectName] = useState("My Website");
@@ -261,14 +286,25 @@ function Canvas({
             </div>
           ) : (
             <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
-              {components.map((component) => (
-                <SortableItem
-                  component={component}
-                  key={component.id}
-                  onDelete={onDelete}
-                  onDuplicate={onDuplicate}
-                  onSelect={onSelect}
-                />
+              {components.map((component, index) => (
+                <div key={component.id} className="w-full">
+                  {/* Quick-insert bar BEFORE this block */}
+                  {index === 0 && (
+                    <QuickInsertBar
+                      onInsert={(type) => handleQuickInsertBefore(type, component.id)}
+                    />
+                  )}
+                  <SortableItem
+                    component={component}
+                    onDelete={onDelete}
+                    onDuplicate={onDuplicate}
+                    onSelect={onSelect}
+                  />
+                  {/* Quick-insert bar AFTER this block */}
+                  <QuickInsertBar
+                    onInsert={(type) => handleQuickInsertAfter(type, component.id)}
+                  />
+                </div>
               ))}
             </SortableContext>
           )}
