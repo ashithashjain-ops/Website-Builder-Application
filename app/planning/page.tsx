@@ -369,45 +369,45 @@ export default function PlanningPage() {
     paymentDetail: string;
   }) {
     if (!selectedPlan) return;
-    const now = new Date();
-    const invoiceId = `INV-${Math.floor(100000 + Math.random() * 899999)}`;
-    const active = getActivePrice(selectedPlan);
+      const now = new Date();
+      const invoiceId = `INV-${Math.floor(100000 + Math.random() * 899999)}`;
+      const active = getActivePrice(selectedPlan);
     const finalAmount = opts.isFree ? "$0" : active.newPrice;
-    const createdInvoice: InvoiceData = {
-      invoiceId,
-      date: now.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
+      const createdInvoice: InvoiceData = {
+        invoiceId,
+        date: now.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
       planName: `${selectedPlan.name} ${opts.isFree ? "(Free)" : billingYearly ? "(Yearly)" : "(Monthly)"}`,
-      amount: finalAmount,
-      name: PLANNING_DISPLAY_USER_NAME,
+        amount: finalAmount,
+        name: PLANNING_DISPLAY_USER_NAME,
       email: PLANNING_INVOICE_CONTACT.email,
       contactNo: PLANNING_INVOICE_CONTACT.phone,
       address: PLANNING_INVOICE_CONTACT.address,
-    };
-    setInvoiceData(createdInvoice);
-    setBillingHistory((prev) => {
-      const row: BillingHistoryEntry = {
-        date: createdInvoice.date,
-        invoiceId: createdInvoice.invoiceId,
-        amount: createdInvoice.amount,
+      };
+      setInvoiceData(createdInvoice);
+      setBillingHistory((prev) => {
+        const row: BillingHistoryEntry = {
+          date: createdInvoice.date,
+          invoiceId: createdInvoice.invoiceId,
+          amount: createdInvoice.amount,
         status: opts.isFree ? "Free" : "Paid",
-        planName: createdInvoice.planName,
-        planTier: selectedPlan.name,
-        websiteLabel: "Stackly workspace subscription",
+          planName: createdInvoice.planName,
+          planTier: selectedPlan.name,
+          websiteLabel: "Stackly workspace subscription",
         paymentMethodLabel: opts.paymentMethodLabel,
         paymentDetail: opts.paymentDetail,
-        buyerName: createdInvoice.name,
-        buyerEmail: createdInvoice.email,
-        buyerPhone: createdInvoice.contactNo,
-        buyerAddress: createdInvoice.address,
-        generatedAt: now.toISOString(),
-      };
-      const next = [row, ...prev.filter((e) => e.invoiceId !== row.invoiceId)];
-      saveBillingHistoryToStorage(next);
-      return next;
-    });
-    setPaymentLoading(false);
-    setIsFreeCheckout(false);
-    setPlanningView("invoice");
+          buyerName: createdInvoice.name,
+          buyerEmail: createdInvoice.email,
+          buyerPhone: createdInvoice.contactNo,
+          buyerAddress: createdInvoice.address,
+          generatedAt: now.toISOString(),
+        };
+        const next = [row, ...prev.filter((e) => e.invoiceId !== row.invoiceId)];
+        saveBillingHistoryToStorage(next);
+        return next;
+      });
+      setPaymentLoading(false);
+      setIsFreeCheckout(false);
+      setPlanningView("invoice");
   }
 
   async function handlePayWithRazorpay() {
@@ -702,8 +702,8 @@ export default function PlanningPage() {
                         <code className="break-all rounded bg-black/20 px-1">RAZORPAY_KEY_SECRET</code> in .env.local, restart{" "}
                         <code className="break-all rounded bg-black/20 px-1">npm run dev</code>, and run{" "}
                         <code className="break-all rounded bg-black/20 px-1">npm run razorpay-api</code>.
-                      </p>
-                    </div>
+                        </p>
+                      </div>
                   ) : null}
                   <div className="rounded-xl border border-white/15 bg-white/10 p-4 text-xs shadow-lg shadow-blue-950/10 backdrop-blur sm:p-5 sm:text-sm">
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-white/70">Order summary</p>
@@ -724,9 +724,9 @@ export default function PlanningPage() {
                       </>
                     )}
                     {!isFreeCheckout ? (
-                      <p className="mt-2 text-[11px] leading-snug text-white/75">
+                          <p className="mt-2 text-[11px] leading-snug text-white/75">
                         Secure Razorpay popup — UPI, cards, netbanking, and wallets.
-                      </p>
+                          </p>
                     ) : null}
                   </div>
                 </div>

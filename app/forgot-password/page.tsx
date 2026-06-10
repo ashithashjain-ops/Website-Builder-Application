@@ -202,12 +202,8 @@ function ForgotPasswordContent() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full max-w-[260px] rounded-[1000px] text-[16px] sm:text-[17px] font-bold shadow-md hover:opacity-95 transition disabled:opacity-60 flex items-center justify-center"
-                  style={{
-                    height: "48px",
-                    backgroundColor: "#F2B541",
-                    color: "#FFFFFF",
-                  }}
+                  className="reset-flow-primary-btn w-full max-w-[260px] cursor-pointer rounded-[1000px] text-[16px] sm:text-[17px] font-bold shadow-md disabled:cursor-not-allowed disabled:opacity-60 flex items-center justify-center"
+                  style={{ height: "48px" }}
                 >
                   {isSubmitting ? "Sending..." : "Continue"}
                 </button>
@@ -227,7 +223,7 @@ function ForgotPasswordContent() {
             <div className="w-full max-w-[316px] mx-auto mt-6 text-center">
               <Link
                 href="/login"
-                className="text-[13px] hover:underline"
+                className="cursor-pointer text-[13px] hover:underline"
                 style={{ color: "#FFFFFF" }}
               >
                 Back to login

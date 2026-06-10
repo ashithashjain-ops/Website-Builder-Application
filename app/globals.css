@@ -2689,6 +2689,44 @@ body.auth-visible {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* Auth + password reset: pointer on clickable controls (Tailwind preflight sets cursor: default on buttons) */
+.auth-page button:not(:disabled),
+.reset-flow-page button:not(:disabled),
+.forgot-password-page button:not(:disabled),
+.auth-page a[href],
+.reset-flow-page a[href],
+.forgot-password-page a[href] {
+  cursor: pointer;
+}
+
+.auth-page button:disabled,
+.reset-flow-page button:disabled,
+.forgot-password-page button:disabled {
+  cursor: not-allowed;
+}
+
+.reset-flow-primary-btn {
+  /* WCAG AA: #0A193F on #F2B541 ≈ 8.9:1 (bold 16–17px button label) */
+  background-color: #f2b541;
+  color: #0a193f;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.reset-flow-primary-btn:not(:disabled):hover {
+  transform: scale(1.025);
+  filter: brightness(1.08);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+}
+
+.reset-flow-primary-btn:not(:disabled):active {
+  transform: scale(0.98);
+  filter: brightness(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
 /* Reset flow pages (OTP, verified, passwords): mobile full-bleed, no white bands */
 @media (max-width: 1023px) {
   .reset-flow-page,

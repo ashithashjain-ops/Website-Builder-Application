@@ -66,10 +66,9 @@ const EMAIL_MAX_LENGTH = 254; /* keep in sync with lib/emailValidation */
 const PASSWORD_MIN_LENGTH = 8;
 const PASSWORD_MAX_LENGTH = 60;
 
-const NAME_MAX_ERROR = `Name cannot exceed ${NAME_MAX_LENGTH} characters.`;
-/* EMAIL_MAX_ERROR imported from lib/emailValidation */
-const PASSWORD_MAX_ERROR = `Password cannot exceed ${PASSWORD_MAX_LENGTH} characters.`;
-const CONFIRM_PASSWORD_MAX_ERROR = `Confirm password cannot exceed ${PASSWORD_MAX_LENGTH} characters.`;
+const NAME_MAX_ERROR = `Name cannot exceed ${NAME_MAX_LENGTH} characters`;
+const PASSWORD_MAX_ERROR = `Password cannot exceed ${PASSWORD_MAX_LENGTH} characters`;
+const CONFIRM_PASSWORD_MAX_ERROR = `Confirm password cannot exceed ${PASSWORD_MAX_LENGTH} characters`;
 
 const FIELD_MAX_LENGTHS: Partial<Record<keyof SignupFormState, number>> = {
   name: NAME_MAX_LENGTH,
@@ -94,6 +93,24 @@ function normalizeSignupEmail(raw: string | undefined | null): string {
   return stripEmailWhitespace(String(raw ?? "")).trim().toLowerCase();
 }
 
+/** Trim edges and collapse internal whitespace runs to a single space. */
+function normalizeSignupName(raw: string | undefined | null): string {
+  return String(raw ?? "")
+    .trim()
+    .replace(/[\s\u00A0\uFEFF\u2000-\u200B\u202F\u205F\u3000]+/g, " ");
+}
+
+function hasExtraSignupNameSpacing(raw: string): boolean {
+  return /^\s|\s$|[\s\u00A0\uFEFF\u2000-\u200B\u202F\u205F\u3000]{2,}/.test(raw);
+}
+
+const SIGNUP_NAME_PATTERN = /^[a-zA-Z]+(?: [a-zA-Z]+)*$/;
+
+function getCountryListIndex(countryId: string): number {
+  const idx = SIGNUP_PHONE_COUNTRIES.findIndex((c) => c.id === countryId);
+  return idx >= 0 ? idx : 0;
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const [form, setForm] = useState<SignupFormState>(initialSignupState);
@@ -102,8 +119,12 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const [countryHighlightIndex, setCountryHighlightIndex] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false); // New state for popup
   const countryDropdownRef = useRef<HTMLDivElement>(null);
+  const countryTriggerRef = useRef<HTMLButtonElement>(null);
+  const countryListRef = useRef<HTMLUListElement>(null);
+  const countryPointerOnTriggerRef = useRef(false);
 
   useEffect(() => {
     if (!countryDropdownOpen) return;
@@ -114,7 +135,10 @@ export default function SignupPage() {
       }
     };
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setCountryDropdownOpen(false);
+      if (e.key === "Escape") {
+        setCountryDropdownOpen(false);
+        countryTriggerRef.current?.focus();
+      }
     };
     document.addEventListener("mousedown", onDocMouseDown);
     document.addEventListener("keydown", onKeyDown);
@@ -123,6 +147,14 @@ export default function SignupPage() {
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [countryDropdownOpen]);
+
+  useEffect(() => {
+    if (!countryDropdownOpen || !countryListRef.current) return;
+    const country = SIGNUP_PHONE_COUNTRIES[countryHighlightIndex];
+    if (!country) return;
+    const option = countryListRef.current.querySelector(`#country-option-${country.id}`);
+    option?.scrollIntoView({ block: "nearest" });
+  }, [countryDropdownOpen, countryHighlightIndex]);
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
@@ -208,15 +240,17 @@ export default function SignupPage() {
   const validate = (values: SignupFormState): SignupFormErrors => {
     const newErrors: SignupFormErrors = {};
 
-    const trimmedName = values.name.trim();
-    if (!trimmedName) {
-      newErrors.name = "Name is required.";
-    } else if (trimmedName.length < NAME_MIN_LENGTH) {
-      newErrors.name = `Name must be at least ${NAME_MIN_LENGTH} characters.`;
-    } else if (trimmedName.length > NAME_MAX_LENGTH) {
+    const normalizedName = normalizeSignupName(values.name);
+    if (!normalizedName) {
+      newErrors.name = "Name is required";
+    } else if (hasExtraSignupNameSpacing(values.name)) {
+      newErrors.name = "Name cannot contain extra spaces";
+    } else if (normalizedName.length < NAME_MIN_LENGTH) {
+      newErrors.name = `Name must be at least ${NAME_MIN_LENGTH} characters`;
+    } else if (normalizedName.length > NAME_MAX_LENGTH) {
       newErrors.name = NAME_MAX_ERROR;
-    } else if (!/^[a-zA-Z\s]+$/.test(trimmedName)) {
-      newErrors.name = "Name must contain only letters.";
+    } else if (!SIGNUP_NAME_PATTERN.test(normalizedName)) {
+      newErrors.name = "Name must contain only letters";
     }
 
     const emailNormalized = normalizeSignupEmail(values.email);
@@ -228,7 +262,7 @@ export default function SignupPage() {
     const phoneCountry =
       getSignupPhoneCountry(values.phoneCountryId) ?? getDefaultSignupPhoneCountry();
     if (!values.mobileNumber.trim()) {
-      newErrors.mobileNumber = "Mobile number is required.";
+      newErrors.mobileNumber = "Mobile number is required";
     } else {
       const mobileErr = validateSignupNationalDigits(values.mobileNumber.trim(), phoneCountry);
       if (mobileErr) {
@@ -239,11 +273,11 @@ export default function SignupPage() {
     const passwordRaw = values.password ?? "";
     // Empty or whitespace-only must show required first (not min-length).
     if (passwordRaw.length === 0 || /^\s+$/.test(passwordRaw)) {
-      newErrors.password = "Password is required.";
+      newErrors.password = "Password is required";
     } else if (passwordContainsWhitespace(passwordRaw)) {
       newErrors.password = PASSWORD_WHITESPACE_ERROR;
     } else if (passwordRaw.length < PASSWORD_MIN_LENGTH) {
-      newErrors.password = `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`;
+      newErrors.password = `Password must be at least ${PASSWORD_MIN_LENGTH} characters`;
     } else if (passwordRaw.length > PASSWORD_MAX_LENGTH) {
       newErrors.password = PASSWORD_MAX_ERROR;
     } else {
@@ -252,25 +286,25 @@ export default function SignupPage() {
       const hasNumber = /[0-9]/.test(passwordRaw);
       const hasSpecial = /[!@#$%^&*(),.?\x3a{}|<>]/.test(passwordRaw);
       if (!hasLower) {
-        newErrors.password = "Password must include a lowercase letter.";
+        newErrors.password = "Password must include a lowercase letter";
       } else if (!hasUpper) {
-        newErrors.password = "Password must include an uppercase letter.";
+        newErrors.password = "Password must include an uppercase letter";
       } else if (!hasNumber) {
-        newErrors.password = "Password must include a number.";
+        newErrors.password = "Password must include a number";
       } else if (!hasSpecial) {
-        newErrors.password = "Password must include a special character (!@#$%^&* etc.).";
+        newErrors.password = "Password must include a special character (!@#$%^&* etc)";
       }
     }
 
     const confirmRaw = values.confirmPassword ?? "";
     if (confirmRaw.length === 0 || /^\s+$/.test(confirmRaw)) {
-      newErrors.confirmPassword = "Please confirm your password.";
+      newErrors.confirmPassword = "Please confirm your password";
     } else if (passwordContainsWhitespace(confirmRaw)) {
       newErrors.confirmPassword = PASSWORD_WHITESPACE_ERROR;
     } else if (confirmRaw.length > PASSWORD_MAX_LENGTH) {
       newErrors.confirmPassword = CONFIRM_PASSWORD_MAX_ERROR;
     } else if (passwordRaw !== confirmRaw) {
-      newErrors.confirmPassword = "Passwords do not match.";
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
     return newErrors;
@@ -292,8 +326,9 @@ export default function SignupPage() {
       }
 
       if (field === "name") {
-        // Strip leading whitespace immediately so the name can never start with a space.
-        raw = raw.replace(/^\s+/, "");
+        // Strip leading whitespace and collapse multiple internal spaces while typing.
+        raw = raw.replace(/^[\s\u00A0\uFEFF\u2000-\u200B\u202F\u205F\u3000]+/, "");
+        raw = raw.replace(/[\s\u00A0\uFEFF\u2000-\u200B\u202F\u205F\u3000]{2,}/g, " ");
       }
 
       if (field === "email") {
@@ -343,9 +378,9 @@ export default function SignupPage() {
     };
 
   const handleNameBlur = () => {
-    const trimmedName = form.name.trim();
-    setForm((prev) => ({ ...prev, name: trimmedName }));
-    const fieldErrors = validate({ ...form, name: trimmedName });
+    const normalizedName = normalizeSignupName(form.name);
+    setForm((prev) => ({ ...prev, name: normalizedName }));
+    const fieldErrors = validate({ ...form, name: normalizedName });
     setErrors((prev) => ({
       ...prev,
       name: fieldErrors.name,
@@ -409,6 +444,18 @@ export default function SignupPage() {
     }
   };
 
+  const openCountryDropdown = () => {
+    setCountryHighlightIndex(getCountryListIndex(form.phoneCountryId));
+    setCountryDropdownOpen(true);
+  };
+
+  const closeCountryDropdown = (returnFocus = false) => {
+    setCountryDropdownOpen(false);
+    if (returnFocus) {
+      countryTriggerRef.current?.focus();
+    }
+  };
+
   const selectPhoneCountry = (id: string) => {
     const country = getSignupPhoneCountry(id) ?? getDefaultSignupPhoneCountry();
     setForm((prev) => ({
@@ -417,8 +464,105 @@ export default function SignupPage() {
       mobileNumber: prev.mobileNumber.replace(/\D/g, "").slice(0, country.maxDigits),
     }));
     setErrors((prev) => ({ ...prev, mobileNumber: undefined, form: undefined }));
+    setCountryHighlightIndex(getCountryListIndex(id));
     setCountryDropdownOpen(false);
-    };
+    countryTriggerRef.current?.focus();
+  };
+
+  const focusCountryOption = (index: number) => {
+    const country = SIGNUP_PHONE_COUNTRIES[index];
+    if (!country) return;
+    setCountryHighlightIndex(index);
+    document.getElementById(`country-option-${country.id}`)?.focus();
+  };
+
+  const handleCountryOptionKeyDown = (
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    countryId: string,
+    index: number
+  ) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      selectPhoneCountry(countryId);
+      return;
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeCountryDropdown(true);
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      focusCountryOption(Math.min(index + 1, SIGNUP_PHONE_COUNTRIES.length - 1));
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (index === 0) {
+        closeCountryDropdown(true);
+        return;
+      }
+      focusCountryOption(Math.max(index - 1, 0));
+      return;
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      focusCountryOption(0);
+      return;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      focusCountryOption(SIGNUP_PHONE_COUNTRIES.length - 1);
+    }
+  };
+
+  const handleCountryTriggerKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "Escape") {
+      if (countryDropdownOpen) {
+        e.preventDefault();
+        closeCountryDropdown(true);
+      }
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!countryDropdownOpen) {
+        openCountryDropdown();
+        return;
+      }
+      setCountryHighlightIndex((i) => Math.min(i + 1, SIGNUP_PHONE_COUNTRIES.length - 1));
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!countryDropdownOpen) {
+        setCountryHighlightIndex(SIGNUP_PHONE_COUNTRIES.length - 1);
+        setCountryDropdownOpen(true);
+        return;
+      }
+      setCountryHighlightIndex((i) => Math.max(i - 1, 0));
+      return;
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (!countryDropdownOpen) {
+        openCountryDropdown();
+        return;
+      }
+      const country = SIGNUP_PHONE_COUNTRIES[countryHighlightIndex];
+      if (country) selectPhoneCountry(country.id);
+      return;
+    }
+    if (e.key === "Home" && countryDropdownOpen) {
+      e.preventDefault();
+      setCountryHighlightIndex(0);
+      return;
+    }
+    if (e.key === "End" && countryDropdownOpen) {
+      e.preventDefault();
+      setCountryHighlightIndex(SIGNUP_PHONE_COUNTRIES.length - 1);
+    }
+  };
 
   const handleSignup = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -436,7 +580,7 @@ export default function SignupPage() {
       const phoneCountry =
         getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry();
       await registerApi({
-        name: form.name.trim(),
+        name: normalizeSignupName(form.name),
         email: normalizeSignupEmail(form.email),
         mobile: toE164Mobile(phoneCountry, form.mobileNumber.trim()),
         password: form.password,
@@ -458,7 +602,7 @@ export default function SignupPage() {
         return;
       }
       const message =
-        error instanceof Error ? error.message : "Registration failed. Please try again.";
+        error instanceof Error ? error.message : "Registration failed, please try again";
       const normalizedEmail = normalizeSignupEmail(form.email);
       const apiMessageLooksLikeMissingEmail =
         !normalizedEmail &&
@@ -468,7 +612,7 @@ export default function SignupPage() {
       if (apiMessageLooksLikeMissingEmail) {
         setErrors((prev) => ({
           ...prev,
-          email: "Email is required.",
+          email: "Email is required",
           form: undefined,
         }));
         return;
@@ -485,7 +629,7 @@ export default function SignupPage() {
           ...prev,
           email:
             message === "Enter valid email"
-              ? "Please enter a valid email address."
+              ? "Please enter a valid email address"
               : message.includes("Only Gmail")
                 ? SIGNUP_EMAIL_DOMAIN_ERROR
                 : message,
@@ -581,15 +725,49 @@ export default function SignupPage() {
                       <div className="signup-phone-row flex items-center border-b border-white/80 pb-2 min-w-0">
                         <FaPhone className="signup-phone-icon mr-3 shrink-0 text-sm text-white/90" />
                         <div className="signup-phone-fields flex min-w-0 flex-1 items-center gap-2">
-                        <div className="signup-country-select relative z-20 w-fit max-lg:max-w-[7.25rem] max-w-[200px] shrink-0 min-w-0" ref={countryDropdownRef}>
+                        <div
+                          className="signup-country-select relative z-20 w-fit max-lg:max-w-[7.25rem] max-w-[200px] shrink-0 min-w-0"
+                          ref={countryDropdownRef}
+                          onBlur={(e) => {
+                            if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+                              setCountryDropdownOpen(false);
+                            }
+                          }}
+                        >
                           <button
+                            ref={countryTriggerRef}
                             type="button"
                             id="country-select-trigger"
+                            role="combobox"
+                            tabIndex={0}
                             aria-label={`Country calling code: ${selectedPhoneCountry.name} (+${selectedPhoneCountry.dialCode})`}
                             aria-haspopup="listbox"
+                            aria-controls="country-select-listbox"
+                            aria-autocomplete="none"
                             aria-expanded={countryDropdownOpen}
-                            onClick={() => setCountryDropdownOpen((o) => !o)}
-                            className="signup-country-trigger flex w-auto max-w-full min-w-0 items-center justify-between gap-1 rounded border border-white/80 bg-transparent px-2 py-0 text-left text-sm leading-5 text-white outline-none hover:border-white max-lg:gap-0.5 max-lg:rounded-sm max-lg:px-1"
+                            aria-activedescendant={
+                              countryDropdownOpen
+                                ? `country-option-${SIGNUP_PHONE_COUNTRIES[countryHighlightIndex]?.id}`
+                                : undefined
+                            }
+                            onPointerDown={() => {
+                              countryPointerOnTriggerRef.current = true;
+                            }}
+                            onFocus={() => {
+                              if (!countryPointerOnTriggerRef.current) {
+                                openCountryDropdown();
+                              }
+                              countryPointerOnTriggerRef.current = false;
+                            }}
+                            onClick={() => {
+                              if (countryDropdownOpen) {
+                                setCountryDropdownOpen(false);
+                              } else {
+                                openCountryDropdown();
+                              }
+                            }}
+                            onKeyDown={handleCountryTriggerKeyDown}
+                            className="signup-country-trigger flex w-auto max-w-full min-w-0 items-center justify-between gap-1 rounded border border-white/80 bg-transparent px-2 py-0 text-left text-sm leading-5 text-white outline-none hover:border-white focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent max-lg:gap-0.5 max-lg:rounded-sm max-lg:px-1"
                           >
                             <span className="min-w-0 truncate">
                               <span className="sm:hidden">
@@ -618,21 +796,31 @@ export default function SignupPage() {
                           </button>
                           {countryDropdownOpen && (
                             <ul
+                              ref={countryListRef}
+                              id="country-select-listbox"
                               role="listbox"
                               aria-labelledby="country-select-trigger"
                               className="signup-country-list absolute left-0 top-full z-50 mt-1 max-h-60 w-max min-w-full max-w-[80vw] overflow-y-auto rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg [scrollbar-color:#94a3b8_#f1f5f9]"
                             >
-                              {SIGNUP_PHONE_COUNTRIES.map((c) => {
+                              {SIGNUP_PHONE_COUNTRIES.map((c, idx) => {
                                 const selected = form.phoneCountryId === c.id;
+                                const highlighted = countryHighlightIndex === idx;
                                 return (
-                                  <li key={c.id} className="px-0 py-0">
+                                  <li key={c.id} role="presentation" className="px-0 py-0">
                                     <button
                                       type="button"
+                                      id={`country-option-${c.id}`}
                                       role="option"
+                                      tabIndex={countryDropdownOpen ? 0 : -1}
                                       aria-selected={selected}
-                                      className={`flex w-full cursor-pointer items-center gap-2 whitespace-nowrap px-3 py-2 text-left text-sm text-gray-900 hover:bg-[#1A73E8] hover:text-white ${
-                                        selected ? "bg-[#1A73E8] text-white" : "bg-white"
+                                      className={`flex w-full cursor-pointer items-center gap-2 whitespace-nowrap px-3 py-2 text-left text-sm outline-none hover:bg-[#1A73E8] hover:text-white focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#1A73E8] ${
+                                        selected || highlighted
+                                          ? "bg-[#1A73E8] text-white"
+                                          : "bg-white text-gray-900"
                                       }`}
+                                      onFocus={() => setCountryHighlightIndex(idx)}
+                                      onMouseEnter={() => setCountryHighlightIndex(idx)}
+                                      onKeyDown={(e) => handleCountryOptionKeyDown(e, c.id, idx)}
                                       onClick={() => selectPhoneCountry(c.id)}
                                     >
                                       <span className="inline-block w-6 shrink-0 font-medium">{c.id}</span>
@@ -747,13 +935,15 @@ export default function SignupPage() {
                   </p>
                 )}
 
-                <button
+                <motion.button
                   type="submit"
                   disabled={isSubmitting}
-                  className="mt-2.5 mb-2.5 lg:mt-2.5 lg:mb-2.5 w-full h-[42px] flex-shrink-0 bg-gradient-to-r from-[#2d8cf0] to-[#5a78c7] rounded-md text-sm font-medium text-white shadow-md hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="mt-2.5 mb-2.5 lg:mt-2.5 lg:mb-2.5 w-full h-[42px] flex-shrink-0 cursor-pointer bg-gradient-to-r from-[#2d8cf0] to-[#5a78c7] rounded-md text-sm font-medium text-white shadow-md transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                  whileHover={!isSubmitting ? { scale: 1.025, filter: "brightness(1.08)" } : undefined}
+                  whileTap={!isSubmitting ? { scale: 0.98 } : undefined}
                 >
                   {isSubmitting ? "Checking..." : "Sign Up"}
-                </button>
+                </motion.button>
               </form>
 
               <div className="flex-shrink-0 mt-1 lg:mt-0.5">

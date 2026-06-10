@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useCallback, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { assetPath } from "@/lib/paths";
 import ResetFlowBackButton from "@/components/ResetFlowBackButton";
@@ -14,10 +14,46 @@ const resetFlowCardStyle = {
 function VerifiedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const continueButtonRef = useRef<HTMLButtonElement>(null);
   const contact = searchParams.get("contact") || "";
   const createNewPasswordUrl = contact
     ? `/create-new-password?contact=${encodeURIComponent(contact)}`
     : "/create-new-password";
+
+  const handleContinue = useCallback(() => {
+    router.push(createNewPasswordUrl);
+  }, [router, createNewPasswordUrl]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Enter" || e.repeat) return;
+
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      if (
+        target === continueButtonRef.current ||
+        continueButtonRef.current?.contains(target)
+      ) {
+        return;
+      }
+      if (target.closest("button[aria-label='Go back']")) return;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      e.preventDefault();
+      handleContinue();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [handleContinue]);
 
   return (
     <div className="reset-flow-page relative min-h-[100dvh] flex flex-col justify-start lg:justify-center items-stretch overflow-y-auto px-0 py-0 lg:px-6 lg:py-6 max-lg:bg-transparent bg-white">
@@ -46,18 +82,22 @@ function VerifiedContent() {
           >
             You have successfully verified
           </p>
-          <button
-            type="button"
-            onClick={() => router.push(createNewPasswordUrl)}
-            className="w-full max-w-[200px] mx-auto rounded-[1000px] text-[14px] sm:text-[15px] font-bold shadow-md hover:opacity-95 transition flex items-center justify-center"
-            style={{
-              height: "40px",
-              backgroundColor: "#F2B541",
-              color: "#000000",
+          <form
+            className="flex justify-center"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleContinue();
             }}
           >
-            Start
-          </button>
+            <button
+              ref={continueButtonRef}
+              type="submit"
+              className="reset-flow-primary-btn w-full max-w-[200px] mx-auto cursor-pointer rounded-[1000px] text-[14px] sm:text-[15px] font-bold shadow-md flex items-center justify-center"
+              style={{ height: "40px" }}
+            >
+              Start
+            </button>
+          </form>
         </div>
       </div>
     </div>

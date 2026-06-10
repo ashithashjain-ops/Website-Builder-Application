@@ -162,9 +162,9 @@ const MULTI_PART_TLDS_DESC = [...VALID_MULTI_PART_TLDS].sort(
   (a, b) => b.length - a.length,
 );
 
-export const EMAIL_REQUIRED_ERROR = "Email is required.";
-export const EMAIL_INVALID_ERROR = "Please enter a valid email address.";
-export const EMAIL_MAX_ERROR = `Email cannot exceed ${EMAIL_MAX_LENGTH} characters.`;
+export const EMAIL_REQUIRED_ERROR = "Email is required";
+export const EMAIL_INVALID_ERROR = "Please enter a valid email address";
+export const EMAIL_MAX_ERROR = `Email cannot exceed ${EMAIL_MAX_LENGTH} characters`;
 
 function labelsAreValid(labels: string[]): boolean {
   return labels.every((label) => label && DOMAIN_LABEL_PATTERN.test(label));
@@ -224,7 +224,16 @@ const SIGNUP_ALLOWED_DOMAIN_SET = new Set<string>(
 );
 
 export const SIGNUP_EMAIL_DOMAIN_ERROR =
-  "Only Gmail, Yahoo, Outlook, and Stackly email addresses are allowed.";
+  "Only Gmail, Yahoo, Outlook, and Stackly email addresses are allowed";
+
+/** Provider-style host labels are letters only (rejects typos like 123gmail.com). */
+function isPlausibleEmailProviderDomain(domain: string): boolean {
+  const hostLabels = splitDomainHostAndTld(domain);
+  if (hostLabels === null || hostLabels.length === 0) {
+    return false;
+  }
+  return hostLabels.every((label) => /^[a-zA-Z]{2,}$/.test(label));
+}
 
 /**
  * Signup email: structural checks plus allowed provider domains only.
@@ -245,6 +254,9 @@ export function getSignupEmailValidationError(
   const atIndex = email.indexOf("@");
   const domain = email.slice(atIndex + 1).toLowerCase();
   if (!SIGNUP_ALLOWED_DOMAIN_SET.has(domain)) {
+    if (!isPlausibleEmailProviderDomain(domain)) {
+      return EMAIL_INVALID_ERROR;
+    }
     return SIGNUP_EMAIL_DOMAIN_ERROR;
   }
 

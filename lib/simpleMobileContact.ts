@@ -8,7 +8,7 @@ export const SIMPLE_MOBILE_MAX_INPUT_LENGTH =
   1 + SIMPLE_MOBILE_MAX_DIGITS;
 
 export const SIMPLE_MOBILE_INVALID_MESSAGE =
-  "Enter valid email or mobile number.";
+  "Enter valid email or mobile number";
 
 /** True when the field is digits with an optional leading + only. */
 export function looksLikeMobileContactInput(value: string): boolean {
@@ -42,7 +42,7 @@ export function isValidSimpleMobileContact(value: string): boolean {
 }
 
 export function simpleMobileMaxLengthMessage(): string {
-  return `Mobile number cannot exceed ${SIMPLE_MOBILE_MAX_DIGITS} digits.`;
+  return `Mobile number cannot exceed ${SIMPLE_MOBILE_MAX_DIGITS} digits`;
 }
 
 /** Keeps optional + and caps national digits to {@link SIMPLE_MOBILE_MAX_DIGITS}. */

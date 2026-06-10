@@ -73,6 +73,46 @@ const COUNTRIES_BY_DIAL_DESC = [...SIGNUP_PHONE_COUNTRIES].sort(
   (a, b) => b.dialCode.length - a.dialCode.length,
 );
 
+/**
+ * National-number format rules (digits only, no country calling code).
+ * Applied after length checks; unknown countries still reject leading zeros.
+ */
+const SIGNUP_NATIONAL_PATTERNS: Partial<Record<string, RegExp>> = {
+  AU: /^4\d{8}$/,
+  BD: /^1[3-9]\d{8}$/,
+  BE: /^4\d{8}$/,
+  BR: /^[1-9]\d{9,10}$/,
+  CA: /^[2-9]\d{9}$/,
+  CH: /^7[5-9]\d{7}$/,
+  CN: /^1[3-9]\d{9}$/,
+  DE: /^1[5-7]\d{8,9}$/,
+  EG: /^1[0125]\d{8}$/,
+  ES: /^[67]\d{8}$/,
+  FR: /^[67]\d{8}$/,
+  GB: /^7\d{9}$/,
+  ID: /^8\d{8,11}$/,
+  IN: /^[6-9]\d{9}$/,
+  IT: /^3\d{8,9}$/,
+  JP: /^[789]0\d{8}$/,
+  KE: /^[17]\d{8}$/,
+  KR: /^1\d{8,10}$/,
+  LK: /^7\d{8}$/,
+  MX: /^[1-9]\d{9}$/,
+  MY: /^1\d{8,9}$/,
+  NG: /^[789]\d{9}$/,
+  NL: /^6\d{8}$/,
+  NZ: /^2\d{7,9}$/,
+  PH: /^9\d{9}$/,
+  PK: /^3\d{9}$/,
+  SA: /^5\d{8}$/,
+  SG: /^[89]\d{7}$/,
+  TH: /^[689]\d{8}$/,
+  AE: /^5\d{8}$/,
+  US: /^[2-9]\d{9}$/,
+  VN: /^[35789]\d{8}$/,
+  ZA: /^[6-8]\d{8}$/,
+};
+
 /** True when the contact field is being used as a mobile number (digits and optional + only). */
 export function looksLikeMobileContactInput(value: string): boolean {
   const trimmed = value.trim();
@@ -80,7 +120,7 @@ export function looksLikeMobileContactInput(value: string): boolean {
 }
 
 export function mobileContactMaxLengthMessage(): string {
-  return `Mobile number cannot exceed ${MAX_MOBILE_INPUT_LENGTH} characters.`;
+  return `Mobile number cannot exceed ${MAX_MOBILE_INPUT_LENGTH} characters`;
 }
 
 /** Returns null when the mobile contact is valid for a supported country length. */
@@ -96,7 +136,7 @@ export function validateInternationalMobileContact(value: string): string | null
 
   const digits = trimmed.replace(/\D/g, "");
   if (!digits) {
-    return "Enter valid email or mobile number.";
+    return "Enter valid email or mobile number";
   }
 
   for (const country of COUNTRIES_BY_DIAL_DESC) {
@@ -121,7 +161,7 @@ export function validateInternationalMobileContact(value: string): string | null
   }
 
   const hint = getDefaultSignupPhoneCountry();
-  return `Enter a valid mobile number (${nationalDigitsMessage(hint)} or include country code).`;
+  return `Enter a valid mobile number (${nationalDigitsMessage(hint)} or include country code)`;
 }
 
 export function isValidMobileContact(value: string): boolean {
@@ -172,9 +212,31 @@ export function getDefaultSignupPhoneCountry(): SignupPhoneCountry {
 
 export function nationalDigitsMessage(country: SignupPhoneCountry): string {
   if (country.minDigits === country.maxDigits) {
-    return `Enter ${country.minDigits} digits for ${country.name}.`;
+    return `Enter ${country.minDigits} digits for ${country.name}`;
   }
-  return `Enter ${country.minDigits}-${country.maxDigits} digits for ${country.name}.`;
+  return `Enter ${country.minDigits}-${country.maxDigits} digits for ${country.name}`;
+}
+
+export const SIGNUP_MOBILE_INVALID_MESSAGE = "Please enter a valid mobile number";
+
+/** Rejects numbers where every digit is identical (e.g. 0000000000, 1111111111). */
+export function hasRepeatingMobileDigits(digits: string): boolean {
+  const n = digits.replace(/\D/g, "");
+  return n.length > 1 && /^(\d)\1*$/.test(n);
+}
+
+function getNationalFormatError(digits: string, country: SignupPhoneCountry): string | null {
+  if (digits.startsWith("0")) {
+    return SIGNUP_MOBILE_INVALID_MESSAGE;
+  }
+  if (hasRepeatingMobileDigits(digits)) {
+    return SIGNUP_MOBILE_INVALID_MESSAGE;
+  }
+  const pattern = SIGNUP_NATIONAL_PATTERNS[country.id];
+  if (pattern && !pattern.test(digits)) {
+    return SIGNUP_MOBILE_INVALID_MESSAGE;
+  }
+  return null;
 }
 
 /** Returns an error message string or null if length is valid. */
@@ -186,7 +248,7 @@ export function validateSignupNationalDigits(
   if (n.length < country.minDigits || n.length > country.maxDigits) {
     return nationalDigitsMessage(country);
   }
-  return null;
+  return getNationalFormatError(n, country);
 }
 
 export function toE164Mobile(country: SignupPhoneCountry, nationalDigits: string): string {

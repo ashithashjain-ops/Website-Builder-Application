@@ -258,12 +258,8 @@ function CreateNewPasswordContent() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full max-w-[240px] mx-auto rounded-lg text-[12px] sm:text-[13px] font-bold uppercase shadow-md hover:opacity-95 transition flex items-center justify-center"
-                style={{
-                  height: "36px",
-                  backgroundColor: "#F2B541",
-                  color: "#FFFFFF",
-                }}
+                className="reset-flow-primary-btn w-full max-w-[240px] mx-auto cursor-pointer rounded-lg text-[12px] sm:text-[13px] font-bold uppercase shadow-md flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-60"
+                style={{ height: "36px" }}
               >
                 {isSubmitting ? "UPDATING..." : "UPDATE PASSWORD"}
               </button>

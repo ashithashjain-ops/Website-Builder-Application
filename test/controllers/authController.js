@@ -11,7 +11,7 @@ exports.register = async (req, res) => {
     // ✅ DEBUG LOG (ADD THIS)
     console.log("BODY RECEIVED:", req.body);
  
-    const name = req.body.name?.trim();
+    const name = (req.body.name ?? "").trim().replace(/\s+/g, " ");
     const email = (req.body.email ?? "").trim().toLowerCase();
     const mobile = req.body.mobile?.trim();
     const password = req.body.password;
@@ -20,6 +20,9 @@ exports.register = async (req, res) => {
     // Required fields — return specific message for empty email before format checks.
     if (!name) {
       return res.status(400).json({ message: "Name is required" });
+    }
+    if (!/^[a-zA-Z]+(?: [a-zA-Z]+)*$/.test(name)) {
+      return res.status(400).json({ message: "Name must contain only letters" });
     }
     if (!email) {
       return res.status(400).json({ message: "Email is required" });

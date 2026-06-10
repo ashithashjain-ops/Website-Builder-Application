@@ -30,6 +30,10 @@ import {
   validateSimpleMobileContact,
 } from "@/lib/simpleMobileContact";
 import AuthGoogleButton from "@/components/AuthGoogleButton";
+import {
+  PASSWORD_WHITESPACE_ERROR,
+  passwordContainsWhitespace,
+} from "@/lib/resetFlowValidation";
 
 function normalizeLoginEmail(raw: string): string {
   return raw.replace(/\s/g, "").trim().toLowerCase();
@@ -55,8 +59,8 @@ const initialLoginState: LoginFormState = {
 
 const EMAIL_MAX_LENGTH = 254;
 const PASSWORD_MAX_LENGTH = 60;
-const EMAIL_MAX_ERROR = `Email or mobile number cannot exceed ${EMAIL_MAX_LENGTH} characters.`;
-const PASSWORD_MAX_ERROR = `Password cannot exceed ${PASSWORD_MAX_LENGTH} characters.`;
+const EMAIL_MAX_ERROR = `Email or mobile number cannot exceed ${EMAIL_MAX_LENGTH} characters`;
+const PASSWORD_MAX_ERROR = `Password cannot exceed ${PASSWORD_MAX_LENGTH} characters`;
 
 const loginContainerVariants: Variants = {
   hidden: {},
@@ -187,7 +191,7 @@ export default function LoginPage() {
 
     const trimmedContact = values.email.trim();
     if (!trimmedContact) {
-      newErrors.email = "Email or mobile number is required.";
+      newErrors.email = "Email or mobile number is required";
     } else if (looksLikeMobileContactInput(trimmedContact)) {
       const mobileError = validateSimpleMobileContact(trimmedContact);
       if (mobileError) {
@@ -206,7 +210,9 @@ export default function LoginPage() {
     }
 
     if (!values.password) {
-      newErrors.password = "Enter valid password";
+      newErrors.password = "Password is required";
+    } else if (passwordContainsWhitespace(values.password)) {
+      newErrors.password = PASSWORD_WHITESPACE_ERROR;
     } else if (values.password.length > PASSWORD_MAX_LENGTH) {
       newErrors.password = PASSWORD_MAX_ERROR;
     } else if (values.password.length < 8) {
@@ -225,9 +231,15 @@ export default function LoginPage() {
         return;
       }
 
-      const rawValue = event.target.value;
+      let rawValue = event.target.value;
       const contactValue =
         field === "email" ? rawValue.replace(/\s+/g, "") : rawValue;
+
+      let passwordWhitespaceRemoved = false;
+      if (field === "password" && passwordContainsWhitespace(rawValue)) {
+        rawValue = rawValue.replace(/\s/g, "");
+        passwordWhitespaceRemoved = true;
+      }
 
       if (field === "email") {
         const treatAsMobile = looksLikeMobileContactInput(contactValue);
@@ -296,10 +308,22 @@ export default function LoginPage() {
             form: undefined,
           }));
         }
+      } else if (field === "password") {
+        setErrors((prev) => ({
+          ...prev,
+          password: passwordWhitespaceRemoved ? PASSWORD_WHITESPACE_ERROR : undefined,
+          form: undefined,
+        }));
       } else {
         setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
       }
     };
+
+  const handlePasswordKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === " ") {
+      e.preventDefault();
+    }
+  };
 
   const handleContactBlur = () => {
     const trimmed = form.email.trim();
@@ -366,7 +390,7 @@ export default function LoginPage() {
       const message =
         error instanceof Error
           ? error.message
-          : "Login failed. Please try again.";
+          : "Login failed, please try again";
       setErrors((prev) => ({ ...prev, form: message }));
     } finally {
       setIsSubmitting(false);
@@ -451,6 +475,7 @@ export default function LoginPage() {
                           placeholder="Password"
                           value={form.password}
                           onChange={handleChange("password")}
+                          onKeyDown={handlePasswordKeyDown}
                           maxLength={PASSWORD_MAX_LENGTH}
                           className="bg-transparent outline-none w-full min-w-0 placeholder-white text-sm pr-9"
                           aria-invalid={!!errors.password}
@@ -555,7 +580,7 @@ export default function LoginPage() {
                     <motion.button
                       type="submit"
                       disabled={isSubmitting}
-                      className="mt-6 sm:mt-6 lg:mt-8 w-full h-[42px] sm:h-[45px] bg-gradient-to-r from-[#2d8cf0] to-[#5a78c7] rounded-md text-sm font-medium shadow-md hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed flex-shrink-0"
+                      className="mt-6 sm:mt-6 lg:mt-8 w-full h-[42px] sm:h-[45px] cursor-pointer bg-gradient-to-r from-[#2d8cf0] to-[#5a78c7] rounded-md text-sm font-medium shadow-md hover:opacity-90 transition disabled:cursor-not-allowed disabled:opacity-60 flex-shrink-0"
                       variants={loginFadeUp}
                       whileHover={!isSubmitting ? { scale: 1.025, filter: "brightness(1.08)" } : undefined}
                       whileTap={!isSubmitting ? { scale: 0.98 } : undefined}

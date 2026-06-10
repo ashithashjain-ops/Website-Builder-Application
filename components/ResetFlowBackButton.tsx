@@ -14,7 +14,7 @@ export default function ResetFlowBackButton({
       type="button"
       onClick={onClick}
       aria-label={ariaLabel}
-      className="absolute z-20 text-2xl text-white lg:text-black left-[max(1rem,env(safe-area-inset-left))] top-[max(1rem,env(safe-area-inset-top))]"
+      className="absolute z-20 cursor-pointer text-2xl text-white lg:text-black left-[max(1rem,env(safe-area-inset-left))] top-[max(1rem,env(safe-area-inset-top))]"
     >
       ←
     </button>
