@@ -15,8 +15,6 @@ import {
   FaPaperPlane,
   FaLaptop,
   FaTabletAlt,
-  FaPlay,
-  FaPen,
 } from "react-icons/fa";
 
 import { FaEye } from "react-icons/fa";
@@ -91,18 +89,8 @@ function AnimatedCount({
 export default function Portfolioedit() {
   const [innerMobileMenuOpen, setInnerMobileMenuOpen] = useState(false);
   const [innerNavHidden, setInnerNavHidden] = useState(false);
-  const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [previewMode, setPreviewMode] = useState("preview");
   const [isEditMode, setIsEditMode] = useState(false);
-  const [dynamicVideoProps, setDynamicVideoProps] = useState<any>(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('portfolioVideoData');
-    if (saved) {
-      try {
-        setDynamicVideoProps(JSON.parse(saved));
-      } catch (e) {}
-    }
-  }, []);
   const canvasScrollRef = useRef<HTMLDivElement | null>(null);
   const { scrollY: canvasScrollY } = useScroll();
   const prefersReducedMotion = useReducedMotion();
@@ -197,38 +185,70 @@ export default function Portfolioedit() {
   return (
     <main className="site-page flex flex-col min-h-screen bg-white w-full max-w-full overflow-x-hidden">
       {/* ====== MAIN BUILDER LAYOUT ====== */}
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-x-hidden max-w-full w-full">
         {/* MAIN CONTENT */}
-        <div className="flex-1 bg-white p-4 @md:p-7 flex justify-center min-w-0">
-          <div className="w-full max-w-[1200px] relative flex flex-col min-w-0">
-             {/* FLOATING DEVICE TOOLBAR */}
-            <div className="fixed z-[100] transition-all duration-500 ease-in-out shrink-0 bottom-6 left-1/2 -translate-x-1/2 max-w-[90vw]"
-            >
-              <div className="flex items-center gap-2 bg-white rounded-full border border-[#E5E7EB] shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-3 py-1.5 w-full overflow-x-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                 <Link href="/landing#templates" className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-100 shadow-sm hover:shadow-md text-[#06224C] transition" title="Preview">
+        <div className="flex-1 bg-white p-4 @md:p-7 flex justify-center min-w-0 overflow-x-hidden max-w-full w-full">
+          <div className="w-full max-w-[1200px] relative flex flex-col min-w-0 overflow-x-hidden">
+            {/* FIXED/FLOATING PREVIEW TOOLBAR */}
+            <div className="fixed z-[100] bottom-6 left-1/2 -translate-x-1/2 @lg:top-[50%] @lg:bottom-auto @lg:-translate-y-1/2 shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-white rounded-full border border-[#E5E7EB] shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-3 py-1.5">
+                 <button
+                   onClick={() => setPreviewMode("preview")}
+                   className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm transition ${
+                     previewMode === "preview"
+                       ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold"
+                       : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"
+                   }`}
+                   title="Preview"
+                 >
                     <FaEye size={14} />
-                 </Link>
-                 <div className="w-px h-6 bg-gray-200 mx-0.5"></div>
-                 <button onClick={() => setDeviceMode("desktop")} className={`w-9 h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${deviceMode === "desktop" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Desktop View">
+                 </button>
+                 <button
+                   onClick={() => setPreviewMode("desktop")}
+                   className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm transition ${
+                     previewMode === "desktop"
+                       ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold"
+                       : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"
+                   }`}
+                   title="Desktop View"
+                 >
                     <FaLaptop size={14} />
                  </button>
-                 <button onClick={() => setDeviceMode("tablet")} className={`w-9 h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${deviceMode === "tablet" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Tablet View">
+                 <button
+                   onClick={() => setPreviewMode("tablet")}
+                   className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm transition ${
+                     previewMode === "tablet"
+                       ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold"
+                       : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"
+                   }`}
+                   title="Tablet View"
+                 >
                     <FaTabletAlt size={14} />
                  </button>
-                 <button onClick={() => setDeviceMode("mobile")} className={`w-9 h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${deviceMode === "mobile" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Mobile View">
+                 <button
+                   onClick={() => setPreviewMode("mobile")}
+                   className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm transition ${
+                     previewMode === "mobile"
+                       ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold"
+                       : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"
+                   }`}
+                   title="Mobile View"
+                 >
                     <FaMobileAlt size={14} />
                  </button>
               </div>
             </div>
 
             {/* Canvas Box */}
-            <div ref={canvasScrollRef} className={`flex-1 overflow-visible min-w-0 relative z-0 transition-colors duration-300 ${deviceMode !== "desktop" ? "bg-gray-200/50 p-2 @sm:p-4 rounded-xl" : ""}`}>
-              <div className={`@container mx-auto w-full min-h-[530px] bg-[#F2F2F2] rounded-xl border-2 border-gray-300 flex flex-col relative portfolio-shell overflow-hidden transition-all duration-500 ease-in-out ${
-                deviceMode === "mobile"
-                  ? "max-w-[375px] shadow-2xl"
-                  : deviceMode === "tablet"
-                    ? "max-w-[768px] shadow-2xl"
-                    : "max-w-full"
+            <div ref={canvasScrollRef} className={`flex-1 overflow-visible min-w-0 relative z-0 transition-colors duration-300 ${(previewMode === "tablet" || previewMode === "mobile") ? "bg-gray-200/50 p-2 @sm:p-4 rounded-xl" : ""}`}>
+              <div className={`@container mx-auto min-h-[530px] bg-[#F2F2F2] flex flex-col relative portfolio-shell overflow-hidden box-border transition-all duration-500 ease-in-out ${
+                previewMode === "mobile"
+                  ? "w-[375px] max-w-full shadow-2xl rounded-xl border-2 border-gray-300"
+                  : previewMode === "tablet"
+                    ? "w-[768px] max-w-full shadow-2xl rounded-xl border-2 border-gray-300"
+                    : previewMode === "desktop"
+                      ? "w-full max-w-[1200px] rounded-xl border-2 border-gray-300"
+                      : "w-full max-w-full"
               }`}>
 
 
@@ -403,7 +423,7 @@ export default function Portfolioedit() {
                                 alt="Srinivas Pentakota - UI/UX Designer Portfolio"
                                 fill
                                 sizes="220px"
-                                className="w-full h-full object-cover"
+                                className="object-cover"
                                 unoptimized
                               />
                             </div>
@@ -466,7 +486,7 @@ export default function Portfolioedit() {
                               boxShadow: heroImageProps.shadow ? '0 10px 25px rgba(0,0,0,0.3)' : 'none',
                               opacity: heroImageProps.opacity / 100
                             }}>
-                            <Image src={assetPath("/portfoliologo.webp")} alt="Srinivas Pentakota - UI/UX Designer Portfolio" fill sizes="245px" className="w-full h-full object-cover" unoptimized />
+                            <Image src={assetPath("/portfoliologo.webp")} alt="Srinivas Pentakota - UI/UX Designer Portfolio" fill sizes="245px" className="object-cover" unoptimized />
                           </div>
                         </div>
                       </div>
@@ -829,34 +849,22 @@ export default function Portfolioedit() {
 
                 {/* MY PROJECTS SECTION */}
 
-                <div id="projects" className="w-full bg-[#F2F2F2] px-0 @md:px-6 @lg:px-12 pb-16 @lg:pb-24 relative overflow-hidden">
+                <div id="projects" className="w-full max-w-full bg-[#F2F2F2] px-0 @md:px-6 @lg:px-12 pb-16 @lg:pb-24 relative overflow-x-hidden box-border">
 
-                  {/* <div className="px-6 @md:px-6 @lg:px-8 mb-12">
-                    <h2 className="text-base font-bold flex items-center gap-1 mb-4 text-gray-800 tracking-wide w-max">
-                      My <span className="bg-[#c4ff0b] text-gray-900 px-2 py-0.5 rounded-full text-sm font-extrabold ml-1 leading-none shadow-sm flex items-center h-6">Projects</span>
-                    </h2>
-                    <h3 className="text-3xl @md:text-4xl @lg:text-4xl font-extrabold text-gray-900 max-w-2xl leading-[1.15]">
-                      Showcase Your Talent with Our <br className="hidden @md:block" /> Latest Works
-                    </h3>
-                  </div> */}
                   <div className="text-center mb-16">
-                    {/* <h3 className="text-base font-bold flex items-center justify-center gap-1 mb-4 text-gray-800 tracking-wide"> */}
-                    <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center justify-center gap-2 mb-4">
                       <h2 className="text-3xl @md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
                       <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @md:text-3xl tracking-tight leading-none">Projects</span>
                     </div>
-                    {/* <h3 className="text-3xl @md:text-4xl @lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
 
-                    <h3 className="text-sm @sm:text-base @md:text-xl @lg:text-2xl font-extrabold text-gray-800 mb-8 @md:mb-16 max-w-full @md:max-w-3xl leading-relaxed break-words text-center @md:text-left">
+                    <h3 className="text-sm @sm:text-base @md:text-xl @lg:text-2xl font-extrabold text-gray-800 mb-8 @md:mb-16 max-w-full @md:max-w-3xl leading-relaxed break-words text-center mx-auto">
                       Showcase Your Talent with Our <br className="hidden @md:block" /> Latest Works
                     </h3>
                   </div>
 
-
                   <div
-                    id="projects-slider"
-                    className="w-full overflow-x-auto flex gap-4 @sm:gap-6 px-4 @sm:px-6 @lg:px-8 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden scroll-smooth"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    id="projects-grid"
+                    className="w-full max-w-full grid grid-cols-1 gap-6 px-4 justify-items-center @min-[769px]:grid-cols-2 @min-[1025px]:grid-cols-3 @min-[769px]:gap-6 @min-[769px]:px-6 @min-[1025px]:px-8 pb-8 overflow-x-hidden box-border"
                   >
                     {[
                       {
@@ -890,54 +898,26 @@ export default function Portfolioedit() {
                         img: "https://images.unsplash.com/photo-1555421689-491a97ff2040?w=500&h=500&fit=crop"
                       }
                     ].map((proj, i) => (
-                      <div key={i} className="portfolio-project-card flex flex-col flex-none w-[240px] @sm:w-[260px] max-w-[80vw] shrink-0 snap-start cursor-pointer group" style={{ animationDelay: `${i * 80}ms` }}>
-                        <div className="w-full aspect-square rounded-[20px] overflow-hidden mb-4 @sm:mb-5 relative border border-gray-100 shadow-sm">
-                          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors z-10 w-full h-full"></div>
-                          <Image src={proj.img} alt={proj.title} fill sizes="260px" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" unoptimized />
+                      <div key={i} className="portfolio-project-card flex flex-col w-full max-w-[320px] cursor-pointer group box-border" style={{ animationDelay: `${i * 80}ms` }}>
+                        <div className="w-full rounded-[20px] overflow-hidden mb-4 @sm:mb-5 border border-gray-100 shadow-sm">
+                          <Image
+                            src={proj.img}
+                            alt={proj.title}
+                            width={500}
+                            height={500}
+                            sizes="(max-width: 768px) 100vw, 320px"
+                            className="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-700"
+                            unoptimized
+                          />
                         </div>
                         <div className="flex items-start mb-3">
-                          <span className="bg-[#63e5ff] border border-gray-900 text-gray-900 px-3.5 py-1.5 rounded-full text-[11px] font-semibold leading-none">
+                          <span className="bg-[#63e5ff] border border-gray-900 text-gray-900 px-3.5 py-1.5 rounded-full text-[11px] font-semibold leading-none break-words [overflow-wrap:anywhere] max-w-full">
                             {proj.tag}
                           </span>
                         </div>
-                        <h4 className="font-bold text-[15px] text-gray-900 leading-snug group-hover:text-[#1a3636] transition-colors mt-1">{proj.title}</h4>
+                        <h4 className="font-bold text-[15px] text-gray-900 leading-snug group-hover:text-[#1a3636] transition-colors mt-1 break-words [overflow-wrap:anywhere] max-w-full w-full">{proj.title}</h4>
                       </div>
                     ))}
-                  </div>
-
-
-                  <div className="flex flex-wrap items-center justify-center gap-4 @sm:gap-6 mt-4 @sm:mt-6 w-full relative px-4 @sm:px-8">
-                    <button
-                      onClick={() => {
-                        const slider = document.getElementById('projects-slider');
-                        if (slider) slider.scrollBy({ left: -280, behavior: 'smooth' });
-                      }}
-                      className="flex items-center justify-center p-2 group hover:opacity-70 transition-opacity cursor-pointer"
-                      aria-label="Slide Left"
-                    >
-                      <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[40px] @sm:w-[60px]">
-                        <path d="M10 5L5 10L10 15M5 10H55" stroke="#1a3636" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => {
-                        const slider = document.getElementById('projects-slider');
-                        if (slider) slider.scrollBy({ left: 280, behavior: 'smooth' });
-                      }}
-                      className="flex items-center justify-center p-2 group hover:opacity-70 transition-opacity cursor-pointer"
-                      aria-label="Slide Right"
-                    >
-                      <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[40px] @sm:w-[60px]">
-                        <path d="M50 5L55 10L50 15M55 10H5" stroke="#1a3636" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
-
-                    {/* <button
-                      className="@md:absolute right-4 @md:right-8 bg-[#1a3636] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:-translate-y-1 transition-transform ml-auto @md:ml-0 shrink-0"
-                      aria-label="Scroll to top"
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-                    </button> */}
                   </div>
                 </div>
 
@@ -975,72 +955,6 @@ export default function Portfolioedit() {
                         </div>
                       ))}
                     </div>
-                  </div>
-                </div>
-
-                {/* VIDEO SECTION */}
-                <div id="video" className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-16 @lg:pb-24">
-                  <div className="relative mx-auto flex w-full max-w-7xl flex-col-reverse @lg:flex-row items-center justify-between gap-12 @lg:gap-8 bg-[#0B1D40] rounded-[2.5rem] p-8 @md:p-12 @lg:p-16 shadow-2xl border border-white/5">
-                    
-                    {/* LEFT COLUMN: Text Content */}
-                    <div className="flex w-full flex-col justify-center space-y-6 lg:w-5/12 relative z-10">
-                      <div>
-                        <p className="text-[#38BDF8] font-bold tracking-widest uppercase text-sm @md:text-base mb-4">
-                          Creative Marketing
-                        </p>
-                        <h2 className="text-[clamp(2rem,5cqi,4.5rem)] font-black text-white leading-[1.1] tracking-tight mb-6">
-                          Showreel 2026
-                        </h2>
-                        <p className="text-gray-300 text-base @sm:text-lg @md:text-xl font-medium max-w-md leading-relaxed mb-8">
-                          We Create digital experience that drives results.
-                        </p>
-                      </div>
-
-                      <div>
-                        <button 
-                          type="button" 
-                          className="group flex items-center gap-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-4 rounded-full font-bold uppercase text-sm tracking-wider hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/30 w-max"
-                        >
-                          Watch Now 
-                          <div className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <FaPlay className="text-xs ml-0.5" aria-hidden="true" />
-                          </div>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* RIGHT COLUMN: Video Player */}
-                    <div className="relative w-full lg:w-7/12 flex justify-center lg:justify-end z-10">
-                      <div className="relative w-full max-w-[640px] aspect-video rounded-[2rem] overflow-hidden shadow-2xl bg-[#0B1D40]">
-                        {dynamicVideoProps?.sourceType === 'embed' && dynamicVideoProps.embedCode ? (
-                          <div className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full" dangerouslySetInnerHTML={{ __html: dynamicVideoProps.embedCode }} />
-                        ) : (
-                          <video 
-                            key={dynamicVideoProps?.uploadUrl || "default-video"}
-                            className="w-full h-full object-cover relative z-10"
-                            controls={dynamicVideoProps?.showControls ?? true}
-                            autoPlay={dynamicVideoProps?.autoplay ?? false}
-                            loop={dynamicVideoProps?.loop ?? false}
-                            muted={dynamicVideoProps?.muted ?? false}
-                            playsInline
-                            preload="none"
-                            poster={dynamicVideoProps?.posterImage || assetPath("/video_block_bg.png")}
-                          >
-                            <source src={dynamicVideoProps?.uploadUrl || "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"} type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* CENTER: Edit Button Overlay (as shown in design) */}
-                    <button 
-                      className="absolute left-1/2 top-[40%] @lg:top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.3)] border-4 border-[#0B1D40] text-blue-600 transition-transform hover:scale-110 active:scale-95 cursor-pointer"
-                      aria-label="Edit Video Block"
-                    >
-                      <FaPen className="text-xl" />
-                    </button>
-                    
                   </div>
                 </div>
 
@@ -1119,7 +1033,7 @@ export default function Portfolioedit() {
         </div>
       </div>
       </div>
-      <Footer />
+      {(previewMode === "desktop" || previewMode === "preview") && <Footer />}
     </main>
   );
 }
