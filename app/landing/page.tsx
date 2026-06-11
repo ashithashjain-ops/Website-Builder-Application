@@ -90,7 +90,7 @@ const bannerSlides = [
   },
   {
     id: "blog",
-    title: "BLog",
+    title: "Blog",
     description: "A modern and visually engaging blog design crafted to showcase creativity, skills and projects with clarity. Designed with clean layouts, smooth user experience and strong visual storytelling to create a lasting impression.",
     image: "/landing-optimized/bloggg.webp",
     bg: "linear-gradient(135deg, #3a3a3a 0%, #151515 100%)", // Dark Grey gradient
