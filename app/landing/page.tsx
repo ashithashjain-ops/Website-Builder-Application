@@ -231,9 +231,9 @@ const softHover: TargetAndTransition = {
   transition: { duration: 0.22, ease: "easeOut" },
 };
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
+  function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mb-8 border-l-4 border-blue-600 pl-3 text-xs font-black uppercase tracking-[0.3em] text-[#0A2357] md:mb-10">
+    <h2 className="mb-8 border-l-4 border-blue-600 pl-3 text-xl font-black uppercase tracking-[0.1em] text-black-600 md:mb-10">
       {children}
     </h2>
   );
@@ -806,8 +806,8 @@ export default function Home() {
 
         <motion.div className="w-full lg:w-1/2 space-y-4 md:space-y-6 text-left" variants={revealContainer}>
           {/* Added About Us box and Blue Line */}
-          <motion.div className="" variants={fadeUp}>
-             <span className="text-sm font-black uppercase tracking-[0.2em] text-blue-600">
+           <motion.div className="" variants={fadeUp}>
+             <span className="uppercase tracking-[0.1em] text-2xl text-black-600">
                About us
              </span>
           </motion.div>
@@ -839,7 +839,7 @@ export default function Home() {
       {/* ─────────────────────────────────────────────────────────────────── */}
 
       <motion.div className="mt-8 text-center md:mt-12 max-w-7xl mx-auto px-4 md:px-8" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-        <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-800">Popular Searches</p>
+        <h2 className="mb-4 text-2xl font-black uppercase tracking-[0.1em] text-black-600">Popular Searches</h2>
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
           {popularSearches.map((search) => (
             <button

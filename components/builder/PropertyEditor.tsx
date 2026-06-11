@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import { Layers2, Paintbrush, Sparkles, SquareMousePointer, X } from "lucide-react";
@@ -44,6 +44,18 @@ export default function PropertyEditor({
   onClose?: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("content");
+
+  useEffect(() => {
+    const handleSetTab = (event: Event) => {
+      const tab = (event as CustomEvent<{ tab?: Tab }>).detail?.tab;
+      if (tab === "content" || tab === "style" || tab === "effects" || tab === "layers") {
+        setActiveTab(tab);
+      }
+    };
+
+    window.addEventListener("stackly:set-property-tab", handleSetTab);
+    return () => window.removeEventListener("stackly:set-property-tab", handleSetTab);
+  }, []);
 
   const renderContentEditor = () => {
     if (!component) return null;

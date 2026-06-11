@@ -3,9 +3,10 @@
 import Image from "next/image";
 import InlineText from "@/components/builder/InlineText";
 import type { BuilderComponent } from "@/types/builder";
-import { toReactStyle } from "./componentStyles";
+import { getTargetTextStyles, getTextStyles, toReactStyle } from "./componentStyles";
 
 export default function GalleryComponent({ component, onUpdate }: { component: BuilderComponent; onUpdate?: (content: string | null) => void }) {
+  const textStyle = getTextStyles(component.styles);
   const lines = component.content.split("\n");
   const images = lines
     .map((item) => {
@@ -31,7 +32,7 @@ export default function GalleryComponent({ component, onUpdate }: { component: B
               <Image alt={image.caption || "Website image"} className="object-cover" fill sizes="(min-width: 768px) 280px, 100vw" src={image.src} unoptimized />
             </div>
             {image.caption && (
-              <InlineText as="figcaption" value={image.caption} onSave={(v) => saveCaption(index, v)} className="px-4 py-3 text-sm font-bold text-[#0B1D40]" />
+              <InlineText componentId={component.id} textKey={`gallery.${index}.caption`} textLabel={`Gallery caption ${index + 1}`} as="figcaption" value={image.caption} onSave={(v) => saveCaption(index, v)} className="px-4 py-3 text-sm font-bold" style={getTargetTextStyles(component, `gallery.${index}.caption`, textStyle)} />
             )}
           </figure>
         ))}

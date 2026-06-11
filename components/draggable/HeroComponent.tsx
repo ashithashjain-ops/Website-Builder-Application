@@ -3,7 +3,7 @@
 import InlineText from "@/components/builder/InlineText";
 import { readHero } from "@/components/blocks/hero/spec";
 import type { BuilderComponent } from "@/types/builder";
-import { toReactStyle } from "./componentStyles";
+import { getTargetTextStyles, getTextStyles, toReactStyle } from "./componentStyles";
 
 export default function HeroComponent({
   component,
@@ -16,6 +16,7 @@ export default function HeroComponent({
 }) {
   // Typed read — falls back to legacy pipe `content` for pre-migration documents.
   const { title, description, cta } = readHero(component);
+  const textStyle = getTextStyles(component.styles);
 
   /**
    * Inline save helper: writes a single prop via `onPatch` so the store
@@ -34,9 +35,9 @@ export default function HeroComponent({
     <section className="w-full overflow-hidden border border-[#dbe3ef]" style={toReactStyle(component.styles)}>
       <div className="grid gap-6 md:grid-cols-[1.15fr_0.85fr] md:items-center">
         <div>
-          <InlineText as="h1" value={title} onSave={(v) => saveProp("title", v)} className="text-[34px] font-bold leading-tight text-[#0B1D40]" />
-          <InlineText as="p" value={description} onSave={(v) => saveProp("description", v)} className="mt-4 max-w-[560px] text-base font-medium leading-7 text-[#566583]" />
-          <InlineText as="button" value={cta.label} onSave={(v) => saveCtaLabel(v)} className="mt-6 rounded-md bg-[#0B1D40] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#152B52]" />
+          <InlineText componentId={component.id} textKey="hero.title" textLabel="Hero title" as="h1" value={title} onSave={(v) => saveProp("title", v)} className="text-[34px] font-bold leading-tight" style={getTargetTextStyles(component, "hero.title", textStyle)} />
+          <InlineText componentId={component.id} textKey="hero.description" textLabel="Hero description" as="p" value={description} onSave={(v) => saveProp("description", v)} className="mt-4 max-w-[560px] text-base font-medium leading-7" style={getTargetTextStyles(component, "hero.description", textStyle)} />
+          <InlineText componentId={component.id} textKey="hero.cta" textLabel="Hero button" as="button" value={cta.label} onSave={(v) => saveCtaLabel(v)} className="mt-6 rounded-md bg-[#0B1D40] px-5 py-3 text-sm font-bold transition hover:bg-[#152B52]" style={getTargetTextStyles(component, "hero.cta", { color: "#ffffff" })} />
         </div>
         <div className="min-h-[180px] rounded-lg border border-[#dbe3ef] bg-white p-4 shadow-sm">
           <div className="mb-3 h-3 w-24 rounded-full bg-[#dbe3ef]" />

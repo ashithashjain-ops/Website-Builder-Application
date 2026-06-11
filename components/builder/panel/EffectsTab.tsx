@@ -193,20 +193,6 @@ export function EffectsTab({
             );
           })}
         </div>
-        {/* Custom shadow input */}
-        <div className="mt-1">
-          <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-wider text-[#566583]">
-            Custom Shadow
-          </span>
-          <input
-            type="text"
-            value={s.boxShadow || ""}
-            placeholder="0 4px 12px rgba(0,0,0,0.1)"
-            onChange={(e) => set({ boxShadow: e.target.value })}
-            className="w-full rounded-lg border border-[#dbe3ef] bg-transparent px-2.5 py-2 text-[12px] font-semibold text-[#0B1D40] outline-none transition placeholder:text-[#566583]/50 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-            spellCheck={false}
-          />
-        </div>
       </Section>
 
       {/* ─── Border ───────────────────────────────────────────────── */}

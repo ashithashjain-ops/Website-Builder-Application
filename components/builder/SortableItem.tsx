@@ -34,7 +34,7 @@ function SortableItem({
   } = useSortable({
     id: component.id,
     data: { fromCanvas: true },
-    disabled: isInlineEditing,
+    disabled: isInlineEditing || Boolean(component.locked),
   });
 
   const isSortingActive = activeIndex !== -1 && overIndex !== -1;
@@ -56,14 +56,16 @@ function SortableItem({
           <span className="h-px flex-1 bg-blue-500 shadow-[0_0_6px_2px_rgba(59,130,246,0.35)]" />
         </div>
       )}
-      <button
-        className="pointer-events-none absolute -left-3 top-5 z-10 flex h-8 w-8 cursor-grab items-center justify-center rounded-lg border border-[#dbe3ef] bg-white text-[#566583] opacity-0 shadow-sm transition-all duration-150 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 group-hover:pointer-events-auto group-hover:opacity-100 active:cursor-grabbing"
-        type="button"
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="h-4 w-4" />
-      </button>
+      {!component.locked && (
+        <button
+          className="pointer-events-none absolute -left-3 top-5 z-10 flex h-8 w-8 cursor-grab items-center justify-center rounded-lg border border-[#dbe3ef] bg-white text-[#566583] opacity-0 shadow-sm transition-all duration-150 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 group-hover:pointer-events-auto group-hover:opacity-100 active:cursor-grabbing"
+          type="button"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+      )}
       <CanvasItem
         component={component}
         isDropTarget={isOver && !isDragging}

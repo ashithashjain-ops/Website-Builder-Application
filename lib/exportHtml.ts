@@ -1,4 +1,8 @@
 import { blockRegistry } from "@/lib/blockRegistry";
+import * as LucideIcons from "lucide-react";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import type { LucideIcon } from "lucide-react";
 import type { BuilderComponent, ComponentStyles } from "@/types/builder";
 import { escapeHtml } from "@/lib/htmlUtils";
 
@@ -7,6 +11,77 @@ const styleToString = (styles: ComponentStyles) =>
     .filter(([, value]) => value !== undefined && value !== "")
     .map(([key, value]) => `${key.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)}:${value}`)
     .join(";");
+
+const textStyleAttr = (component: BuilderComponent, key: string) => {
+  const styles = component.textStyles?.[key];
+  if (!styles) return "";
+  const style = styleToString(styles as ComponentStyles);
+  return style ? ` style="${escapeHtml(style)}"` : "";
+};
+
+const addStyleToTag = (tag: string, attr: string) =>
+  attr ? tag.replace(/>$/, `${attr}>`) : tag;
+
+const applyTextStyleOverrides = (component: BuilderComponent, html: string) => {
+  let result = html;
+
+  if (component.type === "hero") {
+    result = result.replace(/<h1>/, (tag) => addStyleToTag(tag, textStyleAttr(component, "hero.title")));
+    result = result.replace(/<p>/, (tag) => addStyleToTag(tag, textStyleAttr(component, "hero.description")));
+    result = result.replace(/<a href="[^"]*" role="button">/, (tag) => addStyleToTag(tag, textStyleAttr(component, "hero.cta")));
+  }
+
+  if (component.type === "contact") {
+    result = result.replace(/<h2>/, (tag) => addStyleToTag(tag, textStyleAttr(component, "contact.title")));
+    result = result.replace(/<p>/, (tag) => addStyleToTag(tag, textStyleAttr(component, "contact.description")));
+    result = result.replace(/<button type="submit">/, (tag) => addStyleToTag(tag, textStyleAttr(component, "contact.cta")));
+  }
+
+  if (component.type === "features") {
+    let index = 0;
+    result = result.replace(/<h3>/g, (tag) => addStyleToTag(tag, textStyleAttr(component, `features.${index++}.title`)));
+    index = 0;
+    result = result.replace(/<p>/g, (tag) => addStyleToTag(tag, textStyleAttr(component, `features.${index++}.description`)));
+  }
+
+  if (component.type === "navigation") {
+    result = result.replace(/<strong>/, (tag) => addStyleToTag(tag, textStyleAttr(component, "navigation.brand")));
+    let linkIndex = 0;
+    result = result.replace(/<a [^>]*>/g, (tag) => {
+      if (tag.includes("nav-cta")) {
+        return addStyleToTag(tag, textStyleAttr(component, "navigation.cta"));
+      }
+      return addStyleToTag(tag, textStyleAttr(component, `navigation.link.${linkIndex++}`));
+    });
+  }
+
+  return result;
+};
+
+const isFloatingComponent = (component: BuilderComponent) =>
+  (component.type === "icon" || component.type === "button") && component.props?.floating === true;
+
+const floatingWrapper = (component: BuilderComponent, inner: string) => {
+  const x = Math.max(0, Math.round(component.position?.x ?? 32));
+  const y = Math.max(0, Math.round(component.position?.y ?? 32));
+  const zIndex = escapeHtml(String(component.styles.zIndex || component.zIndex || 60));
+
+  return `<div class="stackly-floating" style="left:clamp(0px,${x}px,calc(100% - 44px));top:${y}px;z-index:${zIndex};">${inner}</div>`;
+};
+
+const renderIconSvg = (name: string, styles: ComponentStyles) => {
+  const Icon = (LucideIcons as unknown as Record<string, LucideIcon | undefined>)[name] ?? LucideIcons.Star;
+  const size = parseInt(styles.fontSize || "32", 10) || 32;
+  const color = styles.color || "#0B1D40";
+
+  return renderToStaticMarkup(createElement(Icon, {
+    size,
+    color,
+    strokeWidth: 1.8,
+    "aria-hidden": true,
+    focusable: false,
+  }));
+};
 
 const renderComponent = (component: BuilderComponent): string => {
   const style = styleToString(component.styles);
@@ -19,7 +94,7 @@ const renderComponent = (component: BuilderComponent): string => {
   const spec = blockRegistry[component.type];
   if (spec) {
     const data = spec.read(component);
-    return spec.exportHtml(data, styleAttr);
+    return applyTextStyleOverrides(component, spec.exportHtml(data, styleAttr));
   }
 
   switch (component.type) {
@@ -28,6 +103,9 @@ const renderComponent = (component: BuilderComponent): string => {
     case "text":
       return `<p${styleAttr}>${content}</p>`;
     case "button":
+      if (isFloatingComponent(component)) {
+        return floatingWrapper(component, `<button${styleAttr}>${content}</button>`);
+      }
       return `<button${styleAttr}>${content}</button>`;
     case "image":
       return `<img${styleAttr} src="${escapeHtml(component.content)}" alt="Builder image" />`;
@@ -40,7 +118,7 @@ const renderComponent = (component: BuilderComponent): string => {
         .split("\n")
         .map((item) => item.split("|"))
         .filter(([src]) => src?.trim())
-        .map(([src, caption]) => `<figure><img src="${escapeHtml(src.trim())}" alt="${escapeHtml(caption || "Website image")}" /><figcaption>${escapeHtml(caption || "")}</figcaption></figure>`)
+        .map(([src, caption], index) => `<figure><img src="${escapeHtml(src.trim())}" alt="${escapeHtml(caption || "Website image")}" /><figcaption${textStyleAttr(component, `gallery.${index}.caption`)}>${escapeHtml(caption || "")}</figcaption></figure>`)
         .join("");
 
       return `<section${styleAttr}>${gallery}</section>`;
@@ -52,7 +130,10 @@ const renderComponent = (component: BuilderComponent): string => {
     case "spacer":
       return `<div${styleAttr} style="height:${component.props?.height || component.content || '60px'}"></div>`;
     case "icon":
-      return `<span${styleAttr}>${content}</span>`;
+      if (isFloatingComponent(component)) {
+        return floatingWrapper(component, `<span${styleAttr}>${renderIconSvg(component.content || "Star", component.styles)}</span>`);
+      }
+      return `<span${styleAttr}>${renderIconSvg(component.content || "Star", component.styles)}</span>`;
     case "map": {
       const addr = component.props?.address || "New York";
       const z = component.props?.zoom || 12;
@@ -128,13 +209,19 @@ export const generateHtml = (components: BuilderComponent[]) => {
       * { box-sizing: border-box; }
       body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #ffffff; color: #0B1D40; }
       main { width: min(960px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0; }
+      main { position: relative; min-height: 680px; }
       main > * + * { margin-top: 16px; }
+      .stackly-floating { position: absolute; margin: 0 !important; width: max-content; max-width: calc(100% - 8px); }
+      .stackly-floating > * { margin: 0 !important; }
+      .stackly-floating svg { display: block; }
       .hero-split { display: flex; align-items: center; gap: 40px; }
       .hero-text { flex: 1; }
       .hero-media { flex: 1; }
       .hero-media img { width: 100%; border-radius: 12px; }
       @media (max-width: 640px) { .hero-split { flex-direction: column; } }
       nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; }
+      .nav-brand-group { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; min-width: max-content; }
+      .nav-logo { display: block; height: 36px; width: auto; max-width: 120px; object-fit: contain; flex-shrink: 0; }
       .nav-links { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
       .nav-cta { white-space: nowrap; }
       .nav-hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: transparent !important; border: none; cursor: pointer; padding: 6px; color: #0B1D40; }
@@ -160,6 +247,22 @@ export const generateHtml = (components: BuilderComponent[]) => {
       article { border: 1px solid #dbe3ef; border-radius: 8px; padding: 18px; margin: 12px 0; }
       figure { margin: 12px 0; overflow: hidden; border: 1px solid #dbe3ef; border-radius: 8px; }
       figcaption { padding: 10px 12px; font-weight: 700; }
+      @media (max-width: 768px) {
+        main { width: min(100%, calc(100% - 24px)); padding: 24px 0; }
+        h1 { font-size: min(32px, 7vw); line-height: 1.15; }
+        h2 { font-size: min(28px, 6vw); line-height: 1.2; }
+        h3 { font-size: min(22px, 5vw); line-height: 1.25; }
+        p, li, input, textarea, select { font-size: min(16px, 4vw); }
+        button, [role="button"] { font-size: min(15px, 3.8vw); padding: 10px 14px; }
+      }
+      @media (max-width: 480px) {
+        main { width: min(100%, calc(100% - 20px)); padding: 20px 0; }
+        h1 { font-size: min(28px, 7.5vw); }
+        h2 { font-size: min(24px, 6.5vw); }
+        h3 { font-size: min(20px, 5.5vw); }
+        p, li, input, textarea, select { font-size: min(15px, 4.2vw); line-height: 1.6; }
+        button, [role="button"] { font-size: min(14px, 4vw); }
+      }
     </style>
   </head>
   <body>

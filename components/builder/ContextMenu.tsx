@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowDown, ArrowUp, ChevronFirst, ChevronLast, Clipboard,
-  Copy, Lock, LockOpen, Scissors, SquareStack, Trash2,
+  Clipboard, ClipboardCopy, ClipboardPaste,
+  Copy, FileText, Paintbrush, Scissors, Sparkles, SquareStack, Trash2,
 } from "lucide-react";
 import { useBuilderStore } from "@/store/builderStore";
+import type { BuilderComponent, ComponentStyles } from "@/types/builder";
 
 interface ContextMenuProps {
   x: number;
@@ -21,25 +22,27 @@ interface MenuItem {
   shortcut?: string;
   action: () => void;
   danger?: boolean;
+  disabled?: boolean;
   dividerAfter?: boolean;
 }
 
 export default function ContextMenu({ x, y, componentId, onClose }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
+  const [hasStyleClipboard, setHasStyleClipboard] = useState(() =>
+    typeof window !== "undefined" && Boolean(localStorage.getItem("stackly-style-clipboard")),
+  );
 
   const deleteComponent = useBuilderStore((s) => s.deleteComponent);
   const duplicateComponent = useBuilderStore((s) => s.duplicateComponent);
   const copyComponents = useBuilderStore((s) => s.copyComponents);
   const pasteComponents = useBuilderStore((s) => s.pasteComponents);
-  const moveLayer = useBuilderStore((s) => s.moveLayer);
-  const toggleLock = useBuilderStore((s) => s.toggleLock);
+  const updateComponent = useBuilderStore((s) => s.updateComponent);
   const selectComponent = useBuilderStore((s) => s.selectComponent);
   const components = useBuilderStore((s) => s.components);
   const clipboard = useBuilderStore((s) => s.clipboard);
 
-  // Find if component is locked
   const findById = useCallback(
-    (id: string): { locked?: boolean } | null => {
+    (id: string): BuilderComponent | null => {
       const search = (arr: typeof components): typeof components[number] | null => {
         for (const c of arr) {
           if (c.id === id) return c;
@@ -54,7 +57,6 @@ export default function ContextMenu({ x, y, componentId, onClose }: ContextMenuP
   );
 
   const comp = findById(componentId);
-  const isLocked = comp?.locked ?? false;
 
   // Close on outside click
   useEffect(() => {
@@ -118,30 +120,66 @@ export default function ContextMenu({ x, y, componentId, onClose }: ContextMenuP
       dividerAfter: true,
     },
     {
-      label: "Bring to Front",
-      icon: ChevronFirst,
-      action: () => { moveLayer(componentId, "front"); onClose(); },
+      label: "Edit Content",
+      icon: FileText,
+      action: () => {
+        selectComponent(componentId);
+        window.dispatchEvent(new CustomEvent("stackly:set-property-tab", { detail: { tab: "content" } }));
+        onClose();
+      },
     },
     {
-      label: "Bring Forward",
-      icon: ArrowUp,
-      action: () => { moveLayer(componentId, "forward"); onClose(); },
+      label: "Edit Style",
+      icon: Paintbrush,
+      action: () => {
+        selectComponent(componentId);
+        window.dispatchEvent(new CustomEvent("stackly:set-property-tab", { detail: { tab: "style" } }));
+        onClose();
+      },
     },
     {
-      label: "Send Backward",
-      icon: ArrowDown,
-      action: () => { moveLayer(componentId, "backward"); onClose(); },
+      label: "Edit Effects",
+      icon: Sparkles,
+      action: () => {
+        selectComponent(componentId);
+        window.dispatchEvent(new CustomEvent("stackly:set-property-tab", { detail: { tab: "effects" } }));
+        onClose();
+      },
     },
     {
-      label: "Send to Back",
-      icon: ChevronLast,
-      action: () => { moveLayer(componentId, "back"); onClose(); },
-      dividerAfter: true,
+      label: "Copy Style",
+      icon: ClipboardCopy,
+      action: () => {
+        if (!comp) return;
+        localStorage.setItem(
+          "stackly-style-clipboard",
+          JSON.stringify({ styles: comp.styles, textStyles: comp.textStyles ?? {} }),
+        );
+        setHasStyleClipboard(true);
+        onClose();
+      },
     },
     {
-      label: isLocked ? "Unlock" : "Lock",
-      icon: isLocked ? LockOpen : Lock,
-      action: () => { toggleLock(componentId); onClose(); },
+      label: "Paste Style",
+      icon: ClipboardPaste,
+      action: () => {
+        try {
+          const raw = localStorage.getItem("stackly-style-clipboard");
+          if (!raw) return;
+          const parsed = JSON.parse(raw) as {
+            styles?: ComponentStyles;
+            textStyles?: BuilderComponent["textStyles"];
+          };
+          updateComponent(componentId, {
+            styles: parsed.styles ?? {},
+            textStyles: parsed.textStyles ?? {},
+          });
+        } catch {
+          return;
+        }
+        onClose();
+      },
+      disabled: !hasStyleClipboard,
       dividerAfter: true,
     },
     {
@@ -173,9 +211,9 @@ export default function ContextMenu({ x, y, componentId, onClose }: ContextMenuP
         onClick={(e) => e.stopPropagation()}
         onContextMenu={(e) => e.preventDefault()}
       >
-        {items.map((item, i) => {
+        {items.map((item) => {
           const Icon = item.icon;
-          const disabled = item.label === "Paste" && !clipboard;
+          const disabled = item.disabled || (item.label === "Paste" && !clipboard);
           return (
             <div key={item.label}>
               <button

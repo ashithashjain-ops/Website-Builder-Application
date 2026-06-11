@@ -12,6 +12,7 @@ export const toReactStyle = (styles: ComponentStyles): CSSProperties => ({
   margin: styles.margin,
   borderRadius: styles.borderRadius,
   fontSize: styles.fontSize,
+  fontWeight: styles.fontWeight as CSSProperties["fontWeight"],
   width: styles.width,
   height: styles.height,
   textAlign: styles.textAlign,
@@ -35,4 +36,24 @@ export const toReactStyle = (styles: ComponentStyles): CSSProperties => ({
 /** Convenience wrapper: accept a full BuilderComponent and return CSSProperties. */
 export const getBaseStyles = (component: BuilderComponent): CSSProperties =>
   toReactStyle(component.styles);
+
+export const getTextStyles = (styles: ComponentStyles): CSSProperties => ({
+  color: styles.color,
+  fontSize: styles.fontSize,
+  fontWeight: styles.fontWeight as CSSProperties["fontWeight"],
+  textAlign: styles.textAlign,
+});
+
+export const getTargetTextStyles = (
+  component: BuilderComponent,
+  key: string,
+  fallback?: CSSProperties,
+): CSSProperties => {
+  const override = component.textStyles?.[key];
+
+  return {
+    ...(fallback ?? getTextStyles(component.styles)),
+    ...(override ? getTextStyles(override as ComponentStyles) : {}),
+  };
+};
 
