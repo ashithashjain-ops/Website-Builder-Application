@@ -52,7 +52,7 @@ export default function NavigationComponent({
           <InlineText key={i} componentId={component.id} textKey={`navigation.link.${i}`} textLabel={`Navigation link ${i + 1}`} as="span" value={link.label} onSave={(v) => saveLinkLabel(i, v)} className="transition" style={getTargetTextStyles(component, `navigation.link.${i}`, textStyle)} />
         ))}
       </div>
-      <InlineText componentId={component.id} textKey="navigation.cta" textLabel="Navigation button" as="button" value={cta.label} onSave={(v) => saveCtaLabel(v)} className="rounded-md bg-[#0B1D40] px-4 py-2 text-sm font-bold transition hover:bg-[#152B52]" style={getTargetTextStyles(component, "navigation.cta", { color: "#ffffff" })} />
+      <InlineText componentId={component.id} textKey="navigation.cta" textLabel="Navigation button" as="button" value={cta.label} onSave={(v) => saveCtaLabel(v)} className="px-4 py-2 text-sm font-bold shadow-sm transition hover:opacity-90" style={getTargetTextStyles(component, "navigation.cta", { color: "#ffffff", backgroundColor: "#0B1D40", borderRadius: "6px" })} />
     </nav>
   );
 }

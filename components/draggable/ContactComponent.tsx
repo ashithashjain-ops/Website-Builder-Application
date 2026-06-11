@@ -37,7 +37,7 @@ export default function ContactComponent({
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
           <input className="min-w-0 flex-1 rounded-md border border-[#dbe3ef] px-4 py-3 text-sm font-semibold text-[#0B1D40] outline-none focus:ring-2 focus:ring-blue-100" placeholder={inputPlaceholder} readOnly />
-          <InlineText componentId={component.id} textKey="contact.cta" textLabel="Contact button" as="button" value={cta.label} onSave={(v) => saveCtaLabel(v)} className="rounded-md bg-[#0B1D40] px-5 py-3 text-sm font-bold transition hover:bg-[#152B52]" style={getTargetTextStyles(component, "contact.cta", { color: "#ffffff" })} />
+          <InlineText componentId={component.id} textKey="contact.cta" textLabel="Contact button" as="button" value={cta.label} onSave={(v) => saveCtaLabel(v)} className="px-5 py-3 text-sm font-bold shadow-sm transition hover:opacity-90" style={getTargetTextStyles(component, "contact.cta", { color: "#ffffff", backgroundColor: "#0B1D40", borderRadius: "6px" })} />
         </div>
       </div>
     </section>

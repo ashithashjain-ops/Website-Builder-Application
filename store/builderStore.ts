@@ -474,6 +474,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
     }),
   updateComponent: (id, updates) =>
     set((state) => ({
+      ...captureHistory(state),
       components: updateNodeById(state.components, id, (c) => ({
         ...c,
         ...updates,

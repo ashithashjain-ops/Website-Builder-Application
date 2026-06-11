@@ -57,7 +57,17 @@ export function StyleTab({
       ? selectedTextStyleTarget
       : null;
   const activeTextStyles = textTarget ? component.textStyles?.[textTarget.key] ?? {} : s;
-  const defaultTextColor = textTarget?.key.endsWith(".cta") ? "#ffffff" : "#000000";
+  const defaultTextColor = component.type === "button" || textTarget?.key.endsWith(".cta") ? "#ffffff" : "#000000";
+  const isButtonTarget =
+    component.type === "button" ||
+    textTarget?.key.endsWith(".cta") ||
+    textTarget?.key.toLowerCase().includes("button");
+  const defaultButtonBackground =
+    component.type === "button"
+      ? s.backgroundColor || "#0B1D40"
+      : textTarget
+        ? activeTextStyles.backgroundColor || "#0B1D40"
+        : "#0B1D40";
 
   const set = (patch: Partial<ComponentStyles>) =>
     onUpdate(component.id, { styles: { ...s, ...patch } });
@@ -134,10 +144,27 @@ export function StyleTab({
         />
       </Section>
 
+      {/* Button appearance */}
+      {isButtonTarget && (
+        <Section title="Button">
+          <ColorSwatch
+            label="Button Color"
+            value={(textTarget ? activeTextStyles.backgroundColor : s.backgroundColor) || defaultButtonBackground}
+            onChange={(v) => (textTarget ? setTypography({ backgroundColor: v }) : set({ backgroundColor: v }))}
+          />
+          <UnitInput
+            label="Button Radius"
+            value={(textTarget ? activeTextStyles.borderRadius : s.borderRadius) || ""}
+            onChange={(v) => (textTarget ? setTypography({ borderRadius: v }) : set({ borderRadius: v }))}
+            placeholder="6"
+          />
+        </Section>
+      )}
+
       {/* Background */}
-      <Section title="Background">
+      <Section title="Background" defaultOpen={!isButtonTarget}>
         <ColorSwatch
-          label="Background Color"
+          label={component.type === "button" ? "Block Background" : "Background Color"}
           value={s.backgroundColor || "#ffffff"}
           onChange={(v) => set({ backgroundColor: v })}
         />

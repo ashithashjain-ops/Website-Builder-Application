@@ -53,7 +53,7 @@ export const getTargetTextStyles = (
 
   return {
     ...(fallback ?? getTextStyles(component.styles)),
-    ...(override ? getTextStyles(override as ComponentStyles) : {}),
+    ...(override ? toReactStyle(override as ComponentStyles) : {}),
   };
 };
 

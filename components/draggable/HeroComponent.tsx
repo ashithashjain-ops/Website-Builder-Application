@@ -37,7 +37,7 @@ export default function HeroComponent({
         <div>
           <InlineText componentId={component.id} textKey="hero.title" textLabel="Hero title" as="h1" value={title} onSave={(v) => saveProp("title", v)} className="text-[34px] font-bold leading-tight" style={getTargetTextStyles(component, "hero.title", textStyle)} />
           <InlineText componentId={component.id} textKey="hero.description" textLabel="Hero description" as="p" value={description} onSave={(v) => saveProp("description", v)} className="mt-4 max-w-[560px] text-base font-medium leading-7" style={getTargetTextStyles(component, "hero.description", textStyle)} />
-          <InlineText componentId={component.id} textKey="hero.cta" textLabel="Hero button" as="button" value={cta.label} onSave={(v) => saveCtaLabel(v)} className="mt-6 rounded-md bg-[#0B1D40] px-5 py-3 text-sm font-bold transition hover:bg-[#152B52]" style={getTargetTextStyles(component, "hero.cta", { color: "#ffffff" })} />
+          <InlineText componentId={component.id} textKey="hero.cta" textLabel="Hero button" as="button" value={cta.label} onSave={(v) => saveCtaLabel(v)} className="mt-6 px-5 py-3 text-sm font-bold shadow-sm transition hover:opacity-90" style={getTargetTextStyles(component, "hero.cta", { color: "#ffffff", backgroundColor: "#0B1D40", borderRadius: "6px" })} />
         </div>
         <div className="min-h-[180px] rounded-lg border border-[#dbe3ef] bg-white p-4 shadow-sm">
           <div className="mb-3 h-3 w-24 rounded-full bg-[#dbe3ef]" />
