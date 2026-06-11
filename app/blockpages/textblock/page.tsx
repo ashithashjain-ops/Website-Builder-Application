@@ -61,7 +61,7 @@ export default function TextBlockPage() {
  
   return (
     <main className="flex min-h-screen flex-col bg-[#e9eef6] text-slate-900">
-      <section className="flex min-h-[calc(100vh-64px)] flex-1 gap-4 overflow-hidden p-4">
+      <section className="flex min-h-[calc(100vh-64px)] flex-1 gap-0 sm:gap-2 overflow-hidden p-0 sm:p-2">
         <TextCanvas
           state={textBlockState}
           onStateChange={pushState}
@@ -79,3 +79,4 @@ export default function TextBlockPage() {
     </main>
   );
 }
+ 

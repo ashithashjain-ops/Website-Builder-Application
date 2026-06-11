@@ -222,9 +222,9 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
         </div>
       </div>
  
-      <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 xl:px-8">
-        <div className="mx-auto w-full max-w-[1280px] overflow-hidden rounded-xl border border-[#dbe3ef] bg-white shadow-[0_18px_45px_rgba(15,35,75,0.08)]">
-          <div data-builder-chrome="true" className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e6edf5] px-5 py-4 sm:px-6">
+      <div className="flex-1 overflow-y-auto p-0">
+        <div className="mx-auto w-full max-w-none overflow-hidden rounded-none sm:rounded-xl border-0 sm:border border-[#dbe3ef] bg-white shadow-[0_18px_45px_rgba(15,35,75,0.08)]">
+          <div data-builder-chrome="true" className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e6edf5] px-4 py-3 sm:px-6 sm:py-4">
             <h2 className="text-[18px] font-bold text-[#0B1D40]">
               {template === "portfolio" ? "Portfolio Text Blocks" : "E-Commerce Text Blocks"}
             </h2>
@@ -305,4 +305,5 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
     </main>
   );
 }
+ 
  

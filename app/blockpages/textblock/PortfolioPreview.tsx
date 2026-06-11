@@ -332,45 +332,45 @@ export default function PortfolioPreview({
         {/* MAIN CONTENT */}
 
         {/* <div className="flex-1 bg-white p-4 md:p-7 flex justify-center min-w-0 overflow-hidden"> */}
-        <div className="flex-1 bg-white p-4 md:p-7 flex justify-center min-w-0">
+        <div className="flex-1 bg-white p-0 flex justify-center min-w-0">
 
           {/* <div className="w-full max-w-[1200px] relative flex flex-col h-[calc(100vh-80px)] min-w-0"> */}
-          <div className="w-full max-w-[1200px] relative flex flex-col min-w-0">
+          <div className="w-full relative flex flex-col min-w-0 max-w-none">
             {/* Canvas Box */}
 
             {/* <div className="flex-1 overflow-y-auto min-w-0"> */}
             {/* <div className="flex-1 overflow-y-auto min-w-0 relative z-0"> */}
             <div className="flex-1 min-w-0 relative z-0">
-              <div className="w-full min-h-[530px] rounded-xl border-2 border-gray-300 flex flex-col relative portfolio-shell bg-[#F2F2F2]">
+              <div className="w-full min-h-[530px] rounded-none sm:rounded-xl border-0 sm:border-2 border-gray-300 flex flex-col relative portfolio-shell bg-[#F2F2F2]">
 
 
                 {/* <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 lg:flex-nowrap border-b border-gray-300 bg-[#06224C] rounded-t-xl"> */}
-                <div className="sticky top-0 z-50 backdrop-blur-md bg-[#06224C]/95 flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 border-b border-gray-300 rounded-t-xl">
+                <div className="sticky top-0 z-50 backdrop-blur-md bg-[#06224C]/95 flex w-full flex-wrap items-center justify-between gap-1 sm:gap-4 px-2 sm:px-4 py-2 sm:py-3 md:px-8 border-b border-gray-300 sm:rounded-t-xl">
 
                   {/* ✅ MOBILE LAYOUT */}
                   <div className="flex flex-col w-full lg:hidden gap-2">
 
                     {/* ROW 1 → Logo + Menu */}
                     {/* TOP ROW → Logo + Title + Menu */}
-                    <div className="flex flex-wrap items-center justify-between w-full gap-2">
+                    <div className="flex flex-wrap items-center justify-between w-full gap-1">
 
                       {/* LEFT → Logo */}
                       <Link
                         href="/landing"
-                        className="flex h-7 w-[64px] sm:h-8 sm:w-[80px] items-center justify-center overflow-hidden rounded-[50%] bg-white px-1 sm:px-2 shrink-0"
+                        className="flex h-6 w-[56px] sm:h-8 sm:w-[80px] items-center justify-center overflow-hidden rounded-[50%] bg-white px-1 sm:px-2 shrink-0"
                       >
                         <Image
                           src={assetPath("/stackly-logo.webp")}
                           alt="Stackly logo"
                           width={80}
                           height={24}
-                          className="h-[12px] sm:h-[14px] object-contain"
+                          className="h-[10px] sm:h-[14px] object-contain"
                           unoptimized
                         />
                       </Link>
 
                       {/* CENTER → Title */}
-                      <span className="text-base sm:text-lg font-semibold text-white text-center flex-1 min-w-0 truncate">
+                      <span className="text-sm sm:text-lg font-semibold text-white text-center flex-1 min-w-0 truncate">
                         Portfolio
                       </span>
 
@@ -378,24 +378,24 @@ export default function PortfolioPreview({
                       <button
                         data-builder-chrome="true"
                         onClick={() => setInnerMobileMenuOpen((v) => !v)}
-                        className="h-8 w-8 border border-white/25 text-white rounded-md hover:bg-white/10 transition flex items-center justify-center shrink-0"
+                        className="h-7 w-7 sm:h-8 sm:w-8 border border-white/25 text-white rounded-md hover:bg-white/10 transition flex items-center justify-center shrink-0"
                       >
-                        <FaBars />
+                        <FaBars className="text-sm" />
                       </button>
 
                     </div>
 
                     {/* ROW 3 → Actions (NOW VISIBLE ON MOBILE ✅) */}
                     <div className="flex justify-center" data-builder-chrome="true">
-                      <div className="flex flex-wrap justify-center gap-2 w-full">
+                      <div className="flex flex-wrap justify-center gap-1 sm:gap-2 w-full">
 
                         {/* Save Draft */}
-                        <button className="px-3 py-1 text-xs font-semibold border border-gray-300 rounded-md text-white hover:bg-white hover:text-black transition">
+                        <button className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold border border-gray-300 rounded-md text-white hover:bg-white hover:text-black transition">
                           Save Draft
                         </button>
 
                         {/* Preview */}
-                        <button type="button" onClick={onPreview} className="px-3 py-1 text-xs font-semibold flex items-center gap-1 border border-gray-300 rounded-md text-white hover:bg-white hover:text-black transition">
+                        <button type="button" onClick={onPreview} className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold flex items-center gap-1 border border-gray-300 rounded-md text-white hover:bg-white hover:text-black transition">
                           Preview <FaEye className="text-[10px]" />
                         </button>
 
@@ -506,13 +506,13 @@ export default function PortfolioPreview({
                           <span className="h-2 w-2 rounded-full bg-[#63e5ff] animate-pulse"></span>
                           Available for freelance work
                         </div>
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mt-4 md:mt-6 text-gray-800 leading-snug md:leading-normal break-words whitespace-normal">
-                          <div className="mb-2">Hello, I&apos;m</div>
-                          <div className="text-[#63e5ff] mb-2 leading-snug break-words">Srinivas Pentakota</div>
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mt-4 md:mt-6 text-gray-800 leading-snug md:leading-normal break-words whitespace-normal">
+                          <div className="mb-1 sm:mb-2">Hello, I&apos;m</div>
+                          <div className="text-[#63e5ff] mb-1 sm:mb-2 leading-snug break-words">Srinivas Pentakota</div>
                           <div className="leading-snug break-words">UI/UX Designer</div>
                         </h1>
 
-                        <p className="text-gray-600 mt-4 md:mt-6 text-base md:text-lg max-w-xl mx-auto lg:mx-0 break-words relative z-20">
+                        <p className="text-gray-600 mt-3 sm:mt-4 md:mt-6 text-sm sm:text-base md:text-lg max-w-xl mx-auto lg:mx-0 break-words relative z-20">
                           I design sleek digital products, landing pages, and brand experiences that feel clear, fast, and memorable.
                         </p>
 
@@ -671,11 +671,11 @@ export default function PortfolioPreview({
 
                     {/* STATS */}
 
-                    <div ref={statsRef} className="flex flex-col sm:flex-row items-stretch justify-center gap-4 sm:gap-6 lg:gap-8 mt-12 md:mt-15 mb-2 w-full flex-wrap">
+                    <div ref={statsRef} className="flex flex-col sm:flex-row items-stretch justify-center gap-3 sm:gap-6 lg:gap-8 mt-12 md:mt-15 mb-2 w-full flex-wrap">
                       {stats.map((item, i) => (
                         <div
                           key={i}
-                          className="portfolio-stat-card flex-1 min-w-[140px] sm:min-w-[160px] max-w-[280px] mx-auto sm:mx-0 bg-white py-4 min-h-[6rem] px-4 rounded-lg shadow-md flex flex-col items-center justify-center text-gray-700 transition transform hover:-translate-y-2 hover:shadow-xl text-center"
+                          className="portfolio-stat-card flex-1 min-w-[120px] sm:min-w-[160px] max-w-[280px] mx-auto sm:mx-0 bg-white py-3 sm:py-4 min-h-[5rem] sm:min-h-[6rem] px-3 sm:px-4 rounded-lg shadow-md flex flex-col items-center justify-center text-gray-700 transition transform hover:-translate-y-2 hover:shadow-xl text-center"
                           style={{ animationDelay: `${i * 110}ms` }}
                         >
                           <h5 className="text-2xl font-bold">
@@ -948,7 +948,7 @@ export default function PortfolioPreview({
                       </h3>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 max-w-7xl mx-auto">
                       {[
                         { id: "01", title: "Web Development", desc: "Responsive, clean websites with purposeful layouts and polished front-end details." },
                         { id: "02", title: "UI / UX DESIGN", desc: "User journeys, wireframes, visual systems, and prototypes that make products easier to use." },
