@@ -229,6 +229,31 @@ export default function PortfolioPreview({
     threshold: 0.3,
   });
 
+  useEffect(() => {
+    let frameIds: number[] = [];
+    if (statsInView) {
+      const statsElements = document.querySelectorAll('.stat-animate-count');
+      statsElements.forEach(el => {
+         if (document.activeElement === el) return; 
+         const target = parseInt((el as HTMLElement).dataset.target || "0", 10);
+         const suffix = (el as HTMLElement).dataset.suffix || "";
+         const duration = 2000;
+         const start = performance.now();
+         const step = (now: number) => {
+            if (document.activeElement === el) return; 
+            const progress = Math.min((now - start) / duration, 1);
+            el.textContent = Math.round(progress * target).toString();
+            if (progress < 1) frameIds.push(requestAnimationFrame(step));
+            else el.textContent = target.toString() + suffix;
+         };
+         frameIds.push(requestAnimationFrame(step));
+      });
+    }
+    return () => {
+       frameIds.forEach(cancelAnimationFrame);
+    };
+  }, [statsInView]);
+
   const { ref: processRef, inView: processInView } = useLocalInView<HTMLDivElement>({
     triggerOnce: true,
     threshold: 0.2,
@@ -578,7 +603,7 @@ export default function PortfolioPreview({
                             <button
                               type="button"
                               onClick={() => scrollToSection("projects")}
-                              className={getCustomButtonStyle("hero_btn_1", "w-40 flex justify-center items-center px-3 py-2 bg-gradient-to-r from-[#06224C] to-[#1A5BBC] text-white rounded-lg text-sm transition transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg outline-none focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06224C]").className}
+                              className={getCustomButtonStyle("hero_btn_1", "w-full sm:w-auto min-w-[160px] flex justify-center items-center px-4 py-3 bg-gradient-to-r from-[#06224C] to-[#1A5BBC] text-white rounded-lg text-sm font-semibold transition transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg outline-none focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06224C] whitespace-normal break-words").className}
                               style={getCustomButtonStyle("hero_btn_1", "").style}
                             >
                               View My Works
@@ -597,7 +622,7 @@ export default function PortfolioPreview({
                           <div className="relative inline-block">
                             <Link
                               href="/page-not-found"
-                              className={getCustomButtonStyle("hero_btn_2", "w-40 flex justify-center items-center px-3 py-2 bg-gradient-to-r from-[#06224C] to-[#1A5BBC] text-white rounded-lg text-sm transition transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg outline-none focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06224C]").className}
+                              className={getCustomButtonStyle("hero_btn_2", "w-full sm:w-auto min-w-[160px] flex justify-center items-center px-4 py-3 bg-gradient-to-r from-[#06224C] to-[#1A5BBC] text-white rounded-lg text-sm font-semibold transition transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg outline-none focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06224C] whitespace-normal break-words").className}
                               style={getCustomButtonStyle("hero_btn_2", "").style}
                             >
                               Download CV
@@ -673,23 +698,26 @@ export default function PortfolioPreview({
 
                     <div ref={statsRef} className="flex flex-col sm:flex-row items-stretch justify-center gap-3 sm:gap-6 lg:gap-8 mt-12 md:mt-15 mb-2 w-full flex-wrap">
                       {stats.map((item, i) => (
-                        <div
-                          key={i}
-                          className="portfolio-stat-card flex-1 min-w-[120px] sm:min-w-[160px] max-w-[280px] mx-auto sm:mx-0 bg-white py-3 sm:py-4 min-h-[5rem] sm:min-h-[6rem] px-3 sm:px-4 rounded-lg shadow-md flex flex-col items-center justify-center text-gray-700 transition transform hover:-translate-y-2 hover:shadow-xl text-center"
-                          style={{ animationDelay: `${i * 110}ms` }}
-                        >
-                          <h5 className="text-2xl font-bold">
-                            {statsInView ? (
-                              <AnimatedCount
-                                key={statsInView ? "start" : "reset"} // 👈 important fix
-                                start={0}
-                                end={item.value}
-                                duration={2}
-                                suffix={item.suffix}
-                              />
-                            ) : (
-                              "0"
-                            )}
+                          <div
+                            key={i}
+                            className="portfolio-stat-card flex-1 min-w-[120px] sm:min-w-[160px] max-w-full sm:max-w-[280px] mx-auto sm:mx-0 bg-white py-4 sm:py-5 h-auto px-4 rounded-lg shadow-md flex flex-col items-center justify-center text-gray-700 transition transform hover:-translate-y-2 hover:shadow-xl text-center"
+                            style={{ animationDelay: `${i * 110}ms` }}
+                          >
+                          <h5 
+                            className="text-2xl font-bold stat-animate-count"
+                            suppressContentEditableWarning
+                            data-target={item.value}
+                            data-suffix={item.suffix}
+                            onInput={(e) => {
+                               const text = e.currentTarget.textContent || "";
+                               const match = text.match(/(\d+)(.*)/);
+                               if (match) {
+                                  e.currentTarget.dataset.target = match[1];
+                                  e.currentTarget.dataset.suffix = match[2];
+                               }
+                            }}
+                          >
+                            {item.value}{item.suffix}
                           </h5>
 
                           <span className="text-sm mt-1 break-words">{item.label}</span>
@@ -824,21 +852,35 @@ export default function PortfolioPreview({
 
                       <div ref={skillsRef} className="space-y-6 md:space-y-8">
                         {skills.map((skill, index) => (
-                          <div key={skill.name}>
+                          <div key={skill.name} className="skill-container">
                             <div className="flex justify-between mb-2 md:mb-3">
                               <span className="font-bold text-gray-800 text-sm md:text-lg">
                                 {skill.name}
                               </span>
-                              <span className="text-gray-500 text-xs md:text-sm">
+                              <span
+                                className="text-gray-500 text-xs md:text-sm skill-value-text"
+                                onInput={(e) => {
+                                  const text = e.currentTarget.textContent || "";
+                                  const val = parseInt(text.replace(/[^0-9]/g, ''));
+                                  if (!isNaN(val)) {
+                                    const container = e.currentTarget.closest('.skill-container') as HTMLElement;
+                                    if (container) {
+                                      container.style.setProperty('--skill-width', `${val}%`);
+                                    }
+                                  }
+                                }}
+                                suppressContentEditableWarning
+                              >
                                 {skill.value}%
                               </span>
                             </div>
 
                             <div className="w-full bg-gray-300 h-[4px] md:h-[6px] overflow-hidden">
                               <div
-                                className="h-full transition-all duration-1000 ease-out"
+                                className="h-full transition-all duration-1000 ease-out skill-progress-bar"
+                                data-target-width={`var(--skill-width, ${skill.value}%)`}
                                 style={{
-                                  width: skillsInView ? `${skill.value}%` : "0%",
+                                  width: skillsInView ? `var(--skill-width, ${skill.value}%)` : "0%",
                                   transitionDelay: `${index * 150}ms`,
                                   backgroundColor: skill.color
                                 }}
@@ -1213,7 +1255,7 @@ export default function PortfolioPreview({
                           className="group flex items-center gap-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-4 rounded-full font-bold uppercase text-sm tracking-wider hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/30 max-w-full w-fit"
                         >
                           Watch Now
-                          <div className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <div className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
                             <FaPlay className="text-xs ml-0.5" aria-hidden="true" />
                           </div>
                         </button>
