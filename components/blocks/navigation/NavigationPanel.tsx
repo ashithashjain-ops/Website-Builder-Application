@@ -93,15 +93,6 @@ export function NavigationPanel({ data, setProp }: PanelProps<NavigationProps>) 
             Choose from Assets
           </button>
         )}
-        <input
-          className={contentInputClass}
-          value={data.logoUrl ?? ""}
-          onChange={(e) => {
-            setProp("logoUrl", e.target.value);
-            setProp("logoAssetId", "");
-          }}
-          placeholder="/logo.svg or image URL"
-        />
         <div className="grid grid-cols-2 gap-2">
           {logoPresets.map((src) => (
             <button
