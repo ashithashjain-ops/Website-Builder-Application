@@ -19,6 +19,7 @@ import {
   FaGithub
 } from "react-icons/fa";
 import { assetPath } from "@/lib/paths";
+import { PORTFOLIO_PROJECTS_SLIDER_ID, scrollPortfolioProjectsSlider } from "@/lib/portfolioProjectsSlider";
 import { useBuilder } from "../imageblock/BuilderContext";
 import type { BlockData } from "../buttonblock/types";
 import type { VideoBlockData } from "../videoblock/types";
@@ -121,6 +122,7 @@ export default function PortfolioPreview({
 }: PortfolioPreviewProps) {
   const [innerMobileMenuOpen, setInnerMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+  const projectsSliderRef = useRef<HTMLDivElement>(null);
 
   const videoBlockProps = videoBlocks[0]?.props;
   // Read global builder state for image adjustments
@@ -234,23 +236,23 @@ export default function PortfolioPreview({
     if (statsInView) {
       const statsElements = document.querySelectorAll('.stat-animate-count');
       statsElements.forEach(el => {
-         if (document.activeElement === el) return; 
-         const target = parseInt((el as HTMLElement).dataset.target || "0", 10);
-         const suffix = (el as HTMLElement).dataset.suffix || "";
-         const duration = 2000;
-         const start = performance.now();
-         const step = (now: number) => {
-            if (document.activeElement === el) return; 
-            const progress = Math.min((now - start) / duration, 1);
-            el.textContent = Math.round(progress * target).toString();
-            if (progress < 1) frameIds.push(requestAnimationFrame(step));
-            else el.textContent = target.toString() + suffix;
-         };
-         frameIds.push(requestAnimationFrame(step));
+        if (document.activeElement === el) return;
+        const target = parseInt((el as HTMLElement).dataset.target || "0", 10);
+        const suffix = (el as HTMLElement).dataset.suffix || "";
+        const duration = 2000;
+        const start = performance.now();
+        const step = (now: number) => {
+          if (document.activeElement === el) return;
+          const progress = Math.min((now - start) / duration, 1);
+          el.textContent = Math.round(progress * target).toString();
+          if (progress < 1) frameIds.push(requestAnimationFrame(step));
+          else el.textContent = target.toString() + suffix;
+        };
+        frameIds.push(requestAnimationFrame(step));
       });
     }
     return () => {
-       frameIds.forEach(cancelAnimationFrame);
+      frameIds.forEach(cancelAnimationFrame);
     };
   }, [statsInView]);
 
@@ -698,23 +700,23 @@ export default function PortfolioPreview({
 
                     <div ref={statsRef} className="flex flex-col sm:flex-row items-stretch justify-center gap-3 sm:gap-6 lg:gap-8 mt-12 md:mt-15 mb-2 w-full flex-wrap">
                       {stats.map((item, i) => (
-                          <div
-                            key={i}
-                            className="portfolio-stat-card flex-1 min-w-[120px] sm:min-w-[160px] max-w-full sm:max-w-[280px] mx-auto sm:mx-0 bg-white py-4 sm:py-5 h-auto px-4 rounded-lg shadow-md flex flex-col items-center justify-center text-gray-700 transition transform hover:-translate-y-2 hover:shadow-xl text-center"
-                            style={{ animationDelay: `${i * 110}ms` }}
-                          >
-                          <h5 
+                        <div
+                          key={i}
+                          className="portfolio-stat-card flex-1 min-w-[120px] sm:min-w-[160px] max-w-full sm:max-w-[280px] mx-auto sm:mx-0 bg-white py-4 sm:py-5 h-auto px-4 rounded-lg shadow-md flex flex-col items-center justify-center text-gray-700 transition transform hover:-translate-y-2 hover:shadow-xl text-center"
+                          style={{ animationDelay: `${i * 110}ms` }}
+                        >
+                          <h5
                             className="text-2xl font-bold stat-animate-count"
                             suppressContentEditableWarning
                             data-target={item.value}
                             data-suffix={item.suffix}
                             onInput={(e) => {
-                               const text = e.currentTarget.textContent || "";
-                               const match = text.match(/(\d+)(.*)/);
-                               if (match) {
-                                  e.currentTarget.dataset.target = match[1];
-                                  e.currentTarget.dataset.suffix = match[2];
-                               }
+                              const text = e.currentTarget.textContent || "";
+                              const match = text.match(/(\d+)(.*)/);
+                              if (match) {
+                                e.currentTarget.dataset.target = match[1];
+                                e.currentTarget.dataset.suffix = match[2];
+                              }
                             }}
                           >
                             {item.value}{item.suffix}
@@ -1094,9 +1096,16 @@ export default function PortfolioPreview({
 
 
                     <div
-                      id="projects-slider"
+                      id={PORTFOLIO_PROJECTS_SLIDER_ID}
+                      ref={projectsSliderRef}
+                      data-portfolio-projects-slider="true"
                       className="w-full overflow-x-auto flex gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden scroll-smooth"
-                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                      style={{
+                        scrollbarWidth: "none",
+                        msOverflowStyle: "none",
+                        WebkitOverflowScrolling: "touch",
+                        touchAction: "pan-x",
+                      }}
                     >
                       {[
                         {
@@ -1159,9 +1168,14 @@ export default function PortfolioPreview({
 
                     <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-4 sm:mt-6 w-full relative px-4 sm:px-8">
                       <button
-                        onClick={() => {
-                          const slider = document.getElementById('projects-slider');
-                          if (slider) slider.scrollBy({ left: -280, behavior: 'smooth' });
+                        type="button"
+                        data-slider-nav="prev"
+                        data-slider-target={PORTFOLIO_PROJECTS_SLIDER_ID}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const slider = projectsSliderRef.current;
+                          if (slider) scrollPortfolioProjectsSlider(slider, -1);
                         }}
                         className="flex items-center justify-center p-2 group hover:opacity-70 transition-opacity cursor-pointer"
                         aria-label="Slide Left"
@@ -1171,9 +1185,14 @@ export default function PortfolioPreview({
                         </svg>
                       </button>
                       <button
-                        onClick={() => {
-                          const slider = document.getElementById('projects-slider');
-                          if (slider) slider.scrollBy({ left: 280, behavior: 'smooth' });
+                        type="button"
+                        data-slider-nav="next"
+                        data-slider-target={PORTFOLIO_PROJECTS_SLIDER_ID}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const slider = projectsSliderRef.current;
+                          if (slider) scrollPortfolioProjectsSlider(slider, 1);
                         }}
                         className="flex items-center justify-center p-2 group hover:opacity-70 transition-opacity cursor-pointer"
                         aria-label="Slide Right"

@@ -8,6 +8,7 @@ import StorefrontPreview from "./StorefrontPreview";
 import type { BlockData } from "../buttonblock/types";
 import type { VideoBlockData } from "../videoblock/types";
 import type { TextBlockState, TextEditorTarget, TextStyles, TextTemplateType } from "./types";
+import { injectPortfolioProjectsSliderNavAttributes } from "@/lib/portfolioProjectsSlider";
  
 const TEXTBLOCK_PREVIEW_STORAGE_KEY = "stackly-textblock-preview-html";
  
@@ -178,7 +179,8 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
     previewClone?.querySelectorAll(".editable-text-active").forEach((element) => element.classList.remove("editable-text-active"));
     previewClone?.querySelectorAll("[data-builder-chrome='true']").forEach((element) => element.remove());
     previewClone?.querySelector("[data-textblock-canvas]")?.removeAttribute("class");
- 
+    if (previewClone) injectPortfolioProjectsSliderNavAttributes(previewClone);
+
     window.localStorage.setItem(TEXTBLOCK_PREVIEW_STORAGE_KEY, previewClone?.innerHTML ?? "");
     window.open(assetPath("/blockpages/preview/"), "_blank", "noopener,noreferrer");
   };
