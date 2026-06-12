@@ -11,8 +11,6 @@ import { FaBars, FaChevronDown, FaRightFromBracket, FaUser, FaXmark } from "reac
 
 const START_BLOGGING_HREF = "/page-not-found";
 
-type BlogPreviewMode = "preview" | "desktop" | "tablet" | "mobile";
-
 function scrollToBlogSection(sectionId: string) {
   document.getElementById(sectionId)?.scrollIntoView({
     behavior: "smooth",
@@ -574,7 +572,7 @@ const hireProfessionalDetails = {
 export default function BlogPage() {
   const [openFaq, setOpenFaq] = useState(0);
   const [hireMoreOpen, setHireMoreOpen] = useState(false);
-  const [previewMode, setPreviewMode] = useState<BlogPreviewMode>("preview");
+  const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const canvasScrollRef = useRef<HTMLDivElement | null>(null);
 
   return (
@@ -587,37 +585,28 @@ export default function BlogPage() {
             {/* FLOATING DEVICE TOOLBAR */}
             <div className="fixed z-[100] transition-all duration-500 ease-in-out shrink-0 bottom-6 left-1/2 -translate-x-1/2">
               <div className="blog-device-toolbar-inner flex items-center gap-2 bg-white rounded-full border border-[#E5E7EB] shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-3 py-1.5 @max-[340px]:p-1 @max-[340px]:px-2 @max-[340px]:gap-1">
-                 <button
-                   type="button"
-                   onClick={() => setPreviewMode("preview")}
-                   className={`w-9 h-9 flex items-center justify-center rounded-full bg-white border shadow-sm transition ${
-                     previewMode === "preview"
-                       ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold"
-                       : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"
-                   }`}
-                   title="Preview"
-                 >
+                 <Link href="/landing#templates" className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-100 shadow-sm hover:shadow-md text-[#06224C] transition" title="Preview">
                     <FaEye size={14} />
-                 </button>
+                 </Link>
                  <div className="w-px h-6 bg-gray-200 mx-0.5"></div>
-                 <button type="button" onClick={() => setPreviewMode("desktop")} className={`w-9 h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${previewMode === "desktop" ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold" : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"}`} title="Desktop View">
+                 <button onClick={() => setDeviceMode("desktop")} className={`w-9 h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${deviceMode === "desktop" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Desktop View">
                     <FaLaptop size={14} />
                  </button>
-                 <button type="button" onClick={() => setPreviewMode("tablet")} className={`w-9 h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${previewMode === "tablet" ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold" : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"}`} title="Tablet View">
+                 <button onClick={() => setDeviceMode("tablet")} className={`w-9 h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${deviceMode === "tablet" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Tablet View">
                     <FaTabletAlt size={14} />
                  </button>
-                 <button type="button" onClick={() => setPreviewMode("mobile")} className={`w-9 h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${previewMode === "mobile" ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold" : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"}`} title="Mobile View">
+                 <button onClick={() => setDeviceMode("mobile")} className={`w-9 h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition ${deviceMode === "mobile" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Mobile View">
                     <FaMobileAlt size={14} />
                  </button>
               </div>
             </div>
 
             {/* Canvas Box */}
-            <div ref={canvasScrollRef} className={`flex-1 overflow-visible min-w-0 relative z-0 transition-colors duration-300 ${previewMode === "tablet" || previewMode === "mobile" ? "bg-gray-200/50 p-2 @@min-[640px]:p-4 rounded-xl" : ""}`}>
+            <div ref={canvasScrollRef} className={`flex-1 overflow-visible min-w-0 relative z-0 transition-colors duration-300 ${deviceMode !== "desktop" ? "bg-gray-200/50 p-2 @@min-[640px]:p-4 rounded-xl" : ""}`}>
               <div className={`@container mx-auto w-full min-h-[530px] bg-[#F2F2F2] rounded-xl border-2 border-gray-300 flex flex-col relative overflow-hidden transition-all duration-500 ease-in-out ${
-                previewMode === "mobile"
+                deviceMode === "mobile"
                   ? "max-w-[375px] shadow-2xl"
-                  : previewMode === "tablet"
+                  : deviceMode === "tablet"
                     ? "max-w-[768px] shadow-2xl"
                     : "max-w-full"
               }`}>

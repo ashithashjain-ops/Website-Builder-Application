@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Footer from "@/components/Footer";
@@ -127,10 +128,9 @@ type BuyPreviewControl = "preview" | BuyPreviewDevice;
 const BUY_PREVIEW_QUERY_KEY = "preview";
 
 const buyPreviewFrames: Record<
-  BuyPreviewControl,
+  BuyPreviewDevice,
   { label: string; width: string; maxWidth: number; height: number }
 > = {
-  preview: { label: "Preview", width: "100%", maxWidth: 1440, height: 1200 },
   desktop: { label: "Desktop", width: "100%", maxWidth: 1440, height: 1200 },
   tablet: { label: "Tablet", width: "820px", maxWidth: 820, height: 1180 },
   mobile: { label: "Mobile", width: "390px", maxWidth: 390, height: 844 },
@@ -283,7 +283,8 @@ export default function ECommercePage() {
   const searchParams = useSearchParams();
   const isEmbeddedPreview = searchParams.get(BUY_PREVIEW_QUERY_KEY) === "embed";
 
-  const [previewMode, setPreviewMode] = useState<BuyPreviewControl>("preview");
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<BuyPreviewDevice>("desktop");
 
   const [activeProductStart, setActiveProductStart] = useState(0);
   const [showAllProducts, setShowAllProducts] = useState(false);
@@ -754,14 +755,14 @@ export default function ECommercePage() {
   const previewSrc = routePath(
     previewQuery ? `${pathname}?${previewQuery}` : pathname,
   );
-  const activePreviewFrame = buyPreviewFrames[previewMode];
+  const activePreviewFrame = buyPreviewFrames[previewDevice];
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [iframeHeight, setIframeHeight] = useState<string | number>(activePreviewFrame.height);
 
   useEffect(() => {
     setIframeHeight(activePreviewFrame.height);
-  }, [previewMode, activePreviewFrame.height]);
+  }, [previewDevice, activePreviewFrame.height]);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -979,7 +980,6 @@ export default function ECommercePage() {
              .buyscreen-page .p-6 { padding: 0.75rem !important; }
           }
 
-
           .buyscreen-page button.buyscreen-all-categories-toggle:hover,
           .buyscreen-page button.buyscreen-all-categories-toggle:focus-visible {
             background: #2563eb !important;
@@ -988,7 +988,16 @@ export default function ECommercePage() {
           }
 
           /* Override buttons and container inside product cards to meet specific alignment, sizing, and wrap requirements */
-          .buyscreen-page .buyscreen-product-actions-mobile,
+          .buyscreen-page .buyscreen-product-actions-mobile {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            place-items: center !important;
+            gap: 12px !important;
+            width: 100% !important;
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+          }
           .buyscreen-page .buyscreen-product-hover-actions > div {
             display: flex !important;
             align-items: center !important;
@@ -997,6 +1006,11 @@ export default function ECommercePage() {
             white-space: nowrap !important;
             flex-wrap: nowrap !important;
             overflow: hidden !important;
+          }
+          @media (min-width: 1024px) {
+            .buyscreen-page .buyscreen-product-actions-mobile {
+              display: none !important;
+            }
           }
 
           .buyscreen-page .buyscreen-product-actions-mobile > button,
@@ -1303,8 +1317,8 @@ export default function ECommercePage() {
       <div ref={contentStartRef} className="w-full bg-white pb-12">
 
         <section className="buyscreen-shell bg-white">
-          {!isEmbeddedPreview ? (
-            <div className={`space-y-10 px-4 py-8 sm:space-y-12 sm:px-8 sm:py-10 lg:py-12 ${previewMode === "tablet" || previewMode === "mobile" ? "rounded-xl bg-gray-200/50 p-2 sm:p-4" : ""}`}>
+          {!isEmbeddedPreview && isPreviewOpen ? (
+            <div className="space-y-10 px-4 py-8 sm:space-y-12 sm:px-8 sm:py-10 lg:py-12">
               <section className="overflow-hidden rounded-[1.75rem] border border-[#dbe3ef] bg-[linear-gradient(180deg,#f8fbff_0%,#eaf1f8_100%)] p-3 shadow-[0_20px_60px_rgba(15,35,75,0.12)] sm:p-5">
                 <div
                   className="mx-auto transition-all duration-300"
@@ -1313,7 +1327,7 @@ export default function ECommercePage() {
                     maxWidth: "100%",
                   }}
                 >
-                  <div className={`overflow-hidden rounded-[1.75rem] border bg-white shadow-[0_30px_90px_rgba(15,23,42,0.18)] ${previewMode === "tablet" || previewMode === "mobile" ? "border-gray-300 shadow-2xl" : "border-[#cbd5e1]"}`}>
+                  <div className="overflow-hidden rounded-[1.75rem] border border-[#cbd5e1] bg-white shadow-[0_30px_90px_rgba(15,23,42,0.18)]">
                     <iframe
                       ref={iframeRef}
                       title={`${activePreviewFrame.label} storefront preview`}
@@ -1725,7 +1739,7 @@ export default function ECommercePage() {
                                   backgroundImage: `url('${product.image}')`,
                                 }}
                               />
-                              <div className="buyscreen-product-hover-actions pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-1 pb-2 pt-6 transition-all duration-300 opacity-0 invisible translate-y-[10px] group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-focus-within:visible group-focus-within:translate-y-0">
+                              <div className="buyscreen-product-hover-actions pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden justify-center px-1 pb-2 pt-6 opacity-0 transition-opacity duration-200 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 lg:flex">
                                 <div className="pointer-events-auto flex flex-nowrap items-center justify-center gap-[12px] overflow-hidden whitespace-nowrap">
                                   <BuyProductActionButtons
                                     compact={false}
@@ -1738,6 +1752,17 @@ export default function ECommercePage() {
                                   />
                                 </div>
                               </div>
+                            </div>
+                            <div className="buyscreen-product-actions-mobile grid grid-cols-3 place-items-center gap-1 border-t border-[#f3f4f6] px-1 py-1.5 lg:hidden">
+                              <BuyProductActionButtons
+                                compact
+                                isFavorite={favoriteProductIds.includes(product.id)}
+                                onCartClick={() => openLicenseModal(product)}
+                                onFavoriteClick={() => toggleFavorite(product)}
+                                onShareClick={() => {
+                                  void shareProduct(product);
+                                }}
+                              />
                             </div>
                             <div className="buyscreen-product-meta mt-3 flex min-w-0 flex-1 flex-col px-1 pb-1 sm:mt-4">
                               <p className="text-center text-[10px] font-semibold uppercase leading-snug tracking-tight text-[#6b7280] [overflow-wrap:anywhere] sm:text-xs sm:leading-normal sm:tracking-[0.06em] md:tracking-[0.08em]">
@@ -1917,30 +1942,21 @@ export default function ECommercePage() {
           )}
         </section>
       </div>
-      {isEmbeddedPreview && <Footer />}
+      {(!isPreviewOpen || isEmbeddedPreview) && <Footer />}
       {!isEmbeddedPreview && (
         <div className="fixed z-[100] transition-all duration-500 ease-in-out shrink-0 bottom-5 left-1/2 -translate-x-1/2 max-w-[calc(100vw-2rem)] overflow-x-hidden flex-nowrap whitespace-nowrap">
           <div className="flex items-center gap-1.5 sm:gap-2 bg-white rounded-full border border-[#E5E7EB] shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-2.5 py-1 sm:px-3 sm:py-1.5 flex-nowrap whitespace-nowrap shrink-0 overflow-x-hidden">
-             <button
-               type="button"
-               onClick={() => setPreviewMode("preview")}
-               className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm transition shrink-0 ${
-                 previewMode === "preview"
-                   ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold"
-                   : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"
-               }`}
-               title="Preview"
-             >
+             <Link href="/landing#templates" className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border border-gray-100 shadow-sm hover:shadow-md text-[#06224C] transition shrink-0" title="Preview">
                 <FaEye size={14} className="shrink-0" />
-             </button>
+             </Link>
              <div className="w-px h-6 bg-gray-200 mx-0.5 shrink-0"></div>
-             <button type="button" onClick={() => setPreviewMode("desktop")} className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition shrink-0 ${previewMode === "desktop" ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold" : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"}`} title="Desktop View">
+             <button onClick={() => { setPreviewDevice("desktop"); setIsPreviewOpen(true); }} className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition shrink-0 ${isPreviewOpen && previewDevice === "desktop" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Desktop View">
                 <FaLaptop size={14} className="shrink-0" />
              </button>
-             <button type="button" onClick={() => setPreviewMode("tablet")} className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition shrink-0 ${previewMode === "tablet" ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold" : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"}`} title="Tablet View">
+             <button onClick={() => { setPreviewDevice("tablet"); setIsPreviewOpen(true); }} className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition shrink-0 ${isPreviewOpen && previewDevice === "tablet" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Tablet View">
                 <FaTabletAlt size={14} className="shrink-0" />
              </button>
-             <button type="button" onClick={() => setPreviewMode("mobile")} className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition shrink-0 ${previewMode === "mobile" ? "border-[#06224C] ring-2 ring-[#06224C] bg-gray-50 text-[#06224C] font-bold" : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"}`} title="Mobile View">
+             <button onClick={() => { setPreviewDevice("mobile"); setIsPreviewOpen(true); }} className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border shadow-sm hover:shadow-md transition shrink-0 ${isPreviewOpen && previewDevice === "mobile" ? "border-gray-200 ring-2 ring-[#06224C] text-[#06224C]" : "border-gray-100 text-[#06224C]/70"}`} title="Mobile View">
                 <FaMobileAlt size={14} className="shrink-0" />
              </button>
           </div>

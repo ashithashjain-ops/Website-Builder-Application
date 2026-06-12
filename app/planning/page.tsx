@@ -501,7 +501,7 @@ export default function PlanningPage() {
             {planningView === "plans" && (
             <div className="planning-hero-panel rounded-lg bg-gradient-to-br from-slate-50 via-blue-50 to-white px-5 py-8 shadow-sm ring-1 ring-slate-200/80 sm:px-8 sm:py-10 md:px-10">
               <div className="mx-auto w-full max-w-5xl">
-            <h1 className="planning-fade-up mb-4 text-center text-3xl sm:text-4xl font-black uppercase tracking-[0.1em] text-black drop-shadow-sm">
+            <h1 className="planning-fade-up text-center text-3xl font-bold text-slate-950 sm:text-[44px] sm:leading-tight">
               Choose the Best Plan for You
             </h1>
               <p className="planning-fade-up mx-auto mt-4 max-w-2xl text-center text-[13px] font-medium leading-relaxed text-slate-700 sm:text-sm md:text-base">
@@ -678,7 +678,7 @@ export default function PlanningPage() {
                     </button>
                   </div>
                   <div className="text-center">
-                    <h2 className="text-2xl font-black uppercase tracking-[0.1em] text-white">
+                    <h2 className="text-2xl font-bold sm:text-3xl">
                       {isFreeCheckout ? "Activate free plan" : "Pay with Razorpay"}
                     </h2>
                     <p className="mt-2 text-xs text-white/85 sm:text-sm">
@@ -774,7 +774,7 @@ export default function PlanningPage() {
                     </button>
                   </div>
                   <div className="text-center">
-                    <h2 className="text-2xl font-black uppercase tracking-[0.1em] text-white">Invoice Details</h2>
+                    <h2 className="text-2xl font-bold leading-tight sm:text-[36px]">Invoice Details</h2>
                   </div>
                 </div>
                 <div className="min-w-0 space-y-6 px-4 py-6 sm:space-y-8 sm:px-8 sm:py-7">
@@ -785,7 +785,7 @@ export default function PlanningPage() {
                     <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Amount</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.amount}</span></div>
                   </div>
                   <div className="min-w-0 pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
-                    <h3 className="mx-auto mb-4 w-full min-w-0 max-w-2xl text-2xl font-black uppercase tracking-[0.1em] text-white sm:mb-5">Billing Information</h3>
+                    <h3 className="mx-auto mb-4 w-full min-w-0 max-w-2xl text-xl font-semibold sm:mb-5 sm:text-[30px]">Billing Information</h3>
                     <div className="mx-auto w-full min-w-0 max-w-2xl space-y-3 text-xs sm:space-y-4 sm:text-[15px]">
                       <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Name</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.name}</span></div>
                       <div className="planning-invoice-row rounded-lg border border-white/10 bg-white/10 px-3 py-2.5 shadow-sm" style={{ display: "grid", gridTemplateColumns: "96px 14px minmax(0,1fr)", alignItems: "center" }}><span>Email</span><span>:</span><span className="planning-invoice-value break-words">{invoiceData.email}</span></div>
@@ -829,7 +829,7 @@ export default function PlanningPage() {
                   </button>
                 </div>
                 <div className="planning-history-track mx-auto mb-3 flex w-full max-w-[560px] flex-col gap-3 pb-3 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:pb-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.17)" }}>
-                  <h2 className="shrink-0 text-2xl font-black uppercase tracking-[0.1em] text-white">Billing History</h2>
+                  <h2 className="shrink-0 text-xl font-bold leading-tight tracking-[0.2px] sm:text-[34px]">Billing History</h2>
                   <div
                     className="planning-history-filter flex min-h-0 w-full min-w-0 flex-col items-stretch overflow-visible rounded-md bg-white sm:w-auto sm:max-w-none sm:flex-row sm:flex-nowrap sm:shrink-0"
                     style={{ color: "#1f2937", fontSize: 10, lineHeight: 1.2, boxShadow: "0 0 0 1px rgba(15,23,42,0.08)" }}
@@ -915,3 +915,6 @@ export default function PlanningPage() {
     </main>
   );
 }
+
+
+
