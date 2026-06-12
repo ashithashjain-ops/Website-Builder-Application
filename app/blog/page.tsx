@@ -583,7 +583,7 @@ export default function BlogPage() {
         <div className="flex-1 bg-white p-[clamp(0.35rem,2cqw,1.75rem)] flex justify-center min-w-0">
           <div className="w-full max-w-[1200px] relative flex flex-col min-w-0">
             {/* FLOATING DEVICE TOOLBAR */}
-            <div className="fixed z-[100] transition-all duration-500 ease-in-out shrink-0 bottom-6 left-1/2 -translate-x-1/2">
+            <div className="fixed z-[100] transition-all duration-500 ease-in-out shrink-0 bottom-6 left-1/2 -translate-x-1/2 hidden md:block">
               <div className="blog-device-toolbar-inner flex items-center gap-2 bg-white rounded-full border border-[#E5E7EB] shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-3 py-1.5 @max-[340px]:p-1 @max-[340px]:px-2 @max-[340px]:gap-1">
                  <Link href="/landing#templates" className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-100 shadow-sm hover:shadow-md text-[#06224C] transition" title="Preview">
                     <FaEye size={14} />

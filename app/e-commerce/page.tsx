@@ -1944,7 +1944,7 @@ export default function ECommercePage() {
       </div>
       {(!isPreviewOpen || isEmbeddedPreview) && <Footer />}
       {!isEmbeddedPreview && (
-        <div className="fixed z-[100] transition-all duration-500 ease-in-out shrink-0 bottom-5 left-1/2 -translate-x-1/2 max-w-[calc(100vw-2rem)] overflow-x-hidden flex-nowrap whitespace-nowrap">
+        <div className="fixed z-[100] transition-all duration-500 ease-in-out shrink-0 bottom-5 left-1/2 -translate-x-1/2 max-w-[calc(100vw-2rem)] overflow-x-hidden flex-nowrap whitespace-nowrap hidden md:block">
           <div className="flex items-center gap-1.5 sm:gap-2 bg-white rounded-full border border-[#E5E7EB] shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-2.5 py-1 sm:px-3 sm:py-1.5 flex-nowrap whitespace-nowrap shrink-0 overflow-x-hidden">
              <Link href="/landing#templates" className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white border border-gray-100 shadow-sm hover:shadow-md text-[#06224C] transition shrink-0" title="Preview">
                 <FaEye size={14} className="shrink-0" />

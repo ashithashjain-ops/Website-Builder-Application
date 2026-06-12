@@ -183,14 +183,14 @@ export default function Portfolioedit() {
   const portfolioNavHidden = innerNavHidden && !innerMobileMenuOpen && !prefersReducedMotion;
 
   return (
-    <main className="site-page flex flex-col min-h-screen bg-white w-full max-w-full overflow-x-hidden pb-24 @lg:pb-0">
+    <main className="site-page flex flex-col min-h-screen bg-white w-full max-w-full overflow-x-hidden pb-0 md:pb-24 @lg:pb-0">
       {/* ====== MAIN BUILDER LAYOUT ====== */}
       <div className="flex flex-1 overflow-x-hidden max-w-full w-full">
         {/* MAIN CONTENT */}
         <div className="flex-1 bg-white p-4 @md:p-7 flex justify-center min-w-0 overflow-x-hidden max-w-full w-full">
           <div className="w-full max-w-[1200px] relative flex flex-col min-w-0 overflow-x-hidden">
             {/* FIXED/FLOATING PREVIEW TOOLBAR */}
-            <div className="fixed z-[100] bottom-6 left-1/2 -translate-x-1/2 @lg:top-[50%] @lg:bottom-auto @lg:-translate-y-1/2 shrink-0">
+            <div className="fixed z-[100] bottom-6 left-1/2 -translate-x-1/2 @lg:top-[50%] @lg:bottom-auto @lg:-translate-y-1/2 shrink-0 hidden md:block">
               <div className="flex items-center gap-1.5 sm:gap-2 bg-white rounded-full border border-[#E5E7EB] shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-3 py-1.5">
                  <button
                    onClick={() => setPreviewMode("preview")}
