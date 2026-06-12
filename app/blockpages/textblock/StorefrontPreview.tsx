@@ -319,7 +319,27 @@ export default function StorefrontPreview() {
   const toastTimerRef = useRef<number | null>(null);
   const contentStartRef = useRef<HTMLDivElement | null>(null);
   const allCategoriesWrapRef = useRef<HTMLDivElement | null>(null);
+  const allCategoriesCloseTimerRef = useRef<number | null>(null);
   const userMenuWrapRef = useRef<HTMLDivElement | null>(null);
+
+  const clearAllCategoriesCloseTimer = () => {
+    if (allCategoriesCloseTimerRef.current !== null) {
+      window.clearTimeout(allCategoriesCloseTimerRef.current);
+      allCategoriesCloseTimerRef.current = null;
+    }
+  };
+
+  const handleAllCategoriesMouseEnter = () => {
+    clearAllCategoriesCloseTimer();
+    setIsAllCategoriesDropdownOpen(true);
+  };
+
+  const handleAllCategoriesMouseLeave = () => {
+    clearAllCategoriesCloseTimer();
+    allCategoriesCloseTimerRef.current = window.setTimeout(() => {
+      setIsAllCategoriesDropdownOpen(false);
+    }, 200);
+  };
   const featuredProductsRef = useRef<HTMLElement | null>(null);
   const heroContentRef = useRef<HTMLDivElement | null>(null);
   const topHeaderBarRef = useRef<HTMLDivElement | null>(null);
@@ -530,6 +550,7 @@ export default function StorefrontPreview() {
       if (toastTimerRef.current) {
         window.clearTimeout(toastTimerRef.current);
       }
+      clearAllCategoriesCloseTimer();
     };
   }, []);
 
@@ -736,7 +757,7 @@ export default function StorefrontPreview() {
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
 
   return (
-    <main className="buyscreen-page min-h-[100dvh] overflow-x-hidden bg-[#f5f7fb] text-[#111827]">
+    <main className="buyscreen-page flex min-h-[100dvh] w-full max-w-full min-w-0 flex-col overflow-visible bg-[#f5f7fb] text-[#111827]">
       <style dangerouslySetInnerHTML={{
         __html: `
           @media (max-width: 1024px) {
@@ -765,7 +786,7 @@ export default function StorefrontPreview() {
             .buyscreen-page button { font-size: clamp(0.75rem, 2vw + 0.25rem, 1rem) !important; }
 
             /* 4. Images */
-            .buyscreen-page img, .buyscreen-page svg {
+            .buyscreen-page img, .buyscreen-page svg:not(.buyscreen-header-action-icon) {
               max-width: 100% !important;
               height: auto !important;
               object-fit: contain !important;
@@ -1285,7 +1306,7 @@ export default function StorefrontPreview() {
           </button>
         </div>
 
-        <section className="buyscreen-shell overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_28px_90px_rgba(15,35,75,0.13)]">
+        <section className="buyscreen-shell rounded-[2rem] border border-white/80 bg-white shadow-[0_28px_90px_rgba(15,35,75,0.13)]">
           <header className="buyscreen-header flex flex-col gap-4 border-b border-[#e7edf5] bg-white/95 px-4 py-4 sm:px-8 sm:py-5 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:py-4">
             <div className="flex shrink-0 items-center justify-between lg:justify-start">
               <span className="inline-flex items-center gap-2 text-base font-black tracking-tight text-[#06224C] sm:text-lg">
@@ -1323,7 +1344,7 @@ export default function StorefrontPreview() {
               <div className="buyscreen-header-trailing flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-3">
                 <button type="button" className="buyscreen-cart-trigger flex items-center gap-2 rounded-md px-2 py-1" onClick={() => setIsCartOpen(true)}>
                   <span className="relative shrink-0">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="buyscreen-header-action-icon" aria-hidden>
                       <path d="M3 4h2l1.6 9.2a1 1 0 0 0 1 .8H18a1 1 0 0 0 1-.8L20.6 7H7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       <circle cx="10" cy="19" r="1.5" fill="currentColor" />
                       <circle cx="17" cy="19" r="1.5" fill="currentColor" />
@@ -1341,8 +1362,8 @@ export default function StorefrontPreview() {
                 </button>
                 <button type="button" className="buyscreen-cart-trigger flex items-center gap-2 rounded-md px-2 py-1" onClick={() => setIsFavoritesOpen(true)}>
                   <span className="relative shrink-0">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                      <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733C11.285 5.876 9.623 4.75 7.688 4.75 5.099 4.75 3 6.765 3 9.25c0 7.22 9 12 9 12s9-4.78 9-12z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="buyscreen-header-action-icon" aria-hidden>
+                      <path d="M19.5 12.572l-7.5 7.428-7.5-7.428a5 5 0 1 1 7.5-6.566 5 5 0 1 1 7.5 6.572" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     {favoriteProducts.length > 0 ? (
                       <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ff664f] px-1 text-[10px] font-bold leading-none text-white">
@@ -1364,7 +1385,7 @@ export default function StorefrontPreview() {
                     className="buyscreen-user-summary buyscreen-user-trigger flex min-w-0 items-center gap-2 rounded-md border-0 bg-transparent px-2 py-1 text-left text-inherit"
                     onClick={() => setIsUserMenuOpen((prev) => !prev)}
                   >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0" aria-hidden>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="buyscreen-header-action-icon shrink-0" aria-hidden>
                       <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.8" />
                       <path d="M5.8 19.2c1.1-2.5 3.3-3.8 6.2-3.8s5.1 1.3 6.2 3.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                     </svg>
@@ -1420,8 +1441,8 @@ export default function StorefrontPreview() {
                     key={item.label}
                     ref={allCategoriesWrapRef}
                     className="buyscreen-all-categories-wrap relative shrink-0"
-                    onMouseEnter={() => setIsAllCategoriesDropdownOpen(true)}
-                    onMouseLeave={() => setIsAllCategoriesDropdownOpen(false)}
+                    onMouseEnter={handleAllCategoriesMouseEnter}
+                    onMouseLeave={handleAllCategoriesMouseLeave}
                     onFocus={() => setIsAllCategoriesDropdownOpen(true)}
                     onBlur={(e) => {
                       if (!e.currentTarget.contains(e.relatedTarget)) {
@@ -1605,11 +1626,11 @@ export default function StorefrontPreview() {
                     </button>
                   </div>
                 </div>
-                <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+                <div className="buyscreen-deal-highlights grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
                   {buyDealHighlights.map((item) => (
-                    <div key={item.label} className="flex-1 min-w-[70px] sm:min-w-[90px] rounded-2xl border border-white/15 bg-white/10 p-3 sm:p-4 text-center backdrop-blur">
-                      <p className="text-xl break-words [overflow-wrap:anywhere] font-black sm:text-2xl">{item.value}</p>
-                      <p className="mt-1 break-words [overflow-wrap:anywhere] text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.16em] text-white/65">{item.label}</p>
+                    <div key={item.label} className="buyscreen-deal-highlight-card rounded-2xl border border-white/15 bg-white/10 p-3 text-center backdrop-blur sm:p-4">
+                      <p className="text-xl font-black sm:text-2xl">{item.value}</p>
+                      <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/65 sm:text-[10px]">{item.label}</p>
                     </div>
                   ))}
                 </div>

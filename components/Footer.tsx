@@ -304,7 +304,7 @@ export default function Footer() {
 
             <motion.div className="col-span-2 mt-2 flex flex-col items-start md:col-span-1 md:mt-0" variants={footerItem}>
               <Link href="../landing" className="mb-4 inline-flex aspect-[2/1] min-w-[90px] items-center justify-center rounded-[60%] bg-white px-4 py-3 shadow-[0_14px_32px_rgba(255,255,255,0.16)] transition duration-300 hover:-translate-y-0.5 hover:scale-105">
-                <img src={assetPath("/stackly-logo.webp")} alt="Stackly Logo" className="h-5 w-auto object-contain" />
+                <img src={assetPath("/stackly-logo.webp")} alt="Stackly Logo" className="stackly-footer-logo h-5 w-auto object-contain" />
               </Link>
               <p className="mb-2 max-w-[215px] text-[11px] font-bold uppercase leading-relaxed tracking-tight text-white/70">
                 The <span className="text-blue-400">NO-CODE</span> website builder for everyone. Powered by AWS.

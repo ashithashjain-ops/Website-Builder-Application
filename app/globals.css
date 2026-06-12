@@ -50,7 +50,8 @@ body {
   overflow-y: visible;
 }
 
-.stackly-site-layout > main.blog-page {
+.stackly-site-layout > main.blog-page,
+.stackly-site-layout > main.buyscreen-page {
   overflow: visible;
 }
 
@@ -72,7 +73,8 @@ body:has(main.landing-page) {
 html:has(main.landing-page),
 html:has(main.blog-page),
 html:has(main.site-page),
-html:has(main.planning-page) {
+html:has(main.planning-page),
+html:has(main.buyscreen-page) {
   scrollbar-color: #8fb8e8 #071936;
   scrollbar-width: thin;
 }
@@ -88,8 +90,10 @@ main.landing-page {
 /* Stackly navbar pages — one body scroll, no nested page scroll */
 body:has(main.blog-page),
 body:has(main.site-page),
-body:has(main.planning-page) {
+body:has(main.planning-page),
+body:has(main.buyscreen-page) {
   background: #ffffff;
+  overflow: visible;
 }
 
 main.site-page,
@@ -110,21 +114,24 @@ main.site-page {
 html:has(main.landing-page)::-webkit-scrollbar,
 html:has(main.blog-page)::-webkit-scrollbar,
 html:has(main.site-page)::-webkit-scrollbar,
-html:has(main.planning-page)::-webkit-scrollbar {
+html:has(main.planning-page)::-webkit-scrollbar,
+html:has(main.buyscreen-page)::-webkit-scrollbar {
   width: 12px;
 }
 
 html:has(main.landing-page)::-webkit-scrollbar-track,
 html:has(main.blog-page)::-webkit-scrollbar-track,
 html:has(main.site-page)::-webkit-scrollbar-track,
-html:has(main.planning-page)::-webkit-scrollbar-track {
+html:has(main.planning-page)::-webkit-scrollbar-track,
+html:has(main.buyscreen-page)::-webkit-scrollbar-track {
   background: linear-gradient(180deg, #071936 0%, #0a2357 52%, #071936 100%);
 }
 
 html:has(main.landing-page)::-webkit-scrollbar-thumb,
 html:has(main.blog-page)::-webkit-scrollbar-thumb,
 html:has(main.site-page)::-webkit-scrollbar-thumb,
-html:has(main.planning-page)::-webkit-scrollbar-thumb {
+html:has(main.planning-page)::-webkit-scrollbar-thumb,
+html:has(main.buyscreen-page)::-webkit-scrollbar-thumb {
   min-height: 64px;
   border: 3px solid #071936;
   border-radius: 999px;
@@ -135,7 +142,8 @@ html:has(main.planning-page)::-webkit-scrollbar-thumb {
 html:has(main.landing-page)::-webkit-scrollbar-thumb:hover,
 html:has(main.blog-page)::-webkit-scrollbar-thumb:hover,
 html:has(main.site-page)::-webkit-scrollbar-thumb:hover,
-html:has(main.planning-page)::-webkit-scrollbar-thumb:hover {
+html:has(main.planning-page)::-webkit-scrollbar-thumb:hover,
+html:has(main.buyscreen-page)::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #eff6ff 0%, #93c5fd 45%, #2563eb 100%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 24px rgba(96, 165, 250, 0.55);
 }
@@ -262,21 +270,26 @@ body:has(main.planning-page) {
   }
 }
 
-/* E-Commerce page (/e-commerce): keep page background pure white */
+/* E-Commerce page (/e-commerce): one html scroll like blog — no nested page scroll */
 html:has(main.buyscreen-page),
 body:has(main.buyscreen-page) {
   background-color: #ffffff;
 }
 
-
 main.buyscreen-page {
-  overflow-x: clip;
-  overflow-y: visible;
+  display: block;
+  overflow: visible;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 0;
 }
 
 .buyscreen-shell {
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   animation: buyscreen-store-rise 0.55s ease both;
 }
 
@@ -467,6 +480,15 @@ main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
   box-shadow: inset 0 0 0 1px #94a3b8 !important;
   outline: none !important;
 }
+.buyscreen-header-action-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  max-width: 18px;
+  flex-shrink: 0;
+  overflow: visible;
+}
 .buyscreen-user-menu-wrap {
   position: relative;
 }
@@ -539,17 +561,37 @@ main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
     scrollbar-width: thin;
     -webkit-overflow-scrolling: touch;
   }
+  .buyscreen-categories,
+  .buyscreen-categories-list {
+    overflow: visible !important;
+  }
+  nav.buyscreen-categories {
+    position: relative;
+    z-index: 50;
+  }
+  .buyscreen-all-categories-wrap {
+    padding-bottom: 12px;
+    margin-bottom: -12px;
+  }
   .buyscreen-all-categories-dropdown {
     position: absolute;
-    top: calc(100% + 10px);
+    top: 100%;
     left: 0;
-    z-index: 40;
+    z-index: 60;
     min-width: 240px;
     border: 1px solid #d1d5db;
     border-radius: 12px;
     background: #fff;
     box-shadow: 0 12px 28px rgba(2, 6, 23, 0.18);
     overflow: hidden;
+  }
+  .buyscreen-all-categories-dropdown::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -12px;
+    height: 12px;
   }
 }
 .buyscreen-hero-content h1,
@@ -625,6 +667,21 @@ main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
   border-radius: 9999px;
   background: radial-gradient(circle, rgba(254, 243, 199, 0.18), transparent 64%);
   animation: buyscreen-soft-pulse 5s ease-in-out infinite reverse;
+}
+.buyscreen-deal-highlights {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+}
+@media (min-width: 640px) {
+  .buyscreen-deal-highlights {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+.buyscreen-deal-highlight-card {
+  min-width: 0;
 }
 .buyscreen-category-card img {
   filter: drop-shadow(0 18px 24px rgba(15, 35, 75, 0.16));
@@ -768,9 +825,6 @@ main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
   }
   .buyscreen-hero-content::-webkit-scrollbar {
     display: none;
-  }
-  .buyscreen-page {
-    overflow-x: hidden;
   }
   .buyscreen-shell {
     border-radius: 0.375rem;
@@ -924,13 +978,16 @@ main.buyscreen-page button.buyscreen-user-trigger:focus-visible {
   }
   .buyscreen-all-categories-wrap {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
   }
   .buyscreen-all-categories-toggle {
     width: 100%;
     justify-content: space-between;
   }
   .buyscreen-all-categories-dropdown {
-    margin-top: 0.4rem;
+    margin-top: 0;
     width: 100%;
     border: 1px solid #d1d5db;
     border-radius: 10px;
@@ -3060,6 +3117,13 @@ body.auth-visible {
 .stackly-footer-link:hover::after,
 .stackly-footer-link:focus-visible::after {
   transform: scaleX(1);
+}
+
+.stackly-footer-logo {
+  width: auto !important;
+  max-width: none !important;
+  height: 1.25rem !important;
+  object-fit: contain !important;
 }
 
 .stackly-modal-pop {

@@ -373,7 +373,7 @@ export default function SignupPage() {
           form: undefined,
         }));
       } else {
-        setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
       }
     };
 
@@ -562,7 +562,7 @@ export default function SignupPage() {
       e.preventDefault();
       setCountryHighlightIndex(SIGNUP_PHONE_COUNTRIES.length - 1);
     }
-  };
+    };
 
   const handleSignup = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -958,7 +958,7 @@ export default function SignupPage() {
 
                 <div className="pt-0.5 pb-1 sm:pt-1 sm:pb-3 lg:pb-2">
                     <AuthGoogleButton intent="signup" label="Sign up with Google" />
-                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -614,6 +614,64 @@ export default function Portfolioedit() {
                       transform: none;
                     }
                   }
+
+                  .portfolio-services-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+                  }
+
+                  .portfolio-service-card h4,
+                  .portfolio-service-card p {
+                    overflow-wrap: anywhere;
+                    word-break: normal;
+                  }
+
+                  .process-card {
+                    width: 100%;
+                    min-width: 0;
+                    max-width: 100%;
+                    box-sizing: border-box;
+                    word-break: normal;
+                    overflow-wrap: break-word;
+                    hyphens: none;
+                  }
+
+                  .process-card-title {
+                    white-space: nowrap;
+                    word-break: normal;
+                    overflow-wrap: normal;
+                  }
+
+                  .process-card-desc {
+                    line-height: 1.6;
+                    word-break: normal;
+                    overflow-wrap: break-word;
+                    hyphens: none;
+                  }
+
+                  @media (min-width: 768px) and (max-width: 1024px) {
+                    .process-grid {
+                      display: flex !important;
+                      flex-direction: column !important;
+                      gap: 16px !important;
+                      width: 100% !important;
+                    }
+
+                    .process-card {
+                      width: 100% !important;
+                      min-width: 0 !important;
+                      max-width: 100% !important;
+                      flex: none !important;
+                    }
+
+                    .portfolio-shell,
+                    .portfolio-hero,
+                    .site-page {
+                      max-width: 100% !important;
+                      overflow-x: hidden !important;
+                      box-sizing: border-box !important;
+                    }
+                  }
                 `}</style>
 
 
@@ -772,7 +830,7 @@ export default function Portfolioedit() {
                     </h3>
                   </div>
 
-                  <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4 gap-4 @sm:gap-6 max-w-7xl mx-auto min-w-0 max-w-full">
+                  <div className="grid portfolio-services-grid gap-4 @sm:gap-6 max-w-7xl mx-auto min-w-0 max-w-full">
                     {[
                       { id: "01", title: "Web Development", desc: "Responsive, clean websites with purposeful layouts and polished front-end details." },
                       { id: "02", title: "UI / UX DESIGN", desc: "User journeys, wireframes, visual systems, and prototypes that make products easier to use." },
@@ -817,7 +875,7 @@ export default function Portfolioedit() {
                   <div className="overflow-hidden rounded-2xl bg-[#06224C] px-5 py-8 @sm:px-8 @md:px-10 @md:py-12 text-white shadow-xl relative">
                     <div className="absolute right-[-5rem] top-[-5rem] h-56 w-56 rounded-full bg-[#63e5ff]/20 blur-3xl"></div>
                     <div className="absolute left-[-4rem] bottom-[-5rem] h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
-                    <div className="relative grid grid-cols-1 @lg:grid-cols-[0.9fr_1.4fr] gap-8 @lg:gap-12 items-start min-w-0 max-w-full">
+                    <div className="relative grid grid-cols-1 @min-[1025px]:grid-cols-[0.9fr_1.4fr] gap-8 @min-[1025px]:gap-12 items-start min-w-0 max-w-full">
                       <div className={`portfolio-reveal min-w-0 max-w-full break-words ${processInView ? "is-visible" : ""}`}>
                         <div className="flex flex-wrap items-center gap-2 mb-4 min-w-0 max-w-full">
                           <h2 className="text-[clamp(1.5rem,4cqi,2.25rem)] @md:text-4xl font-extrabold tracking-tight min-w-0 break-words">Design</h2>
@@ -828,18 +886,18 @@ export default function Portfolioedit() {
                         </p>
                       </div>
 
-                      <div className="grid grid-cols-1 @lg:grid-cols-3 gap-4 min-w-0 max-w-full">
+                      <div className="grid grid-cols-1 @min-[1025px]:grid-cols-3 gap-4 min-w-0 max-w-full w-full process-grid">
                         {processSteps.map((item, i) => (
                           <div
                             key={item.step}
-                            className={`portfolio-reveal rounded-xl border border-white/15 bg-white/10 p-5 backdrop-blur transition hover:-translate-y-1 hover:bg-white/15 min-w-0 max-w-full break-words overflow-hidden ${processInView ? "is-visible" : ""}`}
+                            className={`portfolio-reveal rounded-xl border border-white/15 bg-white/10 p-5 backdrop-blur transition hover:-translate-y-1 hover:bg-white/15 min-w-0 max-w-full process-card ${processInView ? "is-visible" : ""}`}
                             style={{ transitionDelay: `${i * 120}ms` }}
                           >
                             <div className="mb-5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#63e5ff] text-sm font-extrabold text-[#06224C]">
                               {item.step}
                             </div>
-                            <h3 className="mb-2 text-lg font-extrabold min-w-0 break-words">{item.title}</h3>
-                            <p className="text-sm leading-relaxed text-blue-100 min-w-0 break-words">{item.desc}</p>
+                            <h3 className="mb-2 text-lg font-extrabold min-w-0 process-card-title">{item.title}</h3>
+                            <p className="text-sm text-blue-100 min-w-0 process-card-desc">{item.desc}</p>
                           </div>
                         ))}
                       </div>
