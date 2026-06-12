@@ -183,7 +183,7 @@ export default function Portfolioedit() {
   const portfolioNavHidden = innerNavHidden && !innerMobileMenuOpen && !prefersReducedMotion;
 
   return (
-    <main className="site-page flex flex-col min-h-screen bg-white w-full max-w-full overflow-x-hidden">
+    <main className="site-page flex flex-col min-h-screen bg-white w-full max-w-full overflow-x-hidden pb-24 @lg:pb-0">
       {/* ====== MAIN BUILDER LAYOUT ====== */}
       <div className="flex flex-1 overflow-x-hidden max-w-full w-full">
         {/* MAIN CONTENT */}
@@ -263,30 +263,34 @@ export default function Portfolioedit() {
                 >
 
                   {/* ✅ MOBILE LAYOUT */}
-                  <div className="flex w-full items-center justify-between @3xl:hidden relative">
+                  <div className="flex w-full items-center justify-between @3xl:hidden relative px-1">
 
                     {/* LEFT → Logo */}
-                    <Link
-                      href="/landing"
-                      className="flex h-7 w-[64px] @sm:h-8 @sm:w-[80px] items-center justify-center overflow-hidden rounded-[50%] bg-white px-1 @sm:px-2 shrink-0 z-10"
-                    >
-                      <Image
-                        src={assetPath("/stackly-logo.webp")}
-                        alt="Stackly logo"
-                        width={80}
-                        height={24}
-                        className="h-[12px] @sm:h-[14px] object-contain"
-                        unoptimized
-                      />
-                    </Link>
+                    <div className="flex items-center justify-start w-1/3 shrink-0">
+                      <Link
+                        href="/landing"
+                        className="flex h-7 w-[64px] @sm:h-8 @sm:w-[80px] items-center justify-center overflow-hidden rounded-[50%] bg-white px-1 @sm:px-2 shrink-0"
+                      >
+                        <Image
+                          src={assetPath("/stackly-logo.webp")}
+                          alt="Stackly logo"
+                          width={80}
+                          height={24}
+                          className="h-[12px] @sm:h-[14px] object-contain"
+                          unoptimized
+                        />
+                      </Link>
+                    </div>
 
                     {/* CENTER → Title */}
-                    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-base @sm:text-lg font-semibold text-white text-center break-words pointer-events-none z-0">
-                      Portfolio
-                    </span>
+                    <div className="flex items-center justify-center flex-1 min-w-0 mx-2">
+                      <span className="text-sm @sm:text-base font-semibold text-white text-center break-words truncate">
+                        Portfolio
+                      </span>
+                    </div>
 
                     {/* RIGHT → Menu */}
-                    <div className="flex items-center shrink-0 z-10">
+                    <div className="flex items-center justify-end w-1/3 shrink-0">
                       <button
                         onClick={() => setInnerMobileMenuOpen((v) => !v)}
                         className="h-7 w-7 @sm:h-8 @sm:w-8 border border-white/25 text-white rounded-md hover:bg-white/10 transition flex items-center justify-center shrink-0"
@@ -677,10 +681,10 @@ export default function Portfolioedit() {
 
                 {/* ABOUT SECTION */}
                 {/* <div className="w-full bg-[#F2F2F2] px-6 @md:px-12 @lg:px-20 py-16 @md:py-24"> */}
-                <div id="about" className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 py-10 @md:py-16">
-                  <div className="flex items-center gap-2 mb-4">
-                    <h2 className="text-3xl @md:text-4xl font-extrabold text-gray-900 tracking-tight">About</h2>
-                    <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @md:text-3xl tracking-tight leading-none">Me</span>
+                <div id="about" className="w-full max-w-full overflow-x-hidden bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 py-10 @md:py-16">
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <h2 className="text-3xl @sm:text-4xl @md:text-5xl @lg:text-6xl font-extrabold text-gray-900 tracking-tight break-words leading-tight">About</h2>
+                    <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @sm:text-3xl @md:text-4xl @lg:text-5xl tracking-tight leading-none break-words">Me</span>
                   </div>
 
                   <h3 className="text-sm @sm:text-base @md:text-xl @lg:text-2xl font-extrabold text-gray-800 mb-8 @md:mb-16 max-w-full @md:max-w-3xl leading-relaxed break-words text-center @md:text-left">
@@ -734,7 +738,7 @@ export default function Portfolioedit() {
                 </div>
 
                 {/* EDUCATION & EXPERIENCE SECTION */}
-                <div className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-12 @md:pb-16 @lg:pb-24">
+                <div className="w-full max-w-full overflow-x-hidden bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-12 @md:pb-16 @lg:pb-24">
 
                   <div className="grid grid-cols-1 @lg:grid-cols-2 gap-8 @md:gap-12 @lg:gap-20 min-w-0 max-w-full">
 
@@ -816,12 +820,12 @@ export default function Portfolioedit() {
                 {/* </div> */}
 
                 {/* MY SERVICES SECTION */}
-                <div className="w-full bg-[#F2F2F2] px-6 @md:px-12 @lg:px-20 pb-16 @lg:pb-24">
+                <div className="w-full max-w-full overflow-x-hidden bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-16 @lg:pb-24">
                   <div className="text-center mb-16">
                     {/* <h3 className="text-base font-bold flex items-center justify-center gap-1 mb-4 text-gray-800 tracking-wide"> */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <h2 className="text-3xl @md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
-                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @md:text-3xl tracking-tight leading-none">Services</span>
+                    <div className="flex flex-wrap items-center gap-2 mb-4">
+                      <h2 className="text-3xl @sm:text-4xl @md:text-5xl @lg:text-6xl font-extrabold text-gray-900 tracking-tight break-words leading-tight">My</h2>
+                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @sm:text-3xl @md:text-4xl @lg:text-5xl tracking-tight leading-none break-words">Services</span>
                     </div>
                     {/* <h3 className="text-3xl @md:text-4xl @lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
 
@@ -871,15 +875,15 @@ export default function Portfolioedit() {
                 </div>
 
                 {/* DESIGN PROCESS SECTION */}
-                <div ref={processRef} className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-16 @lg:pb-24">
+                <div ref={processRef} className="w-full max-w-full overflow-x-hidden bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-16 @lg:pb-24">
                   <div className="overflow-hidden rounded-2xl bg-[#06224C] px-5 py-8 @sm:px-8 @md:px-10 @md:py-12 text-white shadow-xl relative">
                     <div className="absolute right-[-5rem] top-[-5rem] h-56 w-56 rounded-full bg-[#63e5ff]/20 blur-3xl"></div>
                     <div className="absolute left-[-4rem] bottom-[-5rem] h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
                     <div className="relative grid grid-cols-1 @min-[1025px]:grid-cols-[0.9fr_1.4fr] gap-8 @min-[1025px]:gap-12 items-start min-w-0 max-w-full">
                       <div className={`portfolio-reveal min-w-0 max-w-full break-words ${processInView ? "is-visible" : ""}`}>
                         <div className="flex flex-wrap items-center gap-2 mb-4 min-w-0 max-w-full">
-                          <h2 className="text-[clamp(1.5rem,4cqi,2.25rem)] @md:text-4xl font-extrabold tracking-tight min-w-0 break-words">Design</h2>
-                          <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-[clamp(1.25rem,3cqi,1.875rem)] @md:text-3xl tracking-tight leading-none min-w-0 break-words">Process</span>
+                          <h2 className="text-3xl @sm:text-4xl @md:text-5xl @lg:text-6xl font-extrabold tracking-tight min-w-0 break-words leading-tight">Design</h2>
+                          <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @sm:text-3xl @md:text-4xl @lg:text-5xl tracking-tight leading-none min-w-0 break-words">Process</span>
                         </div>
                         <p className="text-sm @md:text-base text-blue-100 leading-relaxed max-w-md min-w-0 break-words">
                           A simple workflow keeps every project moving from rough idea to polished launch without losing the user&apos;s needs along the way.
@@ -910,9 +914,9 @@ export default function Portfolioedit() {
                 <div id="projects" className="w-full max-w-full bg-[#F2F2F2] px-0 @md:px-6 @lg:px-12 pb-16 @lg:pb-24 relative overflow-x-hidden box-border">
 
                   <div className="text-center mb-16">
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <h2 className="text-3xl @md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
-                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @md:text-3xl tracking-tight leading-none">Projects</span>
+                    <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+                      <h2 className="text-3xl @sm:text-4xl @md:text-5xl @lg:text-6xl font-extrabold text-gray-900 tracking-tight break-words leading-tight">My</h2>
+                      <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @sm:text-3xl @md:text-4xl @lg:text-5xl tracking-tight leading-none break-words">Projects</span>
                     </div>
 
                     <h3 className="text-sm @sm:text-base @md:text-xl @lg:text-2xl font-extrabold text-gray-800 mb-8 @md:mb-16 max-w-full @md:max-w-3xl leading-relaxed break-words text-center mx-auto">
@@ -980,7 +984,7 @@ export default function Portfolioedit() {
                 </div>
 
                 {/* TESTIMONIALS SECTION */}
-                <div ref={testimonialsRef} className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-16 @lg:pb-24">
+                <div ref={testimonialsRef} className="w-full max-w-full overflow-x-hidden bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 pb-16 @lg:pb-24">
                   <div className="grid grid-cols-1 @lg:grid-cols-[0.8fr_1.2fr] gap-6 @lg:gap-10 items-stretch min-w-0 max-w-full">
                     <div className={`portfolio-reveal rounded-2xl bg-white p-6 @md:p-8 shadow-lg border border-gray-100 min-w-0 max-w-full break-words overflow-hidden ${testimonialsInView ? "is-visible" : ""}`}>
                       <p className="text-xs font-black uppercase tracking-[0.22em] text-[#1a3636] mb-4 min-w-0 break-words">Client Words</p>
@@ -1017,18 +1021,18 @@ export default function Portfolioedit() {
                 </div>
 
                 {/* CONTACT SECTION */}
-                <div id="contact" className="w-full bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 py-12 @sm:py-16 @lg:py-24 relative border-t border-gray-100">
+                <div id="contact" className="w-full max-w-full overflow-x-hidden bg-[#F2F2F2] px-4 @sm:px-6 @md:px-12 @lg:px-20 py-12 @sm:py-16 @lg:py-24 relative border-t border-gray-100">
                   <div className="max-w-7xl mx-auto grid grid-cols-1 @lg:grid-cols-2 gap-8 @md:gap-12 @lg:gap-20 items-start @lg:items-center">
 
                     <div>
                       {/* <h2 className="text-base font-bold flex items-center gap-1 mb-4 text-gray-800 tracking-wide w-max">
                         Get In <span className="bg-[#c4ff0b] text-gray-900 px-2 py-0.5 rounded-full text-sm font-extrabold ml-1 leading-none shadow-sm flex items-center h-6">Touch</span>
                       </h2> */}
-                      <div className="flex items-center gap-2 mb-4">
-                        <h2 className="text-3xl @md:text-4xl font-extrabold text-gray-900 tracking-tight">Get In</h2>
-                        <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @md:text-3xl tracking-tight leading-none">Touch</span>
+                      <div className="flex flex-wrap items-center gap-2 mb-4">
+                        <h2 className="text-3xl @sm:text-4xl @md:text-5xl @lg:text-6xl font-extrabold text-gray-900 tracking-tight break-words leading-tight">Get In</h2>
+                        <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl @sm:text-3xl @md:text-4xl @lg:text-5xl tracking-tight leading-none break-words">Touch</span>
                       </div>
-                      <h3 className="text-3xl @md:text-4xl @lg:text-5xl font-extrabold text-gray-900 max-w-2xl leading-[1.15] mb-6">
+                      <h3 className="text-3xl @sm:text-4xl @md:text-5xl font-extrabold text-gray-900 max-w-2xl leading-tight mb-6 break-words">
                         Let’s build something <br className="hidden @md:block" />  great together.
                       </h3>
                       <p className="text-gray-600 mb-8 max-w-md">
@@ -1036,22 +1040,22 @@ export default function Portfolioedit() {
                       </p>
 
                       <div className="space-y-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 text-[#1a3636]">
-                            <FaEnvelope size={18} />
+                        <div className="flex items-center gap-4 min-w-0 max-w-full">
+                          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 text-[#1a3636] shrink-0">
+                            <FaEnvelope size={18} className="shrink-0" />
                           </div>
-                          <div>
+                          <div className="min-w-0 flex-1">
                             <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Email</p>
-                            <p className="text-gray-900 font-bold">hello@example.com</p>
+                            <p className="text-gray-900 font-bold break-all [overflow-wrap:anywhere] max-w-full">hello@example.com</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 text-[#1a3636]">
-                            <FaMobileAlt size={18} />
+                        <div className="flex items-center gap-4 min-w-0 max-w-full">
+                          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 text-[#1a3636] shrink-0">
+                            <FaMobileAlt size={18} className="shrink-0" />
                           </div>
-                          <div>
+                          <div className="min-w-0 flex-1">
                             <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Phone</p>
-                            <p className="text-gray-900 font-bold">+1 (555) 000-0000</p>
+                            <p className="text-gray-900 font-bold break-all [overflow-wrap:anywhere] max-w-full">+1 (555) 000-0000</p>
                           </div>
                         </div>
                       </div>
