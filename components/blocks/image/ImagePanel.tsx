@@ -46,6 +46,7 @@ export function ImagePanel({ component, onUpdate }: ImagePanelProps) {
       {/* Preview + actions */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
         {hasImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={currentSrc || "/showcase.webp"}
             alt={currentAlt || "Preview"}

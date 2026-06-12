@@ -4,8 +4,8 @@ import { useState } from "react";
 import { AlignCenter, AlignLeft, AlignRight, ChevronDown } from "lucide-react";
 import { ColorSwatch } from "./controls/ColorSwatch";
 import { UnitInput } from "./controls/UnitInput";
-import { SpacingBox } from "./controls/SpacingBox";
 import { SegmentedControl } from "./controls/SegmentedControl";
+import { useBuilderStore } from "@/store/builderStore";
 import type { BuilderComponent, ComponentStyles } from "@/types/builder";
 
 const FONT_WEIGHTS = [
@@ -50,31 +50,80 @@ export function StyleTab({
   onUpdate: (id: string, updates: Partial<BuilderComponent>) => void;
 }) {
   const s = component.styles;
+  const selectedTextStyleTarget = useBuilderStore((state) => state.selectedTextStyleTarget);
+  const selectTextStyleTarget = useBuilderStore((state) => state.selectTextStyleTarget);
+  const textTarget =
+    selectedTextStyleTarget?.componentId === component.id
+      ? selectedTextStyleTarget
+      : null;
+  const activeTextStyles = textTarget ? component.textStyles?.[textTarget.key] ?? {} : s;
+  const defaultTextColor = component.type === "button" || textTarget?.key.endsWith(".cta") ? "#ffffff" : "#000000";
+  const isButtonTarget =
+    component.type === "button" ||
+    textTarget?.key.endsWith(".cta") ||
+    textTarget?.key.toLowerCase().includes("button");
+  const defaultButtonBackground =
+    component.type === "button"
+      ? s.backgroundColor || "#0B1D40"
+      : textTarget
+        ? activeTextStyles.backgroundColor || "#0B1D40"
+        : "#0B1D40";
 
   const set = (patch: Partial<ComponentStyles>) =>
     onUpdate(component.id, { styles: { ...s, ...patch } });
+  const setTypography = (patch: Partial<ComponentStyles>) => {
+    if (!textTarget) {
+      set(patch);
+      return;
+    }
+
+    onUpdate(component.id, {
+      textStyles: {
+        [textTarget.key]: {
+          ...(component.textStyles?.[textTarget.key] ?? {}),
+          ...patch,
+        },
+      },
+    });
+  };
 
   return (
     <div className="pb-6">
       {/* Typography */}
       <Section title="Typography">
+        {textTarget && (
+          <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="min-w-0 truncate text-[11px] font-bold text-blue-800">
+                Editing {textTarget.label}
+              </span>
+              <button
+                type="button"
+                onClick={() => selectTextStyleTarget(null)}
+                className="text-[10px] font-bold text-blue-600 hover:text-blue-800"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
         <ColorSwatch
           label="Text Color"
-          value={s.color || "#000000"}
-          onChange={(v) => set({ color: v })}
+          value={activeTextStyles.color || defaultTextColor}
+          onChange={(v) => setTypography({ color: v })}
         />
         <div className="grid grid-cols-2 gap-3">
           <UnitInput
             label="Font Size"
-            value={s.fontSize || ""}
-            onChange={(v) => set({ fontSize: v })}
+            value={activeTextStyles.fontSize || ""}
+            onChange={(v) => setTypography({ fontSize: v })}
             placeholder="16"
           />
           <div>
             <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-wider text-[#566583]">Weight</span>
             <select
-              value={s.fontSize ? (String(s.fontSize).includes("px") ? "400" : "400") : "400"}
-              onChange={() => {}}
+              value={activeTextStyles.fontWeight || "400"}
+              onChange={(e) => setTypography({ fontWeight: e.target.value })}
               className="w-full rounded-lg border border-[#dbe3ef] bg-transparent px-2.5 py-2 text-[12px] font-bold text-[#0B1D40] outline-none focus:border-blue-400"
             >
               {FONT_WEIGHTS.map((fw) => (
@@ -85,36 +134,39 @@ export function StyleTab({
         </div>
         <SegmentedControl
           label="Alignment"
-          value={(s.textAlign as string) || "left"}
+          value={(activeTextStyles.textAlign as string) || "left"}
           options={[
             { value: "left",   icon: <AlignLeft className="h-3.5 w-3.5" />,   title: "Left" },
             { value: "center", icon: <AlignCenter className="h-3.5 w-3.5" />, title: "Center" },
             { value: "right",  icon: <AlignRight className="h-3.5 w-3.5" />,  title: "Right" },
           ]}
-          onChange={(v) => set({ textAlign: v as ComponentStyles["textAlign"] })}
+          onChange={(v) => setTypography({ textAlign: v as ComponentStyles["textAlign"] })}
         />
       </Section>
+
+      {/* Button appearance */}
+      {isButtonTarget && (
+        <Section title="Button">
+          <ColorSwatch
+            label="Button Color"
+            value={(textTarget ? activeTextStyles.backgroundColor : s.backgroundColor) || defaultButtonBackground}
+            onChange={(v) => (textTarget ? setTypography({ backgroundColor: v }) : set({ backgroundColor: v }))}
+          />
+          <UnitInput
+            label="Button Radius"
+            value={(textTarget ? activeTextStyles.borderRadius : s.borderRadius) || ""}
+            onChange={(v) => (textTarget ? setTypography({ borderRadius: v }) : set({ borderRadius: v }))}
+            placeholder="6"
+          />
+        </Section>
+      )}
 
       {/* Background */}
-      <Section title="Background">
+      <Section title="Background" defaultOpen={!isButtonTarget}>
         <ColorSwatch
-          label="Background Color"
+          label={component.type === "button" ? "Block Background" : "Background Color"}
           value={s.backgroundColor || "#ffffff"}
           onChange={(v) => set({ backgroundColor: v })}
-        />
-      </Section>
-
-      {/* Spacing */}
-      <Section title="Spacing">
-        <SpacingBox
-          label="Padding"
-          value={s.padding || ""}
-          onChange={(v) => set({ padding: v })}
-        />
-        <SpacingBox
-          label="Margin"
-          value={s.margin || ""}
-          onChange={(v) => set({ margin: v })}
         />
       </Section>
 

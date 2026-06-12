@@ -25,6 +25,8 @@ export const NAV_SCHEMA_VERSION = 1;
 export const navigationDefaults: NavigationProps = {
   schemaVersion: NAV_SCHEMA_VERSION,
   brand: "Stackly Studio",
+  logoUrl: "",
+  logoAssetId: "",
   links: [
     { label: "Home",     href: "#" },
     { label: "About",    href: "#" },
@@ -120,13 +122,15 @@ export function readNavigation(
   component: BuilderComponent,
 ): Required<
   Pick<NavigationProps, "schemaVersion" | "brand" | "links" | "cta" | "variant" | "sticky" | "mobileMenu">
-> {
+> & Pick<NavigationProps, "logoUrl" | "logoAssetId"> {
   const p = component.props;
 
   if (p && typeof p === "object") {
     return {
       schemaVersion: typeof p.schemaVersion === "number" ? p.schemaVersion : NAV_SCHEMA_VERSION,
       brand: asString(p.brand, navigationDefaults.brand),
+      logoUrl: asString(p.logoUrl, ""),
+      logoAssetId: asString(p.logoAssetId, ""),
       links: readLinks(p.links),
       cta: readCta(p.cta),
       variant:
@@ -148,6 +152,8 @@ export function readNavigation(
   return {
     schemaVersion: NAV_SCHEMA_VERSION,
     brand: b?.trim() || navigationDefaults.brand,
+    logoUrl: "",
+    logoAssetId: "",
     links: legacyLinks.length > 0 ? legacyLinks : navigationDefaults.links.map((link) => ({ ...link })),
     cta: { label: c?.trim() || navigationDefaults.cta.label },
     variant: navigationDefaults.variant!,
@@ -172,8 +178,11 @@ export const navigationSpec: BlockSpec<NavigationProps> = {
       .map((link) => `<a href="${escapeHtml(link.href ?? "#")}">${escapeHtml(link.label)}</a>`)
       .join("");
     const ctaHref = data.cta.href ?? "#";
+    const logo = data.logoUrl
+      ? `<img class="nav-logo" src="${escapeHtml(data.logoUrl)}" alt="${escapeHtml(data.brand)} logo" />`
+      : "";
     return `<nav${styleAttr}>` +
-      `<strong>${escapeHtml(data.brand)}</strong>` +
+      `<div class="nav-brand-group">${logo}<strong>${escapeHtml(data.brand)}</strong></div>` +
       `<div class="nav-links">${navLinks}</div>` +
       `<a href="${escapeHtml(ctaHref)}" role="button" class="nav-cta">${escapeHtml(data.cta.label)}</a>` +
       `<button class="nav-hamburger" onclick="_navToggle(this)" aria-label="Toggle menu" aria-expanded="false">` +

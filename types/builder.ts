@@ -35,6 +35,7 @@ export interface ComponentStyles {
   margin?: string;
   borderRadius?: string;
   fontSize?: string;
+  fontWeight?: string;
   width?: string;
   height?: string;
   textAlign?: CSSProperties["textAlign"];
@@ -106,6 +107,8 @@ export interface NavigationProps {
   brand: string;
   /** Future: URL for a logo image; falls back to `brand` text when absent. */
   logoUrl?: string;
+  /** Asset-library id for the selected logo, when chosen from imported assets. */
+  logoAssetId?: string;
   links: NavLink[];
   cta: {
     label: string;
@@ -392,6 +395,7 @@ export interface BuilderComponent {
    */
   props?: Record<string, unknown>;
   styles: ComponentStyles;
+  textStyles?: Record<string, Partial<ComponentStyles>>;
   children: BuilderComponent[];
   order: number;
   /** Whether the element is locked from editing/moving. */
@@ -438,12 +442,14 @@ export interface BuilderRequirements {
 export interface BuilderState {
   components: BuilderComponent[];
   selectedComponentId: string | null;
+  selectedTextStyleTarget: { componentId: string; key: string; label: string } | null;
   addComponent: (type: ComponentType, parentId?: string | null, afterId?: string | null) => void;
   insertComponentBefore: (type: ComponentType, beforeId: string) => void;
   updateComponent: (id: string, updates: Partial<Omit<BuilderComponent, "id" | "children">> & { styles?: ComponentStyles }) => void;
   duplicateComponent: (id: string) => void;
   deleteComponent: (id: string) => void;
   selectComponent: (id: string | null) => void;
+  selectTextStyleTarget: (target: { componentId: string; key: string; label: string } | null) => void;
   isInlineEditing: boolean;
   setInlineEditing: (v: boolean) => void;
   reorderComponents: (activeId: string, overId: string) => void;

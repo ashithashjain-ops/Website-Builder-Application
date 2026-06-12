@@ -153,8 +153,6 @@ function CanvasItem({
   const [isHovered, setIsHovered] = useState(false);
   const typeLabel = component.type.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
   const showOverlay = (isSelected || isHovered) && !isEditing;
-  const anySelected = isSelected || isMultiSelected;
-
   return (
     <>
       <motion.div
@@ -196,25 +194,26 @@ function CanvasItem({
                 {isLocked && <Lock className="ml-1 h-3 w-3 text-yellow-400" />}
               </span>
 
-              {/* Actions */}
-              <div className="pointer-events-auto flex items-center gap-0.5 rounded-lg border border-white/20 bg-[#0B1D40]/80 p-0.5 backdrop-blur-sm">
-                <button
-                  type="button"
-                  title="Duplicate (Ctrl+D)"
-                  onClick={handleDuplicate}
-                  className="flex h-6 w-6 items-center justify-center rounded text-white/80 transition hover:bg-white/15 hover:text-white"
-                >
-                  <Copy className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  type="button"
-                  title="Delete (Del)"
-                  onClick={handleDelete}
-                  className="flex h-6 w-6 items-center justify-center rounded text-red-300 transition hover:bg-red-500/20 hover:text-red-200"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
+              {!isLocked && (
+                <div className="pointer-events-auto flex items-center gap-0.5 rounded-lg border border-white/20 bg-[#0B1D40]/80 p-0.5 backdrop-blur-sm">
+                  <button
+                    type="button"
+                    title="Duplicate (Ctrl+D)"
+                    onClick={handleDuplicate}
+                    className="flex h-6 w-6 items-center justify-center rounded text-white/80 transition hover:bg-white/15 hover:text-white"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    title="Delete (Del)"
+                    onClick={handleDelete}
+                    className="flex h-6 w-6 items-center justify-center rounded text-red-300 transition hover:bg-red-500/20 hover:text-red-200"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

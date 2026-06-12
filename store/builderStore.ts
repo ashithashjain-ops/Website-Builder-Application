@@ -19,7 +19,7 @@ import { formDefaults } from "@/components/draggable/FormComponent";
 import { accordionDefaults } from "@/components/draggable/AccordionComponent";
 import { tabsDefaults } from "@/components/draggable/TabsComponent";
 import { mapDefaults } from "@/components/draggable/MapComponent";
-import type { BuilderComponent, BuilderRequirements, BuilderState, ComponentType, FeatureRecord, SEOMetadata, Viewport } from "@/types/builder";
+import type { BuilderComponent, BuilderRequirements, BuilderState, ComponentType, FeatureRecord, Viewport } from "@/types/builder";
 
 type ComponentDefault = Pick<BuilderComponent, "content" | "styles" | "children"> & {
   props?: BuilderComponent["props"];
@@ -52,7 +52,7 @@ const defaults: Record<ComponentType, ComponentDefault> = {
   },
   button: {
     content: "Click Me",
-    styles: { color: "#ffffff", backgroundColor: "#0B1D40", fontSize: "15px", padding: "12px 22px", margin: "0 0 12px", borderRadius: "6px", width: "auto", textAlign: "center" },
+    styles: { color: "#ffffff", backgroundColor: "#0B1D40", fontSize: "15px", fontWeight: "700", padding: "12px 22px", margin: "0 0 12px", borderRadius: "6px", width: "auto", textAlign: "center" },
     children: [],
   },
   icon: {
@@ -261,16 +261,24 @@ const deepCloneComponent = (component: BuilderComponent): BuilderComponent => ({
   ...component,
   id: uuidv4(),
   styles: { ...component.styles },
+  textStyles: component.textStyles ? { ...component.textStyles } : undefined,
   props: component.props ? { ...component.props } : undefined,
   children: component.children.map(deepCloneComponent),
 });
 
-const createComponent = (type: ComponentType, order: number): BuilderComponent => ({
-  id: uuidv4(),
-  type,
-  ...defaults[type],
-  order,
-});
+const createComponent = (type: ComponentType, order: number): BuilderComponent => {
+  const component: BuilderComponent = {
+    id: uuidv4(),
+    type,
+    ...defaults[type],
+    props: defaults[type].props ? { ...defaults[type].props } : undefined,
+    styles: { ...defaults[type].styles },
+    children: defaults[type].children.map(deepCloneComponent),
+    order,
+  };
+
+  return component;
+};
 
 const categoryCopy: Record<string, { hero: string; description: string; features: FeatureRecord[] }> = {
   "E-commerce": {
@@ -403,6 +411,7 @@ const STORAGE_KEY = "stackly-builder-draft";
 export const useBuilderStore = create<BuilderState>((set, get) => ({
   components: [],
   selectedComponentId: null,
+  selectedTextStyleTarget: null,
   selectedComponentIds: [],
   clipboard: null,
   isInlineEditing: false,
@@ -465,6 +474,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
     }),
   updateComponent: (id, updates) =>
     set((state) => ({
+      ...captureHistory(state),
       components: updateNodeById(state.components, id, (c) => ({
         ...c,
         ...updates,
@@ -472,6 +482,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
         // Shallow-merge typed `props` so callers can patch a single field
         // without clobbering the rest (mirrors the styles merge pattern).
         props: updates.props ? { ...(c.props ?? {}), ...updates.props } : c.props,
+        textStyles: updates.textStyles ? { ...(c.textStyles ?? {}), ...updates.textStyles } : c.textStyles,
       })),
     })),
   duplicateComponent: (id) =>
@@ -493,7 +504,12 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
       components: orderComponents(deleteNodeById(state.components, id)),
       selectedComponentId: state.selectedComponentId === id ? null : state.selectedComponentId,
     })),
-  selectComponent: (id) => set({ selectedComponentId: id, selectedComponentIds: id ? [id] : [] }),
+  selectComponent: (id) => set({ selectedComponentId: id, selectedComponentIds: id ? [id] : [], selectedTextStyleTarget: null }),
+  selectTextStyleTarget: (target) => set({
+    selectedTextStyleTarget: target,
+    selectedComponentId: target?.componentId ?? null,
+    selectedComponentIds: target ? [target.componentId] : [],
+  }),
   reorderComponents: (activeId, overId) =>
     set((state) => {
       const oldIndex = state.components.findIndex((component) => component.id === activeId);
@@ -629,9 +645,10 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
         case "backward": newZ = Math.max(0, currentZ - 1); break;
       }
       return {
+        ...captureHistory(state),
         components: updateNodeById(state.components, id, (c) => ({
           ...c,
-          styles: { ...c.styles, zIndex: String(newZ) },
+          styles: { ...c.styles, position: c.styles.position || "relative", zIndex: String(newZ) },
         })),
       };
     }),
@@ -660,6 +677,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
 
   toggleLock: (id) =>
     set((state) => ({
+      ...captureHistory(state),
       components: updateNodeById(state.components, id, (c) => ({
         ...c,
         locked: !c.locked,

@@ -30,7 +30,7 @@ export default function ButtonComponent({
       sel.removeAllRanges();
       sel.addRange(range);
     }
-  }, [isEditing]);
+  }, [component.content, isEditing]);
 
   return (
     <button

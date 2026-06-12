@@ -3,7 +3,7 @@
 import InlineText from "@/components/builder/InlineText";
 import { readFeatures } from "@/components/blocks/features/spec";
 import type { BuilderComponent } from "@/types/builder";
-import { toReactStyle } from "./componentStyles";
+import { getTargetTextStyles, getTextStyles, toReactStyle } from "./componentStyles";
 
 export default function FeaturesComponent({
   component,
@@ -16,6 +16,7 @@ export default function FeaturesComponent({
 }) {
   // Typed read — falls back to legacy newline+pipe `content` for pre-migration documents.
   const { items } = readFeatures(component);
+  const textStyle = getTextStyles(component.styles);
 
   /**
    * Update one field of one item immutably.
@@ -35,8 +36,8 @@ export default function FeaturesComponent({
             <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-md bg-[#0B1D40] text-sm font-bold text-white">
               {index + 1}
             </div>
-            <InlineText as="h3" value={item.title} onSave={(v) => saveItemField(index, "title", v)} className="text-base font-bold text-[#0B1D40]" />
-            <InlineText as="p" value={item.description} onSave={(v) => saveItemField(index, "description", v)} className="mt-2 text-sm font-medium leading-6 text-[#566583]" />
+            <InlineText componentId={component.id} textKey={`features.${index}.title`} textLabel={`Feature ${index + 1} title`} as="h3" value={item.title} onSave={(v) => saveItemField(index, "title", v)} className="text-base font-bold" style={getTargetTextStyles(component, `features.${index}.title`, textStyle)} />
+            <InlineText componentId={component.id} textKey={`features.${index}.description`} textLabel={`Feature ${index + 1} description`} as="p" value={item.description} onSave={(v) => saveItemField(index, "description", v)} className="mt-2 text-sm font-medium leading-6" style={getTargetTextStyles(component, `features.${index}.description`, textStyle)} />
           </article>
         ))}
       </div>

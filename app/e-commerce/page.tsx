@@ -979,6 +979,7 @@ export default function ECommercePage() {
              .buyscreen-page .p-6 { padding: 0.75rem !important; }
           }
 
+
           .buyscreen-page button.buyscreen-all-categories-toggle:hover,
           .buyscreen-page button.buyscreen-all-categories-toggle:focus-visible {
             background: #2563eb !important;

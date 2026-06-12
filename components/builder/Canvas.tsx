@@ -1,14 +1,16 @@
 "use client";
 
 import { memo, useCallback, useEffect, useRef, useState, useMemo } from "react";
-import { Check, ChevronDown, Eye, FolderOpen, Globe, Images, Layers, Monitor, Palette, Pencil, Redo2, Save, Smartphone, Sparkles, Tablet, Trash2, Undo2 } from "lucide-react";
+import { Check, ChevronDown, Eye, FolderOpen, Images, Layers, MoreHorizontal, Palette, Pencil, Redo2, Save, Sparkles, Trash2, Undo2 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { AssetManager } from "@/components/assets/AssetManager";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import SortableItem from "./SortableItem";
 import QuickInsertBar from "./QuickInsertBar";
 import ExportButton from "./ExportButton";
-import ZoomControls from "./ZoomControls";
+import ButtonComponent from "@/components/draggable/ButtonComponent";
+import IconComponent from "@/components/draggable/IconComponent";
 import { useBuilderStore } from "@/store/builderStore";
 import { useDesignStore } from "@/store/designStore";
 import type { BuilderComponent, ComponentType } from "@/types/builder";
@@ -31,7 +33,15 @@ function Canvas({
   onPreview: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: "builder-canvas" });
-  const sortableIds = useMemo(() => components.map((c) => c.id), [components]);
+  const flowComponents = useMemo(
+    () => components.filter((component) => !isFloatingComponent(component)),
+    [components],
+  );
+  const floatingComponents = useMemo(
+    () => components.filter(isFloatingComponent),
+    [components],
+  );
+  const sortableIds = useMemo(() => flowComponents.map((c) => c.id), [flowComponents]);
 
   /* ── Store actions for new features ── */
   const undo = useBuilderStore((s) => s.undo);
@@ -40,13 +50,9 @@ function Canvas({
   const canRedo = useBuilderStore((s) => s.future.length > 0);
   const saveToLocalStorage = useBuilderStore((s) => s.saveToLocalStorage);
   const loadFromLocalStorage = useBuilderStore((s) => s.loadFromLocalStorage);
-  const viewport = useBuilderStore((s) => s.viewport);
-  const setViewport = useBuilderStore((s) => s.setViewport);
-  const zoom = useDesignStore((s) => s.zoom);
   const autoSaveEnabled = useDesignStore((s) => s.autoSaveEnabled);
   const setLastSavedAt = useDesignStore((s) => s.setLastSavedAt);
   const toggleGlobalStyles = useDesignStore((s) => s.toggleGlobalStyles);
-  const toggleSEOPanel = useDesignStore((s) => s.toggleSEOPanel);
   const storeAddComponent = useBuilderStore((s) => s.addComponent);
   const insertComponentBefore = useBuilderStore((s) => s.insertComponentBefore);
 
@@ -65,22 +71,28 @@ function Canvas({
     [storeAddComponent],
   );
 
-  const handleQuickInsertEnd = useCallback(
-    (type: ComponentType) => {
-      storeAddComponent(type);
-    },
-    [storeAddComponent],
-  );
-
   /* ── Project name (local state, persisted via save) ── */
   const [projectName, setProjectName] = useState("My Website");
   const [editingName, setEditingName] = useState(false);
   const [isAssetsOpen, setIsAssetsOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const toolsMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (editingName) nameInputRef.current?.select();
   }, [editingName]);
+
+  useEffect(() => {
+    if (!toolsOpen) return;
+    const onPointerDown = (event: MouseEvent) => {
+      if (toolsMenuRef.current && !toolsMenuRef.current.contains(event.target as Node)) {
+        setToolsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [toolsOpen]);
 
   /* ── Save feedback ── */
   const [saved, setSaved] = useState(false);
@@ -112,6 +124,11 @@ function Canvas({
     }
   };
 
+  const runTool = (action: () => void) => {
+    action();
+    setToolsOpen(false);
+  };
+
   return (
     <main
       className="relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-[#dbe3ef] bg-[#f7f9fc] shadow-sm"
@@ -119,11 +136,11 @@ function Canvas({
     >
       {/* ── Toolbar ── */}
       <div
-        className="flex h-[60px] flex-shrink-0 items-center justify-between gap-2 overflow-x-auto border-b border-[#dbe3ef] bg-white px-3 shadow-[0_1px_0_rgba(15,23,42,0.03)] md:px-4"
+        className="relative z-30 flex h-[60px] flex-shrink-0 items-center justify-between gap-3 overflow-visible border-b border-[#dbe3ef] bg-white px-3 shadow-[0_1px_0_rgba(15,23,42,0.03)] md:px-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left: undo/redo + project name */}
-        <div className="flex items-center gap-1">
+        <div className="flex min-w-0 items-center gap-1.5">
           <button
             type="button"
             title="Undo (Ctrl+Z)"
@@ -143,7 +160,7 @@ function Canvas({
             <Redo2 className="h-4 w-4" />
           </button>
 
-          <div className="mx-1 hidden h-5 w-px bg-[#dbe3ef] lg:block" />
+          <div className="mx-1 h-5 w-px bg-[#dbe3ef]" />
 
           {/* Editable project name */}
           {editingName ? (
@@ -153,113 +170,61 @@ function Canvas({
               onChange={(e) => setProjectName(e.target.value)}
               onBlur={() => setEditingName(false)}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === "Escape") setEditingName(false); }}
-              className="hidden w-36 rounded border border-blue-300 bg-blue-50 px-2 py-1 text-[13px] font-bold text-[#0B1D40] outline-none focus:ring-2 focus:ring-blue-200 lg:block"
+              className="w-32 rounded border border-blue-300 bg-blue-50 px-2 py-1 text-[13px] font-bold text-[#0B1D40] outline-none focus:ring-2 focus:ring-blue-200 sm:w-44"
             />
           ) : (
             <button
               type="button"
               title="Rename project"
               onClick={() => setEditingName(true)}
-              className="hidden items-center gap-1.5 rounded px-2 py-1 text-[13px] font-bold text-[#0B1D40] transition hover:bg-gray-100 lg:flex"
+              className="flex min-w-0 items-center gap-1.5 rounded-lg px-2 py-1 text-[13px] font-bold text-[#0B1D40] transition hover:bg-gray-100"
             >
-              <Layers className="h-3.5 w-3.5 text-[#566583]" />
-              {projectName}
+              <Layers className="h-3.5 w-3.5 flex-shrink-0 text-[#566583]" />
+              <span className="max-w-[92px] truncate sm:max-w-[180px]">{projectName}</span>
               <Pencil className="h-3 w-3 text-gray-400" />
             </button>
           )}
         </div>
 
         {/* Right: actions */}
-        <div className="flex items-center gap-1.5 md:gap-2">
-          {/* Global Styles */}
-          <button
-            type="button"
-            title="Design System"
-            onClick={toggleGlobalStyles}
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-md border border-violet-200 bg-violet-50 px-2.5 py-1.5 text-[12px] font-bold text-violet-700 shadow-sm transition hover:bg-violet-100 active:scale-95 md:px-3 md:text-[13px]"
-          >
-            <Palette className="h-3.5 w-3.5" />
-            <span className="hidden xl:inline">Design</span>
-          </button>
-
-          {/* SEO */}
-          <button
-            type="button"
-            title="SEO Settings"
-            onClick={toggleSEOPanel}
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-[12px] font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-100 active:scale-95 md:px-3 md:text-[13px]"
-          >
-            <Globe className="h-3.5 w-3.5" />
-            <span className="hidden xl:inline">SEO</span>
-          </button>
-
-          <button
-            type="button"
-            title="Asset Library"
-            onClick={() => setIsAssetsOpen(true)}
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#0B1D40] shadow-sm transition hover:bg-gray-50 active:scale-95 md:px-3 md:text-[13px]"
-          >
-            <Images className="h-3.5 w-3.5 text-gray-500" />
-            <span className="hidden xl:inline">Assets</span>
-          </button>
-
-          <button
-            type="button"
-            title="Starter Website"
-            onClick={onLoadStarter}
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#0B1D40] shadow-sm transition hover:bg-gray-50 active:scale-95 md:px-3 md:text-[13px]"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-gray-500" />
-            <span className="hidden xl:inline">Starter</span>
-          </button>
-
-          <button
-            type="button"
-            title="Clear canvas"
-            onClick={onClear}
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#0B1D40] shadow-sm transition hover:bg-red-50 hover:text-red-600 active:scale-95 md:px-3 md:text-[13px]"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            <span className="hidden xl:inline">Clear</span>
-          </button>
-
-          <div className="hidden h-5 w-px bg-[#dbe3ef] sm:block" />
-
-          {/* Load Draft */}
-          <button
-            type="button"
-            title="Load saved draft"
-            onClick={handleLoad}
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#0B1D40] shadow-sm transition hover:bg-gray-50 active:scale-95 md:px-3 md:text-[13px]"
-          >
-            <FolderOpen className="h-3.5 w-3.5 text-gray-500" />
-            <span className="hidden lg:inline">Load</span>
-          </button>
-
-          {/* Save Draft with visual feedback */}
-          <button
-            type="button"
-            title="Save draft to browser storage"
-            onClick={handleSave}
-            className={`flex items-center gap-1.5 whitespace-nowrap rounded-md border px-2.5 py-1.5 text-[12px] font-bold shadow-sm transition active:scale-95 md:px-3 md:text-[13px] ${
-              saved
-                ? "border-green-300 bg-green-50 text-green-700"
-                : "border-gray-200 bg-white text-[#0B1D40] hover:bg-gray-50"
-            }`}
-          >
-            {saved ? <Check className="h-3.5 w-3.5" /> : <Save className="h-3.5 w-3.5 text-gray-500" />}
-            <span className="hidden lg:inline">{saved ? "Saved!" : "Save"}</span>
-          </button>
-
-          {/* Preview */}
+        <div className="flex flex-shrink-0 items-center gap-1.5 md:gap-2">
+          <div className="relative" ref={toolsMenuRef}>
+            <button
+              type="button"
+              title="Builder tools"
+              onClick={() => setToolsOpen((open) => !open)}
+              className="flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-gray-200 bg-white px-2.5 text-[12px] font-bold text-[#0B1D40] shadow-sm transition hover:bg-gray-50 active:scale-95 sm:px-3"
+            >
+              <MoreHorizontal className="h-4 w-4 text-gray-500" />
+              <span className="hidden sm:inline">Tools</span>
+            </button>
+            <AnimatePresence>
+              {toolsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                  transition={{ duration: 0.16, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="absolute right-0 top-11 z-50 w-[220px] overflow-hidden rounded-xl border border-[#dbe3ef] bg-white p-1.5 shadow-[0_18px_50px_rgba(15,35,75,0.18)]"
+                >
+                  <ToolMenuButton label="Design" Icon={Palette} tone="text-violet-700 bg-violet-50 border-violet-100" onClick={() => runTool(toggleGlobalStyles)} />
+                  <ToolMenuButton label="Assets" Icon={Images} tone="text-slate-700 bg-slate-50 border-slate-100" onClick={() => runTool(() => setIsAssetsOpen(true))} />
+                  <ToolMenuButton label="Starter" Icon={Sparkles} tone="text-blue-700 bg-blue-50 border-blue-100" onClick={() => runTool(onLoadStarter)} />
+                  <ToolMenuButton label="Load" Icon={FolderOpen} tone="text-slate-700 bg-slate-50 border-slate-100" onClick={() => runTool(handleLoad)} />
+                  <ToolMenuButton label={saved ? "Saved" : "Save"} Icon={saved ? Check : Save} tone={saved ? "text-green-700 bg-green-50 border-green-100" : "text-slate-700 bg-slate-50 border-slate-100"} onClick={() => runTool(handleSave)} />
+                  <ToolMenuButton label="Clear" Icon={Trash2} tone="text-red-700 bg-red-50 border-red-100" onClick={() => runTool(onClear)} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <button
             type="button"
             title="Preview page"
             onClick={onPreview}
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#0B1D40] shadow-sm transition hover:bg-blue-50 hover:text-blue-700 active:scale-95 md:px-3 md:text-[13px]"
+            className="flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-blue-100 bg-blue-50 px-2.5 text-[12px] font-bold text-blue-700 shadow-sm transition hover:bg-blue-100 active:scale-95 sm:px-3"
           >
             <Eye className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Preview</span>
+            <span className="hidden sm:inline">Preview</span>
           </button>
 
           <ExportButton components={components} />
@@ -267,52 +232,15 @@ function Canvas({
       </div>
 
       {/* ── Viewport / device switcher + Zoom ── */}
-      <div
-        className="flex h-10 flex-shrink-0 items-center justify-between gap-1 border-b border-[#dbe3ef] bg-[#f7f9fc] px-3"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center gap-1">
-          {([
-            { id: "desktop" as const, Icon: Monitor,    label: "Desktop",  width: "1280" },
-            { id: "tablet"  as const, Icon: Tablet,     label: "Tablet",   width: "768" },
-            { id: "mobile"  as const, Icon: Smartphone, label: "Mobile",   width: "390" },
-          ] as const).map(({ id, Icon, label, width }) => (
-            <button
-              key={id}
-              type="button"
-              title={`${label} (${width}px)`}
-              onClick={() => setViewport(id)}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-bold transition ${
-                viewport === id
-                  ? "bg-[#0B1D40] text-white shadow-sm"
-                  : "text-[#566583] hover:bg-white hover:text-[#0B1D40]"
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{label}</span>
-              {viewport === id && <span className="hidden text-[9px] font-normal opacity-70 lg:inline">{width}px</span>}
-            </button>
-          ))}
-        </div>
-        {/* Zoom controls */}
-        <ZoomControls />
-      </div>
-
       {/* ── Canvas drop zone ── */}
       <div
         ref={setNodeRef}
         className={`flex flex-1 flex-col items-center overflow-y-auto px-3 py-4 transition sm:px-4 ${isOver ? "bg-blue-50/50" : "bg-[#f0f3f8]"}`}
       >
-        {/* Viewport-width frame with zoom */}
         <div
-          className="flex w-full flex-col gap-3 transition-all duration-300 origin-top"
-          style={{
-            maxWidth: viewport === "desktop" ? "100%" : viewport === "tablet" ? "768px" : "390px",
-            transform: zoom !== 100 ? `scale(${zoom / 100})` : undefined,
-            transformOrigin: "top center",
-          }}
+          className="relative flex min-h-[680px] w-full flex-col gap-3 transition-all duration-300"
         >
-          {components.length === 0 ? (
+          {flowComponents.length === 0 && floatingComponents.length === 0 ? (
             <div className="flex min-h-[280px] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#dbe3ef] bg-white px-6 text-center shadow-[0_18px_45px_rgba(15,35,75,0.08)] transition">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#eef4fb] text-[#0B1D40]">
                 <ChevronDown className="h-7 w-7" />
@@ -332,7 +260,7 @@ function Canvas({
             </div>
           ) : (
             <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
-              {components.map((component, index) => (
+              {flowComponents.map((component, index) => (
                 <div key={component.id} className="w-full">
                   {/* Quick-insert bar BEFORE this block */}
                   {index === 0 && (
@@ -354,11 +282,136 @@ function Canvas({
               ))}
             </SortableContext>
           )}
+
+          {floatingComponents.length > 0 && (
+            <div className="pointer-events-none absolute inset-0 z-40">
+              {floatingComponents.map((component) => (
+                <FloatingCanvasItem
+                  key={component.id}
+                  component={component}
+                  onDelete={onDelete}
+                  onSelect={onSelect}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       <AssetManager open={isAssetsOpen} onClose={() => setIsAssetsOpen(false)} />
     </main>
+  );
+}
+
+function ToolMenuButton({
+  label,
+  Icon,
+  tone,
+  onClick,
+}: {
+  label: string;
+  Icon: React.ComponentType<{ className?: string }>;
+  tone: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[12px] font-bold text-[#0B1D40] transition hover:bg-[#f7f9fc]"
+    >
+      <span className={`flex h-7 w-7 items-center justify-center rounded-md border ${tone}`}>
+        <Icon className="h-3.5 w-3.5" />
+      </span>
+      <span className="flex-1">{label}</span>
+    </button>
+  );
+}
+
+const isFloatingComponent = (component: BuilderComponent) =>
+  (component.type === "icon" || component.type === "button") && component.props?.floating === true;
+
+function FloatingCanvasItem({
+  component,
+  onDelete,
+  onSelect,
+}: {
+  component: BuilderComponent;
+  onDelete: (id: string) => void;
+  onSelect: (id: string) => void;
+}) {
+  const selectedComponentId = useBuilderStore((s) => s.selectedComponentId);
+  const moveComponent = useBuilderStore((s) => s.moveComponent);
+  const isSelected = selectedComponentId === component.id;
+  const position = component.position ?? { x: 32, y: 32 };
+  const zIndex = Number(component.styles.zIndex || component.zIndex || 60);
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0 || component.locked) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    onSelect(component.id);
+
+    const startPointer = { x: event.clientX, y: event.clientY };
+    const startPosition = component.position ?? { x: 32, y: 32 };
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const dx = moveEvent.clientX - startPointer.x;
+      const dy = moveEvent.clientY - startPointer.y;
+      moveComponent(component.id, startPosition.x + dx, startPosition.y + dy);
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp, { once: true });
+  };
+
+  return (
+    <motion.div
+      className="pointer-events-auto absolute"
+      style={{
+        left: position.x,
+        top: position.y,
+        zIndex: isSelected ? zIndex + 20 : zIndex,
+      }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.16, ease: [0.25, 0.46, 0.45, 0.94] }}
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect(component.id);
+      }}
+    >
+      <div
+        role="button"
+        tabIndex={0}
+        title={component.locked ? "Element locked" : `Drag ${component.type}`}
+        onPointerDown={handlePointerDown}
+        className={`group/icon flex cursor-grab items-center justify-center rounded-md p-1 transition active:cursor-grabbing ${
+          isSelected ? "bg-white/80 ring-2 ring-blue-500 shadow-[0_8px_24px_rgba(37,99,235,0.18)]" : "hover:bg-white/70 hover:ring-1 hover:ring-blue-200"
+        }`}
+      >
+        {component.type === "button" ? <ButtonComponent component={component} /> : <IconComponent component={component} />}
+      </div>
+      {isSelected && (
+        <button
+          type="button"
+          title={`Delete ${component.type}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete(component.id);
+          }}
+          className="absolute -right-3 -top-3 flex h-6 w-6 items-center justify-center rounded-full border border-red-100 bg-white text-red-500 shadow-sm transition hover:bg-red-50"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      )}
+    </motion.div>
   );
 }
 
