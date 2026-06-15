@@ -15,6 +15,16 @@ import type { TextBlockState, TextTemplateType } from "./textblock/types";
 import VideoCanvas from "./videoblock/Canvas";
 import VideoRightSidebar from "./videoblock/RightSidebar";
 import type { VideoBlockData } from "./videoblock/types";
+import DividerCanvas from "./dividerblock/Canvas";
+import DividerRightSidebar from "./dividerblock/RightSidebar";
+import type { DividerBlockData } from "./dividerblock/types";
+import { defaultDividerProps } from "./dividerblock/types";
+import type { DividerBlockProps } from "./dividerblock/types";
+import IconsCanvas from "./iconsblock/Canvas";
+import IconsRightSidebar from "./iconsblock/RightSidebar";
+import type { IconBlockData } from "./iconsblock/types";
+import { defaultIconProps } from "./iconsblock/types";
+import type { IconBlockProps } from "./iconsblock/types";
  
 const initialVideoBlock: VideoBlockData = {
   id: "video-default",
@@ -29,6 +39,18 @@ const initialVideoBlock: VideoBlockData = {
     muted: false,
     showControls: true
   },
+};
+ 
+const initialDividerBlock: DividerBlockData = {
+  id: "divider-default",
+  type: "divider",
+  props: { ...defaultDividerProps },
+};
+ 
+const initialIconBlock: IconBlockData = {
+  id: "icons-default",
+  type: "icons",
+  props: { ...defaultIconProps },
 };
  
 const initialButtonBlock: BlockData = {
@@ -86,6 +108,16 @@ export default function BlockPagesClient() {
   const [isVideoEditingMode, setIsVideoEditingMode] = useState(false);
   const [editingVideoId, setEditingVideoId] = useState<string | null>(null);
  
+  const [dividerBlocks, setDividerBlocks] = useState<DividerBlockData[]>([initialDividerBlock]);
+  const [selectedDividerBlockId, setSelectedDividerBlockId] = useState<string | null>(initialDividerBlock.id);
+  const [pastDividerStates, setPastDividerStates] = useState<DividerBlockData[][]>([]);
+  const [futureDividerStates, setFutureDividerStates] = useState<DividerBlockData[][]>([]);
+ 
+  const [iconBlocks, setIconBlocks] = useState<IconBlockData[]>([initialIconBlock]);
+  const [selectedIconBlockId, setSelectedIconBlockId] = useState<string | null>(initialIconBlock.id);
+  const [pastIconStates, setPastIconStates] = useState<IconBlockData[][]>([]);
+  const [futureIconStates, setFutureIconStates] = useState<IconBlockData[][]>([]);
+ 
   const [isImageEditingMode, setIsImageEditingMode] = useState(false);
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
   const [customImages, setCustomImages] = useState<Record<string, string>>({});
@@ -93,6 +125,13 @@ export default function BlockPagesClient() {
   const [isButtonEditingMode, setIsButtonEditingMode] = useState(false);
   const [editingButtonId, setEditingButtonId] = useState<string | null>(null);
   const [customButtons, setCustomButtons] = useState<Record<string, ButtonProps>>({});
+ 
+  const [isIconEditingMode, setIsIconEditingMode] = useState(false);
+  const [editingIconId, setEditingIconId] = useState<string | null>(null);
+  const [customIcons, setCustomIcons] = useState<Record<string, IconBlockProps>>({});
+ 
+  const [appliedDividers, setAppliedDividers] = useState<{ id: string, props: DividerBlockProps, position?: { x: number, y: number }, scale?: number }[]>([]);
+  const [appliedIcons, setAppliedIcons] = useState<{ id: string, props: IconBlockProps, position?: { x: number, y: number }, scale?: number }[]>([]);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
  
   useEffect(() => {
@@ -127,6 +166,43 @@ export default function BlockPagesClient() {
       }
     } catch (e) {
       console.error("Failed to load custom buttons", e);
+    }
+ 
+    try {
+      const storedDividers = localStorage.getItem("stackly-custom-dividers");
+      if (storedDividers) {
+        window.setTimeout(() => {
+          const parsed = JSON.parse(storedDividers);
+          if (Array.isArray(parsed)) setAppliedDividers(parsed);
+          else if (parsed) setAppliedDividers([{ id: 'legacy', props: parsed }]);
+        }, 0);
+      }
+    } catch (e) {
+      console.error("Failed to load custom dividers", e);
+    }
+ 
+    try {
+      const storedIcons = localStorage.getItem("stackly-custom-icons");
+      if (storedIcons) {
+        window.setTimeout(() => {
+          const parsed = JSON.parse(storedIcons);
+          if (Array.isArray(parsed)) setAppliedIcons(parsed);
+          else if (parsed) setAppliedIcons([{ id: 'legacy', props: parsed }]);
+        }, 0);
+      }
+    } catch (e) {
+      console.error("Failed to load custom icons", e);
+    }
+ 
+    try {
+      const storedStaticIcons = localStorage.getItem("stackly-custom-static-icons");
+      if (storedStaticIcons) {
+        window.setTimeout(() => {
+          setCustomIcons(JSON.parse(storedStaticIcons) as Record<string, IconBlockProps>);
+        }, 0);
+      }
+    } catch (e) {
+      console.error("Failed to load custom static icons", e);
     }
   }, []);
  
@@ -243,6 +319,98 @@ export default function BlockPagesClient() {
   const selectedVideoBlock =
     videoBlocks.find((block) => block.id === selectedVideoBlockId) ?? videoBlocks[0] ?? null;
  
+  const pushDividerState = (nextBlocks: DividerBlockData[]) => {
+    setPastDividerStates((current) => [...current, dividerBlocks]);
+    setFutureDividerStates([]);
+    setDividerBlocks(nextBlocks);
+  };
+ 
+  const undoDivider = () => {
+    setPastDividerStates((currentPast) => {
+      if (currentPast.length === 0) return currentPast;
+      const previous = currentPast[currentPast.length - 1];
+      setFutureDividerStates((currentFuture) => [dividerBlocks, ...currentFuture]);
+      setDividerBlocks(previous);
+      setSelectedDividerBlockId(previous[0]?.id ?? null);
+      return currentPast.slice(0, -1);
+    });
+  };
+ 
+  const redoDivider = () => {
+    setFutureDividerStates((currentFuture) => {
+      if (currentFuture.length === 0) return currentFuture;
+      const [next, ...remaining] = currentFuture;
+      setPastDividerStates((currentPast) => [...currentPast, dividerBlocks]);
+      setDividerBlocks(next);
+      setSelectedDividerBlockId(next[0]?.id ?? null);
+      return remaining;
+    });
+  };
+ 
+  const updateDividerBlock = (id: string, props: Partial<DividerBlockData["props"]>) => {
+    if (!id) return;
+    pushDividerState(
+      dividerBlocks.map((block) =>
+        block.id === id ? { ...block, props: { ...block.props, ...props } } : block
+      )
+    );
+  };
+ 
+  const removeDividerBlock = (id: string) => {
+    const nextBlocks = dividerBlocks.filter((block) => block.id !== id);
+    pushDividerState(nextBlocks.length > 0 ? nextBlocks : [initialDividerBlock]);
+    setSelectedDividerBlockId((nextBlocks.length > 0 ? nextBlocks : [initialDividerBlock])[0]?.id ?? null);
+  };
+ 
+  const selectedDividerBlock =
+    dividerBlocks.find((block) => block.id === selectedDividerBlockId) ?? dividerBlocks[0] ?? null;
+ 
+  const pushIconState = (nextBlocks: IconBlockData[]) => {
+    setPastIconStates((current) => [...current, iconBlocks]);
+    setFutureIconStates([]);
+    setIconBlocks(nextBlocks);
+  };
+ 
+  const undoIcon = () => {
+    setPastIconStates((currentPast) => {
+      if (currentPast.length === 0) return currentPast;
+      const previous = currentPast[currentPast.length - 1];
+      setFutureIconStates((currentFuture) => [iconBlocks, ...currentFuture]);
+      setIconBlocks(previous);
+      setSelectedIconBlockId(previous[0]?.id ?? null);
+      return currentPast.slice(0, -1);
+    });
+  };
+ 
+  const redoIcon = () => {
+    setFutureIconStates((currentFuture) => {
+      if (currentFuture.length === 0) return currentFuture;
+      const [next, ...remaining] = currentFuture;
+      setPastIconStates((currentPast) => [...currentPast, iconBlocks]);
+      setIconBlocks(next);
+      setSelectedIconBlockId(next[0]?.id ?? null);
+      return remaining;
+    });
+  };
+ 
+  const updateIconBlock = (id: string, props: Partial<IconBlockData["props"]>) => {
+    if (!id) return;
+    pushIconState(
+      iconBlocks.map((block) =>
+        block.id === id ? { ...block, props: { ...block.props, ...props } } : block
+      )
+    );
+  };
+ 
+  const removeIconBlock = (id: string) => {
+    const nextBlocks = iconBlocks.filter((block) => block.id !== id);
+    pushIconState(nextBlocks.length > 0 ? nextBlocks : [initialIconBlock]);
+    setSelectedIconBlockId((nextBlocks.length > 0 ? nextBlocks : [initialIconBlock])[0]?.id ?? null);
+  };
+ 
+  const selectedIconBlock =
+    iconBlocks.find((block) => block.id === selectedIconBlockId) ?? iconBlocks[0] ?? null;
+ 
   const pushTextState = (nextState: TextBlockState) => {
     setPastTextStates((current) => [...current, textBlockState]);
     setFutureTextStates([]);
@@ -286,6 +454,7 @@ export default function BlockPagesClient() {
             isButtonEditingMode={isButtonEditingMode}
             editingButtonId={editingButtonId}
             isVideoEditingMode={isVideoEditingMode}
+            isIconEditingMode={isIconEditingMode}
             onUpdateVideoStyle={(props) => {
               if (selectedVideoBlockId) {
                 updateVideoBlock(selectedVideoBlockId, props);
@@ -374,6 +543,34 @@ export default function BlockPagesClient() {
                 return;
               }
  
+              if (page === "divider") {
+                setIsImageEditingMode(false);
+                setIsButtonEditingMode(false);
+                setIsVideoEditingMode(false);
+                pushTextState({ ...textBlockState, isTextEditable: false });
+                setActiveBlockPage("divider");
+                return;
+              }
+ 
+              if (page === "icons" && activeBlockPage === "text") {
+                setIsIconEditingMode((prev) => !prev);
+                setIsImageEditingMode(false);
+                setIsButtonEditingMode(false);
+                setIsVideoEditingMode(false);
+                pushTextState({ ...textBlockState, isTextEditable: false });
+                return;
+              }
+ 
+              if (page === "icons") {
+                setIsIconEditingMode(false);
+                setIsImageEditingMode(false);
+                setIsButtonEditingMode(false);
+                setIsVideoEditingMode(false);
+                pushTextState({ ...textBlockState, isTextEditable: false });
+                setActiveBlockPage("icons");
+                return;
+              }
+ 
               const wasOnText = activeBlockPage === "text";
               setActiveBlockPage(page);
  
@@ -381,6 +578,7 @@ export default function BlockPagesClient() {
                 setIsImageEditingMode(false);
                 setIsButtonEditingMode(false);
                 setIsVideoEditingMode(false);
+                setIsIconEditingMode(false);
  
                 const nextIsEditable = wasOnText ? !textBlockState.isTextEditable : true;
                 pushTextState({
@@ -475,6 +673,57 @@ export default function BlockPagesClient() {
                 setEditingVideoId(videoId);
                 setActiveBlockPage("video");
               }}
+              isIconEditingMode={isIconEditingMode}
+              editingIconId={editingIconId}
+              customIcons={customIcons}
+              onEditIcon={(iconId) => {
+                setEditingIconId(iconId);
+                setActiveBlockPage("icons");
+              }}
+              appliedDividers={appliedDividers}
+              onRemoveDivider={(id) => {
+                setAppliedDividers((prev) => {
+                  const next = prev.filter(d => d.id !== id);
+                  localStorage.setItem("stackly-custom-dividers", JSON.stringify(next));
+                  return next;
+                });
+              }}
+              appliedIcons={appliedIcons}
+              onRemoveIcon={(id) => {
+                setAppliedIcons((prev) => {
+                  const next = prev.filter(i => i.id !== id);
+                  localStorage.setItem("stackly-custom-icons", JSON.stringify(next));
+                  return next;
+                });
+              }}
+              onUpdateDividerPosition={(id, position) => {
+                setAppliedDividers((prev) => {
+                  const next = prev.map(d => d.id === id ? { ...d, position } : d);
+                  localStorage.setItem("stackly-custom-dividers", JSON.stringify(next));
+                  return next;
+                });
+              }}
+              onUpdateDividerScale={(id, scale) => {
+                setAppliedDividers((prev) => {
+                  const next = prev.map(d => d.id === id ? { ...d, scale } : d);
+                  localStorage.setItem("stackly-custom-dividers", JSON.stringify(next));
+                  return next;
+                });
+              }}
+              onUpdateIconPosition={(id, position) => {
+                setAppliedIcons((prev) => {
+                  const next = prev.map(i => i.id === id ? { ...i, position } : i);
+                  localStorage.setItem("stackly-custom-icons", JSON.stringify(next));
+                  return next;
+                });
+              }}
+              onUpdateIconScale={(id, scale) => {
+                setAppliedIcons((prev) => {
+                  const next = prev.map(i => i.id === id ? { ...i, scale } : i);
+                  localStorage.setItem("stackly-custom-icons", JSON.stringify(next));
+                  return next;
+                });
+              }}
             />
             <div className="hidden w-[210px] shrink-0 xl:block">
               <TextRightSidebar state={textBlockState} onStateChange={pushTextState} />
@@ -540,10 +789,112 @@ export default function BlockPagesClient() {
               />
             </div>
           </div>
+        ) : activeBlockPage === "divider" ? (
+          <div className="flex min-w-0 flex-1 gap-4 relative">
+            <div className="flex-1 min-w-0">
+              <DividerCanvas
+                blocks={dividerBlocks}
+                selectedBlockId={selectedDividerBlockId}
+                onSelectBlock={setSelectedDividerBlockId}
+                onRemoveBlock={removeDividerBlock}
+                onUpdateBlock={updateDividerBlock}
+                canUndo={pastDividerStates.length > 0}
+                canRedo={futureDividerStates.length > 0}
+                onUndo={undoDivider}
+                onRedo={redoDivider}
+                onOpenMobileSidebar={() => setShowMobileSidebar(true)}
+                onApplyDivider={() => {
+                  const block = selectedDividerBlock ?? dividerBlocks[0];
+                  if (block) {
+                    setAppliedDividers((prev) => {
+                      const newDivider = { id: Date.now().toString(), props: block.props };
+                      const next = [...prev, newDivider];
+                      localStorage.setItem("stackly-custom-dividers", JSON.stringify(next));
+                      return next;
+                    });
+                  }
+                  setActiveBlockPage("text");
+                }}
+              />
+            </div>
+            {showMobileSidebar && (
+              <div
+                className="fixed inset-0 bg-black/50 z-[90] xl:hidden"
+                onClick={() => setShowMobileSidebar(false)}
+              />
+            )}
+            <div className={`
+              fixed bottom-0 left-0 w-full h-[60vh] z-[100] transition-transform duration-300
+              ${showMobileSidebar ? "translate-y-0" : "translate-y-full"}
+              xl:translate-y-0 xl:static xl:h-auto xl:w-[210px] xl:shrink-0 xl:block
+              bg-white xl:bg-transparent rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)] xl:shadow-none xl:rounded-none overflow-hidden
+            `}>
+              <DividerRightSidebar
+                selectedBlock={selectedDividerBlock}
+                onUpdateBlock={updateDividerBlock}
+                onClose={() => setShowMobileSidebar(false)}
+              />
+            </div>
+          </div>
+        ) : activeBlockPage === "icons" ? (
+          <div className="flex min-w-0 flex-1 gap-4 relative">
+            <div className="flex-1 min-w-0">
+              <IconsCanvas
+                blocks={iconBlocks}
+                selectedBlockId={selectedIconBlockId}
+                onSelectBlock={setSelectedIconBlockId}
+                onRemoveBlock={removeIconBlock}
+                canUndo={pastIconStates.length > 0}
+                canRedo={futureIconStates.length > 0}
+                onUndo={undoIcon}
+                onRedo={redoIcon}
+                onOpenMobileSidebar={() => setShowMobileSidebar(true)}
+                onApplyIcon={() => {
+                  const block = selectedIconBlock ?? iconBlocks[0];
+                  if (block) {
+                    if (editingIconId) {
+                      setCustomIcons((prev) => {
+                        const next = { ...prev, [editingIconId]: block.props };
+                        localStorage.setItem("stackly-custom-static-icons", JSON.stringify(next));
+                        return next;
+                      });
+                    } else {
+                      setAppliedIcons((prev) => {
+                        const newIcon = { id: Date.now().toString(), props: block.props };
+                        const next = [...prev, newIcon];
+                        localStorage.setItem("stackly-custom-icons", JSON.stringify(next));
+                        return next;
+                      });
+                    }
+                  }
+                  setActiveBlockPage("text");
+                  setEditingIconId(null);
+                  setIsIconEditingMode(false);
+                }}
+              />
+            </div>
+            {showMobileSidebar && (
+              <div
+                className="fixed inset-0 bg-black/50 z-[90] xl:hidden"
+                onClick={() => setShowMobileSidebar(false)}
+              />
+            )}
+            <div className={`
+              fixed bottom-0 left-0 w-full h-[60vh] z-[100] transition-transform duration-300
+              ${showMobileSidebar ? "translate-y-0" : "translate-y-full"}
+              xl:translate-y-0 xl:static xl:h-auto xl:w-[210px] xl:shrink-0 xl:block
+              bg-white xl:bg-transparent rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)] xl:shadow-none xl:rounded-none overflow-hidden
+            `}>
+              <IconsRightSidebar
+                selectedBlock={selectedIconBlock}
+                onUpdateBlock={updateIconBlock}
+                onClose={() => setShowMobileSidebar(false)}
+              />
+            </div>
+          </div>
         ) : null}
       </section>
     </BuilderProvider>
   );
 }
- 
  

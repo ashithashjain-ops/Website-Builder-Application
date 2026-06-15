@@ -3,7 +3,7 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
+import { motion } from "framer-motion";
 
 import {
   FaBars,
@@ -16,7 +16,10 @@ import {
   FaPlay,
   FaMapMarkerAlt,
   FaLinkedin,
-  FaGithub
+  FaGithub,
+  FaTrash,
+  FaPlus,
+  FaMinus
 } from "react-icons/fa";
 import { assetPath } from "@/lib/paths";
 import { PORTFOLIO_PROJECTS_SLIDER_ID, scrollPortfolioProjectsSlider } from "@/lib/portfolioProjectsSlider";
@@ -24,6 +27,10 @@ import { useBuilder } from "../imageblock/BuilderContext";
 import type { BlockData } from "../buttonblock/types";
 import type { VideoBlockData } from "../videoblock/types";
 import type { SectionStyleConfig } from "./types";
+import type { DividerBlockProps } from "../dividerblock/types";
+import DividerPreview from "../dividerblock/DividerPreview";
+import type { IconBlockProps } from "../iconsblock/types";
+import IconPreview from "../iconsblock/IconPreview";
 
 type PortfolioPreviewProps = {
   isImageEditingMode?: boolean;
@@ -38,6 +45,18 @@ type PortfolioPreviewProps = {
   onEditVideo?: (videoId: string) => void;
   sectionStyles?: Record<string, SectionStyleConfig>;
   onPreview?: () => void;
+  appliedDividers?: { id: string, props: DividerBlockProps, position?: { x: number, y: number }, scale?: number }[];
+  onRemoveDivider?: (id: string) => void;
+  onUpdateDividerPosition?: (id: string, position: { x: number, y: number }) => void;
+  onUpdateDividerScale?: (id: string, scale: number) => void;
+  appliedIcons?: { id: string, props: IconBlockProps, position?: { x: number, y: number }, scale?: number }[];
+  onRemoveIcon?: (id: string) => void;
+  onUpdateIconPosition?: (id: string, position: { x: number, y: number }) => void;
+  onUpdateIconScale?: (id: string, scale: number) => void;
+  isIconEditingMode?: boolean;
+  customIcons?: Record<string, IconBlockProps>;
+  onEditIcon?: (iconId: string) => void;
+  editingIconId?: string | null;
 };
 
 function useLocalInView<T extends HTMLElement>({
@@ -119,6 +138,18 @@ export default function PortfolioPreview({
   onEditVideo,
   sectionStyles = {},
   onPreview,
+  appliedDividers = [],
+  onRemoveDivider,
+  onUpdateDividerPosition,
+  onUpdateDividerScale,
+  appliedIcons = [],
+  onRemoveIcon,
+  onUpdateIconPosition,
+  onUpdateIconScale,
+  isIconEditingMode = false,
+  customIcons = {},
+  onEditIcon,
+  editingIconId,
 }: PortfolioPreviewProps) {
   const [innerMobileMenuOpen, setInnerMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
@@ -368,7 +399,7 @@ export default function PortfolioPreview({
             {/* <div className="flex-1 overflow-y-auto min-w-0"> */}
             {/* <div className="flex-1 overflow-y-auto min-w-0 relative z-0"> */}
             <div className="flex-1 min-w-0 relative z-0">
-              <div className="w-full min-h-[530px] rounded-none sm:rounded-xl border-0 sm:border-2 border-gray-300 flex flex-col relative portfolio-shell bg-[#F2F2F2]">
+              <div className="@container w-full min-h-[530px] max-w-full min-w-0 overflow-x-hidden rounded-none sm:rounded-xl border-0 sm:border-2 border-gray-300 flex flex-col relative portfolio-shell bg-[#F2F2F2] box-border">
 
 
                 {/* <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2 sm:py-3 md:px-8 lg:flex-nowrap border-b border-gray-300 bg-[#06224C] rounded-t-xl"> */}
@@ -397,7 +428,7 @@ export default function PortfolioPreview({
                       </Link>
 
                       {/* CENTER → Title */}
-                      <span className="text-sm sm:text-lg font-semibold text-white text-center flex-1 min-w-0 truncate">
+                      <span className="text-sm sm:text-lg font-semibold text-white text-center flex-1 min-w-0 break-words">
                         Portfolio
                       </span>
 
@@ -529,14 +560,14 @@ export default function PortfolioPreview({
                     <div className="flex flex-col lg:flex-row items-center lg:items-stretch justify-between w-full gap-8">
 
                       <div className="w-full lg:w-[50%] lg:w-[55%] shrink-0 flex flex-col relative z-30 text-center lg:text-left portfolio-hero-copy">
-                        <div className="mx-auto lg:mx-0 mb-4 inline-flex max-w-full flex-wrap justify-center text-center items-center gap-2 rounded-full border border-[#63e5ff]/60 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#06224C] shadow-sm">
+                        <div className="mx-auto lg:mx-0 mb-4 inline-flex max-w-full flex-wrap justify-center text-center items-center gap-2 rounded-full border border-[#63e5ff]/60 bg-white/80 px-3 py-1 text-[clamp(0.5625rem,2cqi,0.6875rem)] font-bold uppercase tracking-[0.12em] sm:tracking-[0.18em] text-[#06224C] shadow-sm min-w-0 break-words">
                           <span className="h-2 w-2 rounded-full bg-[#63e5ff] animate-pulse"></span>
                           Available for freelance work
                         </div>
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mt-4 md:mt-6 text-gray-800 leading-snug md:leading-normal break-words whitespace-normal">
-                          <div className="mb-1 sm:mb-2">Hello, I&apos;m</div>
-                          <div className="text-[#63e5ff] mb-1 sm:mb-2 leading-snug break-words">Srinivas Pentakota</div>
-                          <div className="leading-snug break-words">UI/UX Designer</div>
+                        <h1 className="text-[clamp(1.75rem,5cqi,3rem)] sm:text-3xl md:text-4xl lg:text-5xl font-bold mt-4 md:mt-6 text-gray-800 leading-snug md:leading-normal break-words whitespace-normal min-w-0 max-w-full">
+                          <div className="mb-1 sm:mb-2 min-w-0 break-words">Hello, I&apos;m</div>
+                          <div className="text-[#63e5ff] mb-1 sm:mb-2 leading-snug break-words min-w-0 max-w-full">Srinivas Pentakota</div>
+                          <div className="leading-snug break-words min-w-0 max-w-full">UI/UX Designer</div>
                         </h1>
 
                         <p className="text-gray-600 mt-3 sm:mt-4 md:mt-6 text-sm sm:text-base md:text-lg max-w-xl mx-auto lg:mx-0 break-words relative z-20">
@@ -820,8 +851,147 @@ export default function PortfolioPreview({
                       transform: none;
                     }
                   }
+
+                  .portfolio-services-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+                  }
+
+                  .portfolio-service-card {
+                    min-width: 0;
+                    max-width: 100%;
+                    overflow: hidden;
+                    box-sizing: border-box;
+                  }
+
+                  .portfolio-service-card h4,
+                  .portfolio-service-card p {
+                    overflow-wrap: anywhere;
+                    word-break: normal;
+                    min-width: 0;
+                    max-width: 100%;
+                  }
+
+                  .portfolio-shell h1,
+                  .portfolio-shell h2,
+                  .portfolio-shell h3,
+                  .portfolio-shell h4,
+                  .portfolio-shell p {
+                    overflow-wrap: break-word;
+                    word-wrap: break-word;
+                    min-width: 0;
+                    max-width: 100%;
+                  }
+
+                  @container (max-width: 768px) {
+                    .portfolio-shell .portfolio-service-card h4 {
+                      font-size: clamp(1rem, 3cqi, 1.0625rem) !important;
+                      white-space: normal !important;
+                    }
+                    .portfolio-shell .portfolio-service-card p {
+                      font-size: clamp(0.8125rem, 2.5cqi, 0.8125rem) !important;
+                      white-space: normal !important;
+                    }
+                  }
                 `}</style>
 
+                {appliedIcons.map((icon, index) => (
+                  <motion.div
+                    key={icon.id}
+                    drag
+                    dragMomentum={false}
+                    initial={{ x: icon.position?.x ?? 0, y: icon.position?.y ?? 0 }}
+                    onDragEnd={(e, info) => {
+                      onUpdateIconPosition?.(icon.id, {
+                        x: (icon.position?.x ?? 0) + info.offset.x,
+                        y: (icon.position?.y ?? 0) + info.offset.y
+                      });
+                    }}
+                    data-draggable-chrome="true"
+                    className="absolute left-0 z-[100] flex w-full max-w-full flex-col items-center bg-transparent cursor-move active:cursor-grabbing px-4 py-2 sm:px-6 md:px-12 lg:px-20"
+                    style={{ top: `${200 + index * 50}px` }}
+                    title="Drag to move the icon"
+                  >
+                    <div className="relative flex flex-col items-center justify-center group/inner outline-none" tabIndex={0}>
+                      <div className="absolute inset-0 -top-12 bg-transparent z-0" />
+                      <div className="relative z-10 transition-transform group-hover/inner:outline group-hover/inner:outline-2 group-hover/inner:outline-blue-400 group-hover/inner:outline-dashed group-focus-within/inner:outline group-focus-within/inner:outline-2 group-focus-within/inner:outline-blue-400 group-focus-within/inner:outline-dashed rounded-md p-2" style={{ transform: `scale(${icon.scale ?? 1})`, transformOrigin: 'center' }}>
+                        <IconPreview props={icon.props} />
+                      </div>
+                      <div data-builder-chrome="true" className="absolute -top-10 left-1/2 -translate-x-1/2 hidden group-hover/inner:flex group-focus-within/inner:flex items-center gap-2 z-[110] bg-white p-1.5 rounded-lg shadow-xl border border-gray-200">
+                        <button
+                          onClick={() => onUpdateIconScale?.(icon.id, Math.max(0.2, (icon.scale ?? 1) - 0.1))}
+                          className="bg-gray-100 text-gray-700 p-1.5 rounded-md shadow-sm hover:bg-gray-200 hover:scale-105 transition-transform flex items-center justify-center cursor-pointer"
+                          title="Decrease Size"
+                        >
+                          <FaMinus size={12} />
+                        </button>
+                        <button
+                          onClick={() => onUpdateIconScale?.(icon.id, (icon.scale ?? 1) + 0.1)}
+                          className="bg-gray-100 text-gray-700 p-1.5 rounded-md shadow-sm hover:bg-gray-200 hover:scale-105 transition-transform flex items-center justify-center cursor-pointer"
+                          title="Increase Size"
+                        >
+                          <FaPlus size={12} />
+                        </button>
+                        <button
+                          onClick={() => onRemoveIcon?.(icon.id)}
+                          className="bg-red-50 text-red-500 p-1.5 rounded-md shadow-sm hover:bg-red-100 hover:scale-105 transition-transform flex items-center justify-center cursor-pointer"
+                          title="Remove Icon"
+                        >
+                          <FaTrash size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+                {appliedDividers.map((divider, index) => (
+                  <motion.div
+                    key={divider.id}
+                    drag
+                    dragMomentum={false}
+                    initial={{ x: divider.position?.x ?? 0, y: divider.position?.y ?? 0 }}
+                    onDragEnd={(e, info) => {
+                      onUpdateDividerPosition?.(divider.id, {
+                        x: (divider.position?.x ?? 0) + info.offset.x,
+                        y: (divider.position?.y ?? 0) + info.offset.y
+                      });
+                    }}
+                    data-draggable-chrome="true"
+                    className="absolute left-0 z-[100] flex w-full max-w-full flex-col items-center bg-transparent cursor-move active:cursor-grabbing px-4 py-2 sm:px-6 md:px-12 lg:px-20"
+                    style={{ top: `${400 + index * 60}px` }}
+                    title="Drag to move the divider"
+                  >
+                    <div className="relative flex flex-col items-center w-full group/inner outline-none" tabIndex={0}>
+                      <div className="absolute inset-0 -top-12 bg-transparent z-0" />
+                      <div className="relative z-10 transition-transform group-hover/inner:outline group-hover/inner:outline-2 group-hover/inner:outline-blue-400 group-hover/inner:outline-dashed group-focus-within/inner:outline group-focus-within/inner:outline-2 group-focus-within/inner:outline-blue-400 group-focus-within/inner:outline-dashed rounded-md p-2" style={{ transform: `scale(${divider.scale ?? 1})`, transformOrigin: 'center', width: divider.props.width || '100%' }}>
+                        <DividerPreview props={divider.props} />
+                      </div>
+                      <div data-builder-chrome="true" className="absolute -top-10 left-1/2 -translate-x-1/2 hidden group-hover/inner:flex group-focus-within/inner:flex items-center gap-2 z-[110] bg-white p-1.5 rounded-lg shadow-xl border border-gray-200">
+                        <button
+                          onClick={() => onUpdateDividerScale?.(divider.id, Math.max(0.2, (divider.scale ?? 1) - 0.1))}
+                          className="bg-gray-100 text-gray-700 p-1.5 rounded-md shadow-sm hover:bg-gray-200 hover:scale-105 transition-transform flex items-center justify-center cursor-pointer"
+                          title="Decrease Size"
+                        >
+                          <FaMinus size={12} />
+                        </button>
+                        <button
+                          onClick={() => onUpdateDividerScale?.(divider.id, (divider.scale ?? 1) + 0.1)}
+                          className="bg-gray-100 text-gray-700 p-1.5 rounded-md shadow-sm hover:bg-gray-200 hover:scale-105 transition-transform flex items-center justify-center cursor-pointer"
+                          title="Increase Size"
+                        >
+                          <FaPlus size={12} />
+                        </button>
+                        <button
+                          onClick={() => onRemoveDivider?.(divider.id)}
+                          className="bg-red-50 text-red-500 p-1.5 rounded-md shadow-sm hover:bg-red-100 hover:scale-105 transition-transform flex items-center justify-center cursor-pointer"
+                          title="Remove Divider"
+                        >
+                          <FaTrash size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
 
                 {/* ABOUT SECTION */}
                 <div className="relative w-full overflow-hidden portfolio-hero bg-[#F2F2F2]" style={getSpecificSectionStyle('about')}>
@@ -978,21 +1148,19 @@ export default function PortfolioPreview({
                   {/* </div> */}
 
                   {/* MY SERVICES SECTION */}
-                  <div className="relative z-10 w-full px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
-                    <div className="text-center mb-16">
-                      {/* <h3 className="text-base font-bold flex items-center justify-center gap-1 mb-4 text-gray-800 tracking-wide"> */}
-                      <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">My</h2>
-                        <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none">Services</span>
+                  <div className="relative z-10 w-full max-w-full overflow-x-hidden px-4 sm:px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
+                    <div className="text-center mb-16 min-w-0 max-w-full">
+                      <div className="flex flex-wrap items-center justify-center gap-2 mb-4 min-w-0 max-w-full">
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight break-words leading-tight min-w-0">My</h2>
+                        <span className="bg-[#63e5ff] text-gray-900 font-extrabold px-3 py-1 rounded-full text-2xl md:text-3xl tracking-tight leading-none break-words">Services</span>
                       </div>
-                      {/* <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 max-w-2xl mx-auto leading-tight"> */}
 
-                      <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left">
+                      <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-extrabold text-gray-800 mb-8 md:mb-16 max-w-full md:max-w-3xl leading-relaxed break-words text-center md:text-left min-w-0">
                         Provide Wide Range of  Digital Services
                       </h3>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 max-w-7xl mx-auto">
+                    <div className="grid portfolio-services-grid gap-3 sm:gap-6 max-w-7xl mx-auto min-w-0 max-w-full">
                       {[
                         { id: "01", title: "Web Development", desc: "Responsive, clean websites with purposeful layouts and polished front-end details." },
                         { id: "02", title: "UI / UX DESIGN", desc: "User journeys, wireframes, visual systems, and prototypes that make products easier to use." },
@@ -1003,22 +1171,39 @@ export default function PortfolioPreview({
                         { id: "07", title: "App Development", desc: "Mobile-first screens, component states, and interaction patterns for product teams." },
                         { id: "08", title: "Marketing", desc: "Campaign visuals, social assets, and creative direction for stronger digital presence." },
                       ].map((service) => (
-                        <div key={service.id} className="portfolio-service-card border border-gray-200 rounded-[20px] p-5 sm:p-6 lg:p-8 flex flex-col items-start transition-all duration-300 hover:-translate-y-2 hover:shadow-xl bg-white group hover:border-gray-300 cursor-pointer h-full" style={{ animationDelay: `${Number(service.id) * 45}ms` }}>
-                          <div className="w-12 h-12 mb-4 sm:mb-6 flex items-center justify-center text-gray-800 shrink-0">
-                            {service.id === "01" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>}
-                            {service.id === "02" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>}
-                            {service.id === "03" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>}
-                            {service.id === "04" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line><circle cx="12" cy="10" r="2"></circle></svg>}
-                            {service.id === "05" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path></svg>}
-                            {service.id === "06" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>}
-                            {service.id === "07" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>}
-                            {service.id === "08" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h1.76a1 1 0 0 1 .84.45l2.4 3.6a1 1 0 0 1-.84 1.55H11z"></path><path d="M18 10h-2V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4z"></path></svg>}
+                        <div key={service.id} className="portfolio-service-card border border-gray-200 rounded-[20px] p-5 sm:p-6 lg:p-8 flex flex-col items-start transition-all duration-300 hover:-translate-y-2 hover:shadow-xl bg-white group hover:border-gray-300 cursor-pointer h-full min-w-0 max-w-full break-words overflow-hidden" style={{ animationDelay: `${Number(service.id) * 45}ms` }}>
+                          <div
+                            className={`w-12 h-12 mb-4 sm:mb-6 flex items-center justify-center shrink-0 ${
+                              isIconEditingMode ? "cursor-pointer rounded-lg border-2 border-dashed border-blue-400 hover:bg-blue-50 transition-colors" : ""
+                            } ${editingIconId === `service-${service.id}` ? "ring-2 ring-blue-500 bg-blue-50" : "text-gray-800"}`}
+                            onClick={(e) => {
+                              if (isIconEditingMode && onEditIcon) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onEditIcon(`service-${service.id}`);
+                              }
+                            }}
+                          >
+                            {customIcons[`service-${service.id}`] ? (
+                              <IconPreview props={customIcons[`service-${service.id}`]} />
+                            ) : (
+                              <>
+                                {service.id === "01" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>}
+                                {service.id === "02" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>}
+                                {service.id === "03" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>}
+                                {service.id === "04" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line><circle cx="12" cy="10" r="2"></circle></svg>}
+                                {service.id === "05" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path></svg>}
+                                {service.id === "06" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>}
+                                {service.id === "07" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>}
+                                {service.id === "08" && <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h1.76a1 1 0 0 1 .84.45l2.4 3.6a1 1 0 0 1-.84 1.55H11z"></path><path d="M18 10h-2V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4z"></path></svg>}
+                              </>
+                            )}
                           </div>
-                          <h4 className="text-[17px] font-bold text-gray-900 mb-2 sm:mb-3">{service.title}</h4>
-                          <p className="text-gray-500 text-[13px] leading-relaxed mb-6 sm:mb-8 flex-1">
+                          <h4 className="text-[clamp(1rem,3cqi,1.0625rem)] font-bold text-gray-900 mb-2 sm:mb-3 min-w-0 break-words w-full">{service.title}</h4>
+                          <p className="text-gray-500 text-[13px] leading-relaxed mb-6 sm:mb-8 flex-1 min-w-0 break-words w-full">
                             {service.desc}
                           </p>
-                          <div className="mt-auto flex items-center gap-1.5 w-full shrink-0">
+                          <div className="mt-auto flex flex-wrap items-center gap-1.5 w-full shrink-0 min-w-0">
                             <div className="w-[30px] h-[30px] rounded-full bg-[#1a3636] text-white flex items-center justify-center text-[11px] font-semibold shrink-0 group-hover:bg-[#63e5ff] group-hover:text-gray-900 transition-colors">
                               {service.id}
                             </div>
@@ -1212,34 +1397,34 @@ export default function PortfolioPreview({
                   </div>
 
                   {/* TESTIMONIALS SECTION */}
-                  <div ref={testimonialsRef} className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
-                    <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-6 lg:gap-10 items-stretch">
-                      <div className={`portfolio-reveal rounded-2xl bg-white p-6 md:p-8 shadow-lg border border-gray-100 ${testimonialsInView ? "is-visible" : ""}`}>
-                        <p className="text-xs font-black uppercase tracking-[0.22em] text-[#1a3636] mb-4">Client Words</p>
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+                  <div ref={testimonialsRef} className="relative z-10 w-full max-w-full overflow-x-hidden px-4 sm:px-6 md:px-12 lg:px-20 pb-16 lg:pb-24">
+                    <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-6 lg:gap-10 items-stretch min-w-0 max-w-full">
+                      <div className={`portfolio-reveal rounded-2xl bg-white p-6 md:p-8 shadow-lg border border-gray-100 min-w-0 max-w-full break-words overflow-hidden ${testimonialsInView ? "is-visible" : ""}`}>
+                        <p className="text-xs font-black uppercase tracking-[0.22em] text-[#1a3636] mb-4 min-w-0 break-words">Client Words</p>
+                        <h2 className="text-[clamp(1.5rem,4cqi,2.25rem)] md:text-4xl font-extrabold text-gray-900 leading-tight mb-4 min-w-0 break-words">
                           Designs that feel clear before they feel clever.
                         </h2>
-                        <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                        <p className="text-gray-600 text-sm md:text-base leading-relaxed min-w-0 break-words">
                           Strong visuals are only useful when they help people understand, trust, and take action.
                         </p>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0 max-w-full">
                         {testimonials.map((item, i) => (
                           <div
                             key={item.name}
-                            className={`portfolio-reveal rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl break-words min-w-0 ${testimonialsInView ? "is-visible" : ""}`}
+                            className={`portfolio-reveal rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl break-words min-w-0 max-w-full overflow-hidden ${testimonialsInView ? "is-visible" : ""}`}
                             style={{ transitionDelay: `${i * 140}ms` }}
                           >
                             <div className="mb-5 text-5xl font-black leading-none text-[#63e5ff]">“</div>
-                            <p className="mb-6 text-sm leading-relaxed text-gray-600 break-words whitespace-normal">{item.quote}</p>
-                            <div className="flex flex-wrap items-center gap-3">
-                              <div className="h-11 w-11 rounded-full bg-[#06224C] text-white flex items-center justify-center text-sm font-black">
+                            <p className="mb-6 text-[clamp(0.875rem,2.5cqi,1rem)] leading-relaxed text-gray-600 break-words whitespace-normal min-w-0">{item.quote}</p>
+                            <div className="flex flex-wrap items-center gap-3 min-w-0">
+                              <div className="h-11 w-11 shrink-0 rounded-full bg-[#06224C] text-white flex items-center justify-center text-sm font-black">
                                 {item.name.charAt(0)}
                               </div>
-                              <div>
-                                <p className="font-extrabold text-gray-900">{item.name}</p>
-                                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{item.role}</p>
+                              <div className="min-w-0 break-words flex-1">
+                                <p className="font-extrabold text-gray-900 min-w-0 break-words">{item.name}</p>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 min-w-0 break-words">{item.role}</p>
                               </div>
                             </div>
                           </div>
@@ -1351,8 +1536,23 @@ export default function PortfolioPreview({
 
                       <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 text-[#1a3636]">
-                            <FaEnvelope size={18} />
+                          <div
+                            className={`w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 shrink-0 ${
+                              isIconEditingMode ? "cursor-pointer border-2 border-dashed border-blue-400 hover:bg-blue-50 transition-colors" : "text-[#1a3636]"
+                            } ${editingIconId === "contact-email" ? "ring-2 ring-blue-500 bg-blue-50" : ""}`}
+                            onClick={(e) => {
+                              if (isIconEditingMode && onEditIcon) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onEditIcon("contact-email");
+                              }
+                            }}
+                          >
+                            {customIcons["contact-email"] ? (
+                              <IconPreview props={customIcons["contact-email"]} />
+                            ) : (
+                              <FaEnvelope size={18} />
+                            )}
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Email</p>
@@ -1360,8 +1560,23 @@ export default function PortfolioPreview({
                           </div>
                         </div>
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 text-[#1a3636]">
-                            <FaMobileAlt size={18} />
+                          <div
+                            className={`w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 shrink-0 ${
+                              isIconEditingMode ? "cursor-pointer border-2 border-dashed border-blue-400 hover:bg-blue-50 transition-colors" : "text-[#1a3636]"
+                            } ${editingIconId === "contact-phone" ? "ring-2 ring-blue-500 bg-blue-50" : ""}`}
+                            onClick={(e) => {
+                              if (isIconEditingMode && onEditIcon) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onEditIcon("contact-phone");
+                              }
+                            }}
+                          >
+                            {customIcons["contact-phone"] ? (
+                              <IconPreview props={customIcons["contact-phone"]} />
+                            ) : (
+                              <FaMobileAlt size={18} />
+                            )}
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Phone</p>
@@ -1471,31 +1686,116 @@ export default function PortfolioPreview({
                         <ul className="space-y-5">
                           <li>
                             <a href="mailto:@thestackly.com" className="flex items-center gap-3 text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">
-                              <span className="flex items-center justify-center text-red-500 w-5"><FaEnvelope size={18} /></span>
+                              <span
+                                className={`flex items-center justify-center w-5 shrink-0 ${
+                                  isIconEditingMode ? "cursor-pointer rounded border border-dashed border-blue-400 hover:bg-blue-50 transition-colors" : "text-red-500"
+                                } ${editingIconId === "footer-email" ? "ring-2 ring-blue-500 bg-blue-50" : ""}`}
+                                onClick={(e) => {
+                                  if (isIconEditingMode && onEditIcon) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onEditIcon("footer-email");
+                                  }
+                                }}
+                              >
+                                {customIcons["footer-email"] ? (
+                                  <IconPreview props={customIcons["footer-email"]} />
+                                ) : (
+                                  <FaEnvelope size={18} />
+                                )}
+                              </span>
                               @thestackly.com
                             </a>
                           </li>
                           <li>
                             <a href="tel:+9956796541" className="flex items-center gap-3 text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">
-                              <span className="flex items-center justify-center text-[#517AA5] w-5"><FaMobileAlt size={18} /></span>
+                              <span
+                                className={`flex items-center justify-center w-5 shrink-0 ${
+                                  isIconEditingMode ? "cursor-pointer rounded border border-dashed border-blue-400 hover:bg-blue-50 transition-colors" : "text-[#517AA5]"
+                                } ${editingIconId === "footer-phone" ? "ring-2 ring-blue-500 bg-blue-50" : ""}`}
+                                onClick={(e) => {
+                                  if (isIconEditingMode && onEditIcon) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onEditIcon("footer-phone");
+                                  }
+                                }}
+                              >
+                                {customIcons["footer-phone"] ? (
+                                  <IconPreview props={customIcons["footer-phone"]} />
+                                ) : (
+                                  <FaMobileAlt size={18} />
+                                )}
+                              </span>
                               +9956796541
                             </a>
                           </li>
                           <li>
                             <span className="flex items-center gap-3 text-[#8B9DB1] text-[15px] font-medium">
-                              <span className="flex items-center justify-center text-green-500 w-5"><FaMapMarkerAlt size={18} /></span>
+                              <span
+                                className={`flex items-center justify-center w-5 shrink-0 ${
+                                  isIconEditingMode ? "cursor-pointer rounded border border-dashed border-blue-400 hover:bg-blue-50 transition-colors" : "text-green-500"
+                                } ${editingIconId === "footer-map" ? "ring-2 ring-blue-500 bg-blue-50" : ""}`}
+                                onClick={(e) => {
+                                  if (isIconEditingMode && onEditIcon) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onEditIcon("footer-map");
+                                  }
+                                }}
+                              >
+                                {customIcons["footer-map"] ? (
+                                  <IconPreview props={customIcons["footer-map"]} />
+                                ) : (
+                                  <FaMapMarkerAlt size={18} />
+                                )}
+                              </span>
                               Bengaluru, India
                             </span>
                           </li>
                           <li>
                             <a href="https://linkedin.com/in/stackly" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">
-                              <span className="flex items-center justify-center text-blue-500 w-5"><FaLinkedin size={18} /></span>
+                              <span
+                                className={`flex items-center justify-center w-5 shrink-0 ${
+                                  isIconEditingMode ? "cursor-pointer rounded border border-dashed border-blue-400 hover:bg-blue-50 transition-colors" : "text-blue-500"
+                                } ${editingIconId === "footer-linkedin" ? "ring-2 ring-blue-500 bg-blue-50" : ""}`}
+                                onClick={(e) => {
+                                  if (isIconEditingMode && onEditIcon) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onEditIcon("footer-linkedin");
+                                  }
+                                }}
+                              >
+                                {customIcons["footer-linkedin"] ? (
+                                  <IconPreview props={customIcons["footer-linkedin"]} />
+                                ) : (
+                                  <FaLinkedin size={18} />
+                                )}
+                              </span>
                               linkedin.com/in/stackly
                             </a>
                           </li>
                           <li>
                             <a href="https://github.com/stackly" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">
-                              <span className="flex items-center justify-center text-white w-5"><FaGithub size={18} /></span>
+                              <span
+                                className={`flex items-center justify-center w-5 shrink-0 ${
+                                  isIconEditingMode ? "cursor-pointer rounded border border-dashed border-blue-400 hover:bg-blue-50 transition-colors" : "text-white"
+                                } ${editingIconId === "footer-github" ? "ring-2 ring-blue-500 bg-blue-50" : ""}`}
+                                onClick={(e) => {
+                                  if (isIconEditingMode && onEditIcon) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onEditIcon("footer-github");
+                                  }
+                                }}
+                              >
+                                {customIcons["footer-github"] ? (
+                                  <IconPreview props={customIcons["footer-github"]} />
+                                ) : (
+                                  <FaGithub size={18} />
+                                )}
+                              </span>
                               github.com/stackly
                             </a>
                           </li>

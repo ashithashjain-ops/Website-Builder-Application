@@ -12,7 +12,7 @@ import { useBuilder } from './BuilderContext';
 import {
   FaWindowMinimize
 } from "react-icons/fa";
-export type BlockPageType = 'image' | 'button' | 'text' | 'video';
+export type BlockPageType = 'image' | 'button' | 'text' | 'video' | 'divider' | 'icons';
 
 import type { TextBlockState, TextSectionProps } from "../textblock/types";
 
@@ -25,6 +25,7 @@ type LeftSidebarProps = {
   isButtonEditingMode?: boolean;
   editingButtonId?: string | null;
   isVideoEditingMode?: boolean;
+  isIconEditingMode?: boolean;
   onUpdateButtonStyle?: (props: Record<string, unknown>) => void;
   onUpdateVideoStyle?: (props: any) => void;
   onImageSelected?: (url: string) => void;
@@ -62,7 +63,7 @@ const blockCategories = [
     title: 'Basic Blocks',
     blocks: [
       { name: 'Video', icon: <Video className="w-[18px] h-[18px] mb-1.5 text-[#517AA5]" strokeWidth={1.5} /> },
-      { name: 'Cenh', icon: <ImageIcon className="w-[18px] h-[18px] mb-1.5 text-[#517AA5]" strokeWidth={1.5} /> },
+      { name: 'Icon', icon: <ImageIcon className="w-[18px] h-[18px] mb-1.5 text-[#517AA5]" strokeWidth={1.5} /> },
       { name: 'Divider', icon: <Minus className="w-[18px] h-[18px] mb-1.5 text-[#517AA5]" strokeWidth={1.5} /> },
     ]
   },
@@ -84,6 +85,7 @@ export default function LeftSidebar({
   isButtonEditingMode,
   editingButtonId,
   isVideoEditingMode,
+  isIconEditingMode,
   onUpdateButtonStyle,
   onUpdateVideoStyle,
   onImageSelected,
@@ -218,6 +220,16 @@ export default function LeftSidebar({
 
     if (type === 'Video') {
       onSelectBlockPage?.('video');
+      return;
+    }
+
+    if (type === 'Divider') {
+      onSelectBlockPage?.('divider');
+      return;
+    }
+
+    if (type === 'Icon') {
+      onSelectBlockPage?.('icons');
       return;
     }
 
@@ -515,11 +527,11 @@ export default function LeftSidebar({
                         <Video className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                         <span className="text-[10px] font-semibold text-[#0B182B]">Video</span>
                       </div>
-                      <div onClick={() => setMobileOverlayTab('Video')} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                      <div onClick={() => addBlock('Icon')} className={`bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border hover:border-[#0B182B]/20 ${(activeBlockPage === 'icons' || isIconEditingMode) ? 'ring-2 ring-[#517AA5] border-[#517AA5]' : 'border-transparent'}`}>
                         <ImageIcon className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
-                        <span className="text-[10px] font-semibold text-[#0B182B]">Cenh</span>
+                        <span className="text-[10px] font-semibold text-[#0B182B]">Icon</span>
                       </div>
-                      <div onClick={() => mobileAddBlock('Divider')} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
+                      <div onClick={() => addBlock('Divider')} className="bg-white rounded-xl flex flex-col items-center justify-center w-[60px] h-[64px] shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-transform border border-transparent hover:border-[#0B182B]/20">
                         <Minus className="w-5 h-5 text-[#0B182B] mb-1" strokeWidth={1.5} />
                         <span className="text-[10px] font-semibold text-[#0B182B]">Divider</span>
                       </div>
@@ -1307,6 +1319,8 @@ export default function LeftSidebar({
                                 (block.name === 'Image' && (activeBlockPage === 'image' || isImageEditingMode)) ||
                                 (block.name === 'Button' && (activeBlockPage === 'button' || isButtonEditingMode)) ||
                                 (block.name === 'Video' && (activeBlockPage === 'video' || isVideoEditingMode)) ||
+                                (block.name === 'Divider' && activeBlockPage === 'divider') ||
+                                (block.name === 'Icon' && activeBlockPage === 'icons') ||
                                 (block.name === 'Text' && activeTextTarget === 'text') ||
                                 (block.name === 'Header' && activeTextTarget === 'header') ||
                                 (block.name === 'Footer' && activeTextTarget === 'footer') ||

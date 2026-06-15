@@ -1,16 +1,21 @@
 "use client";
  
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Eye, Redo2, Save, Send, Undo2 } from "lucide-react";
+import { FaLaptop, FaMobileAlt, FaTabletAlt } from "react-icons/fa";
 import { assetPath } from "@/lib/paths";
 import PortfolioPreview from "./PortfolioPreview";
 import StorefrontPreview from "./StorefrontPreview";
 import type { BlockData } from "../buttonblock/types";
 import type { VideoBlockData } from "../videoblock/types";
+import type { DividerBlockProps } from "../dividerblock/types";
+import type { IconBlockProps } from "../iconsblock/types";
 import type { TextBlockState, TextEditorTarget, TextStyles, TextTemplateType } from "./types";
 import { injectPortfolioProjectsSliderNavAttributes } from "@/lib/portfolioProjectsSlider";
  
 const TEXTBLOCK_PREVIEW_STORAGE_KEY = "stackly-textblock-preview-html";
+ 
+type PreviewDevice = "desktop" | "tablet" | "mobile";
  
 type TextCanvasProps = {
   state: TextBlockState;
@@ -30,6 +35,18 @@ type TextCanvasProps = {
   videoBlocks?: VideoBlockData[];
   isVideoEditingMode?: boolean;
   onEditVideo?: (videoId: string) => void;
+  appliedDividers?: { id: string, props: DividerBlockProps, position?: { x: number, y: number }, scale?: number }[];
+  onRemoveDivider?: (id: string) => void;
+  onUpdateDividerPosition?: (id: string, position: { x: number, y: number }) => void;
+  onUpdateDividerScale?: (id: string, scale: number) => void;
+  appliedIcons?: { id: string, props: IconBlockProps, position?: { x: number, y: number }, scale?: number }[];
+  onRemoveIcon?: (id: string) => void;
+  onUpdateIconPosition?: (id: string, position: { x: number, y: number }) => void;
+  onUpdateIconScale?: (id: string, scale: number) => void;
+  isIconEditingMode?: boolean;
+  customIcons?: Record<string, IconBlockProps>;
+  onEditIcon?: (iconId: string) => void;
+  editingIconId?: string | null;
 };
  
 const rgbToHex = (rgb: string) => {
@@ -46,9 +63,22 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
   onEditButton,
   videoBlocks = [],
   isVideoEditingMode = false,
-  onEditVideo
+  onEditVideo,
+  isIconEditingMode = false,
+  customIcons = {},
+  onEditIcon,
+  editingIconId,
+  appliedDividers = [],
+  onRemoveDivider,
+  onUpdateDividerPosition,
+  onUpdateDividerScale,
+  appliedIcons = [],
+  onRemoveIcon,
+  onUpdateIconPosition,
+  onUpdateIconScale,
 }: TextCanvasProps) {
   const isPreviewMode = false;
+  const [previewDevice, setPreviewDevice] = useState<PreviewDevice>("desktop");
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const activeEditableRef = useRef<HTMLElement | null>(null);
@@ -178,9 +208,13 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
     previewClone?.querySelectorAll("[contenteditable]").forEach((element) => element.removeAttribute("contenteditable"));
     previewClone?.querySelectorAll(".editable-text-active").forEach((element) => element.classList.remove("editable-text-active"));
     previewClone?.querySelectorAll("[data-builder-chrome='true']").forEach((element) => element.remove());
+    previewClone?.querySelectorAll("[data-draggable-chrome='true']").forEach((element) => {
+      element.removeAttribute("title");
+      element.classList.remove("cursor-move", "active:cursor-grabbing", "hover:outline", "hover:outline-2", "hover:outline-blue-400", "hover:outline-dashed", "group");
+    });
     previewClone?.querySelector("[data-textblock-canvas]")?.removeAttribute("class");
     if (previewClone) injectPortfolioProjectsSliderNavAttributes(previewClone);
-
+ 
     window.localStorage.setItem(TEXTBLOCK_PREVIEW_STORAGE_KEY, previewClone?.innerHTML ?? "");
     window.open(assetPath("/blockpages/preview/"), "_blank", "noopener,noreferrer");
   };
@@ -293,12 +327,108 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
                 ${section.footerText ? `color: inherit !important; border-color: ${section.footerText}33 !important;` : ''}
               }
             `}</style>
-            <div
-              data-textblock-canvas
-              className="h-[calc(100vh-160px)] min-h-[560px] overflow-y-auto custom-scrollbar"
-            >
-              <div ref={contentRef}>
-                {template === "portfolio" ? <PortfolioPreview isImageEditingMode={isImageEditingMode} customImages={customImages} onEditImage={onEditImage} editingImageId={editingImageId} isButtonEditingMode={isButtonEditingMode} customButtons={customButtons} onEditButton={onEditButton} videoBlocks={videoBlocks} isVideoEditingMode={isVideoEditingMode} onEditVideo={onEditVideo} sectionStyles={state.sectionStyles} onPreview={openPreviewPage} /> : <StorefrontPreview />}
+            <div className="relative">
+              <div
+                data-builder-chrome="true"
+                className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2"
+              >
+                <div className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-[#E5E7EB] bg-white px-3 py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewDevice("desktop")}
+                    className={`flex h-8 w-8 items-center justify-center rounded-full border shadow-sm transition sm:h-9 sm:w-9 ${previewDevice === "desktop" ? "border-[#06224C] bg-gray-50 text-[#06224C] ring-2 ring-[#06224C]" : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"}`}
+                    title="Desktop View"
+                  >
+                    <FaLaptop size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewDevice("tablet")}
+                    className={`flex h-8 w-8 items-center justify-center rounded-full border shadow-sm transition sm:h-9 sm:w-9 ${previewDevice === "tablet" ? "border-[#06224C] bg-gray-50 text-[#06224C] ring-2 ring-[#06224C]" : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"}`}
+                    title="Tablet View"
+                  >
+                    <FaTabletAlt size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewDevice("mobile")}
+                    className={`flex h-8 w-8 items-center justify-center rounded-full border shadow-sm transition sm:h-9 sm:w-9 ${previewDevice === "mobile" ? "border-[#06224C] bg-gray-50 text-[#06224C] ring-2 ring-[#06224C]" : "border-gray-100 text-[#06224C]/70 hover:bg-gray-50"}`}
+                    title="Mobile View"
+                  >
+                    <FaMobileAlt size={14} />
+                  </button>
+                </div>
+              </div>
+ 
+              <div
+                className={`mx-auto w-full min-w-0 transition-all duration-500 ease-in-out ${
+                  previewDevice === "mobile"
+                    ? "max-w-[375px] shadow-2xl"
+                    : previewDevice === "tablet"
+                      ? "max-w-[768px] shadow-2xl"
+                      : "max-w-full"
+                } ${previewDevice !== "desktop" ? "rounded-xl border-2 border-gray-300 bg-gray-200/50 p-2 sm:p-4" : ""}`}
+              >
+                <div
+                  data-textblock-canvas
+                  className="@container h-[calc(100vh-160px)] min-h-[560px] w-full min-w-0 max-w-full overflow-x-hidden overflow-y-auto custom-scrollbar [overflow-wrap:break-word] [word-wrap:break-word]"
+                >
+                  <style>{`
+                    [data-textblock-canvas] .portfolio-shell,
+                    [data-textblock-canvas] .buyscreen-page {
+                      max-width: 100%;
+                      min-width: 0;
+                      overflow-x: hidden;
+                      box-sizing: border-box;
+                    }
+                    [data-textblock-canvas] h1,
+                    [data-textblock-canvas] h2,
+                    [data-textblock-canvas] h3,
+                    [data-textblock-canvas] h4,
+                    [data-textblock-canvas] h5,
+                    [data-textblock-canvas] h6,
+                    [data-textblock-canvas] p,
+                    [data-textblock-canvas] span,
+                    [data-textblock-canvas] a,
+                    [data-textblock-canvas] li,
+                    [data-textblock-canvas] label {
+                      overflow-wrap: break-word;
+                      word-wrap: break-word;
+                      min-width: 0;
+                      max-width: 100%;
+                    }
+                    @container (max-width: 768px) {
+                      [data-textblock-canvas] h1 {
+                        font-size: clamp(1.5rem, 5cqi, 2.25rem) !important;
+                        line-height: 1.2 !important;
+                        white-space: normal !important;
+                      }
+                      [data-textblock-canvas] h2 {
+                        font-size: clamp(1.25rem, 4cqi, 2rem) !important;
+                        line-height: 1.2 !important;
+                        white-space: normal !important;
+                      }
+                      [data-textblock-canvas] h3,
+                      [data-textblock-canvas] h4 {
+                        font-size: clamp(1rem, 3cqi, 1.25rem) !important;
+                        line-height: 1.3 !important;
+                        white-space: normal !important;
+                      }
+                      [data-textblock-canvas] p {
+                        font-size: clamp(0.8125rem, 2.5cqi, 1rem) !important;
+                        line-height: 1.5 !important;
+                        white-space: normal !important;
+                      }
+                      [data-textblock-canvas] .flex,
+                      [data-textblock-canvas] .grid {
+                        min-width: 0;
+                      }
+                    }
+                  `}</style>
+                  <div ref={contentRef} className="min-w-0 max-w-full">
+                    {template === "portfolio" ? <PortfolioPreview isImageEditingMode={isImageEditingMode} customImages={customImages} onEditImage={onEditImage} editingImageId={editingImageId} isButtonEditingMode={isButtonEditingMode} customButtons={customButtons} onEditButton={onEditButton} videoBlocks={videoBlocks} isVideoEditingMode={isVideoEditingMode} onEditVideo={onEditVideo} sectionStyles={state.sectionStyles} onPreview={openPreviewPage} appliedDividers={appliedDividers} onRemoveDivider={onRemoveDivider} onUpdateDividerPosition={onUpdateDividerPosition} onUpdateDividerScale={onUpdateDividerScale} appliedIcons={appliedIcons} onRemoveIcon={onRemoveIcon} onUpdateIconPosition={onUpdateIconPosition} onUpdateIconScale={onUpdateIconScale} isIconEditingMode={isIconEditingMode} customIcons={customIcons} onEditIcon={onEditIcon} editingIconId={editingIconId} /> : <StorefrontPreview />}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -307,5 +437,3 @@ export default function TextCanvas({ state, onStateChange, canUndo, canRedo, onU
     </main>
   );
 }
- 
- 

@@ -757,10 +757,31 @@ export default function StorefrontPreview() {
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
 
   return (
-    <main className="buyscreen-page flex min-h-[100dvh] w-full max-w-full min-w-0 flex-col overflow-visible bg-[#f5f7fb] text-[#111827]">
+    <main className="@container buyscreen-page flex min-h-[100dvh] w-full max-w-full min-w-0 flex-col overflow-x-hidden bg-[#f5f7fb] text-[#111827] box-border">
       <style dangerouslySetInnerHTML={{
         __html: `
-          @media (max-width: 1024px) {
+          .buyscreen-page {
+            max-width: 100%;
+            min-width: 0;
+            overflow-x: hidden;
+            box-sizing: border-box;
+          }
+
+          .buyscreen-page h1,
+          .buyscreen-page h2,
+          .buyscreen-page h3,
+          .buyscreen-page h4,
+          .buyscreen-page p,
+          .buyscreen-page span,
+          .buyscreen-page a,
+          .buyscreen-page button {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            min-width: 0;
+            max-width: 100%;
+          }
+
+          @container (max-width: 1024px) {
             /* 1. Fluid Layouts & Remove Fixed Constraints */
             .buyscreen-page .w-96, .buyscreen-page .w-80, .buyscreen-page .w-72, .buyscreen-page .w-64, .buyscreen-page .w-56, .buyscreen-page .w-48, .buyscreen-page .max-w-md, .buyscreen-page .max-w-sm, .buyscreen-page .max-w-lg, .buyscreen-page .w-[350px] {
               max-width: 100% !important;
@@ -779,11 +800,11 @@ export default function StorefrontPreview() {
             }
 
             /* 3. Responsive Clamp Fonts */
-            .buyscreen-page h1 { font-size: clamp(1.5rem, 5vw + 0.5rem, 3rem) !important; line-height: 1.2 !important; }
-            .buyscreen-page h2 { font-size: clamp(1.25rem, 4vw + 0.5rem, 2.5rem) !important; line-height: 1.2 !important; }
-            .buyscreen-page h3 { font-size: clamp(1rem, 3vw + 0.5rem, 2rem) !important; line-height: 1.3 !important; }
-            .buyscreen-page p { font-size: clamp(0.875rem, 2.5vw + 0.25rem, 1.125rem) !important; line-height: 1.5 !important; }
-            .buyscreen-page button { font-size: clamp(0.75rem, 2vw + 0.25rem, 1rem) !important; }
+            .buyscreen-page h1 { font-size: clamp(1.5rem, 5cqi, 3rem) !important; line-height: 1.2 !important; }
+            .buyscreen-page h2 { font-size: clamp(1.25rem, 4cqi, 2.5rem) !important; line-height: 1.2 !important; }
+            .buyscreen-page h3 { font-size: clamp(1rem, 3cqi, 2rem) !important; line-height: 1.3 !important; }
+            .buyscreen-page p { font-size: clamp(0.875rem, 2.5cqi, 1.125rem) !important; line-height: 1.5 !important; }
+            .buyscreen-page button { font-size: clamp(0.75rem, 2cqi, 1rem) !important; }
 
             /* 4. Images */
             .buyscreen-page img, .buyscreen-page svg:not(.buyscreen-header-action-icon) {
@@ -860,7 +881,7 @@ export default function StorefrontPreview() {
             }
           }
 
-          @media (max-width: 480px) {
+          @container (max-width: 480px) {
              .buyscreen-page .gap-8 { gap: 1rem !important; }
              .buyscreen-page .gap-6 { gap: 0.75rem !important; }
              .buyscreen-page .p-8 { padding: 1rem !important; }
