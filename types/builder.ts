@@ -35,6 +35,7 @@ export interface ComponentStyles {
   margin?: string;
   borderRadius?: string;
   fontSize?: string;
+  fontFamily?: string;
   fontWeight?: string;
   width?: string;
   height?: string;
@@ -455,6 +456,13 @@ export interface BuilderState {
   reorderComponents: (activeId: string, overId: string) => void;
   loadStarterWebsite: () => void;
   loadWebsiteFromRequirements: (requirements: BuilderRequirements) => void;
+  loadComponents: (components: BuilderComponent[]) => void;
+  applyDesignTokens: (tokens: {
+    colors: { primary: string; secondary: string; accent: string; background: string; text: string };
+    typography: { fontFamily: string; baseFontSize: string; headingScale: number };
+    buttons: { borderRadius: string; fontWeight: string };
+    spacing: { base: number };
+  }) => void;
   clearCanvas: () => void;
   exportHtml: () => string;
   /** Past component snapshots for undo. Capped at 50 entries. */

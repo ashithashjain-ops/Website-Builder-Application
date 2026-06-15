@@ -12,6 +12,7 @@ export const toReactStyle = (styles: ComponentStyles): CSSProperties => ({
   margin: styles.margin,
   borderRadius: styles.borderRadius,
   fontSize: styles.fontSize,
+  fontFamily: styles.fontFamily,
   fontWeight: styles.fontWeight as CSSProperties["fontWeight"],
   width: styles.width,
   height: styles.height,
@@ -40,6 +41,7 @@ export const getBaseStyles = (component: BuilderComponent): CSSProperties =>
 export const getTextStyles = (styles: ComponentStyles): CSSProperties => ({
   color: styles.color,
   fontSize: styles.fontSize,
+  fontFamily: styles.fontFamily,
   fontWeight: styles.fontWeight as CSSProperties["fontWeight"],
   textAlign: styles.textAlign,
 });

@@ -20,6 +20,7 @@ import { accordionDefaults } from "@/components/draggable/AccordionComponent";
 import { tabsDefaults } from "@/components/draggable/TabsComponent";
 import { mapDefaults } from "@/components/draggable/MapComponent";
 import type { BuilderComponent, BuilderRequirements, BuilderState, ComponentType, FeatureRecord, Viewport } from "@/types/builder";
+import type { DesignTokens } from "@/store/designStore";
 
 type ComponentDefault = Pick<BuilderComponent, "content" | "styles" | "children"> & {
   props?: BuilderComponent["props"];
@@ -265,6 +266,60 @@ const deepCloneComponent = (component: BuilderComponent): BuilderComponent => ({
   props: component.props ? { ...component.props } : undefined,
   children: component.children.map(deepCloneComponent),
 });
+
+const cloneComponentTree = (components: BuilderComponent[]): BuilderComponent[] =>
+  components.map((component) => ({
+    ...component,
+    styles: { ...component.styles },
+    textStyles: component.textStyles ? { ...component.textStyles } : undefined,
+    props: component.props ? { ...component.props } : undefined,
+    children: cloneComponentTree(component.children ?? []),
+  }));
+
+const applyTokensToComponent = (component: BuilderComponent, tokens: DesignTokens): BuilderComponent => {
+  const nextStyles = { ...component.styles, fontFamily: tokens.typography.fontFamily };
+  let nextTextStyles = component.textStyles ? { ...component.textStyles } : undefined;
+  const headingSize = `${Math.round(parseFloat(tokens.typography.baseFontSize) * tokens.typography.headingScale * 1.7)}px`;
+
+  if (["heading"].includes(component.type)) {
+    nextStyles.color = tokens.colors.primary;
+    nextStyles.fontSize = component.styles.fontSize || headingSize;
+  } else if (["text", "input"].includes(component.type)) {
+    nextStyles.color = tokens.colors.text;
+    nextStyles.fontSize = tokens.typography.baseFontSize;
+  } else if (component.type === "button") {
+    nextStyles.color = "#ffffff";
+    nextStyles.backgroundColor = tokens.colors.primary;
+    nextStyles.borderRadius = tokens.buttons.borderRadius;
+    nextStyles.fontWeight = tokens.buttons.fontWeight;
+    nextStyles.fontFamily = tokens.typography.fontFamily;
+  } else if (component.type === "divider") {
+    nextStyles.backgroundColor = tokens.colors.secondary;
+  } else if (!["image", "video", "map", "spacer"].includes(component.type)) {
+    nextStyles.color = tokens.colors.text;
+    nextStyles.backgroundColor = component.type === "footer" ? tokens.colors.primary : tokens.colors.background;
+  }
+
+  const buttonTargets = ["navigation.cta", "hero.cta"];
+  buttonTargets.forEach((key) => {
+    nextTextStyles ??= {};
+    nextTextStyles[key] = {
+      ...(nextTextStyles[key] ?? {}),
+      color: "#ffffff",
+      backgroundColor: tokens.colors.primary,
+      borderRadius: tokens.buttons.borderRadius,
+      fontWeight: tokens.buttons.fontWeight,
+      fontFamily: tokens.typography.fontFamily,
+    };
+  });
+
+  return {
+    ...component,
+    styles: nextStyles,
+    textStyles: nextTextStyles,
+    children: component.children.map((child) => applyTokensToComponent(child, tokens)),
+  };
+};
 
 const createComponent = (type: ComponentType, order: number): BuilderComponent => {
   const component: BuilderComponent = {
@@ -531,6 +586,18 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
       const components = createRequirementComponents(requirements);
       return { ...captureHistory(state), components, selectedComponentId: components[0]?.id || null };
     }),
+  loadComponents: (components) =>
+    set((state) => ({
+      ...captureHistory(state),
+      components: orderComponents(cloneComponentTree(components)),
+      selectedComponentId: null,
+      selectedComponentIds: [],
+    })),
+  applyDesignTokens: (tokens) =>
+    set((state) => ({
+      ...captureHistory(state),
+      components: state.components.map((component) => applyTokensToComponent(component, tokens)),
+    })),
   clearCanvas: () =>
     set((state) => ({ ...captureHistory(state), components: [], selectedComponentId: null })),
   exportHtml: () => generateHtml(get().components),

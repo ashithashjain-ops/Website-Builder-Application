@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Palette, RotateCcw, Type, X } from "lucide-react";
 import { useDesignStore } from "@/store/designStore";
+import { useBuilderStore } from "@/store/builderStore";
 
 const GOOGLE_FONTS = [
   "Inter, system-ui, sans-serif",
@@ -19,6 +20,28 @@ const GOOGLE_FONTS = [
   "DM Sans, sans-serif",
   "Space Grotesk, sans-serif",
 ];
+
+const DEFAULT_PANEL_TOKENS = {
+  colors: {
+    primary: "#0B1D40",
+    secondary: "#3b82f6",
+    accent: "#f59e0b",
+    background: "#ffffff",
+    text: "#0B1D40",
+  },
+  typography: {
+    fontFamily: "Inter, system-ui, sans-serif",
+    baseFontSize: "16px",
+    headingScale: 1.25,
+  },
+  buttons: {
+    borderRadius: "8px",
+    fontWeight: "700",
+  },
+  spacing: {
+    base: 8,
+  },
+};
 
 function Section({
   title,
@@ -87,6 +110,24 @@ function ColorInput({
 
 export default function GlobalStylesPanel({ onClose }: { onClose: () => void }) {
   const { tokens, setColorToken, setTokens, resetTokens } = useDesignStore();
+  const applyDesignTokens = useBuilderStore((s) => s.applyDesignTokens);
+
+  const updateColor = (key: keyof typeof tokens.colors, value: string) => {
+    const next = { ...tokens, colors: { ...tokens.colors, [key]: value } };
+    setColorToken(key, value);
+    applyDesignTokens(next);
+  };
+
+  const updateTypography = (typography: typeof tokens.typography) => {
+    const next = { ...tokens, typography };
+    setTokens({ typography });
+    applyDesignTokens(next);
+  };
+
+  const handleReset = () => {
+    resetTokens();
+    applyDesignTokens(DEFAULT_PANEL_TOKENS);
+  };
 
   return (
     <motion.div
@@ -117,11 +158,11 @@ export default function GlobalStylesPanel({ onClose }: { onClose: () => void }) 
       <div className="flex-1 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#1A315E_transparent]">
         {/* Colors */}
         <Section title="Color Palette" icon={Palette}>
-          <ColorInput label="Primary" value={tokens.colors.primary} onChange={(v) => setColorToken("primary", v)} />
-          <ColorInput label="Secondary" value={tokens.colors.secondary} onChange={(v) => setColorToken("secondary", v)} />
-          <ColorInput label="Accent" value={tokens.colors.accent} onChange={(v) => setColorToken("accent", v)} />
-          <ColorInput label="Background" value={tokens.colors.background} onChange={(v) => setColorToken("background", v)} />
-          <ColorInput label="Text" value={tokens.colors.text} onChange={(v) => setColorToken("text", v)} />
+          <ColorInput label="Primary" value={tokens.colors.primary} onChange={(v) => updateColor("primary", v)} />
+          <ColorInput label="Secondary" value={tokens.colors.secondary} onChange={(v) => updateColor("secondary", v)} />
+          <ColorInput label="Accent" value={tokens.colors.accent} onChange={(v) => updateColor("accent", v)} />
+          <ColorInput label="Background" value={tokens.colors.background} onChange={(v) => updateColor("background", v)} />
+          <ColorInput label="Text" value={tokens.colors.text} onChange={(v) => updateColor("text", v)} />
         </Section>
 
         {/* Typography */}
@@ -130,7 +171,7 @@ export default function GlobalStylesPanel({ onClose }: { onClose: () => void }) 
             <span className="mb-1.5 block text-[11px] font-bold text-gray-400">Font Family</span>
             <select
               value={tokens.typography.fontFamily}
-              onChange={(e) => setTokens({ typography: { ...tokens.typography, fontFamily: e.target.value } })}
+              onChange={(e) => updateTypography({ ...tokens.typography, fontFamily: e.target.value })}
               className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-[12px] font-bold text-gray-200 outline-none focus:border-blue-400"
             >
               {GOOGLE_FONTS.map((f) => (
@@ -144,7 +185,7 @@ export default function GlobalStylesPanel({ onClose }: { onClose: () => void }) 
               <input
                 type="text"
                 value={tokens.typography.baseFontSize}
-                onChange={(e) => setTokens({ typography: { ...tokens.typography, baseFontSize: e.target.value } })}
+                onChange={(e) => updateTypography({ ...tokens.typography, baseFontSize: e.target.value })}
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-[12px] font-bold text-gray-200 outline-none focus:border-blue-400"
               />
             </div>
@@ -156,7 +197,7 @@ export default function GlobalStylesPanel({ onClose }: { onClose: () => void }) 
                 min="1"
                 max="2"
                 value={tokens.typography.headingScale}
-                onChange={(e) => setTokens({ typography: { ...tokens.typography, headingScale: parseFloat(e.target.value) || 1.25 } })}
+                onChange={(e) => updateTypography({ ...tokens.typography, headingScale: parseFloat(e.target.value) || 1.25 })}
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-[12px] font-bold text-gray-200 outline-none focus:border-blue-400"
               />
             </div>
@@ -168,7 +209,7 @@ export default function GlobalStylesPanel({ onClose }: { onClose: () => void }) 
       <div className="flex-shrink-0 border-t border-[#1A315E] px-5 py-3">
         <button
           type="button"
-          onClick={resetTokens}
+          onClick={handleReset}
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 py-2 text-[11px] font-bold text-red-300 transition hover:bg-red-500/20"
         >
           <RotateCcw className="h-3 w-3" />

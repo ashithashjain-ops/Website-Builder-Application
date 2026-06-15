@@ -3,6 +3,7 @@
 import { memo, useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { Check, ChevronDown, Eye, FolderOpen, Images, Layers, MoreHorizontal, Palette, Pencil, Redo2, Save, Sparkles, Trash2, Undo2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 import { AssetManager } from "@/components/assets/AssetManager";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -13,6 +14,7 @@ import ButtonComponent from "@/components/draggable/ButtonComponent";
 import IconComponent from "@/components/draggable/IconComponent";
 import { useBuilderStore } from "@/store/builderStore";
 import { useDesignStore } from "@/store/designStore";
+import { useProjectStore } from "@/store/projectStore";
 import type { BuilderComponent, ComponentType } from "@/types/builder";
 
 function Canvas({
@@ -50,11 +52,20 @@ function Canvas({
   const canRedo = useBuilderStore((s) => s.future.length > 0);
   const saveToLocalStorage = useBuilderStore((s) => s.saveToLocalStorage);
   const loadFromLocalStorage = useBuilderStore((s) => s.loadFromLocalStorage);
+  const loadComponents = useBuilderStore((s) => s.loadComponents);
+  const loadWebsiteFromRequirements = useBuilderStore((s) => s.loadWebsiteFromRequirements);
   const autoSaveEnabled = useDesignStore((s) => s.autoSaveEnabled);
+  const tokens = useDesignStore((s) => s.tokens);
+  const setTokens = useDesignStore((s) => s.setTokens);
   const setLastSavedAt = useDesignStore((s) => s.setLastSavedAt);
   const toggleGlobalStyles = useDesignStore((s) => s.toggleGlobalStyles);
+  const loadProjects = useProjectStore((s) => s.loadProjects);
+  const updateProject = useProjectStore((s) => s.updateProject);
+  const getProjectById = useProjectStore((s) => s.getProjectById);
   const storeAddComponent = useBuilderStore((s) => s.addComponent);
   const insertComponentBefore = useBuilderStore((s) => s.insertComponentBefore);
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get("projectId");
 
   /* ── Quick-insert helpers ── */
   const handleQuickInsertBefore = useCallback(
@@ -97,9 +108,47 @@ function Canvas({
   /* ── Save feedback ── */
   const [saved, setSaved] = useState(false);
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const loadedProjectRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!projectId || loadedProjectRef.current === projectId) return;
+    loadProjects();
+    const project = getProjectById(projectId);
+    if (!project) return;
+
+    loadedProjectRef.current = projectId;
+    window.setTimeout(() => setProjectName(project.name || "My Website"), 0);
+    if (project.designTokens) {
+      setTokens(project.designTokens);
+    }
+    if (project.components && project.components.length > 0) {
+      loadComponents(project.components);
+    } else if (components.length === 0) {
+      loadWebsiteFromRequirements({
+        projectName: project.name || "My Website",
+        category: project.category || "Business",
+        style: project.style || "Modern",
+        sections: project.sections || [],
+      });
+    }
+  }, [components.length, getProjectById, loadComponents, loadProjects, loadWebsiteFromRequirements, projectId, setTokens]);
 
   const handleSave = () => {
-    saveToLocalStorage();
+    if (projectId) {
+      loadProjects();
+      const project = getProjectById(projectId);
+      if (project) {
+        updateProject(projectId, {
+          name: projectName.trim() || project.name,
+          components,
+          designTokens: tokens,
+        });
+      } else {
+        saveToLocalStorage();
+      }
+    } else {
+      saveToLocalStorage();
+    }
     setSaved(true);
     if (savedTimer.current) clearTimeout(savedTimer.current);
     savedTimer.current = setTimeout(() => setSaved(false), 2200);
@@ -110,14 +159,39 @@ function Canvas({
   useEffect(() => {
     if (!autoSaveEnabled || components.length === 0) return;
     const id = setInterval(() => {
-      saveToLocalStorage();
+      if (projectId) {
+        const project = getProjectById(projectId);
+        if (project) {
+          updateProject(projectId, {
+            name: projectName.trim() || project.name,
+            components,
+            designTokens: tokens,
+          });
+        }
+      } else {
+        saveToLocalStorage();
+      }
       setLastSavedAt(Date.now());
     }, 30000);
     return () => clearInterval(id);
-  }, [autoSaveEnabled, components.length, saveToLocalStorage, setLastSavedAt]);
+  }, [autoSaveEnabled, components, getProjectById, projectId, projectName, saveToLocalStorage, setLastSavedAt, tokens, updateProject]);
 
   const handleLoad = () => {
-    const ok = loadFromLocalStorage();
+    let ok = false;
+    if (projectId) {
+      loadProjects();
+      const project = getProjectById(projectId);
+      if (project?.components && project.components.length > 0) {
+        loadComponents(project.components);
+        if (project.designTokens) {
+          setTokens(project.designTokens);
+        }
+        setProjectName(project.name || "My Website");
+        ok = true;
+      }
+    } else {
+      ok = loadFromLocalStorage();
+    }
     if (!ok) {
       // Brief shake feedback would be ideal; keeping simple for now
       alert("No saved draft found.");
@@ -236,6 +310,12 @@ function Canvas({
       <div
         ref={setNodeRef}
         className={`flex flex-1 flex-col items-center overflow-y-auto px-3 py-4 transition sm:px-4 ${isOver ? "bg-blue-50/50" : "bg-[#f0f3f8]"}`}
+        style={{
+          backgroundColor: tokens.colors.background,
+          color: tokens.colors.text,
+          fontFamily: tokens.typography.fontFamily,
+          fontSize: tokens.typography.baseFontSize,
+        }}
       >
         <div
           className="relative flex min-h-[680px] w-full flex-col gap-3 transition-all duration-300"

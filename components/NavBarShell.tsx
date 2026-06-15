@@ -20,7 +20,7 @@ export default function NavBarShell() {
   const pathname = usePathname();
   const normalizedPathname = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
 
-  if (navbarHiddenRoutes.has(normalizedPathname)) {
+  if (navbarHiddenRoutes.has(normalizedPathname) || normalizedPathname.startsWith("/dashboard")) {
     return null;
   }
 
