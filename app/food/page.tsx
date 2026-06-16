@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-// import Footer from "@/components/Footer";
+import Footer from "@/components/Footer";
 import { FaEye, FaLaptop, FaTabletAlt, FaMobileAlt } from "react-icons/fa";
 import { FaBars, FaRightFromBracket, FaUser, FaXmark } from "react-icons/fa6";
 
@@ -368,7 +368,7 @@ export default function FoodTemplatesPage() {
 
            
            
-               {/* <Footer /> */}
+                <Footer /> 
             </div>
 
           </div>
