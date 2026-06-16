@@ -40,7 +40,7 @@ const Footer = dynamic(() => import("@/components/Footer"), {
 });
 
 const popularSearches = [
-  "Food",
+  "Restaurant",
   "Blog",
   "Hotel",
   "News",
@@ -68,7 +68,13 @@ const categories = [
     editHref: "/blockpages?template=blog",
   },
   { title: "Construction Themes", image: "/landing-optimized/construction02.webp", alt: "Construction website preview" },
-  { title: "Food Restaurant", image: "/landing-optimized/foodd03.webp", alt: "Food restaurant website preview" },
+ {
+  title: "Restaurant",
+    image: "/landing-optimized/foodd03.webp",
+    alt: "Restaurant website preview",
+    previewHref: "/restaurant",
+    editHref: "/blockpages?template=restaurant"
+  }, 
 ];
 
 const topProducts = [
@@ -156,7 +162,7 @@ const features = [
   {
     title: "Shapers",
     description: "Enhance your website with abstract-style layouts and unique shape-based designs.",
-    image: "/landing-optimized/shapers.webp",
+    image: "/shapers.webp",
     quote: "Shape-based layouts make your site feel creative, polished, and professional.",
   },
   {
@@ -1031,7 +1037,7 @@ export default function Home() {
           {visibleTemplates.length === 0 && (
             <div className="py-16 text-center">
               <p className="text-sm font-black uppercase tracking-widest text-[#06224C]">No matching websites found</p>
-              <p className="mt-2 text-sm text-gray-500">Try searching for portfolio, blog, ecommerce, business, food, or dashboard.</p>
+              <p className="mt-2 text-sm text-gray-500">Try searching for portfolio, blog, ecommerce, business, restaurant, or dashboard.</p>
             </div>
           )}
         </motion.div>
@@ -1081,7 +1087,7 @@ export default function Home() {
             <p className="text-xs font-bold uppercase tracking-widest text-gray-500">
               Create your site in 3 simple steps
             </p>
-            <Link href="/signup" className="mt-2 rounded-full bg-[#2B2B2B] px-8 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg transition hover:scale-[1.04] hover:bg-gray-800 hover:brightness-110">
+            <Link href="/builder" className="mt-2 rounded-full bg-[#2B2B2B] px-8 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg transition hover:scale-[1.04] hover:bg-gray-800 hover:brightness-110">
               Get Started
             </Link>
           </motion.div>
@@ -1175,7 +1181,7 @@ export default function Home() {
           <p className="mb-8 font-serif text-2xl font-black text-white md:text-4xl">
             Your vision. Your goals. Your website.
           </p>
-          <Link href="/signup" className="inline-flex rounded-full bg-white px-10 py-3.5 text-sm font-bold uppercase tracking-wider text-[#06224C] shadow-xl transition hover:scale-[1.04] hover:bg-blue-50 hover:brightness-105">
+          <Link href="/builder" className="inline-flex rounded-full bg-white px-10 py-3.5 text-sm font-bold uppercase tracking-wider text-[#06224C] shadow-xl transition hover:scale-[1.04] hover:bg-blue-50 hover:brightness-105">
             Get Started
           </Link>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-2 text-sm text-white">

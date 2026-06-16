@@ -20,14 +20,14 @@ function scrollToSection(sectionId: string) {
 }
 
 const navLinks = [
-  { label: "Home", hash: "#food-home" },
-  { label: "Templates", hash: "#food-templates" },
-  { label: "Features", hash: "#food-features" },
-  { label: "FAQ", hash: "#food-faq" },
+  { label: "Home", hash: "#restaurant-home" },
+  { label: "Templates", hash: "#restaurant-templates" },
+  { label: "Features", hash: "#restaurant-features" },
+  { label: "FAQ", hash: "#restaurant-faq" },
 ] as const;
 
 // 1. Pass deviceMode down to Header so it knows when to force mobile navigation
-function FoodHeader({ deviceMode }: { deviceMode: "desktop" | "tablet" | "mobile" }) {
+function RestaurantHeader({ deviceMode }: { deviceMode: "desktop" | "tablet" | "mobile" }) {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -66,9 +66,9 @@ function FoodHeader({ deviceMode }: { deviceMode: "desktop" | "tablet" | "mobile
         <button
           type="button"
           className="text-xl font-black text-white no-underline shrink-0 bg-none border-none cursor-pointer p-0 hover:opacity-90 focus-visible:outline-none"
-          onClick={() => scrollToSection("food-home")}
+          onClick={() => scrollToSection("restaurant-home")}
         >
-          Stackly Food.
+          Stackly Restaurant.
         </button>
 
         {/* Conditionally hide desktop nav based on real deviceMode */}
@@ -147,12 +147,12 @@ function FoodHeader({ deviceMode }: { deviceMode: "desktop" | "tablet" | "mobile
   );
 }
 
-const foodTemplates = [
+const restaurantTemplates = [
   { title: "Fine Dining & Steakhouse", image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop" },
   { title: "Modern Cafe & Bakery", image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=800&auto=format&fit=crop" },
   { title: "Authentic Pizzeria", image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=800&auto=format&fit=crop" },
   { title: "Bistro & Brunch Bar", image: "https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=800&auto=format&fit=crop",},
-  { title: "Street Food & Trucks", image: "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?q=80&w=800&auto=format&fit=crop" },
+  { title: "Street Eats & Trucks", image: "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?q=80&w=800&auto=format&fit=crop" },
   { title: "Gourmet Burger Joint", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop" },
 ];
 
@@ -165,17 +165,17 @@ const buildFeatures = [
 const infraItems = [
   { title: "Mobile-optimized design", text: "Hungry customers are searching on their phones. Our templates are automatically formatted to look perfect on any device." },
   { title: "Local SEO tools", text: "Get found by diners in your area. Built-in SEO settings help your restaurant rank higher on Google Maps and local search results." },
-  { title: "Fast loading times", text: "We use a worldwide CDN to ensure your menus and high-quality food images load instantly, providing a seamless browsing experience." },
+  { title: "Fast loading times", text: "We use a worldwide CDN to ensure your menus and high-quality restaurant images load instantly, providing a seamless browsing experience." },
 ];
 
 const faqItems = [
   { q: "Can I easily update my menu prices?", answer: "Yes! The Stackly drag-and-drop builder makes it incredibly easy to update text, swap out seasonal dishes, and adjust pricing instantly without touching a line of code." },
   { q: "Do I need to pay commission for online orders?", answer: "No. Unlike third-party delivery apps, setting up an online ordering system through your Stackly website is commission-free. You keep 100% of your profits." },
   { q: "Can customers book tables through the website?", answer: "Absolutely. You can integrate booking forms and reservation widgets that sync directly with your preferred management software." },
-  { q: "Are the food templates mobile friendly?", answer: "Yes, all our restaurant templates are 100% responsive. Your menus, contact info, and booking buttons will look perfect and be easy to tap on smartphones." },
+  { q: "Are the restaurant templates mobile friendly?", answer: "Yes, all our restaurant templates are 100% responsive. Your menus, contact info, and booking buttons will look perfect and be easy to tap on smartphones." },
 ];
 
-export default function FoodTemplatesPage() {
+export default function RestaurantTemplatesPage() {
   const [openFaq, setOpenFaq] = useState(0);
   const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const canvasScrollRef = useRef<HTMLDivElement | null>(null);
@@ -213,10 +213,10 @@ export default function FoodTemplatesPage() {
           }`}
         >
           <div className="w-full max-w-full overflow-x-hidden min-w-0">
-            <FoodHeader deviceMode={deviceMode} />
+            <RestaurantHeader deviceMode={deviceMode} />
 
             {/* 1. HERO SECTION */}
-            <div id="food-home" className={`w-full bg-[#FFF5F5] text-center min-w-0 ${
+            <div id="restaurant-home" className={`w-full bg-[#FFF5F5] text-center min-w-0 ${
               deviceMode === "desktop" ? "py-16 sm:py-24 px-4 sm:px-6 lg:px-8" : "py-12 px-4"
             }`}>
               <div className="max-w-3xl mx-auto break-words">
@@ -235,15 +235,15 @@ export default function FoodTemplatesPage() {
             </div>
 
             {/* 2. TEMPLATES GRID */}
-            <section id="food-templates" className={`bg-white min-w-0 ${
+            <section id="restaurant-templates" className={`bg-white min-w-0 ${
               deviceMode === "desktop" ? "py-16 sm:py-24 px-4 sm:px-6 lg:px-8" : "py-12 px-4"
             }`}>
               <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-10 break-words">
                   <h2 className={`font-black text-[#0A1E3D] mb-4 text-balance ${
                     deviceMode === "desktop" ? "text-3xl md:text-4xl" : "text-2xl"
-                  }`}>Choose a Food Template to Start</h2>
-                  <p className="text-base text-gray-600 max-w-2xl mx-auto">Select a layout designed specifically for the food industry and customize it to match your brand.</p>
+                  }`}>Choose a Restaurant Template to Start</h2>
+                  <p className="text-base text-gray-600 max-w-2xl mx-auto">Select a layout designed specifically for restaurants and customize it to match your brand.</p>
                 </div>
 
                 <div className={`grid ${
@@ -251,7 +251,7 @@ export default function FoodTemplatesPage() {
                   deviceMode === "tablet" ? "grid-cols-1 sm:grid-cols-2 gap-6" :
                   "grid-cols-1 gap-6"
                 }`}>
-                  {foodTemplates.map((template) => (
+                  {restaurantTemplates.map((template) => (
                     <article key={template.title} className="group flex flex-col rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-red-100 min-w-0">
                       <div className="overflow-hidden rounded-xl bg-gray-100 aspect-[4/3] mb-5">
                         <img src={template.image} alt="Template Preview" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
@@ -260,7 +260,7 @@ export default function FoodTemplatesPage() {
                         <h3 className="text-lg font-bold text-[#0A1E3D] mb-5 truncate">{template.title}</h3>
                         <div className="mt-auto flex gap-3">
                           <Link href="/landing#templates" className="flex-1 rounded-xl border-2 border-dashed border-[#b91c1c] flex items-center justify-center py-2.5 text-sm font-bold text-[#b91c1c] hover:bg-red-50">Preview</Link>
-                          <Link href={`/blockpages?template=food`} className="flex-1 rounded-xl bg-[#0A1E3D] flex items-center justify-center py-2.5 text-sm font-bold text-white hover:bg-[#112a52]">Edit</Link>
+                          <Link href={`/blockpages?template=restaurant`} className="flex-1 rounded-xl bg-[#0A1E3D] flex items-center justify-center py-2.5 text-sm font-bold text-white hover:bg-[#112a52]">Edit</Link>
                         </div>
                       </div>
                     </article>
@@ -270,7 +270,7 @@ export default function FoodTemplatesPage() {
             </section>
 
             {/* 3. BUILD YOUR WAY (FEATURES) */}
-            <section id="food-features" className={`bg-[#FFF5F5] border-y border-red-100/50 min-w-0 ${
+            <section id="restaurant-features" className={`bg-[#FFF5F5] border-y border-red-100/50 min-w-0 ${
               deviceMode === "desktop" ? "py-16 sm:py-24 px-4 sm:px-6 lg:px-8" : "py-12 px-4"
             }`}>
               <div className={`max-w-7xl mx-auto grid items-center ${
@@ -330,7 +330,7 @@ export default function FoodTemplatesPage() {
             </section>
 
             {/* 5. FAQ */}
-            <section id="food-faq" className={`bg-white min-w-0 ${
+            <section id="restaurant-faq" className={`bg-white min-w-0 ${
               deviceMode === "desktop" ? "py-16 sm:py-24 px-4 sm:px-6 lg:px-8" : "py-12 px-4"
             }`}>
               <div className="max-w-3xl mx-auto">

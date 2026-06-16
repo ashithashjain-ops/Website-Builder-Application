@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Footer from "@/components/Footer";
+import { assetPath } from "@/lib/paths";
 import { motion, type Variants } from "framer-motion";
 import { FaArrowRight, FaBullseye, FaEye, FaGem, FaHeart, FaFlag, FaUsers, FaRocket, FaStar, FaGlobe, FaLayerGroup, FaHeadset } from "react-icons/fa6";
 
@@ -156,7 +157,7 @@ export default function AboutPage() {
               </motion.div>
               <motion.div className="w-full lg:w-1/2" variants={scaleIn} whileHover={{ y: -7, rotate: 0.4 }}>
                 <img 
-                  src="/about.webp" 
+                  src={assetPath("/about.webp")}
                   alt="Team shaking hands" 
                   className="rounded-2xl shadow-2xl object-cover w-full h-[300px] md:h-[450px]"
                 />

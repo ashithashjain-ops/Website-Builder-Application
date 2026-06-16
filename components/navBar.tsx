@@ -54,10 +54,10 @@ const navCategories = [
     items: ["Designer", "Developer", "Agency", "Minimal", "Personal", "Freelancer", "Others"],
   },
   {
-    title: "FOOD",
+    title: "RESTAURANT",
     label: "RESTAURANTS",
     icon: FaUtensils,
-    items: ["Burger House", "Pizza Corner", "Fresh & Natural", "Food Stories", "Others"],
+    items: ["Burger House", "Pizza Corner", "Fresh & Natural", "Restaurant Stories", "Others"],
   },
   {
     title: "TRAVEL",
@@ -81,7 +81,7 @@ const navCategories = [
     title: "BLOG",
     label: "TOPICS",
     icon: FaPenNib,
-    items: ["Corporate", "Travel & Life", "Food & Health", "Modern News", "Finance", "Education", "Portfolio", "Minimal", "Others"],
+    items: ["Corporate", "Travel & Life", "Restaurant & Health", "Modern News", "Finance", "Education", "Portfolio", "Minimal", "Others"],
   },
   {
     title: "EDUCATION",
@@ -99,7 +99,7 @@ const navCategories = [
     title: "PHOTOGRAPHY",
     label: "GALLERY",
     icon: FaCamera,
-    items: ["Wedding", "Baby & Kids", "Fashion", "Studio Personal", "General/Portfolio", "Travel", "Event", "Food", "Studio/Personal", "Others"],
+    items: ["Wedding", "Baby & Kids", "Fashion", "Studio Personal", "General/Portfolio", "Travel", "Event", "Restaurant", "Studio/Personal", "Others"],
   },
 ];
  

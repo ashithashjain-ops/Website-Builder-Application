@@ -432,7 +432,7 @@ function BlogHeader() {
 const blogImages = {
   hero: "/blog/hero-meeting.webp",
   templateNew: "/blog/template-travel.webp",
-  templateFood: "/blog/template-food.webp",
+  templateRestaurant: "/blog/template-food.webp",
   templatePersonal: "/blog/template-personal.webp",
   buildDesk: "/blog/build-desk.webp",
   teamWork: "/blog/team-work.webp",
@@ -447,9 +447,9 @@ const templates = [
     alt: "New blog template on laptop",
   },
   {
-    title: "Food Blog",
-    image: blogImages.templateFood,
-    alt: "Food blog template preview",
+    title: "Restaurant Blog",
+    image: blogImages.templateRestaurant,
+    alt: "Restaurant blog template preview",
   },
   {
     title: "Personal Blog",

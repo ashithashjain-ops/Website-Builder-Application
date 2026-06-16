@@ -15,9 +15,9 @@ export const blogCategories = [
     image: "/landing-optimized/blog2.webp",
   },
   {
-    id: "blog-cat-food",
-    label: "Food Blog",
-    description: "Recipe cards, menu sections, and rich food photography blocks.",
+    id: "blog-cat-restaurant",
+    label: "Restaurant Blog",
+    description: "Recipe cards, menu sections, and rich restaurant photography blocks.",
     image: "/blog/template-food.webp",
   },
   {
