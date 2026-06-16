@@ -28,7 +28,6 @@ function DashboardContent() {
     searchQuery,
     sort,
     loadProjects,
-    setSearchQuery,
     setSort,
     renameProject,
     deleteProject,
@@ -69,7 +68,7 @@ function DashboardContent() {
 
   return (
     <main className="dashboard-page min-h-screen bg-[linear-gradient(135deg,#f8fafc_0%,#ffffff_45%,#ecfeff_100%)]">
-      <DashboardHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <DashboardHeader />
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 md:px-8">
         <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-6 sm:space-y-8">
