@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useCallback, useEffect, useRef, useState, useMemo } from "react";
-import { Check, ChevronDown, Eye, FolderOpen, Images, Layers, MoreHorizontal, Palette, Pencil, Redo2, Save, Sparkles, Trash2, Undo2 } from "lucide-react";
+import { Check, ChevronDown, Eye, FolderOpen, Images, Layers, Monitor, MoreHorizontal, Palette, Pencil, Redo2, Save, Smartphone, Sparkles, Tablet, Trash2, Undo2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { AssetManager } from "@/components/assets/AssetManager";
@@ -15,7 +15,8 @@ import IconComponent from "@/components/draggable/IconComponent";
 import { useBuilderStore } from "@/store/builderStore";
 import { useDesignStore } from "@/store/designStore";
 import { useProjectStore } from "@/store/projectStore";
-import type { BuilderComponent, ComponentType } from "@/types/builder";
+import type { BuilderComponent, ComponentType, Viewport } from "@/types/builder";
+import { VIEWPORT_WIDTHS } from "@/types/builder";
 
 function Canvas({
   components,
@@ -64,6 +65,8 @@ function Canvas({
   const getProjectById = useProjectStore((s) => s.getProjectById);
   const storeAddComponent = useBuilderStore((s) => s.addComponent);
   const insertComponentBefore = useBuilderStore((s) => s.insertComponentBefore);
+  const viewport = useBuilderStore((s) => s.viewport);
+  const setViewport = useBuilderStore((s) => s.setViewport);
   const searchParams = useSearchParams();
   const projectId = searchParams.get("projectId");
 
@@ -305,7 +308,38 @@ function Canvas({
         </div>
       </div>
 
-      {/* ── Viewport / device switcher + Zoom ── */}
+      {/* ── Viewport / device switcher ── */}
+      <div
+        className="flex h-9 flex-shrink-0 items-center justify-center gap-1 border-b border-[#dbe3ef] bg-white/80 px-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {([
+          { id: "desktop" as Viewport, Icon: Monitor,    label: "Desktop" },
+          { id: "tablet"  as Viewport, Icon: Tablet,     label: "Tablet" },
+          { id: "mobile"  as Viewport, Icon: Smartphone, label: "Mobile" },
+        ]).map(({ id, Icon, label }) => (
+          <button
+            key={id}
+            type="button"
+            title={`${label} (${VIEWPORT_WIDTHS[id]}px)`}
+            onClick={() => setViewport(id)}
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-bold transition ${
+              viewport === id
+                ? "bg-[#0B1D40] text-white shadow-sm"
+                : "text-[#566583] hover:bg-gray-100 hover:text-[#0B1D40]"
+            }`}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{label}</span>
+          </button>
+        ))}
+        {viewport !== "desktop" && (
+          <span className="ml-2 rounded bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
+            {VIEWPORT_WIDTHS[viewport]}px
+          </span>
+        )}
+      </div>
+
       {/* ── Canvas drop zone ── */}
       <div
         ref={setNodeRef}
@@ -319,6 +353,7 @@ function Canvas({
       >
         <div
           className="relative flex min-h-[680px] w-full flex-col gap-3 transition-all duration-300"
+          style={viewport !== "desktop" ? { maxWidth: VIEWPORT_WIDTHS[viewport], margin: "0 auto" } : undefined}
         >
           {flowComponents.length === 0 && floatingComponents.length === 0 ? (
             <div className="flex min-h-[280px] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#dbe3ef] bg-white px-6 text-center shadow-[0_18px_45px_rgba(15,35,75,0.08)] transition">

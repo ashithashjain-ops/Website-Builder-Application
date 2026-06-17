@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Download } from "lucide-react";
 import { downloadHtml } from "@/lib/exportHtml";
 import { useAssetStore } from "@/store/assetStore";
+import { useDesignStore } from "@/store/designStore";
 import { blobToDataUrl } from "@/lib/assetUtils";
 import type { BuilderComponent } from "@/types/builder";
 
@@ -102,12 +103,13 @@ async function embedImageAssets(
 export default function ExportButton({ components }: { components: BuilderComponent[] }) {
   const [isExporting, setIsExporting] = useState(false);
   const getDataUrl = useAssetStore((s) => s.getDataUrl);
+  const seo = useDesignStore((s) => s.seo);
 
   const handleExport = async () => {
     if (isExporting) return;
     setIsExporting(true);
     try {
-      downloadHtml(await embedImageAssets(components, getDataUrl));
+      downloadHtml(await embedImageAssets(components, getDataUrl), seo);
     } finally {
       setIsExporting(false);
     }

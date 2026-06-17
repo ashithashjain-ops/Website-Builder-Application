@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Monitor, RotateCcw, Smartphone, Tablet } from "lucide-react";
 import { ColorSwatch } from "./controls/ColorSwatch";
-import type { BuilderComponent, ComponentStyles } from "@/types/builder";
+import { useBuilderStore } from "@/store/builderStore";
+import type { BuilderComponent, ComponentStyles, Viewport } from "@/types/builder";
 
 /* ── Collapsible section (shared pattern with StyleTab) ───────────── */
 
@@ -88,6 +89,20 @@ function buildBorder(width: string, style: string, color: string): string {
   return `${width}px ${style} ${color}`;
 }
 
+function OverrideDot({ hasOverride, onReset }: { hasOverride: boolean; onReset: () => void }) {
+  if (!hasOverride) return null;
+  return (
+    <button
+      type="button"
+      title="This field has a viewport override. Click to reset to desktop value."
+      onClick={(e) => { e.stopPropagation(); onReset(); }}
+      className="inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition hover:bg-amber-200"
+    >
+      <RotateCcw className="h-2.5 w-2.5" />
+    </button>
+  );
+}
+
 /* ── Parse rotation from transform ────────────────────────────────── */
 
 function parseRotation(transform: string): string {
@@ -105,11 +120,38 @@ export function EffectsTab({
   component: BuilderComponent;
   onUpdate: (id: string, updates: Partial<BuilderComponent>) => void;
 }) {
-  const s = component.styles;
+  const viewport = useBuilderStore((state) => state.viewport) as Viewport;
+  const isResponsive = viewport !== "desktop";
+  const baseStyles = component.styles;
+  const vpOverrides = isResponsive ? (component.responsiveStyles?.[viewport] ?? {}) : {};
+  const s: ComponentStyles = isResponsive ? { ...baseStyles, ...vpOverrides } : baseStyles;
   const opacityRef = useRef<HTMLInputElement>(null);
 
-  const set = (patch: Partial<ComponentStyles>) =>
-    onUpdate(component.id, { styles: { ...s, ...patch } });
+  const hasOverride = (key: keyof ComponentStyles) =>
+    isResponsive && vpOverrides[key] !== undefined;
+
+  const resetOverride = (key: keyof ComponentStyles) => {
+    if (!isResponsive) return;
+    const next = { ...vpOverrides };
+    delete next[key];
+    onUpdate(component.id, {
+      responsiveStyles: { ...component.responsiveStyles, [viewport]: next },
+    });
+  };
+
+  const set = (patch: Partial<ComponentStyles>) => {
+    if (isResponsive) {
+      onUpdate(component.id, {
+        responsiveStyles: {
+          ...component.responsiveStyles,
+          [viewport]: { ...vpOverrides, ...patch },
+        },
+      });
+      return;
+    }
+
+    onUpdate(component.id, { styles: { ...baseStyles, ...patch } });
+  };
 
   /* ── Border sub-state ── */
   const border = parseBorder(s.border || "");
@@ -124,9 +166,19 @@ export function EffectsTab({
 
   /* ── Rotation ── */
   const rotation = parseRotation(s.transform || "");
+  const ViewportIcon = viewport === "tablet" ? Tablet : viewport === "mobile" ? Smartphone : Monitor;
 
   return (
     <div className="pb-6">
+      {isResponsive && (
+        <div className="mx-5 mb-3 mt-2 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+          <ViewportIcon className="h-3.5 w-3.5 text-amber-700" />
+          <span className="text-[11px] font-bold text-amber-800">
+            Editing {viewport === "tablet" ? "Tablet" : "Mobile"} overrides
+          </span>
+        </div>
+      )}
+
       {/* ─── Opacity ──────────────────────────────────────────────── */}
       <Section title="Opacity">
         <div className="flex items-center gap-3">
@@ -143,6 +195,7 @@ export function EffectsTab({
           <span className="w-10 text-right text-[13px] font-bold tabular-nums text-[#0B1D40]">
             {opacityPercent}%
           </span>
+          <OverrideDot hasOverride={hasOverride("opacity")} onReset={() => resetOverride("opacity")} />
         </div>
         {opacityPercent < 100 && (
           <button
@@ -157,6 +210,10 @@ export function EffectsTab({
 
       {/* ─── Box Shadow ───────────────────────────────────────────── */}
       <Section title="Shadow">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[12px] font-bold uppercase tracking-wider text-[#566583]">Preset</span>
+          <OverrideDot hasOverride={hasOverride("boxShadow")} onReset={() => resetOverride("boxShadow")} />
+        </div>
         <div className="grid grid-cols-3 gap-2">
           {SHADOW_PRESETS.map((preset) => {
             const isActive = (s.boxShadow || "") === preset.value;
@@ -197,6 +254,10 @@ export function EffectsTab({
 
       {/* ─── Border ───────────────────────────────────────────────── */}
       <Section title="Border" defaultOpen={false}>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[12px] font-bold uppercase tracking-wider text-[#566583]">Border</span>
+          <OverrideDot hasOverride={hasOverride("border")} onReset={() => resetOverride("border")} />
+        </div>
         <div className="grid grid-cols-2 gap-3">
           {/* Width */}
           <div>
@@ -261,6 +322,10 @@ export function EffectsTab({
 
       {/* ─── Overflow ─────────────────────────────────────────────── */}
       <Section title="Overflow" defaultOpen={false}>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[12px] font-bold uppercase tracking-wider text-[#566583]">Mode</span>
+          <OverrideDot hasOverride={hasOverride("overflow")} onReset={() => resetOverride("overflow")} />
+        </div>
         <div className="flex overflow-hidden rounded-lg border border-[#dbe3ef]">
           {OVERFLOW_OPTIONS.map((opt) => {
             const isActive = (s.overflow || "") === opt.value;
@@ -288,6 +353,10 @@ export function EffectsTab({
 
       {/* ─── Cursor ───────────────────────────────────────────────── */}
       <Section title="Cursor" defaultOpen={false}>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[12px] font-bold uppercase tracking-wider text-[#566583]">Cursor</span>
+          <OverrideDot hasOverride={hasOverride("cursor")} onReset={() => resetOverride("cursor")} />
+        </div>
         <div className="grid grid-cols-4 gap-1.5">
           {CURSOR_OPTIONS.map((opt) => {
             const isActive = (s.cursor || "") === opt.value;
@@ -317,9 +386,12 @@ export function EffectsTab({
       {/* ─── Transform (Rotate) ───────────────────────────────────── */}
       <Section title="Transform" defaultOpen={false}>
         <div>
-          <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-wider text-[#566583]">
-            Rotation
-          </span>
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <span className="block text-[12px] font-bold uppercase tracking-wider text-[#566583]">
+              Rotation
+            </span>
+            <OverrideDot hasOverride={hasOverride("transform")} onReset={() => resetOverride("transform")} />
+          </div>
           <div className="flex items-center gap-3">
             <input
               type="range"
@@ -362,9 +434,12 @@ export function EffectsTab({
       {/* ─── Transition ───────────────────────────────────────────── */}
       <Section title="Transition" defaultOpen={false}>
         <div>
-          <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-wider text-[#566583]">
-            CSS Transition
-          </span>
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <span className="block text-[12px] font-bold uppercase tracking-wider text-[#566583]">
+              CSS Transition
+            </span>
+            <OverrideDot hasOverride={hasOverride("transition")} onReset={() => resetOverride("transition")} />
+          </div>
           <input
             type="text"
             value={s.transition || ""}

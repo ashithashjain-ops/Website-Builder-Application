@@ -6,14 +6,12 @@ import { Plus } from "lucide-react";
 import { useBuilderStore } from "@/store/builderStore";
 import { useDesignStore } from "@/store/designStore";
 import FreeformItem from "./FreeformItem";
-import type { ComponentType } from "@/types/builder";
+import type { ComponentType, Viewport } from "@/types/builder";
+import { VIEWPORT_WIDTHS } from "@/types/builder";
 
 // Canvas dimensions (px). Height grows automatically.
 const CANVAS_W = 1280;
 const CANVAS_MIN_H = 900;
-
-// Default drop size when a new item lands
-const DEFAULT_W = 640;
 
 export default function FreeformCanvas({
   onAddComponent,
@@ -22,9 +20,10 @@ export default function FreeformCanvas({
 }) {
   const components = useBuilderStore((s) => s.components);
   const selectComponent = useBuilderStore((s) => s.selectComponent);
-  const moveComponent = useBuilderStore((s) => s.moveComponent);
+  const viewport = useBuilderStore((s) => s.viewport) as Viewport;
   const zoom = useDesignStore((s) => s.zoom);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const canvasWidth = viewport === "desktop" ? CANVAS_W : VIEWPORT_WIDTHS[viewport];
 
   // Compute canvas height: enough to hold all items + padding
   const maxBottom = components.reduce((acc, c) => {
@@ -65,7 +64,7 @@ export default function FreeformCanvas({
         style={{
           transform: zoom !== 100 ? `scale(${zoom / 100})` : undefined,
           transformOrigin: "top center",
-          width: CANVAS_W,
+          width: canvasWidth,
           flexShrink: 0,
         }}
       >
@@ -73,7 +72,7 @@ export default function FreeformCanvas({
         <div
           ref={canvasRef}
           className="relative bg-white shadow-[0_4px_40px_rgba(0,0,0,0.12)] rounded-xl overflow-visible"
-          style={{ width: CANVAS_W, minHeight: maxBottom }}
+          style={{ width: canvasWidth, minHeight: maxBottom }}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleCanvasDrop}
           onClick={(e) => {
@@ -109,7 +108,6 @@ export default function FreeformCanvas({
               >
                 <FreeformItem
                   component={component}
-                  canvasRef={canvasRef as React.RefObject<HTMLDivElement>}
                   siblings={components}
                 />
               </motion.div>

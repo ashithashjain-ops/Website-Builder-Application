@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { AlignCenter, AlignLeft, AlignRight, ChevronDown } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, ChevronDown, Monitor, RotateCcw, Smartphone, Tablet } from "lucide-react";
 import { ColorSwatch } from "./controls/ColorSwatch";
 import { UnitInput } from "./controls/UnitInput";
 import { SegmentedControl } from "./controls/SegmentedControl";
 import { useBuilderStore } from "@/store/builderStore";
-import type { BuilderComponent, ComponentStyles } from "@/types/builder";
+import type { BuilderComponent, ComponentStyles, Viewport } from "@/types/builder";
 
 const FONT_WEIGHTS = [
   { value: "400", label: "Regular" },
@@ -42,6 +42,21 @@ function Section({
   );
 }
 
+/** Small dot indicator showing a field has a viewport override */
+function OverrideDot({ hasOverride, onReset }: { hasOverride: boolean; onReset: () => void }) {
+  if (!hasOverride) return null;
+  return (
+    <button
+      type="button"
+      title="This field has a viewport override. Click to reset to desktop value."
+      onClick={(e) => { e.stopPropagation(); onReset(); }}
+      className="ml-1 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition hover:bg-amber-200"
+    >
+      <RotateCcw className="h-2.5 w-2.5" />
+    </button>
+  );
+}
+
 export function StyleTab({
   component,
   onUpdate,
@@ -49,7 +64,14 @@ export function StyleTab({
   component: BuilderComponent;
   onUpdate: (id: string, updates: Partial<BuilderComponent>) => void;
 }) {
-  const s = component.styles;
+  const viewport = useBuilderStore((s) => s.viewport) as Viewport;
+  const isResponsive = viewport !== "desktop";
+
+  /* ── Resolve styles for current viewport ── */
+  const baseStyles = component.styles;
+  const vpOverrides = isResponsive ? (component.responsiveStyles?.[viewport] ?? {}) : {};
+  const s: ComponentStyles = isResponsive ? { ...baseStyles, ...vpOverrides } : baseStyles;
+
   const selectedTextStyleTarget = useBuilderStore((state) => state.selectedTextStyleTarget);
   const selectTextStyleTarget = useBuilderStore((state) => state.selectTextStyleTarget);
   const textTarget =
@@ -69,8 +91,36 @@ export function StyleTab({
         ? activeTextStyles.backgroundColor || "#0B1D40"
         : "#0B1D40";
 
-  const set = (patch: Partial<ComponentStyles>) =>
-    onUpdate(component.id, { styles: { ...s, ...patch } });
+  /** Check if a specific style key has a viewport override */
+  const hasOverride = (key: keyof ComponentStyles) =>
+    isResponsive && vpOverrides[key] !== undefined;
+
+  /** Reset a specific field's viewport override back to desktop */
+  const resetOverride = (key: keyof ComponentStyles) => {
+    if (!isResponsive) return;
+    const current = component.responsiveStyles?.[viewport] ?? {};
+    const next = { ...current };
+    delete next[key];
+    onUpdate(component.id, {
+      responsiveStyles: { ...component.responsiveStyles, [viewport]: next },
+    });
+  };
+
+  /** Write a style patch — to responsiveStyles if on a breakpoint, else to base styles */
+  const set = (patch: Partial<ComponentStyles>) => {
+    if (isResponsive) {
+      // Write only the delta to the viewport override
+      onUpdate(component.id, {
+        responsiveStyles: {
+          ...component.responsiveStyles,
+          [viewport]: { ...vpOverrides, ...patch },
+        },
+      });
+    } else {
+      onUpdate(component.id, { styles: { ...baseStyles, ...patch } });
+    }
+  };
+
   const setTypography = (patch: Partial<ComponentStyles>) => {
     if (!textTarget) {
       set(patch);
@@ -79,6 +129,7 @@ export function StyleTab({
 
     onUpdate(component.id, {
       textStyles: {
+        ...(component.textStyles ?? {}),
         [textTarget.key]: {
           ...(component.textStyles?.[textTarget.key] ?? {}),
           ...patch,
@@ -87,8 +138,20 @@ export function StyleTab({
     });
   };
 
+  const ViewportIcon = viewport === "tablet" ? Tablet : viewport === "mobile" ? Smartphone : Monitor;
+
   return (
     <div className="pb-6">
+      {/* Viewport editing banner */}
+      {isResponsive && (
+        <div className="mx-5 mb-3 mt-2 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+          <ViewportIcon className="h-3.5 w-3.5 text-amber-700" />
+          <span className="text-[11px] font-bold text-amber-800">
+            Editing {viewport === "tablet" ? "Tablet" : "Mobile"} overrides
+          </span>
+        </div>
+      )}
+
       {/* Typography */}
       <Section title="Typography">
         {textTarget && (
@@ -107,18 +170,28 @@ export function StyleTab({
             </div>
           </div>
         )}
-        <ColorSwatch
-          label="Text Color"
-          value={activeTextStyles.color || defaultTextColor}
-          onChange={(v) => setTypography({ color: v })}
-        />
+        <div>
+          <div className="flex items-center">
+            <ColorSwatch
+              label="Text Color"
+              value={activeTextStyles.color || defaultTextColor}
+              onChange={(v) => setTypography({ color: v })}
+            />
+            <OverrideDot hasOverride={hasOverride("color")} onReset={() => resetOverride("color")} />
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-3">
-          <UnitInput
-            label="Font Size"
-            value={activeTextStyles.fontSize || ""}
-            onChange={(v) => setTypography({ fontSize: v })}
-            placeholder="16"
-          />
+          <div className="flex items-end gap-0.5">
+            <div className="flex-1">
+              <UnitInput
+                label="Font Size"
+                value={activeTextStyles.fontSize || ""}
+                onChange={(v) => setTypography({ fontSize: v })}
+                placeholder="16"
+              />
+            </div>
+            <OverrideDot hasOverride={hasOverride("fontSize")} onReset={() => resetOverride("fontSize")} />
+          </div>
           <div>
             <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-wider text-[#566583]">Weight</span>
             <select
@@ -163,35 +236,81 @@ export function StyleTab({
 
       {/* Background */}
       <Section title="Background" defaultOpen={!isButtonTarget}>
-        <ColorSwatch
-          label={component.type === "button" ? "Block Background" : "Background Color"}
-          value={s.backgroundColor || "#ffffff"}
-          onChange={(v) => set({ backgroundColor: v })}
-        />
+        <div className="flex items-center">
+          <ColorSwatch
+            label={component.type === "button" ? "Block Background" : "Background Color"}
+            value={s.backgroundColor || "#ffffff"}
+            onChange={(v) => set({ backgroundColor: v })}
+          />
+          <OverrideDot hasOverride={hasOverride("backgroundColor")} onReset={() => resetOverride("backgroundColor")} />
+        </div>
+      </Section>
+
+      {/* Spacing */}
+      <Section title="Spacing" defaultOpen={false}>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-end gap-0.5">
+            <div className="flex-1">
+              <UnitInput
+                label="Padding"
+                value={s.padding || ""}
+                onChange={(v) => set({ padding: v })}
+                placeholder="16"
+              />
+            </div>
+            <OverrideDot hasOverride={hasOverride("padding")} onReset={() => resetOverride("padding")} />
+          </div>
+          <div className="flex items-end gap-0.5">
+            <div className="flex-1">
+              <UnitInput
+                label="Margin"
+                value={s.margin || ""}
+                onChange={(v) => set({ margin: v })}
+                placeholder="0"
+              />
+            </div>
+            <OverrideDot hasOverride={hasOverride("margin")} onReset={() => resetOverride("margin")} />
+          </div>
+        </div>
       </Section>
 
       {/* Size */}
       <Section title="Size" defaultOpen={false}>
         <div className="grid grid-cols-2 gap-3">
-          <UnitInput
-            label="Width"
-            value={s.width || ""}
-            onChange={(v) => set({ width: v })}
-            placeholder="100"
-          />
-          <UnitInput
-            label="Height"
-            value={s.height || ""}
-            onChange={(v) => set({ height: v })}
-            placeholder="auto"
-          />
+          <div className="flex items-end gap-0.5">
+            <div className="flex-1">
+              <UnitInput
+                label="Width"
+                value={s.width || ""}
+                onChange={(v) => set({ width: v })}
+                placeholder="100"
+              />
+            </div>
+            <OverrideDot hasOverride={hasOverride("width")} onReset={() => resetOverride("width")} />
+          </div>
+          <div className="flex items-end gap-0.5">
+            <div className="flex-1">
+              <UnitInput
+                label="Height"
+                value={s.height || ""}
+                onChange={(v) => set({ height: v })}
+                placeholder="auto"
+              />
+            </div>
+            <OverrideDot hasOverride={hasOverride("height")} onReset={() => resetOverride("height")} />
+          </div>
         </div>
-        <UnitInput
-          label="Border Radius"
-          value={s.borderRadius || ""}
-          onChange={(v) => set({ borderRadius: v })}
-          placeholder="8"
-        />
+        <div className="flex items-end gap-0.5">
+          <div className="flex-1">
+            <UnitInput
+              label="Border Radius"
+              value={s.borderRadius || ""}
+              onChange={(v) => set({ borderRadius: v })}
+              placeholder="8"
+            />
+          </div>
+          <OverrideDot hasOverride={hasOverride("borderRadius")} onReset={() => resetOverride("borderRadius")} />
+        </div>
       </Section>
 
       {/* Position */}

@@ -232,7 +232,14 @@ export default function PropertyEditor({
       const setProp = (key: string, value: unknown) =>
         onUpdate(component.id, { props: { [key]: value } });
       const Panel = spec.Panel;
-      return <Panel data={data} setProp={setProp} />;
+      return (
+        <Panel
+          component={component}
+          data={data}
+          setContent={(content) => onUpdate(component.id, { content })}
+          setProp={setProp}
+        />
+      );
     }
 
     if (component.type === "gallery") {
