@@ -107,6 +107,96 @@ const buyUpdateProducts = [
   { name: "Watch", image: assetPath("/watch.webp") },
   { name: "Keyboard", image: assetPath("/keyboard.webp") },
 ];
+
+type BuyBlogPost = {
+  title: string;
+  category: string;
+  excerpt: string;
+  image: string;
+  readTime: string;
+  body: string[];
+};
+
+const buyBlogPosts: BuyBlogPost[] = [
+  {
+    title: "How to choose the right laptop for work and travel",
+    category: "Buying guides",
+    excerpt: "Compare battery life, display quality, and portability before you commit to your next daily driver.",
+    image: assetPath("/laptop.webp"),
+    readTime: "6 min read",
+    body: [
+      "Choosing a laptop today means balancing performance, battery life, and portability. Start by listing how you actually use your machine: video calls, spreadsheets, creative work, or travel-heavy days away from a charger.",
+      "For hybrid work, look for a 14-inch display with at least 8 GB of RAM and a comfortable keyboard. If you edit photos or run heavier apps, prioritize 16 GB RAM and a brighter screen rated above 300 nits.",
+      "Battery claims on spec sheets are optimistic. Instead, check real-world reviews and fast-charge support. A laptop that recovers 50% charge in 30 minutes is far more practical on the road.",
+      "Finally, compare warranty and repair options before checkout. A slightly higher upfront price can save money if the brand offers reliable service centers and accidental damage coverage.",
+    ],
+  },
+  {
+    title: "5 audio upgrades that transform your home setup",
+    category: "Reviews",
+    excerpt: "From compact speakers to noise-cancelling headphones, see which picks deliver the best value this season.",
+    image: assetPath("/audio.webp"),
+    readTime: "4 min read",
+    body: [
+      "Great audio does not always mean the most expensive gear. Start with the room you use most: desk, living room, or commute.",
+      "Compact bookshelf speakers paired with a small amplifier can outperform all-in-one soundbars for music listening. If space is tight, a quality Bluetooth speaker with stereo pairing is a strong alternative.",
+      "For focused work, noise-cancelling headphones reduce fatigue during long calls. Look for multipoint pairing if you switch between phone and laptop throughout the day.",
+      "Match your purchase to your source quality. Streaming at higher bitrates and placing speakers away from walls will improve clarity more than chasing the next model upgrade.",
+    ],
+  },
+  {
+    title: "Smartphone camera tips for sharper everyday photos",
+    category: "How-to",
+    excerpt: "Simple framing, lighting, and settings adjustments that help you get cleaner shots without extra gear.",
+    image: assetPath("/phone.webp"),
+    readTime: "5 min read",
+    body: [
+      "Most blurry smartphone photos come from low light and movement, not a missing pro mode. Clean the lens, steady your elbows, and tap to focus on your subject before shooting.",
+      "Use natural side light when possible. Shooting directly into windows or overhead lamps creates harsh contrast and noise in shadows.",
+      "Portrait mode works best with clear separation between subject and background. Step back slightly and keep faces well lit for cleaner edge detection.",
+      "After capture, adjust exposure and crop instead of relying on heavy filters. Small edits preserve detail and make everyday photos look more consistent.",
+    ],
+  },
+  {
+    title: "Wearables worth buying in 2026",
+    category: "Trending",
+    excerpt: "Track fitness, notifications, and battery goals with wearables that pair well with phones and tablets.",
+    image: assetPath("/watch.webp"),
+    readTime: "3 min read",
+    body: [
+      "The best wearable is the one you will wear daily. Prioritize comfort, water resistance, and notification reliability over niche sport metrics you may never use.",
+      "Battery life varies widely. If you travel often, choose a watch that lasts multiple days and supports quick top-ups overnight.",
+      "Health tracking accuracy improves when you wear the device consistently and update your profile details. Sleep and heart-rate trends become useful after one to two weeks of data.",
+      "Before buying, confirm app compatibility with your phone ecosystem. Cross-platform support can limit call replies, wallet features, and firmware updates.",
+    ],
+  },
+  {
+    title: "Desk accessories that boost productivity",
+    category: "Workspace",
+    excerpt: "Keyboards, mice, and compact add-ons that keep your hybrid setup comfortable and efficient.",
+    image: assetPath("/keyboard.webp"),
+    readTime: "4 min read",
+    body: [
+      "A better desk setup starts with ergonomics. Position your screen at eye level and keep wrists neutral while typing to reduce strain during long sessions.",
+      "Mechanical or low-profile keyboards can improve typing feel, but key travel is personal. Test switch type and layout before committing to a premium model.",
+      "A responsive mouse with programmable buttons saves time in design and spreadsheet workflows. Pair it with a large mouse pad for smoother movement.",
+      "Cable management and a compact USB hub reduce clutter and make hot-desking easier. Small upgrades often improve daily focus more than replacing your entire workstation.",
+    ],
+  },
+  {
+    title: "Weekend deals: what to look for before checkout",
+    category: "Savings",
+    excerpt: "Spot real discounts, compare warranty terms, and avoid impulse buys during limited-time tech events.",
+    image: assetPath("/television.webp"),
+    readTime: "5 min read",
+    body: [
+      "Event pricing can look dramatic, but not every discount is a bargain. Compare the current offer with prices from the last 30 days to see if savings are genuine.",
+      "Bundle deals are useful only when you need every item included. Skip add-ons like extended cables or cases unless they replace something you planned to buy anyway.",
+      "Check return windows and restocking fees before placing large orders. A lower price loses value if returns are difficult or warranty coverage is shortened.",
+      "Make a shortlist before the sale starts. A predefined budget and model comparison help you buy confidently instead of reacting to countdown timers.",
+    ],
+  },
+];
 const BUYSCREEN_CART_STORAGE_KEY = "buyscreenCartItemsV1";
 const BUYSCREEN_FAVORITES_STORAGE_KEY = "buyscreenFavoriteIdsV1";
 const STORAGE_SYNC_EVENT = "stackly-storage-change";
@@ -277,6 +367,39 @@ function BuyMailIcon() {
   );
 }
 
+function BuyContactPhoneIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="7" y="3" width="10" height="18" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M10 17h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function BuySendIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+      className="buyscreen-send-icon shrink-0"
+    >
+      <path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z" />
+    </svg>
+  );
+}
+
+function BuyLocationIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M12 21s6-5.3 6-11a6 6 0 1 0-12 0c0 5.7 6 11 6 11Z" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="12" cy="10" r="2.3" fill="currentColor" />
+    </svg>
+  );
+}
+
 export default function ECommercePage() {
   const router = useRouter();
   const pathname = usePathname();
@@ -308,6 +431,7 @@ export default function ECommercePage() {
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [licenseProduct, setLicenseProduct] = useState<BuyProduct | null>(null);
   const [licenseQty, setLicenseQty] = useState(1);
+  const [activeBlogPost, setActiveBlogPost] = useState<BuyBlogPost | null>(null);
   const [actionToast, setActionToast] = useState<string | null>(null);
   const toastTimerRef = useRef<number | null>(null);
   const contentStartRef = useRef<HTMLDivElement | null>(null);
@@ -334,6 +458,8 @@ export default function ECommercePage() {
     }, 200);
   };
   const featuredProductsRef = useRef<HTMLElement | null>(null);
+  const blogSectionRef = useRef<HTMLElement | null>(null);
+  const contactSectionRef = useRef<HTMLElement | null>(null);
   const heroContentRef = useRef<HTMLDivElement | null>(null);
   const topHeaderBarRef = useRef<HTMLDivElement | null>(null);
   const topHeaderSearchInputRef = useRef<HTMLInputElement | null>(null);
@@ -522,12 +648,13 @@ export default function ECommercePage() {
   );
 
   useEffect(() => {
-    if (!licenseProduct && !isCartOpen && !isFavoritesOpen) return;
+    if (!licenseProduct && !isCartOpen && !isFavoritesOpen && !activeBlogPost) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (licenseProduct) closeLicenseModal();
       if (isCartOpen) setIsCartOpen(false);
       if (isFavoritesOpen) setIsFavoritesOpen(false);
+      if (activeBlogPost) setActiveBlogPost(null);
     };
     window.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
@@ -536,7 +663,7 @@ export default function ECommercePage() {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [licenseProduct, isCartOpen, isFavoritesOpen, closeLicenseModal]);
+  }, [licenseProduct, isCartOpen, isFavoritesOpen, activeBlogPost, closeLicenseModal]);
 
   useEffect(() => {
     return () => {
@@ -614,10 +741,34 @@ export default function ECommercePage() {
     setActiveProductStart((prev) => (prev + direction + totalProducts) % totalProducts);
   }
 
+  const scrollToBlogSection = useCallback(() => {
+    setIsAllCategoriesDropdownOpen(false);
+    setIsUserMenuOpen(false);
+    setIsCategoryMenuOpen(false);
+    setActiveTopHeaderItem("Blog");
+    window.requestAnimationFrame(() => {
+      blogSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, []);
+
+  const scrollToContactSection = useCallback(() => {
+    setIsAllCategoriesDropdownOpen(false);
+    setIsUserMenuOpen(false);
+    setIsCategoryMenuOpen(false);
+    setActiveTopHeaderItem("Contact");
+    window.requestAnimationFrame(() => {
+      contactSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, []);
+
   const handleCategoryClick = useCallback(
     (label: string) => {
-      if (label === "Blog" || label === "Contact") {
-        router.push("/page-not-found");
+      if (label === "Blog") {
+        scrollToBlogSection();
+        return;
+      }
+      if (label === "Contact") {
+        scrollToContactSection();
         return;
       }
       setActiveSubCategoryKey(null);
@@ -630,7 +781,7 @@ export default function ECommercePage() {
       featuredProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       setIsCategoryMenuOpen(false);
     },
-    [router]
+    [scrollToBlogSection, scrollToContactSection]
   );
 
   const handleSubCategoryClick = useCallback((key: string) => {
@@ -659,9 +810,19 @@ export default function ECommercePage() {
         return;
       }
 
+      if (item === "Contact") {
+        scrollToContactSection();
+        return;
+      }
+
+      if (item === "Blog") {
+        scrollToBlogSection();
+        return;
+      }
+
       router.push("/page-not-found");
     },
-    [router],
+    [router, scrollToBlogSection, scrollToContactSection],
   );
 
   const handleProductsTouchStart = useCallback(
@@ -884,7 +1045,14 @@ export default function ECommercePage() {
             }
 
             /* 2. Prevent Text Overflow */
-            .buyscreen-page h1, .buyscreen-page h2, .buyscreen-page h3, .buyscreen-page h4, .buyscreen-page p, .buyscreen-page span, .buyscreen-page a, .buyscreen-page button {
+            .buyscreen-page h1:not(.buyscreen-blog-article-title),
+            .buyscreen-page h2:not(.buyscreen-blog-article-title),
+            .buyscreen-page h3:not(.buyscreen-blog-article-title),
+            .buyscreen-page h4:not(.buyscreen-blog-article-title),
+            .buyscreen-page p:not(.buyscreen-blog-article-paragraph):not(.buyscreen-blog-article-excerpt),
+            .buyscreen-page span:not(.buyscreen-blog-article-category):not(.buyscreen-blog-article-meta),
+            .buyscreen-page a:not(.buyscreen-blog-article-title),
+            .buyscreen-page button:not(.buyscreen-blog-article-close-btn):not(.buyscreen-blog-article-dismiss) {
               overflow-wrap: break-word !important;
               word-wrap: break-word !important;
               hyphens: auto !important;
@@ -893,16 +1061,23 @@ export default function ECommercePage() {
 
             /* 3. Responsive Clamp Fonts */
             .buyscreen-page h1 { font-size: clamp(1.5rem, 5vw + 0.5rem, 3rem) !important; line-height: 1.2 !important; }
-            .buyscreen-page h2 { font-size: clamp(1.25rem, 4vw + 0.5rem, 2.5rem) !important; line-height: 1.2 !important; }
+            .buyscreen-page h2:not(.buyscreen-blog-article-title) { font-size: clamp(1.25rem, 4vw + 0.5rem, 2.5rem) !important; line-height: 1.2 !important; }
             .buyscreen-page h3 { font-size: clamp(1rem, 3vw + 0.5rem, 2rem) !important; line-height: 1.3 !important; }
-            .buyscreen-page p { font-size: clamp(0.875rem, 2.5vw + 0.25rem, 1.125rem) !important; line-height: 1.5 !important; }
-            .buyscreen-page button { font-size: clamp(0.75rem, 2vw + 0.25rem, 1rem) !important; }
+            .buyscreen-page p:not(.buyscreen-blog-article-paragraph):not(.buyscreen-blog-article-excerpt) { font-size: clamp(0.875rem, 2.5vw + 0.25rem, 1.125rem) !important; line-height: 1.5 !important; }
+            .buyscreen-page button:not(.buyscreen-blog-article-close-btn):not(.buyscreen-blog-article-dismiss) { font-size: clamp(0.75rem, 2vw + 0.25rem, 1rem) !important; }
 
             /* 4. Images */
-            .buyscreen-page img:not(.stackly-footer-logo), .buyscreen-page svg:not(.buyscreen-header-action-icon) {
+            .buyscreen-page img:not(.stackly-footer-logo), .buyscreen-page svg:not(.buyscreen-header-action-icon):not(.buyscreen-send-icon) {
               max-width: 100% !important;
               height: auto !important;
               object-fit: contain !important;
+              flex-shrink: 0 !important;
+            }
+            .buyscreen-page svg.buyscreen-send-icon {
+              width: 16px !important;
+              height: 16px !important;
+              max-width: 16px !important;
+              min-width: 16px !important;
               flex-shrink: 0 !important;
             }
 
@@ -978,6 +1153,365 @@ export default function ECommercePage() {
              .buyscreen-page .gap-6 { gap: 0.75rem !important; }
              .buyscreen-page .p-8 { padding: 1rem !important; }
              .buyscreen-page .p-6 { padding: 0.75rem !important; }
+          }
+
+          /* Contact section: readable at mobile 150–200% zoom */
+          .buyscreen-page .buyscreen-contact {
+            overflow: visible !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .buyscreen-page .buyscreen-contact,
+          .buyscreen-page .buyscreen-contact * {
+            box-sizing: border-box;
+          }
+          .buyscreen-page .buyscreen-contact-grid {
+            min-width: 0;
+            max-width: 100%;
+          }
+          .buyscreen-page .buyscreen-contact-info-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 0.75rem;
+            min-width: 0;
+            max-width: 100%;
+          }
+          .buyscreen-page .buyscreen-contact-info-body {
+            flex: 1 1 8rem;
+            min-width: 0;
+            max-width: 100%;
+          }
+          .buyscreen-page .buyscreen-contact-form-card {
+            min-width: 0;
+            max-width: 100%;
+          }
+          .buyscreen-page .buyscreen-contact h2 {
+            font-size: clamp(1.15rem, 5.2vw, 1.75rem);
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+          }
+          .buyscreen-page .buyscreen-contact-eyebrow {
+            font-size: clamp(0.62rem, 2.8vw, 0.75rem);
+            letter-spacing: 0.12em;
+            line-height: 1.35;
+          }
+          .buyscreen-page .buyscreen-contact label {
+            font-size: clamp(0.68rem, 2.6vw, 0.75rem);
+            letter-spacing: 0.06em;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+          }
+          .buyscreen-page .buyscreen-contact input,
+          .buyscreen-page .buyscreen-contact textarea {
+            font-size: 16px;
+            line-height: 1.4;
+            max-width: 100%;
+          }
+          .buyscreen-page .buyscreen-contact-submit {
+            width: 100%;
+            max-width: 100%;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.3;
+            padding-top: 0.7rem;
+            padding-bottom: 0.7rem;
+          }
+          @media (max-width: 640px) {
+            .buyscreen-page .buyscreen-contact {
+              padding: 0.85rem !important;
+              border-radius: 1.15rem !important;
+            }
+            .buyscreen-page .buyscreen-contact-form-card {
+              padding: 0.85rem !important;
+            }
+            .buyscreen-page .buyscreen-contact-grid {
+              gap: 1rem !important;
+            }
+            .buyscreen-page .buyscreen-contact-info-row {
+              flex-direction: column;
+              align-items: stretch;
+              gap: 0.65rem;
+              padding: 0.75rem !important;
+            }
+            .buyscreen-page .buyscreen-contact-info-icon {
+              width: 2.5rem !important;
+              height: 2.5rem !important;
+            }
+            .buyscreen-page .buyscreen-contact-desc,
+            .buyscreen-page .buyscreen-contact-form-note {
+              font-size: clamp(0.8rem, 3.6vw, 0.9rem);
+              line-height: 1.45;
+            }
+          }
+          @media (max-width: 480px) {
+            .buyscreen-page .buyscreen-contact h3 {
+              font-size: clamp(1rem, 4.8vw, 1.15rem);
+              line-height: 1.3;
+            }
+          }
+          @media (max-width: 768px) and (min-resolution: 1.5dppx) {
+            .buyscreen-page .buyscreen-contact-fields {
+              grid-template-columns: minmax(0, 1fr) !important;
+            }
+          }
+
+          /* Blog section: readable at mobile 150–200% zoom */
+          .buyscreen-page .buyscreen-blog {
+            overflow: visible !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .buyscreen-page .buyscreen-blog,
+          .buyscreen-page .buyscreen-blog * {
+            box-sizing: border-box;
+          }
+          .buyscreen-page .buyscreen-blog-grid {
+            min-width: 0;
+            max-width: 100%;
+          }
+          .buyscreen-page .buyscreen-blog-card {
+            min-width: 0;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+          }
+          .buyscreen-page .buyscreen-blog-card-image {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            max-height: 11rem;
+            object-fit: contain !important;
+          }
+          .buyscreen-page .buyscreen-blog h2 {
+            font-size: clamp(1.15rem, 5.2vw, 1.75rem);
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+          }
+          .buyscreen-page .buyscreen-blog-eyebrow {
+            font-size: clamp(0.62rem, 2.8vw, 0.75rem);
+            letter-spacing: 0.12em;
+            line-height: 1.35;
+          }
+          .buyscreen-page .buyscreen-blog-desc {
+            font-size: clamp(0.8rem, 3.2vw, 0.95rem);
+            line-height: 1.45;
+          }
+          .buyscreen-page .buyscreen-blog-card-title {
+            font-size: clamp(0.95rem, 3.8vw, 1.05rem);
+            line-height: 1.35;
+          }
+          .buyscreen-page .buyscreen-blog-card-excerpt {
+            font-size: clamp(0.8rem, 3.2vw, 0.9rem);
+            line-height: 1.5;
+          }
+          .buyscreen-page .buyscreen-blog-read-btn {
+            width: 100%;
+            max-width: 100%;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.3;
+          }
+          @media (max-width: 640px) {
+            .buyscreen-page .buyscreen-blog {
+              padding: 0.85rem !important;
+              border-radius: 1.15rem !important;
+            }
+            .buyscreen-page .buyscreen-blog-grid {
+              gap: 0.85rem !important;
+            }
+            .buyscreen-page .buyscreen-blog-card {
+              padding: 0.85rem !important;
+            }
+            .buyscreen-page .buyscreen-blog-card-image-wrap {
+              padding: 0.5rem !important;
+            }
+          }
+          @media (max-width: 768px) and (min-resolution: 1.5dppx) {
+            .buyscreen-page .buyscreen-blog-grid {
+              grid-template-columns: minmax(0, 1fr) !important;
+            }
+          }
+
+          /* Blog article modal: readable on mobile at all zoom levels */
+          .buyscreen-blog-article-overlay {
+            box-sizing: border-box;
+            padding: 0.75rem;
+            overflow: hidden;
+            background: transparent;
+          }
+          .buyscreen-blog-article-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.62) !important;
+            backdrop-filter: blur(2px);
+          }
+          .buyscreen-blog-article-dialog {
+            box-sizing: border-box;
+            width: 100%;
+            min-width: 0;
+            max-width: 42rem;
+            height: min(92dvh, 820px);
+            max-height: min(92dvh, 820px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #ffffff !important;
+            isolation: isolate;
+          }
+          .buyscreen-blog-article-dialog,
+          .buyscreen-blog-article-dialog * {
+            box-sizing: border-box;
+            hyphens: manual !important;
+          }
+          .buyscreen-blog-article-header,
+          .buyscreen-blog-article-content,
+          .buyscreen-blog-article-footer {
+            min-width: 0;
+            max-width: 100%;
+            background: #ffffff !important;
+          }
+          .buyscreen-blog-article-content {
+            flex: 1 1 0%;
+            min-height: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+          }
+          .buyscreen-blog-article-dialog .buyscreen-blog-article-title {
+            font-size: 1.35rem !important;
+            line-height: 1.35 !important;
+            letter-spacing: -0.02em !important;
+            overflow-wrap: break-word !important;
+            word-wrap: break-word !important;
+            word-break: normal !important;
+            white-space: normal !important;
+          }
+          .buyscreen-blog-article-dialog .buyscreen-blog-article-category {
+            font-size: 0.8rem !important;
+            letter-spacing: 0.08em !important;
+            line-height: 1.35 !important;
+            white-space: normal !important;
+          }
+          .buyscreen-blog-article-dialog .buyscreen-blog-article-meta {
+            font-size: 0.9rem !important;
+            line-height: 1.45 !important;
+          }
+          .buyscreen-blog-article-dialog .buyscreen-blog-article-excerpt {
+            font-size: 1.0625rem !important;
+            line-height: 1.7 !important;
+            overflow-wrap: break-word !important;
+            word-wrap: break-word !important;
+            word-break: normal !important;
+            white-space: normal !important;
+          }
+          .buyscreen-blog-article-dialog .buyscreen-blog-article-paragraph {
+            font-size: 1rem !important;
+            line-height: 1.75 !important;
+            overflow-wrap: break-word !important;
+            word-wrap: break-word !important;
+            word-break: normal !important;
+            white-space: normal !important;
+          }
+          .buyscreen-blog-article-dialog .buyscreen-blog-article-close-btn {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-height: 2.75rem !important;
+            font-size: 0.875rem !important;
+            letter-spacing: 0.08em !important;
+            line-height: 1.35 !important;
+            white-space: normal !important;
+            text-align: center !important;
+            flex-shrink: 1 !important;
+          }
+          .buyscreen-blog-article-dialog .buyscreen-blog-article-dismiss {
+            flex-shrink: 0 !important;
+          }
+          .buyscreen-blog-article-image-wrap {
+            min-width: 0;
+            max-width: 100%;
+          }
+          .buyscreen-blog-article-image {
+            width: auto !important;
+            max-width: 100% !important;
+            height: auto !important;
+            max-height: 9rem !important;
+            object-fit: contain !important;
+          }
+          @media (max-width: 640px) {
+            .buyscreen-blog-article-overlay {
+              padding: 0 !important;
+              align-items: stretch !important;
+            }
+            .buyscreen-blog-article-dialog {
+              width: 100% !important;
+              height: 100dvh !important;
+              max-height: 100dvh !important;
+              min-height: 100dvh !important;
+              overflow: hidden !important;
+              border-radius: 0 !important;
+              border-left: 0 !important;
+              border-right: 0 !important;
+              margin: 0 !important;
+            }
+            .buyscreen-blog-article-header {
+              padding: 0.85rem !important;
+              background: #ffffff !important;
+            }
+            .buyscreen-blog-article-content {
+              flex: 1 1 0% !important;
+              overflow-x: hidden !important;
+              overflow-y: auto !important;
+              min-height: 0 !important;
+              padding: 0.85rem !important;
+              background: #ffffff !important;
+            }
+            .buyscreen-blog-article-footer {
+              padding: 0.85rem !important;
+              padding-bottom: max(0.85rem, env(safe-area-inset-bottom, 0.85rem)) !important;
+              background: #f8fafc !important;
+            }
+            .buyscreen-blog-article-image-wrap {
+              min-height: 6rem !important;
+              padding: 0.65rem !important;
+            }
+            .buyscreen-blog-article-image {
+              max-height: 6.5rem !important;
+            }
+            .buyscreen-blog-article-dialog .buyscreen-blog-article-title {
+              font-size: 1.2rem !important;
+              line-height: 1.4 !important;
+            }
+            .buyscreen-blog-article-dialog .buyscreen-blog-article-excerpt {
+              font-size: 1.0625rem !important;
+            }
+            .buyscreen-blog-article-dialog .buyscreen-blog-article-paragraph {
+              font-size: 1rem !important;
+            }
+          }
+          @media (max-width: 768px) and (min-resolution: 1.5dppx) {
+            .buyscreen-blog-article-dialog .buyscreen-blog-article-title {
+              font-size: 1.15rem !important;
+              line-height: 1.4 !important;
+            }
+            .buyscreen-blog-article-dialog .buyscreen-blog-article-excerpt {
+              font-size: 1.0625rem !important;
+              line-height: 1.75 !important;
+            }
+            .buyscreen-blog-article-dialog .buyscreen-blog-article-paragraph {
+              font-size: 1rem !important;
+              line-height: 1.8 !important;
+            }
+            .buyscreen-blog-article-image-wrap {
+              min-height: 5rem !important;
+            }
+            .buyscreen-blog-article-image {
+              max-height: 5rem !important;
+            }
           }
 
           .buyscreen-page button.buyscreen-all-categories-toggle:hover,
@@ -1135,7 +1669,9 @@ export default function ECommercePage() {
               object-fit: cover !important;
             }
             .buyscreen-page .buyscreen-category-card img,
-            .buyscreen-page .buyscreen-update-product img {
+            .buyscreen-page .buyscreen-update-product img,
+            .buyscreen-page .buyscreen-blog-card-image,
+            .buyscreen-page .buyscreen-blog-article-image {
               object-fit: contain !important;
             }
           }
@@ -1264,6 +1800,21 @@ export default function ECommercePage() {
                 </p>
               )}
             </div>
+            {cartItems.length > 0 && (
+              <div className="shrink-0 border-t border-[#eef2f7] bg-gray-50 p-6 sm:p-8">
+                <div className="mb-6 flex items-center justify-between">
+                  <span className="text-sm font-black uppercase tracking-[0.28em] text-gray-500">Subtotal</span>
+                  <span className="text-2xl font-black tabular-nums text-[#06224C]">{formatUsd(cartTotalCents)}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => alert("Checkout is coming soon.")}
+                  className="flex w-full items-center justify-center rounded-2xl bg-[#06224C] px-6 py-4 text-sm font-black uppercase tracking-[0.35em] text-white shadow-xl transition hover:bg-blue-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+                >
+                  Checkout Now
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ) : null}
@@ -1293,13 +1844,32 @@ export default function ECommercePage() {
                         <p className="break-words text-sm font-semibold text-[#111827]">{product.name}</p>
                         <p className="text-xs text-[#6b7280]">{product.price}</p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeFavoriteProduct(product.id)}
-                        className="w-full rounded-md border border-[#fecaca] px-2 py-1 text-xs font-semibold text-[#dc2626] hover:bg-[#fef2f2] sm:w-auto"
-                      >
-                        Remove
-                      </button>
+                      <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-nowrap sm:gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCartItems((prev) => {
+                              const existing = prev.find((item) => item.product.id === product.id);
+                              if (existing) {
+                                return prev.map((item) => (item.product.id === product.id ? { ...item, qty: item.qty + 1 } : item));
+                              }
+                              return [...prev, { product, qty: 1 }];
+                            });
+                            removeFavoriteProduct(product.id);
+                            showActionToast(`${product.name} added to cart`);
+                          }}
+                          className="w-full rounded-md bg-[#06224C] px-3 py-1 text-xs font-semibold text-white hover:bg-blue-900 sm:w-auto"
+                        >
+                          Add to Cart
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeFavoriteProduct(product.id)}
+                          className="w-full rounded-md border border-[#fecaca] px-2 py-1 text-xs font-semibold text-[#dc2626] hover:bg-[#fef2f2] sm:w-auto"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1937,6 +2507,203 @@ export default function ECommercePage() {
                     </div>
                   </div>
                 </section>
+
+                <section
+                  ref={blogSectionRef}
+                  id="blog"
+                  className="buyscreen-section-reveal buyscreen-blog scroll-mt-24 rounded-[1.75rem] border border-[#e7edf5] bg-white p-4 shadow-sm sm:p-7 lg:p-8"
+                >
+                  <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+                    <div className="min-w-0 max-w-full">
+                      <p className="buyscreen-blog-eyebrow font-black uppercase text-[#2563eb]">From our blog</p>
+                      <h2 className="mt-2 break-words font-black text-[#111827] [overflow-wrap:anywhere]">
+                        Latest <span className="text-[#2563eb]">Insights</span>
+                      </h2>
+                      <p className="buyscreen-blog-desc mt-3 max-w-2xl break-words text-[#64748b] [overflow-wrap:anywhere]">
+                        Guides, reviews, and shopping tips to help you choose the right tech with confidence.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="buyscreen-blog-read-btn inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-[#bfdbfe] bg-[#eff6ff] px-4 text-xs font-black uppercase tracking-[0.1em] text-[#2563eb] transition duration-300 hover:-translate-y-0.5 hover:bg-[#2563eb] hover:text-white sm:w-auto sm:tracking-[0.14em]"
+                      onClick={() => showActionToast("More articles coming soon")}
+                    >
+                      View all posts
+                    </button>
+                  </div>
+
+                  <div className="buyscreen-blog-grid grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {buyBlogPosts.map((post) => (
+                      <article
+                        key={post.title}
+                        className="buyscreen-blog-card group overflow-visible rounded-2xl border border-[#e7edf5] bg-[#f8fafc] p-4 shadow-sm transition duration-300 hover:border-[#bfdbfe] hover:bg-white hover:shadow-md sm:p-5"
+                      >
+                        <div className="buyscreen-blog-card-image-wrap flex min-h-[8.5rem] items-center justify-center overflow-hidden rounded-xl border border-[#e7edf5] bg-white p-3 sm:min-h-[9.5rem]">
+                          <Image
+                            src={post.image}
+                            alt=""
+                            width={220}
+                            height={160}
+                            className="buyscreen-blog-card-image transition duration-500 group-hover:scale-105"
+                            loading="lazy"
+                            unoptimized
+                          />
+                        </div>
+                        <div className="mt-4 flex min-w-0 flex-1 flex-col">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="inline-flex rounded-full bg-[#eff6ff] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-[#2563eb] sm:text-[11px]">
+                              {post.category}
+                            </span>
+                            <span className="text-[11px] font-semibold text-[#94a3b8]">{post.readTime}</span>
+                          </div>
+                          <h3 className="buyscreen-blog-card-title mt-3 break-words font-black text-[#111827] [overflow-wrap:anywhere]">
+                            {post.title}
+                          </h3>
+                          <p className="buyscreen-blog-card-excerpt mt-2 flex-1 break-words text-[#64748b] [overflow-wrap:anywhere]">
+                            {post.excerpt}
+                          </p>
+                          <button
+                            type="button"
+                            className="buyscreen-blog-read-btn mt-4 inline-flex min-h-10 items-center justify-center rounded-full bg-[#06224C] px-4 text-[11px] font-black uppercase tracking-[0.1em] text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#0f3b89] sm:text-xs sm:tracking-[0.12em]"
+                            onClick={() => setActiveBlogPost(post)}
+                          >
+                            Read article
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+
+                <section
+                  ref={contactSectionRef}
+                  id="contact"
+                  className="buyscreen-section-reveal buyscreen-contact scroll-mt-24 rounded-[1.75rem] border border-[#e7edf5] bg-[#f8fafc] p-4 sm:p-7 lg:p-8"
+                >
+                  <div className="buyscreen-contact-grid grid min-w-0 max-w-full gap-8 lg:grid-cols-2 lg:items-start lg:gap-10">
+                    <div className="min-w-0 max-w-full">
+                      <p className="buyscreen-contact-eyebrow font-black uppercase text-[#2563eb]">Customer support</p>
+                      <h2 className="mt-2 break-words font-black text-[#111827] [overflow-wrap:anywhere]">
+                        Get in <span className="text-[#2563eb]">Touch</span>
+                      </h2>
+                      <p className="buyscreen-contact-desc mt-3 max-w-md break-words text-sm leading-relaxed text-[#64748b] [overflow-wrap:anywhere]">
+                        Questions about orders, returns, or product availability? Reach our support team or send a message and we will respond within one business day.
+                      </p>
+                      <div className="mt-6 space-y-3 sm:mt-8 sm:space-y-4">
+                        <div className="buyscreen-contact-info-row rounded-2xl border border-[#e7edf5] bg-white p-3 shadow-sm sm:p-4">
+                          <span className="buyscreen-contact-info-icon inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eff6ff] text-[#2563eb] sm:h-11 sm:w-11">
+                            <BuyMailIcon />
+                          </span>
+                          <div className="buyscreen-contact-info-body">
+                            <p className="text-[11px] font-black uppercase tracking-[0.1em] text-[#94a3b8] sm:tracking-[0.14em]">Email</p>
+                            <a href="mailto:support@eshop.example.com" className="mt-1 block break-all text-sm font-bold leading-snug text-[#111827] hover:text-[#2563eb]">
+                              support@eshop.example.com
+                            </a>
+                          </div>
+                        </div>
+                        <div className="buyscreen-contact-info-row rounded-2xl border border-[#e7edf5] bg-white p-3 shadow-sm sm:p-4">
+                          <span className="buyscreen-contact-info-icon inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eff6ff] text-[#2563eb] sm:h-11 sm:w-11">
+                            <BuyContactPhoneIcon />
+                          </span>
+                          <div className="buyscreen-contact-info-body">
+                            <p className="text-[11px] font-black uppercase tracking-[0.1em] text-[#94a3b8] sm:tracking-[0.14em]">Phone</p>
+                            <a href="tel:+15550000000" className="mt-1 block break-words text-sm font-bold leading-snug text-[#111827] hover:text-[#2563eb] [overflow-wrap:anywhere]">
+                              +1 (555) 000-0000
+                            </a>
+                            <p className="mt-1 break-words text-xs leading-relaxed text-[#64748b] [overflow-wrap:anywhere]">Mon–Fri, 9:00 AM – 6:00 PM</p>
+                          </div>
+                        </div>
+                        <div className="buyscreen-contact-info-row rounded-2xl border border-[#e7edf5] bg-white p-3 shadow-sm sm:p-4">
+                          <span className="buyscreen-contact-info-icon inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eff6ff] text-[#2563eb] sm:h-11 sm:w-11">
+                            <BuyLocationIcon />
+                          </span>
+                          <div className="buyscreen-contact-info-body">
+                            <p className="text-[11px] font-black uppercase tracking-[0.1em] text-[#94a3b8] sm:tracking-[0.14em]">Address</p>
+                            <p className="mt-1 break-words text-sm font-bold leading-snug text-[#111827] [overflow-wrap:anywhere]">
+                              245 Market Street, Suite 300
+                            </p>
+                            <p className="mt-1 break-words text-xs leading-relaxed text-[#64748b] [overflow-wrap:anywhere]">
+                              San Francisco, CA 94105
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="buyscreen-contact-form-card min-w-0 max-w-full rounded-2xl border border-[#e7edf5] bg-white p-4 shadow-sm sm:p-6 lg:p-7">
+                      <h3 className="break-words text-lg font-black text-[#111827] [overflow-wrap:anywhere] sm:text-xl">
+                        Send us a <span className="text-[#2563eb]">message</span>
+                      </h3>
+                      <p className="buyscreen-contact-form-note mt-1 break-words text-sm text-[#64748b] [overflow-wrap:anywhere]">We typically reply within 24 hours.</p>
+                      <form
+                        className="mt-4 space-y-4 sm:mt-5"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          showActionToast("Message sent");
+                          e.currentTarget.reset();
+                        }}
+                      >
+                        <div className="buyscreen-contact-fields grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <div className="min-w-0 max-w-full">
+                            <label htmlFor="buyscreen-contact-name" className="mb-1.5 block font-black uppercase text-[#64748b]">
+                              Your name
+                            </label>
+                            <input
+                              id="buyscreen-contact-name"
+                              type="text"
+                              required
+                              placeholder="John Doe"
+                              className="min-h-11 w-full min-w-0 max-w-full rounded-xl border border-[#dbe3ef] bg-[#f8fafc] px-3 py-2.5 font-semibold text-[#111827] outline-none transition focus:border-[#2563eb] focus:bg-white sm:px-4 sm:text-sm"
+                            />
+                          </div>
+                          <div className="min-w-0 max-w-full">
+                            <label htmlFor="buyscreen-contact-email" className="mb-1.5 block font-black uppercase text-[#64748b]">
+                              Your email
+                            </label>
+                            <input
+                              id="buyscreen-contact-email"
+                              type="email"
+                              required
+                              placeholder="john@example.com"
+                              className="min-h-11 w-full min-w-0 max-w-full rounded-xl border border-[#dbe3ef] bg-[#f8fafc] px-3 py-2.5 font-semibold text-[#111827] outline-none transition focus:border-[#2563eb] focus:bg-white sm:px-4 sm:text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="min-w-0 max-w-full">
+                          <label htmlFor="buyscreen-contact-subject" className="mb-1.5 block font-black uppercase text-[#64748b]">
+                            Subject
+                          </label>
+                          <input
+                            id="buyscreen-contact-subject"
+                            type="text"
+                            required
+                            placeholder="Order inquiry"
+                            className="min-h-11 w-full min-w-0 max-w-full rounded-xl border border-[#dbe3ef] bg-[#f8fafc] px-3 py-2.5 font-semibold text-[#111827] outline-none transition focus:border-[#2563eb] focus:bg-white sm:px-4 sm:text-sm"
+                          />
+                        </div>
+                        <div className="min-w-0 max-w-full">
+                          <label htmlFor="buyscreen-contact-message" className="mb-1.5 block font-black uppercase text-[#64748b]">
+                            Message
+                          </label>
+                          <textarea
+                            id="buyscreen-contact-message"
+                            required
+                            rows={4}
+                            placeholder="Tell us how we can help..."
+                            className="w-full min-w-0 max-w-full resize-y rounded-xl border border-[#dbe3ef] bg-[#f8fafc] px-3 py-2.5 font-semibold text-[#111827] outline-none transition focus:border-[#2563eb] focus:bg-white sm:px-4 sm:py-3 sm:text-sm"
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          className="buyscreen-contact-submit inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#06224C] px-4 text-xs font-black uppercase tracking-[0.1em] text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#0f3b89] sm:px-5 sm:tracking-[0.14em]"
+                        >
+                          Send message
+                          <BuySendIcon />
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </section>
               </div>
             </>
           )}
@@ -1962,6 +2729,80 @@ export default function ECommercePage() {
           </div>
         </div>
       )}
+      {activeBlogPost ? (
+        <div className="buyscreen-blog-article-overlay fixed inset-0 z-[120] flex items-center justify-center overflow-hidden sm:p-6">
+          <button
+            type="button"
+            className="buyscreen-blog-article-backdrop"
+            aria-label="Close article"
+            onClick={() => setActiveBlogPost(null)}
+          />
+          <div
+            role="dialog"
+            aria-modal
+            aria-labelledby="buyscreen-blog-article-title"
+            className="buyscreen-blog-article-dialog relative z-10 flex w-full min-w-0 max-w-2xl flex-col rounded-2xl border border-[#e5e7eb] bg-white shadow-2xl"
+          >
+            <div className="buyscreen-blog-article-header shrink-0 border-b border-[#eef2f7] p-4 sm:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="buyscreen-blog-article-category inline-flex rounded-full bg-[#eff6ff] px-2.5 py-1 font-black uppercase text-[#2563eb]">
+                      {activeBlogPost.category}
+                    </span>
+                    <span className="buyscreen-blog-article-meta font-semibold text-[#94a3b8]">{activeBlogPost.readTime}</span>
+                  </div>
+                  <h2
+                    id="buyscreen-blog-article-title"
+                    className="buyscreen-blog-article-title mt-3 font-black text-[#111827]"
+                  >
+                    {activeBlogPost.title}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  className="buyscreen-blog-article-dismiss inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#e5e7eb] text-[#64748b] transition hover:bg-[#f8fafc] hover:text-[#111827]"
+                  aria-label="Close article"
+                  onClick={() => setActiveBlogPost(null)}
+                >
+                  <span className="text-lg leading-none">×</span>
+                </button>
+              </div>
+            </div>
+            <div className="buyscreen-blog-article-content px-4 pb-5 pt-4 sm:px-6 sm:pb-6">
+              <div className="buyscreen-blog-article-image-wrap flex min-h-[9rem] items-center justify-center rounded-xl border border-[#e7edf5] bg-[#f8fafc] p-3 sm:min-h-[11rem] sm:p-4">
+                <Image
+                  src={activeBlogPost.image}
+                  alt=""
+                  width={320}
+                  height={220}
+                  className="buyscreen-blog-article-image"
+                  unoptimized
+                />
+              </div>
+              <p className="buyscreen-blog-article-excerpt mt-4 font-semibold text-[#475569]">
+                {activeBlogPost.excerpt}
+              </p>
+              <div className="mt-4 space-y-4">
+                {activeBlogPost.body.map((paragraph) => (
+                  <p key={paragraph} className="buyscreen-blog-article-paragraph text-[#374151]">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+            <div className="buyscreen-blog-article-footer shrink-0 border-t border-[#eef2f7] bg-[#f8fafc] p-4 sm:p-5">
+              <button
+                type="button"
+                className="buyscreen-blog-article-close-btn inline-flex items-center justify-center rounded-full bg-[#06224C] px-5 font-black uppercase text-white transition hover:bg-[#0f3b89]"
+                onClick={() => setActiveBlogPost(null)}
+              >
+                Close article
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       {actionToast ? (
         <div className="pointer-events-none fixed bottom-4 right-4 z-[130] max-w-[260px] rounded-md bg-[#111827] px-3 py-2 text-xs font-medium text-white shadow-lg sm:text-sm">
           {actionToast}
