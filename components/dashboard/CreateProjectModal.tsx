@@ -19,6 +19,7 @@ import {
   Palette,
   PanelTop,
   ShoppingBag,
+  Utensils,
   WandSparkles,
 } from "lucide-react";
 import { fadeUp, scaleIn } from "@/lib/motion";
@@ -29,6 +30,7 @@ const categories = [
   { title: "Portfolio", description: "Personal brand, work showcase, and contact", icon: Palette },
   { title: "Blog", description: "Articles, categories, and reader growth", icon: Newspaper },
   { title: "Business", description: "Services, company profile, and leads", icon: BriefcaseBusiness },
+  { title: "Restaurant", description: "Menus, reservations, location, and guest contact", icon: Utensils },
 ];
 
 const templateStyles = [

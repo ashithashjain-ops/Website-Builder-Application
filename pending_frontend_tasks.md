@@ -5,6 +5,36 @@
 
 ---
 
+## Task Tracker
+
+- [x] Task 1: Export HTML - Inject SEO Meta Tags
+- [x] Task 2: Builder - Responsive Breakpoint Style Overrides
+- [x] Task 3: Migrate All Remaining Blocks to BlockSpec Pattern
+- [x] Task 4: Create Full Template Designs for All 5 Categories
+- [x] Task 5: NavBar - Wire Logout Button
+- [ ] Task 6: All Auth Pages - Session Persistence
+- [ ] Task 7: Dashboard Settings - Profile Editing
+- [ ] Task 8: Dashboard - Replace localStorage with Backend Save
+- [ ] Task 9: Builder - Auto-Save to Server
+- [ ] Task 10: Asset Manager - Replace IndexedDB with Cloud Upload
+- [ ] Task 11: Builder Toolbar - Add "Publish" Button
+- [ ] Task 12: Builder - Deployment History Panel
+- [ ] Task 13: Dashboard Project Cards - Show "Visit Site" Link
+- [ ] Task 14: Dashboard Settings - Custom Domain Input
+- [ ] Task 15: Analytics Dashboard - Connect to Real Data
+- [ ] Task 16: New Page - Template Marketplace
+- [ ] Task 17: All Premium Features - Add Lock / Upgrade Gate
+- [ ] Task 18: Dashboard Settings - Subscription Management
+- [ ] Task 19: New Page - Blog Post Editor
+- [ ] Task 20: Blog - SEO-Friendly URLs
+- [ ] Task 21: Builder - Product Management Panel (E-commerce)
+- [ ] Task 22: Builder - Cart & Checkout Components (E-commerce)
+- [ ] Task 23: Builder Property Editor - AI "Generate Text" Button
+- [ ] Task 24: Asset Manager - AI Image Generation
+- [ ] Task 25: Builder - AI Layout Suggestions
+
+---
+
 ## ✅ Execution Order
 
 | Order | Label | What | Can Start Now? |
@@ -21,7 +51,9 @@
 
 ---
 
-### Task 1: Export HTML — Inject SEO Meta Tags
+### Task 1: Export HTML - Inject SEO Meta Tags - COMPLETED
+
+**Status**: Completed on 2026-06-17. Exported HTML now reads SEO metadata and injects title, description, and Open Graph tags into the generated document.
 
 **Where**: [lib/exportHtml.ts](file:///d:/stackly/Workplace/Website-Builder-Application/lib/exportHtml.ts)
 
@@ -113,7 +145,9 @@ We have a `BlockSpec` pattern (used by `hero`, `navigation`, `features`, `contac
 
 ---
 
-### Task 4: Create Full Template Designs for All 5 Categories
+### Task 4: Create Full Template Designs for All 5 Categories - COMPLETED
+
+**Status**: Completed on 2026-06-17. Builder project creation now loads full multi-section `BuilderComponent[]` templates for E-commerce, Portfolio, Blog, Business, and Restaurant without changing the existing standalone page designs.
 
 **Where**: [store/builderStore.ts](file:///d:/stackly/Workplace/Website-Builder-Application/store/builderStore.ts) (`categoryCopy` + `loadWebsiteFromRequirements`)
 
@@ -138,7 +172,9 @@ When a user creates a project and picks a category (E-commerce, Portfolio, Blog,
 
 ---
 
-### Task 5: NavBar — Wire Logout Button
+### Task 5: NavBar — Wire Logout Button - COMPLETED
+
+**Status**: Completed on 2026-06-17. The NavBar profile menu logout now clears Stackly local/session storage, resets builder/project/design/asset Zustand state, clears local IndexedDB assets, and redirects to `/login`.
 
 **Where**: [components/navBar.tsx](file:///d:/stackly/Workplace/Website-Builder-Application/components/navBar.tsx)
 
@@ -515,3 +551,4 @@ Add a "✨ Suggest Layout" button in the builder (maybe in the quick insert bar 
 | 23 | AI generate text button | `PropertyEditor.tsx` | 🔮 Future |
 | 24 | AI image generation | `AssetManager.tsx` | 🔮 Future |
 | 25 | AI layout suggestions | New `AILayoutSuggest.tsx` | 🔮 Future |
+

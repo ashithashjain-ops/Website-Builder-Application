@@ -14,7 +14,7 @@
 import { create } from "zustand";
 import { v4 as uuid } from "uuid";
 import type { Asset } from "@/types/assets";
-import { dbGetAllAssets, dbPutAsset, dbGetBlob, dbDeleteAsset } from "@/lib/assetDb";
+import { dbGetAllAssets, dbPutAsset, dbGetBlob, dbDeleteAsset, dbClearAssets } from "@/lib/assetDb";
 import { generateThumbnail, getImageDimensions, compressImage, isImageFile, blobToDataUrl } from "@/lib/assetUtils";
 
 interface AssetState {
@@ -51,6 +51,9 @@ interface AssetActions {
 
   /** Revoke all cached object URLs (call on page unload / store teardown). */
   cleanup: () => void;
+
+  /** Clear local asset records and reset in-memory state after logout. */
+  resetAssets: () => Promise<void>;
 
   clearError: () => void;
 }
@@ -156,6 +159,23 @@ export const useAssetStore = create<AssetState & AssetActions>((set, get) => ({
   cleanup() {
     Object.values(get().objectUrls).forEach((u) => URL.revokeObjectURL(u));
     set({ objectUrls: {} });
+  },
+
+  async resetAssets() {
+    Object.values(get().objectUrls).forEach((u) => URL.revokeObjectURL(u));
+    try {
+      await dbClearAssets();
+    } catch (err) {
+      set({ error: String(err) });
+    }
+
+    set({
+      assets: [],
+      objectUrls: {},
+      isLoading: false,
+      uploadProgress: -1,
+      error: null,
+    });
   },
 
   clearError() { set({ error: null }); },

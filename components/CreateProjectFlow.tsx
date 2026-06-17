@@ -9,6 +9,7 @@ const categories = [
   { title: "Portfolio", description: "Personal brand, work showcase, and contact" },
   { title: "Blog", description: "Articles, categories, and reader growth" },
   { title: "Business", description: "Services, company profile, and leads" },
+  { title: "Restaurant", description: "Menus, reservations, location, and guest contact" },
 ];
 
 const templateStyles = [

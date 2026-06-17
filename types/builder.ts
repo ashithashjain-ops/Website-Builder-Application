@@ -478,6 +478,8 @@ export interface BuilderState {
   saveToLocalStorage: () => void;
   /** Restore canvas from localStorage. Returns false if no draft exists. */
   loadFromLocalStorage: () => boolean;
+  /** Reset builder state after logout. */
+  resetBuilder: () => void;
   /** Active editing viewport. */
   viewport: Viewport;
   setViewport: (v: Viewport) => void;

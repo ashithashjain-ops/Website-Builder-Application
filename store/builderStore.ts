@@ -348,6 +348,152 @@ const createComponent = (type: ComponentType, order: number): BuilderComponent =
   return component;
 };
 
+const withComponentOverrides = (
+  type: ComponentType,
+  order: number,
+  overrides: Partial<Omit<BuilderComponent, "id" | "type" | "order" | "children">> & {
+    children?: BuilderComponent[];
+  } = {},
+): BuilderComponent => {
+  const component = createComponent(type, order);
+
+  return {
+    ...component,
+    ...overrides,
+    content: overrides.content ?? component.content,
+    props: overrides.props ? { ...(component.props ?? {}), ...overrides.props } : component.props,
+    styles: { ...component.styles, ...(overrides.styles ?? {}) },
+    textStyles: overrides.textStyles ?? component.textStyles,
+    children: overrides.children ?? component.children,
+  };
+};
+
+const templateNav = (projectName: string, links: Array<{ label: string; href?: string }>, cta = "Get Started") => ({
+  ...navigationDefaults,
+  brand: projectName,
+  links,
+  cta: { label: cta, href: "#contact" },
+});
+
+const templateFooter = (brand: string, tagline: string) => ({
+  ...footerDefaults,
+  brand,
+  tagline,
+  copyright: `Copyright ${new Date().getFullYear()} ${brand}. All rights reserved.`,
+});
+
+const buildCategoryTemplate = (category: string, projectName: string, style: string): BuilderComponent[] | null => {
+  const bold = style === "Bold";
+  const minimal = style === "Minimal";
+  const surface = minimal ? "#ffffff" : "#f7f9fc";
+  const heroBg = bold ? "#0B1D40" : minimal ? "#ffffff" : "#eef4fb";
+  const heroColor = bold ? "#ffffff" : "#0B1D40";
+
+  const baseHeroStyles = {
+    backgroundColor: heroBg,
+    color: heroColor,
+    padding: "56px 40px",
+    borderRadius: minimal ? "0" : "18px",
+    margin: "0 0 20px",
+  };
+
+  const categoryKey = category.toLowerCase();
+
+  const templates: Record<string, () => BuilderComponent[]> = {
+    "e-commerce": () => [
+      withComponentOverrides("navigation", 0, { props: templateNav(projectName, [{ label: "Shop" }, { label: "Collections" }, { label: "Reviews" }, { label: "Contact" }], "Shop Now") }),
+      withComponentOverrides("hero", 1, {
+        props: { ...heroDefaults, title: "Launch a storefront customers trust", description: "Showcase collections, highlight offers, and guide shoppers from discovery to checkout with a polished commerce homepage.", cta: { label: "Explore Products", href: "#products" }, layout: "split" },
+        styles: baseHeroStyles,
+      }),
+      withComponentOverrides("features", 2, {
+        props: { ...featuresDefaults, heading: "Built for selling", items: [
+          { title: "Curated collections", description: "Organize products into easy-to-scan shopping paths." },
+          { title: "Trust-first layout", description: "Use reviews, guarantees, and clear CTAs to reduce friction." },
+          { title: "Mobile shopping", description: "Responsive sections keep carts and offers easy to reach." },
+        ] },
+        styles: { backgroundColor: surface, padding: "36px", borderRadius: "16px" },
+      }),
+      withComponentOverrides("gallery", 3, { content: "/landing-optimized/store11.webp|Featured store layout\n/landing-optimized/fashion06.webp|Fashion collection\n/landing-optimized/jewellery07.webp|Premium product showcase", styles: { backgroundColor: "#ffffff", padding: "28px", borderRadius: "16px" } }),
+      withComponentOverrides("pricing-table", 4, { props: { ...pricingTableDefaults, heading: "Simple launch packages" }, styles: { backgroundColor: surface, padding: "42px 24px", borderRadius: "16px" } }),
+      withComponentOverrides("testimonial", 5, { props: { ...testimonialDefaults, heading: "Loved by growing stores" }, styles: { backgroundColor: "#ffffff", padding: "40px 24px", borderRadius: "16px" } }),
+      withComponentOverrides("contact", 6, { props: { ...contactDefaults, title: "Ready to open your store?", description: "Share your email and start shaping your product-first website.", cta: { label: "Start Selling", href: "#contact" } } }),
+      withComponentOverrides("footer", 7, { props: templateFooter(projectName, "A modern storefront built with Stackly."), styles: { borderRadius: "16px" } }),
+    ],
+    portfolio: () => [
+      withComponentOverrides("navigation", 0, { props: templateNav(projectName, [{ label: "Work" }, { label: "About" }, { label: "Services" }, { label: "Contact" }], "Hire Me") }),
+      withComponentOverrides("hero", 1, {
+        props: { ...heroDefaults, title: "Showcase your work with clarity", description: "Present your best projects, tell your story, and make it simple for clients to start a conversation.", cta: { label: "View Work", href: "#work" }, layout: "split" },
+        styles: baseHeroStyles,
+      }),
+      withComponentOverrides("gallery", 2, { content: "/landing-optimized/port.webp|Signature portfolio homepage\n/landing-optimized/portfolio03.webp|Agency case study\n/landing-optimized/portfolio04.webp|Minimal project grid", styles: { backgroundColor: "#ffffff", padding: "28px", borderRadius: "16px" } }),
+      withComponentOverrides("features", 3, { props: { ...featuresDefaults, heading: "What you bring to clients", items: [
+        { title: "Project storytelling", description: "Frame outcomes, process, and creative thinking." },
+        { title: "Personal brand", description: "Shape a memorable introduction around your strengths." },
+        { title: "Easy inquiries", description: "Turn interest into contact with clear next steps." },
+      ] }, styles: { backgroundColor: surface, padding: "36px", borderRadius: "16px" } }),
+      withComponentOverrides("testimonial", 4, { props: { ...testimonialDefaults, heading: "Client notes" }, styles: { backgroundColor: "#ffffff", padding: "40px 24px", borderRadius: "16px" } }),
+      withComponentOverrides("form", 5, { props: { ...formDefaults, heading: "Start a project", description: "Tell visitors how to reach you for work, collaborations, or speaking.", submitLabel: "Send Inquiry" } }),
+      withComponentOverrides("footer", 6, { props: templateFooter(projectName, "Portfolio, selected work, and contact."), styles: { borderRadius: "16px" } }),
+    ],
+    blog: () => [
+      withComponentOverrides("navigation", 0, { props: templateNav(projectName, [{ label: "Stories" }, { label: "Categories" }, { label: "Guides" }, { label: "Subscribe" }], "Subscribe") }),
+      withComponentOverrides("hero", 1, {
+        props: { ...heroDefaults, title: "Create a blog worth returning to", description: "Build a readable home for essays, guides, and updates with sections that support discovery and reader growth.", cta: { label: "Start Reading", href: "#posts" }, layout: "split" },
+        styles: baseHeroStyles,
+      }),
+      withComponentOverrides("features", 2, { props: { ...featuresDefaults, heading: "Editorial foundations", items: [
+        { title: "Featured posts", description: "Lead with timely stories and high-value guides." },
+        { title: "Clear categories", description: "Help readers browse topics without friction." },
+        { title: "Newsletter path", description: "Convert loyal readers into subscribers." },
+      ] }, styles: { backgroundColor: surface, padding: "36px", borderRadius: "16px" } }),
+      withComponentOverrides("gallery", 3, { content: "/landing-optimized/blog1.webp|Personal blog layout\n/landing-optimized/blog2.webp|Tech insights template\n/blog/template-food.webp|Restaurant story blog", styles: { backgroundColor: "#ffffff", padding: "28px", borderRadius: "16px" } }),
+      withComponentOverrides("tabs", 4, { props: { ...tabsDefaults, items: [
+        { label: "Ideas", content: "Publish essays, explainers, guides, and behind-the-scenes stories." },
+        { label: "Categories", content: "Organize posts around practical topics your readers revisit." },
+        { label: "Growth", content: "Use subscription CTAs and featured content to build an audience." },
+      ] } }),
+      withComponentOverrides("contact", 5, { props: { ...contactDefaults, title: "Join the newsletter", description: "Invite readers to subscribe for new posts and updates.", inputPlaceholder: "reader@example.com", cta: { label: "Subscribe", href: "#subscribe" } } }),
+      withComponentOverrides("footer", 6, { props: templateFooter(projectName, "Stories, ideas, and reader updates."), styles: { borderRadius: "16px" } }),
+    ],
+    business: () => [
+      withComponentOverrides("navigation", 0, { props: templateNav(projectName, [{ label: "Services" }, { label: "Results" }, { label: "Pricing" }, { label: "Contact" }], "Book a Call") }),
+      withComponentOverrides("hero", 1, {
+        props: { ...heroDefaults, title: "Build trust for your business", description: "Explain services, show credibility, and create a direct path from visitor interest to qualified leads.", cta: { label: "Book a Consultation", href: "#contact" }, layout: "split" },
+        styles: baseHeroStyles,
+      }),
+      withComponentOverrides("features", 2, { props: { ...featuresDefaults, heading: "How you help", items: [
+        { title: "Service clarity", description: "Explain what you offer with structured, scannable sections." },
+        { title: "Trust signals", description: "Use testimonials and proof points to support decisions." },
+        { title: "Lead capture", description: "Make contact simple with forms and strong CTAs." },
+      ] }, styles: { backgroundColor: surface, padding: "36px", borderRadius: "16px" } }),
+      withComponentOverrides("pricing-table", 3, { props: { ...pricingTableDefaults, heading: "Service packages" }, styles: { backgroundColor: "#ffffff", padding: "42px 24px", borderRadius: "16px" } }),
+      withComponentOverrides("testimonial", 4, { props: { ...testimonialDefaults, heading: "What clients say" }, styles: { backgroundColor: surface, padding: "40px 24px", borderRadius: "16px" } }),
+      withComponentOverrides("form", 5, { props: { ...formDefaults, heading: "Talk to our team", description: "Collect qualified business inquiries with a focused contact form.", submitLabel: "Request Consultation" } }),
+      withComponentOverrides("footer", 6, { props: templateFooter(projectName, "Professional services and business growth."), styles: { borderRadius: "16px" } }),
+    ],
+    restaurant: () => [
+      withComponentOverrides("navigation", 0, { props: templateNav(projectName, [{ label: "Menu" }, { label: "About" }, { label: "Reservations" }, { label: "Contact" }], "Reserve") }),
+      withComponentOverrides("hero", 1, {
+        props: { ...heroDefaults, title: "Create a mouth-watering restaurant website", description: "Showcase signature dishes, share your story, and help guests find, call, or reserve from any device.", cta: { label: "View Menu", href: "#menu" }, layout: "split" },
+        styles: { ...baseHeroStyles, backgroundColor: bold ? "#3A1111" : minimal ? "#ffffff" : "#FFF5F5", color: bold ? "#ffffff" : "#0A1E3D" },
+      }),
+      withComponentOverrides("gallery", 2, { content: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop|Premium ribeye steak\nhttps://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=800&auto=format&fit=crop|Wood-fired pizza\nhttps://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop|Classic cheeseburger", styles: { backgroundColor: "#ffffff", padding: "28px", borderRadius: "16px" } }),
+      withComponentOverrides("features", 3, { props: { ...featuresDefaults, heading: "Restaurant essentials", items: [
+        { title: "Signature menu", description: "Highlight best sellers, prices, and seasonal dishes." },
+        { title: "Guest confidence", description: "Tell your story and show atmosphere before guests arrive." },
+        { title: "Reservation path", description: "Make contact, hours, and booking details easy to find." },
+      ] }, styles: { backgroundColor: "#FFF5F5", padding: "36px", borderRadius: "16px" } }),
+      withComponentOverrides("testimonial", 4, { props: { ...testimonialDefaults, heading: "Guest reviews" }, styles: { backgroundColor: "#ffffff", padding: "40px 24px", borderRadius: "16px" } }),
+      withComponentOverrides("map", 5, { props: { ...mapDefaults, address: "123 Culinary Avenue, Food District", zoom: 14, height: "320px" }, styles: { backgroundColor: "#ffffff", padding: "20px", borderRadius: "16px" } }),
+      withComponentOverrides("contact", 6, { props: { ...contactDefaults, title: "Book a table", description: "Invite guests to reserve, call, or ask about private dining.", inputPlaceholder: "guest@example.com", cta: { label: "Reserve Now", href: "#contact" } } }),
+      withComponentOverrides("footer", 7, { props: templateFooter(projectName, "Fresh flavors, warm service, and easy reservations."), styles: { borderRadius: "16px" } }),
+    ],
+  };
+
+  return templates[categoryKey]?.() ?? null;
+};
+
 const categoryCopy: Record<string, { hero: string; description: string; features: FeatureRecord[] }> = {
   "E-commerce": {
     hero: "Launch your online store with Stackly",
@@ -385,12 +531,23 @@ const categoryCopy: Record<string, { hero: string; description: string; features
       { title: "Lead capture",     description: "Make contact and inquiry simple" },
     ],
   },
+  Restaurant: {
+    hero: "Create a mouth-watering restaurant website",
+    description: "Showcase menus, reservations, location details, and guest-friendly contact sections.",
+    features: [
+      { title: "Menu highlights", description: "Feature signature dishes and seasonal specials" },
+      { title: "Reservation ready", description: "Guide guests toward booking or contact" },
+      { title: "Location clarity", description: "Make hours, map, and phone details easy to find" },
+    ],
+  },
 };
 
 const createRequirementComponents = (requirements: BuilderRequirements) => {
   const projectName = requirements.projectName || "Stackly Studio";
   const category = requirements.category || "Business";
   const style = requirements.style || "Modern";
+  const categoryTemplate = buildCategoryTemplate(category, projectName, style);
+  if (categoryTemplate) return categoryTemplate;
   const copy = categoryCopy[category] || categoryCopy.Business;
   const selectedSections = requirements.sections.length > 0 ? requirements.sections : ["navigation", "hero", "features", "contact"];
   const sectionTypes: ComponentType[] = selectedSections
@@ -659,6 +816,26 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
     } catch {
       return false;
     }
+  },
+  resetBuilder: () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem("stackly-clipboard");
+      localStorage.removeItem("stackly-style-clipboard");
+    } catch { /* storage unavailable */ }
+
+    set({
+      components: [],
+      selectedComponentId: null,
+      selectedTextStyleTarget: null,
+      selectedComponentIds: [],
+      clipboard: null,
+      isInlineEditing: false,
+      history: [],
+      future: [],
+      viewport: "desktop",
+      canvasMode: "flow",
+    });
   },
 
   /* ── Wix-style freeform editing actions ──────────────────────────── */

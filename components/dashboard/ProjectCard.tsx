@@ -16,6 +16,7 @@ import {
   ShoppingBag,
   Sparkles,
   Trash2,
+  Utensils,
 } from "lucide-react";
 import { scaleIn } from "@/lib/motion";
 import type { Project } from "@/types/project";
@@ -58,6 +59,13 @@ const categoryStyles: Record<
     border: "border-blue-200",
     gradient: "from-blue-300/35 via-sky-200/30 to-cyan-200/25",
     icon: BriefcaseBusiness,
+  },
+  Restaurant: {
+    bg: "bg-red-50",
+    text: "text-red-700",
+    border: "border-red-200",
+    gradient: "from-red-300/35 via-rose-200/30 to-orange-200/25",
+    icon: Utensils,
   },
 };
 
