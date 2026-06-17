@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Copy, Lock, LockOpen, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { useBuilderStore } from "@/store/builderStore";
 import { componentRegistry } from "@/lib/componentRegistry";
-import type { BuilderComponent } from "@/types/builder";
+import type { BuilderComponent, Viewport } from "@/types/builder";
 
 const SNAP = 8; // grid snap in px
 const MIN_W = 120;
@@ -35,12 +34,11 @@ const HANDLE_CLASSES: Record<ResizeHandle, string> = {
 
 interface FreeformItemProps {
   component: BuilderComponent;
-  canvasRef: React.RefObject<HTMLDivElement>;
   /** Other components – used for alignment guide calculation */
   siblings: BuilderComponent[];
 }
 
-export default function FreeformItem({ component, canvasRef, siblings }: FreeformItemProps) {
+export default function FreeformItem({ component, siblings }: FreeformItemProps) {
   const Renderer = componentRegistry[component.type];
   const isSelected = useBuilderStore((s) => s.selectedComponentId === component.id);
   const selectComponent = useBuilderStore((s) => s.selectComponent);
@@ -51,6 +49,7 @@ export default function FreeformItem({ component, canvasRef, siblings }: Freefor
   const toggleLock = useBuilderStore((s) => s.toggleLock);
   const moveLayer = useBuilderStore((s) => s.moveLayer);
   const updateComponent = useBuilderStore((s) => s.updateComponent);
+  const viewport = useBuilderStore((s) => s.viewport) as Viewport;
 
   const isLocked = component.locked ?? false;
 
@@ -67,9 +66,18 @@ export default function FreeformItem({ component, canvasRef, siblings }: Freefor
   const [isResizing, setIsResizing] = useState(false);
   const [guides, setGuides] = useState<{ x?: number; y?: number }>({});
 
-  // Sync position from store (e.g. after undo)
-  useEffect(() => { setPos({ x: posX, y: posY }); }, [posX, posY]);
-  useEffect(() => { setSize({ w: width, h: height ?? size.h }); }, [width, height]);
+  // Sync position from store (e.g. after undo) without cascading render effects.
+  useEffect(() => {
+    const id = window.setTimeout(() => setPos({ x: posX, y: posY }), 0);
+    return () => window.clearTimeout(id);
+  }, [posX, posY]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      setSize((current) => ({ w: width, h: height ?? current.h }));
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [width, height]);
 
   const dragStart = useRef({ mx: 0, my: 0, px: 0, py: 0 });
   const resizeStart = useRef({ mx: 0, my: 0, pw: 0, ph: 0, px: 0, py: 0, handle: "se" as ResizeHandle });
@@ -155,10 +163,9 @@ export default function FreeformItem({ component, canvasRef, siblings }: Freefor
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
       setIsResizing(false);
-      const { pw, ph, px, py, handle, mx, my } = resizeStart.current;
       // Get final from state via ref pattern
       const el2 = itemRef.current;
-      const finalH = el2 ? el2.getBoundingClientRect().height : ph;
+      const finalH = el2 ? el2.getBoundingClientRect().height : resizeStart.current.ph;
       resizeComponent(component.id, size.w, size.h || finalH);
       moveComponent(component.id, pos.x, pos.y);
     };
@@ -175,6 +182,13 @@ export default function FreeformItem({ component, canvasRef, siblings }: Freefor
   const handlePatch = useCallback((patch: Partial<BuilderComponent>) => {
     updateComponent(component.id, patch);
   }, [component.id, updateComponent]);
+
+  const viewportComponent = useMemo(() => {
+    if (viewport === "desktop" || !component.responsiveStyles) return component;
+    const overrides = component.responsiveStyles[viewport];
+    if (!overrides || Object.keys(overrides).length === 0) return component;
+    return { ...component, styles: { ...component.styles, ...overrides } };
+  }, [component, viewport]);
 
   if (!Renderer) return null;
 
@@ -261,7 +275,7 @@ export default function FreeformItem({ component, canvasRef, siblings }: Freefor
           onDoubleClick={(e) => { e.stopPropagation(); }}
         >
           <Renderer
-            component={component}
+            component={viewportComponent}
             isEditing={false}
             onUpdate={handleUpdate}
             onPatch={handlePatch}

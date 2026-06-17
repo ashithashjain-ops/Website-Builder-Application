@@ -29,6 +29,26 @@ import { featureItemSpec } from "@/components/blocks/feature-item/spec";
 import { contactSpec }     from "@/components/blocks/contact/spec";
 import { featuresSpec }    from "@/components/blocks/features/spec";
 import { videoSpec }       from "@/components/blocks/video/spec";
+import { headingSpec }     from "@/components/blocks/heading/spec";
+import { textSpec }        from "@/components/blocks/text/spec";
+import { buttonSpec }      from "@/components/blocks/button/spec";
+import { imageSpec }       from "@/components/blocks/image/spec";
+import { iconSpec }        from "@/components/blocks/icon/spec";
+import { columnsSpec }     from "@/components/blocks/columns/spec";
+import { inputSpec }       from "@/components/blocks/input/spec";
+import { dividerSpec }     from "@/components/blocks/divider/spec";
+import { gallerySpec }     from "@/components/blocks/gallery/spec";
+import { containerSpec }   from "@/components/blocks/container/spec";
+import { mapSpec }         from "@/components/blocks/map/spec";
+import { accordionSpec }   from "@/components/blocks/accordion/spec";
+import { tabsSpec }        from "@/components/blocks/tabs/spec";
+import { spacerSpec }      from "@/components/blocks/spacer/spec";
+import { socialLinksSpec } from "@/components/blocks/social-links/spec";
+import { countdownSpec }   from "@/components/blocks/countdown/spec";
+import { pricingTableSpec } from "@/components/blocks/pricing-table/spec";
+import { testimonialSpec } from "@/components/blocks/testimonial/spec";
+import { footerSpec }      from "@/components/blocks/footer/spec";
+import { formSpec }        from "@/components/blocks/form/spec";
 
 /* ─── Renderer props ─────────────────────────────────────────────────
    Mirrors BuilderRenderer in componentRegistry.ts — kept here so
@@ -53,6 +73,10 @@ export interface RendererProps {
 export interface PanelProps<P> {
   /** Pre-read, fully typed component props from `spec.read(component)`. */
   data: P;
+  /** Raw component, exposed for transitional panels that still bridge legacy content. */
+  component?: BuilderComponent;
+  /** Transitional setter for legacy `content` blocks during BlockSpec migration. */
+  setContent?: (content: string) => void;
   /**
    * Type-checked setter for one top-level prop key.
    * The store shallow-merges `props`, so this patches a single field
@@ -137,4 +161,24 @@ export const blockRegistry: Partial<Record<ComponentType, BlockSpec<any>>> = {
   contact:        contactSpec,
   features:       featuresSpec,
   video:          videoSpec,
+  heading:        headingSpec,
+  text:           textSpec,
+  button:         buttonSpec,
+  image:          imageSpec,
+  icon:           iconSpec,
+  columns:        columnsSpec,
+  input:          inputSpec,
+  divider:        dividerSpec,
+  gallery:        gallerySpec,
+  container:      containerSpec,
+  map:            mapSpec,
+  accordion:      accordionSpec,
+  tabs:           tabsSpec,
+  spacer:         spacerSpec,
+  "social-links": socialLinksSpec,
+  countdown:      countdownSpec,
+  "pricing-table": pricingTableSpec,
+  testimonial:    testimonialSpec,
+  footer:         footerSpec,
+  form:           formSpec,
 };

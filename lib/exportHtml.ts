@@ -3,7 +3,7 @@ import * as LucideIcons from "lucide-react";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { LucideIcon } from "lucide-react";
-import type { BuilderComponent, ComponentStyles } from "@/types/builder";
+import type { BuilderComponent, ComponentStyles, SEOMetadata } from "@/types/builder";
 import { escapeHtml } from "@/lib/htmlUtils";
 
 const styleToString = (styles: ComponentStyles) =>
@@ -21,6 +21,14 @@ const textStyleAttr = (component: BuilderComponent, key: string) => {
 
 const addStyleToTag = (tag: string, attr: string) =>
   attr ? tag.replace(/>$/, `${attr}>`) : tag;
+
+const componentClassName = (id: string) => `stackly-component-${id.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+
+const componentAttr = (component: BuilderComponent, styles: ComponentStyles = component.styles) => {
+  const style = styleToString(styles);
+  const classAttr = ` class="${componentClassName(component.id)}"`;
+  return style ? `${classAttr} style="${escapeHtml(style)}"` : classAttr;
+};
 
 const applyTextStyleOverrides = (component: BuilderComponent, html: string) => {
   let result = html;
@@ -84,10 +92,17 @@ const renderIconSvg = (name: string, styles: ComponentStyles) => {
 };
 
 const renderComponent = (component: BuilderComponent): string => {
-  const style = styleToString(component.styles);
-  const styleAttr = style ? ` style="${escapeHtml(style)}"` : "";
+  const styleAttr = componentAttr(component);
   const content = escapeHtml(component.content);
   const children = component.children.map(renderComponent).join("\n");
+
+  if (component.type === "container") {
+    return `<section${styleAttr}>${children || content}</section>`;
+  }
+
+  if (component.type === "columns") {
+    return `<div${componentAttr(component, { display: "flex", gap: "16px", ...component.styles })}>${children}</div>`;
+  }
 
   // ── Registry path ────────────────────────────────────────────────────────────
   // Migrated blocks delegate export to spec.exportHtml(data, styleAttr).
@@ -123,12 +138,8 @@ const renderComponent = (component: BuilderComponent): string => {
 
       return `<section${styleAttr}>${gallery}</section>`;
     }
-    case "container":
-      return `<section${styleAttr}>${children || content}</section>`;
-    case "columns":
-      return `<div${styleAttr} style="display:flex;gap:16px;${style}">${children}</div>`;
     case "spacer":
-      return `<div${styleAttr} style="height:${component.props?.height || component.content || '60px'}"></div>`;
+      return `<div${componentAttr(component, { ...component.styles, height: String(component.props?.height || component.content || "60px") })}></div>`;
     case "icon":
       if (isFloatingComponent(component)) {
         return floatingWrapper(component, `<span${styleAttr}>${renderIconSvg(component.content || "Star", component.styles)}</span>`);
@@ -153,11 +164,11 @@ const renderComponent = (component: BuilderComponent): string => {
     case "social-links": {
       const links = (component.props as unknown as { links?: Array<{ platform: string; url: string }> })?.links || [];
       const inner = links.map((l) => `<a href="${escapeHtml(l.url)}" target="_blank" rel="noopener" style="display:inline-block;margin:0 4px;font-weight:700">${escapeHtml(l.platform)}</a>`).join("");
-      return `<div${styleAttr} style="text-align:center;${style}">${inner}</div>`;
+      return `<div${componentAttr(component, { ...component.styles, textAlign: "center" })}>${inner}</div>`;
     }
     case "countdown": {
       const label = (component.props as unknown as { label?: string })?.label || "Coming Soon";
-      return `<div${styleAttr} style="text-align:center;${style}"><h3>${escapeHtml(label)}</h3><p>Countdown timer (requires JavaScript)</p></div>`;
+      return `<div${componentAttr(component, { ...component.styles, textAlign: "center" })}><h3>${escapeHtml(label)}</h3><p>Countdown timer (requires JavaScript)</p></div>`;
     }
     case "pricing-table": {
       const tiers = (component.props as unknown as { heading?: string; tiers?: Array<{ name: string; price: string; period: string; features: string[]; cta: string; highlighted?: boolean }> })?.tiers || [];
@@ -175,7 +186,7 @@ const renderComponent = (component: BuilderComponent): string => {
       const fp = component.props as unknown as { brand?: string; tagline?: string; copyright?: string; columns?: Array<{ title: string; links: Array<{ label: string; href: string }> }> } || {};
       const cols = fp?.columns || [];
       const colHtml = cols.map((c) => `<div style="flex:1"><h4>${escapeHtml(c.title)}</h4>${c.links.map((l) => `<a href="${escapeHtml(l.href)}" style="display:block;padding:4px 0;color:rgba(255,255,255,.6)">${escapeHtml(l.label)}</a>`).join("")}</div>`).join("");
-      return `<footer${styleAttr} style="background:#0B1D40;color:#fff;padding:40px;${style}"><div style="display:flex;gap:32px"><div style="flex:1"><strong>${escapeHtml(fp?.brand || "")}</strong><p style="color:rgba(255,255,255,.5)">${escapeHtml(fp?.tagline || "")}</p></div>${colHtml}</div><hr style="border-color:rgba(255,255,255,.1)"/><p style="text-align:center;color:rgba(255,255,255,.4)">${escapeHtml(fp?.copyright || "")}</p></footer>`;
+      return `<footer${componentAttr(component, { backgroundColor: "#0B1D40", color: "#fff", padding: "40px", ...component.styles })}><div style="display:flex;gap:32px"><div style="flex:1"><strong>${escapeHtml(fp?.brand || "")}</strong><p style="color:rgba(255,255,255,.5)">${escapeHtml(fp?.tagline || "")}</p></div>${colHtml}</div><hr style="border-color:rgba(255,255,255,.1)"/><p style="text-align:center;color:rgba(255,255,255,.4)">${escapeHtml(fp?.copyright || "")}</p></footer>`;
     }
     case "form": {
       const fields = (component.props as unknown as { heading?: string; fields?: Array<{ name: string; type: string; label: string; placeholder?: string }> })?.fields || [];
@@ -192,19 +203,70 @@ const renderComponent = (component: BuilderComponent): string => {
   }
 };
 
-export const generateHtml = (components: BuilderComponent[]) => {
+const collectResponsiveCss = (components: BuilderComponent[]): string => {
+  const tabletRules: string[] = [];
+  const mobileRules: string[] = [];
+
+  const visit = (component: BuilderComponent) => {
+    const tabletStyle = component.responsiveStyles?.tablet
+      ? styleToString(component.responsiveStyles.tablet as ComponentStyles)
+      : "";
+    const mobileStyle = component.responsiveStyles?.mobile
+      ? styleToString(component.responsiveStyles.mobile as ComponentStyles)
+      : "";
+
+    if (tabletStyle) {
+      tabletRules.push(`        .${componentClassName(component.id)} { ${tabletStyle}; }`);
+    }
+    if (mobileStyle) {
+      mobileRules.push(`        .${componentClassName(component.id)} { ${mobileStyle}; }`);
+    }
+
+    component.children.forEach(visit);
+  };
+
+  components.forEach(visit);
+
+  return [
+    tabletRules.length ? `      @media (max-width: 768px) {\n${tabletRules.join("\n")}\n      }` : "",
+    mobileRules.length ? `      @media (max-width: 390px) {\n${mobileRules.join("\n")}\n      }` : "",
+  ].filter(Boolean).join("\n");
+};
+
+export const generateHtml = (components: BuilderComponent[], seo?: SEOMetadata) => {
   const body = components
     .slice()
     .sort((a, b) => a.order - b.order)
     .map(renderComponent)
     .join("\n");
 
+  /* ── SEO meta tags ───────────────────────────────────────────────── */
+  const pageTitle = escapeHtml(seo?.title || "Exported Stackly Page");
+  const metaDesc = seo?.description
+    ? `\n    <meta name="description" content="${escapeHtml(seo.description)}" />`
+    : "";
+
+  const ogTitle = seo?.ogTitle || seo?.title;
+  const ogDesc = seo?.ogDescription || seo?.description;
+
+  const ogTags = [
+    ogTitle   ? `<meta property="og:title" content="${escapeHtml(ogTitle)}" />`       : "",
+    ogDesc    ? `<meta property="og:description" content="${escapeHtml(ogDesc)}" />` : "",
+    seo?.ogImage ? `<meta property="og:image" content="${escapeHtml(seo.ogImage)}" />` : "",
+    ogTitle   ? `<meta property="og:type" content="website" />`                       : "",
+  ].filter(Boolean);
+
+  const ogBlock = ogTags.length > 0
+    ? "\n    " + ogTags.join("\n    ")
+    : "";
+  const responsiveCss = collectResponsiveCss(components);
+
   return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Exported Stackly Page</title>
+    <title>${pageTitle}</title>${metaDesc}${ogBlock}
     <style>
       * { box-sizing: border-box; }
       body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #ffffff; color: #0B1D40; }
@@ -263,7 +325,7 @@ export const generateHtml = (components: BuilderComponent[]) => {
         p, li, input, textarea, select { font-size: min(15px, 4.2vw); line-height: 1.6; }
         button, [role="button"] { font-size: min(14px, 4vw); }
       }
-    </style>
+${responsiveCss ? `${responsiveCss}\n` : ""}    </style>
   </head>
   <body>
     <script>
@@ -282,8 +344,8 @@ ${body}
 </html>`;
 };
 
-export const downloadHtml = (components: BuilderComponent[], filename = "stackly-page.html") => {
-  const html = generateHtml(components);
+export const downloadHtml = (components: BuilderComponent[], seo?: SEOMetadata, filename = "stackly-page.html") => {
+  const html = generateHtml(components, seo);
   const blob = new Blob([html], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");

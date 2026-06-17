@@ -56,6 +56,8 @@ export interface ComponentStyles {
   zIndex?: string;
   minWidth?: string;
   minHeight?: string;
+  display?: string;
+  gap?: string;
 }
 
 /**
@@ -410,6 +412,8 @@ export interface BuilderComponent {
   zIndex?: number;
   /** Explicit pixel size in freeform mode. */
   freeformSize?: { width: number; height: number };
+  /** Per-viewport style overrides (tablet / mobile). Desktop is the base `styles`. */
+  responsiveStyles?: ResponsiveStyles;
 }
 
 /* ─── Viewport / responsive editing ────────────────────────────────── */
@@ -424,13 +428,12 @@ export const VIEWPORT_WIDTHS: Record<Viewport, number> = {
 
 /**
  * Per-breakpoint style overrides.
- * Only deltas from `styles` (base) need to be stored.
- * sm=640px  md=768px  lg=1024px
+ * Only deltas from `styles` (base/desktop) need to be stored.
+ * `tablet` applies at ≤768px, `mobile` at ≤480px.
  */
 export type ResponsiveStyles = {
-  sm?: Partial<ComponentStyles>;
-  md?: Partial<ComponentStyles>;
-  lg?: Partial<ComponentStyles>;
+  tablet?: Partial<ComponentStyles>;
+  mobile?: Partial<ComponentStyles>;
 };
 
 export interface BuilderRequirements {

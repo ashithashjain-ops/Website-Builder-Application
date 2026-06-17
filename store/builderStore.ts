@@ -20,6 +20,7 @@ import { accordionDefaults } from "@/components/draggable/AccordionComponent";
 import { tabsDefaults } from "@/components/draggable/TabsComponent";
 import { mapDefaults } from "@/components/draggable/MapComponent";
 import type { BuilderComponent, BuilderRequirements, BuilderState, ComponentType, FeatureRecord, Viewport } from "@/types/builder";
+import { useDesignStore } from "@/store/designStore";
 import type { DesignTokens } from "@/store/designStore";
 
 type ComponentDefault = Pick<BuilderComponent, "content" | "styles" | "children"> & {
@@ -264,6 +265,12 @@ const deepCloneComponent = (component: BuilderComponent): BuilderComponent => ({
   styles: { ...component.styles },
   textStyles: component.textStyles ? { ...component.textStyles } : undefined,
   props: component.props ? { ...component.props } : undefined,
+  responsiveStyles: component.responsiveStyles
+    ? {
+        tablet: component.responsiveStyles.tablet ? { ...component.responsiveStyles.tablet } : undefined,
+        mobile: component.responsiveStyles.mobile ? { ...component.responsiveStyles.mobile } : undefined,
+      }
+    : undefined,
   children: component.children.map(deepCloneComponent),
 });
 
@@ -273,6 +280,12 @@ const cloneComponentTree = (components: BuilderComponent[]): BuilderComponent[] 
     styles: { ...component.styles },
     textStyles: component.textStyles ? { ...component.textStyles } : undefined,
     props: component.props ? { ...component.props } : undefined,
+    responsiveStyles: component.responsiveStyles
+      ? {
+          tablet: component.responsiveStyles.tablet ? { ...component.responsiveStyles.tablet } : undefined,
+          mobile: component.responsiveStyles.mobile ? { ...component.responsiveStyles.mobile } : undefined,
+        }
+      : undefined,
     children: cloneComponentTree(component.children ?? []),
   }));
 
@@ -538,6 +551,12 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
         // without clobbering the rest (mirrors the styles merge pattern).
         props: updates.props ? { ...(c.props ?? {}), ...updates.props } : c.props,
         textStyles: updates.textStyles ? { ...(c.textStyles ?? {}), ...updates.textStyles } : c.textStyles,
+        responsiveStyles: updates.responsiveStyles
+          ? {
+              ...c.responsiveStyles,
+              ...updates.responsiveStyles,
+            }
+          : c.responsiveStyles,
       })),
     })),
   duplicateComponent: (id) =>
@@ -600,7 +619,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
     })),
   clearCanvas: () =>
     set((state) => ({ ...captureHistory(state), components: [], selectedComponentId: null })),
-  exportHtml: () => generateHtml(get().components),
+  exportHtml: () => generateHtml(get().components, useDesignStore.getState().seo),
   undo: () =>
     set((state) => {
       if (state.history.length === 0) return state;

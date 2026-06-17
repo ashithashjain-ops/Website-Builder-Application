@@ -6,7 +6,7 @@ import { Copy, Lock, Trash2 } from "lucide-react";
 import { componentRegistry } from "@/lib/componentRegistry";
 import { useBuilderStore } from "@/store/builderStore";
 import { canvasItem, floatUp } from "@/lib/motion";
-import type { BuilderComponent } from "@/types/builder";
+import type { BuilderComponent, Viewport } from "@/types/builder";
 import ResizeHandles from "./ResizeHandles";
 import ContextMenu from "./ContextMenu";
 
@@ -29,6 +29,7 @@ function CanvasItem({
   const updateComponent = useBuilderStore((s) => s.updateComponent);
   const setInlineEditing = useBuilderStore((s) => s.setInlineEditing);
   const toggleSelectComponent = useBuilderStore((s) => s.toggleSelectComponent);
+  const viewport = useBuilderStore((s) => s.viewport) as Viewport;
   const [isEditing, setIsEditing] = useState(false);
   const isInlineEditable = component.type === "heading" || component.type === "text" || component.type === "button";
   const isSectionComponent = component.type === "contact" || component.type === "hero" || component.type === "navigation" || component.type === "features" || component.type === "gallery" || component.type === "pricing-table" || component.type === "testimonial" || component.type === "footer" || component.type === "accordion" || component.type === "tabs" || component.type === "form";
@@ -152,6 +153,15 @@ function CanvasItem({
 
   const [isHovered, setIsHovered] = useState(false);
   const typeLabel = component.type.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+
+  /* ── Merge responsive overrides for active viewport ── */
+  const viewportComponent = useMemo(() => {
+    if (viewport === "desktop" || !component.responsiveStyles) return component;
+    const overrides = component.responsiveStyles[viewport];
+    if (!overrides || Object.keys(overrides).length === 0) return component;
+    return { ...component, styles: { ...component.styles, ...overrides } };
+  }, [component, viewport]);
+
   const showOverlay = (isSelected || isHovered) && !isEditing;
   return (
     <>
@@ -240,7 +250,7 @@ function CanvasItem({
           onDoubleClick={isInlineEditable ? handleDoubleClick : undefined}
         >
           <Renderer
-            component={component}
+            component={viewportComponent}
             isEditing={isEditing}
             onUpdate={isSectionComponent ? handleSectionUpdate : isEditing ? handleInlineUpdate : undefined}
             onPatch={handlePatch}
