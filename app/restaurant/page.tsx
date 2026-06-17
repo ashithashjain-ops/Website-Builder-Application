@@ -19,14 +19,16 @@ function scrollToSection(sectionId: string) {
   }
 }
 
+// Updated navigation links to include Menu, About Us, and Contact
 const navLinks = [
   { label: "Home", hash: "#restaurant-home" },
-  { label: "Templates", hash: "#restaurant-templates" },
+  { label: "Menu", hash: "#restaurant-menu" },
+  { label: "About Us", hash: "#restaurant-about" },
   { label: "Features", hash: "#restaurant-features" },
   { label: "FAQ", hash: "#restaurant-faq" },
+  { label: "Contact", hash: "#restaurant-contact" },
 ] as const;
 
-// 1. Pass deviceMode down to Header so it knows when to force mobile navigation
 function RestaurantHeader({ deviceMode }: { deviceMode: "desktop" | "tablet" | "mobile" }) {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -71,7 +73,6 @@ function RestaurantHeader({ deviceMode }: { deviceMode: "desktop" | "tablet" | "
           Stackly Restaurant.
         </button>
 
-        {/* Conditionally hide desktop nav based on real deviceMode */}
         <nav className={`${deviceMode === "desktop" ? "hidden md:flex" : "hidden"} items-center gap-6 lg:gap-8`}>
           {navLinks.map((link) => (
             <button
@@ -107,7 +108,6 @@ function RestaurantHeader({ deviceMode }: { deviceMode: "desktop" | "tablet" | "
             )}
           </div>
           
-          {/* Conditionally show mobile hamburger */}
           <button
             type="button"
             className={`${deviceMode === "desktop" ? "md:hidden" : "flex"} inline-flex items-center justify-center w-10 h-10 rounded-md border text-white transition-colors ${
@@ -147,13 +147,14 @@ function RestaurantHeader({ deviceMode }: { deviceMode: "desktop" | "tablet" | "
   );
 }
 
-const restaurantTemplates = [
-  { title: "Fine Dining & Steakhouse", image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop" },
-  { title: "Modern Cafe & Bakery", image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=800&auto=format&fit=crop" },
-  { title: "Authentic Pizzeria", image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=800&auto=format&fit=crop" },
-  { title: "Bistro & Brunch Bar", image: "https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=800&auto=format&fit=crop",},
-  { title: "Street Eats & Trucks", image: "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?q=80&w=800&auto=format&fit=crop" },
-  { title: "Gourmet Burger Joint", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop" },
+// Renamed from templates to foods, keeping exact images requested
+const foodItems = [
+  { title: "Premium Ribeye Steak", price: "$45", image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop" },
+  { title: "Artisan Cafe Pastries", price: "$12", image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=800&auto=format&fit=crop" },
+  { title: "Authentic Wood-Fired Pizza", price: "$18", image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=800&auto=format&fit=crop" },
+  { title: "Avocado Brunch Toast", price: "$14", image: "https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=800&auto=format&fit=crop"},
+  { title: "Gourmet Street Tacos", price: "$16", image: "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?q=80&w=800&auto=format&fit=crop" },
+  { title: "Classic Cheeseburger", price: "$15", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop" },
 ];
 
 const buildFeatures = [
@@ -234,16 +235,16 @@ export default function RestaurantTemplatesPage() {
               </div>
             </div>
 
-            {/* 2. TEMPLATES GRID */}
-            <section id="restaurant-templates" className={`bg-white min-w-0 ${
+            {/* 2. MENU GRID (Changed from Templates to Foods) */}
+            <section id="restaurant-menu" className={`bg-white min-w-0 ${
               deviceMode === "desktop" ? "py-16 sm:py-24 px-4 sm:px-6 lg:px-8" : "py-12 px-4"
             }`}>
               <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-10 break-words">
                   <h2 className={`font-black text-[#0A1E3D] mb-4 text-balance ${
                     deviceMode === "desktop" ? "text-3xl md:text-4xl" : "text-2xl"
-                  }`}>Choose a Restaurant Template to Start</h2>
-                  <p className="text-base text-gray-600 max-w-2xl mx-auto">Select a layout designed specifically for restaurants and customize it to match your brand.</p>
+                  }`}>Our Signature Menu</h2>
+                  <p className="text-base text-gray-600 max-w-2xl mx-auto">Explore our carefully curated selection of fresh, delicious dishes made from scratch.</p>
                 </div>
 
                 <div className={`grid ${
@@ -251,16 +252,20 @@ export default function RestaurantTemplatesPage() {
                   deviceMode === "tablet" ? "grid-cols-1 sm:grid-cols-2 gap-6" :
                   "grid-cols-1 gap-6"
                 }`}>
-                  {restaurantTemplates.map((template) => (
-                    <article key={template.title} className="group flex flex-col rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-red-100 min-w-0">
+                  {foodItems.map((item) => (
+                    <article key={item.title} className="group flex flex-col rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-red-100 min-w-0">
                       <div className="overflow-hidden rounded-xl bg-gray-100 aspect-[4/3] mb-5">
-                        <img src={template.image} alt="Template Preview" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                        <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
                       </div>
                       <div className="flex-1 flex flex-col min-w-0">
-                        <h3 className="text-lg font-bold text-[#0A1E3D] mb-5 truncate">{template.title}</h3>
-                        <div className="mt-auto flex gap-3">
-                          <Link href="/landing#templates" className="flex-1 rounded-xl border-2 border-dashed border-[#b91c1c] flex items-center justify-center py-2.5 text-sm font-bold text-[#b91c1c] hover:bg-red-50">Preview</Link>
-                          <Link href={`/blockpages?template=restaurant`} className="flex-1 rounded-xl bg-[#0A1E3D] flex items-center justify-center py-2.5 text-sm font-bold text-white hover:bg-[#112a52]">Edit</Link>
+                        <div className="flex justify-between items-start mb-5 gap-3">
+                          <h3 className="text-lg font-bold text-[#0A1E3D] truncate leading-tight">{item.title}</h3>
+                          <span className="font-black text-[#b91c1c] shrink-0">{item.price}</span>
+                        </div>
+                        <div className="mt-auto">
+                          <button type="button" className="w-full rounded-xl bg-[#b91c1c] flex items-center justify-center py-3 text-sm font-bold text-white hover:bg-red-800 transition-colors">
+                            Order Now
+                          </button>
                         </div>
                       </div>
                     </article>
@@ -269,8 +274,44 @@ export default function RestaurantTemplatesPage() {
               </div>
             </section>
 
-            {/* 3. BUILD YOUR WAY (FEATURES) */}
-            <section id="restaurant-features" className={`bg-[#FFF5F5] border-y border-red-100/50 min-w-0 ${
+            {/* 3. ABOUT US SECTION */}
+            <section id="restaurant-about" className={`bg-gray-50 border-y border-gray-100 min-w-0 ${
+              deviceMode === "desktop" ? "py-16 sm:py-24 px-4 sm:px-6 lg:px-8" : "py-12 px-4"
+            }`}>
+              <div className={`max-w-7xl mx-auto grid items-center ${
+                deviceMode === "desktop" ? "grid-cols-1 lg:grid-cols-2 gap-16" : "grid-cols-1 gap-10"
+              }`}>
+                <div className="rounded-[2rem] overflow-hidden shadow-xl">
+                  <img 
+                    src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop" 
+                    alt="Restaurant Interior" 
+                    className="w-full h-auto aspect-[4/3] object-cover"
+                  />
+                </div>
+                <div className="break-words">
+                  <h2 className="text-[#b91c1c] font-black uppercase tracking-[0.2em] text-sm mb-3">Our Story</h2>
+                  <h3 className={`font-black text-[#0A1E3D] text-balance leading-tight mb-6 ${
+                    deviceMode === "desktop" ? "text-3xl md:text-4xl" : "text-2xl"
+                  }`}>Tradition meets modern flavor.</h3>
+                  <p className="text-base text-gray-600 leading-relaxed mb-6">Founded with a passion for exceptional food, we started as a small family kitchen dedicated to bringing authentic, vibrant flavors to our neighborhood.</p>
+                  <p className="text-base text-gray-600 leading-relaxed mb-8">Today, we continue that tradition by sourcing the freshest local ingredients and applying modern culinary techniques to classic recipes. Every bite is crafted to make your dining experience memorable.</p>
+                  
+                  <div className="flex gap-8 border-t border-gray-200 pt-6">
+                    <div>
+                      <p className="text-3xl font-black text-[#0A1E3D]">10+</p>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Years</p>
+                    </div>
+                    <div>
+                      <p className="text-3xl font-black text-[#0A1E3D]">5k+</p>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Guests</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* 4. BUILD YOUR WAY (FEATURES) */}
+            <section id="restaurant-features" className={`bg-[#FFF5F5] min-w-0 ${
               deviceMode === "desktop" ? "py-16 sm:py-24 px-4 sm:px-6 lg:px-8" : "py-12 px-4"
             }`}>
               <div className={`max-w-7xl mx-auto grid items-center ${
@@ -294,15 +335,15 @@ export default function RestaurantTemplatesPage() {
                 </div>
                 <div className="rounded-[2rem] overflow-hidden shadow-2xl order-1 lg:order-2 w-full">
                   <img 
-                    src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop" 
-                    alt="Restaurant Management" 
+                    src="https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?q=80&w=800&auto=format&fit=crop" 
+                    alt="Chef plating food" 
                     className="w-full h-auto aspect-[4/3] object-cover"
                   />
                 </div>
               </div>
             </section>
 
-            {/* 4. INFRASTRUCTURE */}
+            {/* 5. INFRASTRUCTURE */}
             <section className={`bg-[#0A1E3D] text-white min-w-0 ${
               deviceMode === "desktop" ? "py-16 sm:py-24 px-4 sm:px-6 lg:px-8" : "py-12 px-4"
             }`}>
@@ -329,7 +370,7 @@ export default function RestaurantTemplatesPage() {
               </div>
             </section>
 
-            {/* 5. FAQ */}
+            {/* 6. FAQ */}
             <section id="restaurant-faq" className={`bg-white min-w-0 ${
               deviceMode === "desktop" ? "py-16 sm:py-24 px-4 sm:px-6 lg:px-8" : "py-12 px-4"
             }`}>
@@ -366,14 +407,43 @@ export default function RestaurantTemplatesPage() {
               </div>
             </section>
 
-           
-           
-                <Footer /> 
+            {/* 7. CONTACT SECTION */}
+            <section id="restaurant-contact" className={`bg-gray-50 min-w-0 ${
+              deviceMode === "desktop" ? "py-16 sm:py-24 px-4 sm:px-6 lg:px-8" : "py-12 px-4"
+            }`}>
+              <div className="max-w-5xl mx-auto text-center break-words">
+                <h2 className="text-[#b91c1c] font-black uppercase tracking-[0.2em] text-sm mb-3">Get in Touch</h2>
+                <h3 className={`font-black text-[#0A1E3D] text-balance leading-tight mb-10 ${
+                  deviceMode === "desktop" ? "text-3xl md:text-4xl" : "text-2xl"
+                }`}>Visit Us or Reach Out</h3>
+                
+                <div className={`grid ${
+                  deviceMode === "desktop" ? "grid-cols-3 gap-8" : "grid-cols-1 gap-6"
+                }`}>
+                  <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <h4 className="font-bold text-[#0A1E3D] mb-3 text-lg">Location</h4>
+                    <p className="text-gray-600 text-sm leading-relaxed">123 Culinary Avenue<br/>Food District, FD 10020</p>
+                  </div>
+                  <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <h4 className="font-bold text-[#0A1E3D] mb-3 text-lg">Hours</h4>
+                    <p className="text-gray-600 text-sm leading-relaxed">Mon - Fri: 11AM - 10PM<br/>Sat - Sun: 10AM - 11PM</p>
+                  </div>
+                  <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <h4 className="font-bold text-[#0A1E3D] mb-3 text-lg">Contact</h4>
+                    <p className="text-gray-600 text-sm leading-relaxed">info@stacklyfood.com<br/>+1 (555) 123-4567</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Wrapped Global Footer to prevent overflow */}
+            <div className="w-full max-w-full shrink-0 overflow-hidden bg-[#071936] relative z-20">
+               <Footer />
             </div>
 
           </div>
         </div>
-    
+      </div>
     </main>
   );
 }
