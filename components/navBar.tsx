@@ -371,6 +371,29 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
     window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
   };
  
+  const moveToCartFromWishlist = (storedItem: StoredCommerceItem) => {
+    const item = normalizeStoredItem(storedItem);
+    const title = storedItem.title || storedItem.name || item.title;
+
+    const nextCart = [...cartItems];
+    const existing = nextCart.find((i) => (i.title || i.name) === title);
+    if (existing) {
+      existing.quantity = (existing.quantity || existing.qty || 1) + 1;
+      existing.qty = undefined;
+    } else {
+      nextCart.push({ ...item, quantity: 1, qty: undefined });
+    }
+    const nextCount = nextCart.reduce((total, i) => total + (i.quantity || i.qty || 1), 0);
+
+    window.localStorage.setItem("cartItems", JSON.stringify(nextCart));
+    window.localStorage.setItem("cartCount", String(nextCount));
+
+    const nextWishlist = wishlistItems.filter((i) => (i.title || i.name) !== title);
+    window.localStorage.setItem("wishlistItems", JSON.stringify(nextWishlist));
+
+    window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
+  };
+ 
   const removeCartItem = (title: string) => {
     const next = cartItems.filter((item) => (item.title || item.name) !== title);
     const nextCount = next.reduce((total, item) => total + (item.quantity || item.qty || 1), 0);
@@ -823,14 +846,23 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
                         {item.price ? `$ ${item.price}` : "Saved"}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeWishlistItem(title)}
-                      className="text-gray-300 transition hover:text-red-500 focus-visible:outline-none focus-visible:text-red-500 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:rounded-md"
-                      aria-label={`Remove ${item.title} from wishlist`}
-                    >
-                      <FaXmark />
-                    </button>
+                    <div className="flex shrink-0 flex-col items-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => moveToCartFromWishlist(storedItem)}
+                        className="rounded-md bg-[#06224C] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-md transition hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1"
+                      >
+                        Add to Cart
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeWishlistItem(title)}
+                        className="text-gray-300 transition hover:text-red-500 focus-visible:outline-none focus-visible:text-red-500 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:rounded-md"
+                        aria-label={`Remove ${item.title} from wishlist`}
+                      >
+                        <FaXmark />
+                      </button>
+                    </div>
                   </div>
                 );
               })
