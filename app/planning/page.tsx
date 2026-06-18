@@ -123,6 +123,11 @@ function historyYearFromDate(date: string) {
   return m ? Number(m[1]) : NaN;
 }
 
+function historyMonthIndexFromDate(date: string) {
+  const parsed = new Date(`${date} 00:00:00`);
+  return Number.isNaN(parsed.getTime()) ? -1 : parsed.getMonth();
+}
+
 const DEFAULT_BILLING_HISTORY: BillingHistoryEntry[] = [
   {
     date: "Apr 02 2026",
@@ -299,26 +304,29 @@ export default function PlanningPage() {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null);
   const [billingHistory, setBillingHistory] = useState<BillingHistoryEntry[]>(DEFAULT_BILLING_HISTORY);
-  const [historyYearFilter, setHistoryYearFilter] = useState<string>("this");
+  const [historyMonthFilter, setHistoryMonthFilter] = useState<string>("all");
   const currentYear = new Date().getFullYear();
-  const extraHistoryYears = [2024, 2023, 2022, 2021];
-  const historyYears = Array.from(
-    new Set(
-      [
-        currentYear,
-        ...extraHistoryYears,
-        ...billingHistory
-          .map((e) => historyYearFromDate(e.date))
-          .filter((y) => Number.isFinite(y))
-          .map((y) => Number(y)),
-      ],
-    ),
-  ).sort((a, b) => b - a);
-  const activeHistoryYear = historyYearFilter === "this" ? currentYear : Number(historyYearFilter);
+  const historyMonths = [
+    { value: "0", label: "January" },
+    { value: "1", label: "February" },
+    { value: "2", label: "March" },
+    { value: "3", label: "April" },
+    { value: "4", label: "May" },
+    { value: "5", label: "June" },
+    { value: "6", label: "July" },
+    { value: "7", label: "August" },
+    { value: "8", label: "September" },
+    { value: "9", label: "October" },
+    { value: "10", label: "November" },
+    { value: "11", label: "December" },
+  ] as const;
   const filteredBillingHistory =
-    historyYearFilter === "all"
+    historyMonthFilter === "all"
       ? billingHistory
-      : billingHistory.filter((entry) => historyYearFromDate(entry.date) === activeHistoryYear);
+      : billingHistory.filter((entry) => {
+          if (historyYearFromDate(entry.date) !== currentYear) return false;
+          return historyMonthIndexFromDate(entry.date) === Number(historyMonthFilter);
+        });
 
   useEffect(() => {
     const stored = loadBillingHistoryFromStorage();
@@ -836,28 +844,28 @@ export default function PlanningPage() {
                   >
                     <button
                       type="button"
-                      onClick={() => setHistoryYearFilter("all")}
+                      onClick={() => setHistoryMonthFilter("all")}
                       className="min-w-0 w-full whitespace-nowrap border-b border-[#e2e8f0] sm:w-auto sm:flex-none sm:border-b-0 sm:border-r sm:border-[#e2e8f0]"
                       style={{
                         padding: "7px 10px",
                         color: "#1f2937",
-                        background: historyYearFilter === "all" ? "#eef2ff" : "transparent",
-                        fontWeight: historyYearFilter === "all" ? 700 : 500,
+                        background: historyMonthFilter === "all" ? "#eef2ff" : "transparent",
+                        fontWeight: historyMonthFilter === "all" ? 700 : 500,
                       }}
                     >
                       All Invoices
                     </button>
                     <select
                       id="historyYearSelect"
-                      value={historyYearFilter}
-                      onChange={(e) => setHistoryYearFilter(e.target.value)}
+                      value={historyMonthFilter}
+                      onChange={(e) => setHistoryMonthFilter(e.target.value)}
                       className="planning-history-year-select box-border w-full min-w-0 max-w-none shrink-0 bg-transparent py-[7px] pl-[10px] pr-9 text-[12px] leading-snug text-[#1f2937] sm:min-w-[10rem] sm:max-w-[12rem] sm:flex-1 sm:pr-9 sm:text-[10px]"
-                      style={{ border: 0, outline: "none", fontWeight: historyYearFilter === "all" ? 500 : 700 }}
+                      style={{ border: 0, outline: "none", fontWeight: historyMonthFilter === "all" ? 500 : 700 }}
                     >
-                      <option value="this">This Year</option>
-                      {historyYears.map((year) => (
-                        <option key={year} value={String(year)}>
-                          {year}
+                      <option value="all">This Year (All Months)</option>
+                      {historyMonths.map((month) => (
+                        <option key={month.value} value={month.value}>
+                          {month.label}
                         </option>
                       ))}
                     </select>
