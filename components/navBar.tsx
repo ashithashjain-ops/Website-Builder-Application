@@ -1,7 +1,8 @@
 "use client";
  
 import Link from "next/link";
-import { MouseEvent, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   FaBookOpen,
@@ -31,6 +32,10 @@ import {
 } from "react-icons/fa6";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { assetPath } from "@/lib/paths";
+import { useAssetStore } from "@/store/assetStore";
+import { useBuilderStore } from "@/store/builderStore";
+import { useDesignStore } from "@/store/designStore";
+import { useProjectStore } from "@/store/projectStore";
  
 const products = ["PREMIUM TEMPLATES", "UI KITS", "WORDPRESS THEMES", "FREE ASSETS"];
  
@@ -193,6 +198,27 @@ type StoredCommerceItem = {
 };
  
 const STORAGE_SYNC_EVENT = "stackly-storage-change";
+const LOGOUT_STORAGE_KEYS = new Set([
+  "cartItems",
+  "cartCount",
+  "wishlistItems",
+  "buyscreenCartItemsV1",
+  "buyscreenFavoriteIdsV1",
+  "portfolioVideoData",
+]);
+
+function shouldClearOnLogout(key: string) {
+  return key.toLowerCase().startsWith("stackly") || LOGOUT_STORAGE_KEYS.has(key);
+}
+
+function clearLogoutStorage(storage: Storage) {
+  for (let index = storage.length - 1; index >= 0; index -= 1) {
+    const key = storage.key(index);
+    if (key && shouldClearOnLogout(key)) {
+      storage.removeItem(key);
+    }
+  }
+}
  
 function readRawJsonArray(key: string): unknown[] {
   if (typeof window === "undefined") {
@@ -229,6 +255,7 @@ function normalizeStoredItem(item: StoredCommerceItem) {
 }
  
 export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistClick, keepVisible = false }: NavBarProps) {
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [wishlistItems, setWishlistItems] = useState<StoredCommerceItem[]>([]);
   const [cartItems, setCartItems] = useState<StoredCommerceItem[]>([]);
@@ -428,6 +455,25 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
     setIsProfileMenuOpen(false);
   };
 
+  const handleLogout = useCallback(async () => {
+    setActiveMenu(null);
+    setIsProfileMenuOpen(false);
+    setMobileOpen(false);
+    setActivePanel(null);
+    setWishlistItems([]);
+    setCartItems([]);
+
+    useBuilderStore.getState().resetBuilder();
+    useProjectStore.getState().resetProjects();
+    useDesignStore.getState().resetDesignStore();
+    await useAssetStore.getState().resetAssets();
+
+    clearLogoutStorage(window.localStorage);
+    clearLogoutStorage(window.sessionStorage);
+    window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
+    router.push("/login");
+  }, [router]);
+
   const navLockedVisible = mobileOpen || Boolean(activeMenu) || isProfileMenuOpen || Boolean(activePanel);
   const navHidden = hidden && !navLockedVisible && !keepVisible;
  
@@ -618,10 +664,10 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
                     SETTINGS
                   </Link>
                   <div className="mt-1 border-t border-gray-50">
-                    <Link href="/login" onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-red-500 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:bg-red-50">
+                    <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[11px] font-black text-red-500 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:bg-red-50">
                       <FaRightFromBracket className="w-4" />
                       LOGOUT
-                    </Link>
+                    </button>
                   </div>
                   <div className="border-t border-gray-50 px-3 pb-2.5 pt-2">
                     <Link

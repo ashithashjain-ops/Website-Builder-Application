@@ -21,7 +21,7 @@ interface ProjectSettingsFormProps {
   projectId: string;
 }
 
-const categoryOptions = ["E-commerce", "Portfolio", "Blog", "Business"];
+const categoryOptions = ["E-commerce", "Portfolio", "Blog", "Business", "Restaurant"];
 const styleOptions = ["Modern", "Minimal", "Bold"];
 
 export default function ProjectSettingsForm({ projectId }: ProjectSettingsFormProps) {
@@ -39,8 +39,11 @@ export default function ProjectSettingsForm({ projectId }: ProjectSettingsFormPr
   useEffect(() => {
     const p = getProjectById(projectId);
     if (p) {
-      setProject(p);
-      setFormData({ name: p.name, category: p.category, style: p.style });
+      const id = window.setTimeout(() => {
+        setProject(p);
+        setFormData({ name: p.name, category: p.category, style: p.style });
+      }, 0);
+      return () => window.clearTimeout(id);
     }
   }, [projectId, getProjectById]);
 

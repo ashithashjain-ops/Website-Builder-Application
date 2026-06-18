@@ -83,3 +83,15 @@ export async function dbDeleteAsset(id: string): Promise<void> {
     tx.onerror    = () => reject(tx.error);
   });
 }
+
+/** Remove all local asset metadata and blobs. */
+export async function dbClearAssets(): Promise<void> {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction([STORE_META, STORE_BLOB], "readwrite");
+    tx.objectStore(STORE_META).clear();
+    tx.objectStore(STORE_BLOB).clear();
+    tx.oncomplete = () => resolve();
+    tx.onerror    = () => reject(tx.error);
+  });
+}

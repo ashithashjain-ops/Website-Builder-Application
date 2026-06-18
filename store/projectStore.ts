@@ -59,6 +59,7 @@ interface ProjectState {
   renameProject: (id: string, name: string) => void;
   setSearchQuery: (query: string) => void;
   setSort: (key: ProjectSortKey, order?: ProjectSortOrder) => void;
+  resetProjects: () => void;
 
   /* Derived */
   getFilteredProjects: () => Project[];
@@ -139,6 +140,20 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     const currentSort = get().sort;
     const newOrder = order ?? (currentSort.key === key && currentSort.order === "desc" ? "asc" : "desc");
     set({ sort: { key, order: newOrder } });
+  },
+
+  resetProjects: () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* storage unavailable */
+    }
+
+    set({
+      projects: [],
+      searchQuery: "",
+      sort: { key: "updatedAt", order: "desc" },
+    });
   },
 
   getFilteredProjects: () => {

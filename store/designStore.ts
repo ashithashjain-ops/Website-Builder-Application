@@ -64,6 +64,7 @@ interface DesignState {
   setTokens: (tokens: Partial<DesignTokens>) => void;
   setColorToken: (key: keyof DesignTokens["colors"], value: string) => void;
   resetTokens: () => void;
+  resetDesignStore: () => void;
 
   seo: SEOMetadata;
   setSEO: (seo: Partial<SEOMetadata>) => void;
@@ -129,4 +130,17 @@ export const useDesignStore = create<DesignState>((set) => ({
 
   showSEOPanel: false,
   toggleSEOPanel: () => set((s) => ({ showSEOPanel: !s.showSEOPanel })),
+
+  resetDesignStore: () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+    set({
+      tokens: { ...DEFAULT_TOKENS },
+      seo: { ...DEFAULT_SEO },
+      zoom: 100,
+      autoSaveEnabled: true,
+      lastSavedAt: null,
+      showGlobalStyles: false,
+      showSEOPanel: false,
+    });
+  },
 }));
