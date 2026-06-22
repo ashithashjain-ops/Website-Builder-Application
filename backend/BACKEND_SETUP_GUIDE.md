@@ -125,6 +125,9 @@ Copy the printed workspace ID into `backend/.env` as `ECOMMERCE_WORKSPACE_ID`. C
 
 ## Common Errors
 
+### GitHub Pages redirects to `/backend-error`
+GitHub Pages hosts only the static frontend. Deploy `render.yaml` as a Render Blueprint, then set the GitHub Actions secret `NEXT_PUBLIC_API_BASE_URL` to the Render service URL plus `/api` and redeploy Pages.
+
 ### `MONGODB_URI is not set`
 → Create/edit `backend/.env` and add your MongoDB connection string.
 

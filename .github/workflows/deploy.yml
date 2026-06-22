@@ -35,6 +35,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_BASE_PATH: /Website-Builder-Application
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
           # Set in repo secrets when Razorpay API is hosted (see .env.example)
           NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ secrets.NEXT_PUBLIC_RAZORPAY_KEY_ID }}
           NEXT_PUBLIC_RAZORPAY_API_BASE: ${{ secrets.NEXT_PUBLIC_RAZORPAY_API_BASE }}

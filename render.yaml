@@ -1,0 +1,61 @@
+services:
+  - type: web
+    name: stackly-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://ashithashjain-ops.github.io/Website-Builder-Application
+      - key: CORS_ORIGINS
+        value: https://ashithashjain-ops.github.io
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DNS_SERVERS
+        value: 8.8.8.8,1.1.1.1
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 30d
+      - key: EMAIL_DELIVERY_MODE
+        value: smtp
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_SECURE
+        value: "false"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM_NAME
+        value: Stackly
+      - key: SMTP_FROM_EMAIL
+        sync: false
+      - key: SMS_PROVIDER
+        value: mock
+      - key: PAYMENT_PRIMARY_PROVIDER
+        value: razorpay
+      - key: RAZORPAY_MODE
+        value: test
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: ECOMMERCE_TAX_RATE
+        value: "0"
+      - key: ECOMMERCE_SHIPPING_COST
+        value: "0"
+      - key: ECOMMERCE_WORKSPACE_ID
+        sync: false
