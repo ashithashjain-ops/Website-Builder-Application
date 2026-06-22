@@ -1,5 +1,7 @@
 /** Client-side Razorpay Checkout — WBA uses static export + razorpay-api on :3001 in dev. */
 
+import { getAuthToken } from "@/lib/api";
+
 export type RazorpayPaymentSuccess = {
   razorpay_payment_id: string;
   razorpay_order_id: string;
@@ -39,7 +41,7 @@ declare global {
   }
 }
 
-const PLACEHOLDER_KEY_RE = /xxxx|your_secret|placeholder/i;
+const PLACEHOLDER_KEY_RE = /xxxx|your[_-]|placeholder|demo/i;
 
 export function getRazorpayConfigError(): string | null {
   const key = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "";
@@ -60,6 +62,10 @@ export function isRazorpayDemoMode(): boolean {
   return PLACEHOLDER_KEY_RE.test(key);
 }
 
+export function isDemoRazorpayOrder(order: RazorpayOrderResponse): boolean {
+  return PLACEHOLDER_KEY_RE.test(order.keyId) || order.orderId.startsWith("order_demo_");
+}
+
 export function getRazorpaySetupHint(): string | null {
   if (!isRazorpayDemoMode()) return null;
   return "Demo mode: payment completes locally without Razorpay keys. Add real Test keys to .env.local for live checkout.";
@@ -69,10 +75,7 @@ export function getRazorpaySetupHint(): string | null {
 export function getRazorpayApiBase(): string {
   const fromEnv = process.env.NEXT_PUBLIC_RAZORPAY_API_BASE?.replace(/\/$/, "");
   if (fromEnv) return fromEnv;
-  if (typeof window !== "undefined" && window.location.hostname === "localhost") {
-    return "http://localhost:3001";
-  }
-  return "";
+  return process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/api\/?$/, "") || "http://localhost:5000";
 }
 
 function razorpayApiUrl(path: string): string {
@@ -120,7 +123,10 @@ async function postRazorpayApi<T>(path: string, body: unknown): Promise<T> {
   try {
     res = await fetch(razorpayApiUrl(path), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(getAuthToken() ? { Authorization: `Bearer ${getAuthToken()}` } : {}),
+      },
       body: JSON.stringify(body),
     });
   } catch {
@@ -143,7 +149,14 @@ export async function createRazorpayOrder(payload: {
   return postRazorpayApi<RazorpayOrderResponse>("/api/razorpay/create-order", payload);
 }
 
-export async function verifyRazorpayPayment(payload: RazorpayPaymentSuccess): Promise<boolean> {
+export async function verifyRazorpayPayment(
+  payload: RazorpayPaymentSuccess & {
+    amount?: number;
+    currency?: string;
+    planName?: string;
+    billingPeriod?: string;
+  },
+): Promise<boolean> {
   const data = await postRazorpayApi<{ verified?: boolean }>("/api/razorpay/verify", payload);
   return Boolean(data.verified);
 }

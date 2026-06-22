@@ -2,15 +2,6 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 import { fadeUp } from "@/lib/motion";
 import type { DailyTraffic } from "@/types/analytics";
 
@@ -20,6 +11,26 @@ interface ViewsChartProps {
 }
 
 export default function ViewsChart({ data, title = "Traffic Overview" }: ViewsChartProps) {
+  const width = 640;
+  const height = 220;
+  const padding = 28;
+  const maxValue = Math.max(1, ...data.flatMap((item) => [item.views, item.visitors]));
+  const xFor = (index: number) =>
+    padding + (index / Math.max(1, data.length - 1)) * (width - padding * 2);
+  const yFor = (value: number) =>
+    height - padding - (value / maxValue) * (height - padding * 2);
+  const toPoints = (key: "views" | "visitors") =>
+    data.map((item, index) => `${xFor(index)},${yFor(item[key])}`).join(" ");
+  const areaPath = (key: "views" | "visitors") => {
+    const points = data.map((item, index) => [xFor(index), yFor(item[key])] as const);
+    if (!points.length) return "";
+    const first = points[0];
+    const last = points[points.length - 1];
+    return `M ${first[0]} ${height - padding} L ${points
+      .map(([x, y]) => `${x} ${y}`)
+      .join(" L ")} L ${last[0]} ${height - padding} Z`;
+  };
+
   return (
     <motion.div
       variants={fadeUp}
@@ -31,66 +42,31 @@ export default function ViewsChart({ data, title = "Traffic Overview" }: ViewsCh
         {title}
       </h3>
       <div className="h-64 w-full sm:h-72">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02} />
-              </linearGradient>
-              <linearGradient id="visitorsGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.02} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-            <XAxis
-              dataKey="date"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 11, fill: "#94a3b8", fontWeight: 600 }}
-              dy={8}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 11, fill: "#94a3b8", fontWeight: 600 }}
-              dx={-4}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#06224C",
-                border: "none",
-                borderRadius: "12px",
-                padding: "10px 14px",
-                boxShadow: "0 12px 28px rgba(6, 34, 76, 0.25)",
-              }}
-              labelStyle={{ color: "#94a3b8", fontSize: 11, fontWeight: 700, marginBottom: 4 }}
-              itemStyle={{ color: "#ffffff", fontSize: 12, fontWeight: 700 }}
-              cursor={{ stroke: "#3b82f6", strokeWidth: 1, strokeDasharray: "4 4" }}
-            />
-            <Area
-              type="monotone"
-              dataKey="views"
-              name="Views"
-              stroke="#3b82f6"
-              strokeWidth={2.5}
-              fill="url(#viewsGradient)"
-              dot={false}
-              activeDot={{ r: 5, strokeWidth: 2, stroke: "#fff", fill: "#3b82f6" }}
-            />
-            <Area
-              type="monotone"
-              dataKey="visitors"
-              name="Visitors"
-              stroke="#8b5cf6"
-              strokeWidth={2}
-              fill="url(#visitorsGradient)"
-              dot={false}
-              activeDot={{ r: 4, strokeWidth: 2, stroke: "#fff", fill: "#8b5cf6" }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        <svg className="h-full w-full" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={title}>
+          <defs>
+            <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.28} />
+              <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.02} />
+            </linearGradient>
+            <linearGradient id="visitorsGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.2} />
+              <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
+          {[0, 1, 2, 3].map((line) => {
+            const y = padding + line * ((height - padding * 2) / 3);
+            return <line key={line} x1={padding} x2={width - padding} y1={y} y2={y} stroke="#f1f5f9" />;
+          })}
+          <path d={areaPath("views")} fill="url(#viewsGradient)" />
+          <path d={areaPath("visitors")} fill="url(#visitorsGradient)" />
+          <polyline points={toPoints("views")} fill="none" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <polyline points={toPoints("visitors")} fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          {data.map((item, index) => (
+            <text key={item.date} x={xFor(index)} y={height - 6} textAnchor="middle" className="fill-slate-400 text-[10px] font-semibold">
+              {item.date}
+            </text>
+          ))}
+        </svg>
       </div>
 
       {/* Legend */}

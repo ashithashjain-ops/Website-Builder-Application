@@ -15,6 +15,7 @@ import IconComponent from "@/components/draggable/IconComponent";
 import { useBuilderStore } from "@/store/builderStore";
 import { useDesignStore } from "@/store/designStore";
 import { useProjectStore } from "@/store/projectStore";
+import { loadWorkspaceState, saveWorkspaceState } from "@/lib/api";
 import type { BuilderComponent, ComponentType, Viewport } from "@/types/builder";
 import { VIEWPORT_WIDTHS } from "@/types/builder";
 
@@ -110,74 +111,126 @@ function Canvas({
 
   /* ── Save feedback ── */
   const [saved, setSaved] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "failed">("idle");
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loadedProjectRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!projectId || loadedProjectRef.current === projectId) return;
-    loadProjects();
-    const project = getProjectById(projectId);
-    if (!project) return;
+    let cancelled = false;
 
-    loadedProjectRef.current = projectId;
-    window.setTimeout(() => setProjectName(project.name || "My Website"), 0);
-    if (project.designTokens) {
-      setTokens(project.designTokens);
-    }
-    if (project.components && project.components.length > 0) {
-      loadComponents(project.components);
-    } else if (components.length === 0) {
-      loadWebsiteFromRequirements({
-        projectName: project.name || "My Website",
-        category: project.category || "Business",
-        style: project.style || "Modern",
-        sections: project.sections || [],
-      });
-    }
-  }, [components.length, getProjectById, loadComponents, loadProjects, loadWebsiteFromRequirements, projectId, setTokens]);
+    void (async () => {
+      await loadProjects();
+      if (cancelled) return;
 
-  const handleSave = () => {
-    if (projectId) {
-      loadProjects();
       const project = getProjectById(projectId);
-      if (project) {
-        updateProject(projectId, {
-          name: projectName.trim() || project.name,
-          components,
-          designTokens: tokens,
-        });
-      } else {
-        saveToLocalStorage();
+      if (!project) return;
+
+      loadedProjectRef.current = projectId;
+      setProjectName(project.name || "My Website");
+
+      try {
+        const response = await loadWorkspaceState(projectId);
+        const state = response.state as {
+          builderData?: {
+            components?: BuilderComponent[];
+            designTokens?: typeof tokens;
+            projectName?: string;
+          };
+        };
+        const builderData = state?.builderData || {};
+        if (builderData.projectName) setProjectName(builderData.projectName);
+        if (builderData.designTokens) setTokens(builderData.designTokens);
+        if (builderData.components && builderData.components.length > 0) {
+          loadComponents(builderData.components);
+          return;
+        }
+      } catch {
+        /* fall back to project snapshot */
       }
-    } else {
+
+      if (project.designTokens) {
+        setTokens(project.designTokens);
+      }
+      if (project.components && project.components.length > 0) {
+        loadComponents(project.components);
+      } else if (components.length === 0) {
+        loadWebsiteFromRequirements({
+          projectName: project.name || "My Website",
+          category: project.category || "Business",
+          style: project.style || "Modern",
+          sections: project.sections || [],
+        });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [components.length, getProjectById, loadComponents, loadProjects, loadWebsiteFromRequirements, projectId, setTokens, tokens]);
+
+  const saveProjectState = useCallback(async () => {
+    if (!projectId) {
       saveToLocalStorage();
+      return;
     }
-    setSaved(true);
-    if (savedTimer.current) clearTimeout(savedTimer.current);
-    savedTimer.current = setTimeout(() => setSaved(false), 2200);
-    setLastSavedAt(Date.now());
-  };
+
+    const project = getProjectById(projectId);
+    const nextName = projectName.trim() || project?.name || "My Website";
+    await saveWorkspaceState(projectId, {
+      builderData: {
+        projectName: nextName,
+        components,
+        designTokens: tokens,
+      },
+    });
+    await updateProject(projectId, {
+      name: nextName,
+      components,
+      designTokens: tokens,
+    });
+  }, [components, getProjectById, projectId, projectName, saveToLocalStorage, tokens, updateProject]);
+
+  const handleSave = useCallback(async () => {
+    setSaveStatus("saving");
+    try {
+      await saveProjectState();
+      setSaved(true);
+      setSaveStatus("saved");
+      setLastSavedAt(Date.now());
+      if (savedTimer.current) clearTimeout(savedTimer.current);
+      savedTimer.current = setTimeout(() => {
+        setSaved(false);
+        setSaveStatus("idle");
+      }, 2200);
+    } catch {
+      saveToLocalStorage();
+      setSaveStatus("failed");
+      setLastSavedAt(Date.now());
+      if (savedTimer.current) clearTimeout(savedTimer.current);
+      savedTimer.current = setTimeout(() => setSaveStatus("idle"), 3200);
+    }
+  }, [saveProjectState, saveToLocalStorage, setLastSavedAt]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        void handleSave();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [handleSave]);
 
   /* ── Auto-save every 30s ── */
   useEffect(() => {
     if (!autoSaveEnabled || components.length === 0) return;
     const id = setInterval(() => {
-      if (projectId) {
-        const project = getProjectById(projectId);
-        if (project) {
-          updateProject(projectId, {
-            name: projectName.trim() || project.name,
-            components,
-            designTokens: tokens,
-          });
-        }
-      } else {
-        saveToLocalStorage();
-      }
-      setLastSavedAt(Date.now());
+      void handleSave();
     }, 30000);
     return () => clearInterval(id);
-  }, [autoSaveEnabled, components, getProjectById, projectId, projectName, saveToLocalStorage, setLastSavedAt, tokens, updateProject]);
+  }, [autoSaveEnabled, components.length, handleSave]);
 
   const handleLoad = () => {
     let ok = false;
@@ -288,7 +341,7 @@ function Canvas({
                   <ToolMenuButton label="Assets" Icon={Images} tone="text-slate-700 bg-slate-50 border-slate-100" onClick={() => runTool(() => setIsAssetsOpen(true))} />
                   <ToolMenuButton label="Starter" Icon={Sparkles} tone="text-blue-700 bg-blue-50 border-blue-100" onClick={() => runTool(onLoadStarter)} />
                   <ToolMenuButton label="Load" Icon={FolderOpen} tone="text-slate-700 bg-slate-50 border-slate-100" onClick={() => runTool(handleLoad)} />
-                  <ToolMenuButton label={saved ? "Saved" : "Save"} Icon={saved ? Check : Save} tone={saved ? "text-green-700 bg-green-50 border-green-100" : "text-slate-700 bg-slate-50 border-slate-100"} onClick={() => runTool(handleSave)} />
+                  <ToolMenuButton label={saveStatus === "saving" ? "Saving..." : saveStatus === "failed" ? "Save failed" : saved ? "Saved" : "Save"} Icon={saved ? Check : Save} tone={saveStatus === "failed" ? "text-red-700 bg-red-50 border-red-100" : saved ? "text-green-700 bg-green-50 border-green-100" : "text-slate-700 bg-slate-50 border-slate-100"} onClick={() => runTool(() => void handleSave())} />
                   <ToolMenuButton label="Clear" Icon={Trash2} tone="text-red-700 bg-red-50 border-red-100" onClick={() => runTool(onClear)} />
                 </motion.div>
               )}

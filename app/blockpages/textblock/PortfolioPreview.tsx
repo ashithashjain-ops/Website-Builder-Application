@@ -263,7 +263,7 @@ export default function PortfolioPreview({
   });
 
   useEffect(() => {
-    let frameIds: number[] = [];
+    const frameIds: number[] = [];
     if (statsInView) {
       const statsElements = document.querySelectorAll('.stat-animate-count');
       statsElements.forEach(el => {
@@ -1653,10 +1653,10 @@ export default function PortfolioPreview({
                           Turning Ideas Into <br /> Meaningful Experiences.
                         </h2>
                         <p className="text-[#8B9DB1] text-sm mb-8 leading-relaxed max-w-[280px]">
-                          Im a UI/UX Designer & Frontend Developer who craft clean, user-focused digital experience.
+                          I&apos;m a UI/UX Designer & Frontend Developer who craft clean, user-focused digital experience.
                         </p>
                         <button className="px-5 py-2 border border-white/20 text-white text-sm font-semibold rounded-md flex items-center gap-2 hover:bg-white/10 transition group">
-                          Let's work together <FaArrowRight className="-rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                          Let&apos;s work together <FaArrowRight className="-rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                         </button>
                       </div>
 
@@ -1682,7 +1682,7 @@ export default function PortfolioPreview({
 
                       {/* Connect Column */}
                       <div>
-                        <h3 className="text-white font-bold text-sm mb-8 tracking-wider uppercase">Let's Connect</h3>
+                        <h3 className="text-white font-bold text-sm mb-8 tracking-wider uppercase">Let&apos;s Connect</h3>
                         <ul className="space-y-5">
                           <li>
                             <a href="mailto:@thestackly.com" className="flex items-center gap-3 text-[#8B9DB1] hover:text-white text-[15px] font-medium transition-colors">

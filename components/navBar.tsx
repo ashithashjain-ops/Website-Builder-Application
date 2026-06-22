@@ -13,6 +13,7 @@ import {
   FaChartLine,
   FaChevronDown,
   FaChevronRight,
+  FaCircleCheck,
   FaCircleUser,
   FaGear,
   FaGraduationCap,
@@ -33,6 +34,7 @@ import {
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { assetPath } from "@/lib/paths";
 import { useAssetStore } from "@/store/assetStore";
+import { useAuthStore } from "@/store/authStore";
 import { useBuilderStore } from "@/store/builderStore";
 import { useDesignStore } from "@/store/designStore";
 import { useProjectStore } from "@/store/projectStore";
@@ -256,6 +258,7 @@ function normalizeStoredItem(item: StoredCommerceItem) {
  
 export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistClick, keepVisible = false }: NavBarProps) {
   const router = useRouter();
+  const { user, isAuthenticated, loadUser, logout } = useAuthStore();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [wishlistItems, setWishlistItems] = useState<StoredCommerceItem[]>([]);
   const [cartItems, setCartItems] = useState<StoredCommerceItem[]>([]);
@@ -275,6 +278,10 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
   useEffect(() => {
     keepVisibleRef.current = keepVisible;
   });
+
+  useEffect(() => {
+    void loadUser();
+  }, [loadUser]);
  
   const scrollLandingSection = (event: MouseEvent<HTMLAnchorElement>, sectionId: string, closeMobile = false) => {
     const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -468,14 +475,26 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
     useDesignStore.getState().resetDesignStore();
     await useAssetStore.getState().resetAssets();
 
+    logout();
     clearLogoutStorage(window.localStorage);
     clearLogoutStorage(window.sessionStorage);
     window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
     router.push("/login");
-  }, [router]);
+  }, [logout, router]);
 
   const navLockedVisible = mobileOpen || Boolean(activeMenu) || isProfileMenuOpen || Boolean(activePanel);
   const navHidden = hidden && !navLockedVisible && !keepVisible;
+  const displayName = user?.name || "Guest";
+  const displayEmail = user?.email || "Sign in to manage your account";
+  const displayAvatar = user?.avatar || assetPath("/profile.webp");
+  const profileHref = isAuthenticated ? "/dashboard/settings" : "/login";
+  const accountHref = isAuthenticated ? "/dashboard" : "/login";
+  const isSubscribed = user?.subscriptionStatus === "active" && user?.plan && user.plan !== "free";
+  const planLabel = user?.plan
+    ? user.plan === "business"
+      ? "Business Plan"
+      : `${user.plan.charAt(0).toUpperCase()}${user.plan.slice(1)}`
+    : "Free";
  
   return (
     <>
@@ -638,7 +657,7 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
               }}
               className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border-2 border-white/40 transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_26px_rgba(255,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95 md:h-9 md:w-9"
             >
-              <img src={assetPath("/profile.webp")} alt="User Profile Picture" className="h-full w-full object-cover" />
+              <img src={displayAvatar} alt="User Profile Picture" className="h-full w-full object-cover" />
             </motion.button>
  
             <AnimatePresence>
@@ -653,31 +672,45 @@ export default function NavBar({ wishlistCount: wishlistCountProp, onWishlistCli
                   className="absolute right-0 top-full z-[100] mt-3 w-48 rounded-xl border border-gray-100 bg-white py-2 text-left shadow-2xl"
                 >
                   <div className="mb-1 border-b border-gray-50 px-4 py-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">User Menu</p>
+                    <p className="truncate text-xs font-black text-[#06224C]">{displayName}</p>
+                    <p className="mt-0.5 truncate text-[10px] font-semibold text-gray-400">{displayEmail}</p>
                   </div>
-                  <Link href="/login" onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600 focus-visible:outline-none focus-visible:bg-blue-50 focus-visible:text-blue-600">
+                  <Link href={accountHref} onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600 focus-visible:outline-none focus-visible:bg-blue-50 focus-visible:text-blue-600">
                     <FaCircleUser className="w-4 opacity-50" />
-                    ACCOUNT
+                    {isAuthenticated ? "DASHBOARD" : "ACCOUNT"}
                   </Link>
-                  <Link href="/login" onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600 focus-visible:outline-none focus-visible:bg-blue-50 focus-visible:text-blue-600">
+                  <Link href={profileHref} onClick={closeMenus} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-black text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600 focus-visible:outline-none focus-visible:bg-blue-50 focus-visible:text-blue-600">
                     <FaGear className="w-4 opacity-50" />
                     SETTINGS
                   </Link>
-                  <div className="mt-1 border-t border-gray-50">
-                    <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[11px] font-black text-red-500 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:bg-red-50">
-                      <FaRightFromBracket className="w-4" />
-                      LOGOUT
-                    </button>
-                  </div>
+                  {isAuthenticated ? (
+                    <div className="mt-1 border-t border-gray-50">
+                      <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[11px] font-black text-red-500 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:bg-red-50">
+                        <FaRightFromBracket className="w-4" />
+                        LOGOUT
+                      </button>
+                    </div>
+                  ) : null}
                   <div className="border-t border-gray-50 px-3 pb-2.5 pt-2">
-                    <Link
-                      href="/planning"
-                      onClick={closeMenus}
-                      className="flex items-center justify-center gap-3 rounded-lg border-0 bg-gradient-to-r from-slate-950 to-blue-700 px-4 py-2.5 text-[11px] font-black text-white shadow-lg shadow-blue-950/20 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-900/30 hover:ring-2 hover:ring-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white active:translate-y-0 active:scale-100"
-                    >
-                      <FaLayerGroup className="w-4 opacity-80" />
-                      SUBSCRIPTIONS
-                    </Link>
+                    {isSubscribed ? (
+                      <div
+                        className="flex items-center justify-center gap-3 rounded-lg border-0 bg-gradient-to-r from-emerald-600 to-green-500 px-4 py-2.5 text-[11px] font-black text-white shadow-lg shadow-emerald-950/20"
+                        role="status"
+                        aria-label={`Active subscription: ${planLabel}`}
+                      >
+                        <FaCircleCheck className="w-4 opacity-95" />
+                        {planLabel} ACTIVE
+                      </div>
+                    ) : (
+                      <Link
+                        href="/planning"
+                        onClick={closeMenus}
+                        className="flex items-center justify-center gap-3 rounded-lg border-0 bg-gradient-to-r from-slate-950 to-blue-700 px-4 py-2.5 text-[11px] font-black text-white shadow-lg shadow-blue-950/20 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-900/30 hover:ring-2 hover:ring-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white active:translate-y-0 active:scale-100"
+                      >
+                        <FaLayerGroup className="w-4 opacity-80" />
+                        SUBSCRIPTIONS
+                      </Link>
+                    )}
                   </div>
                 </motion.div>
               )}

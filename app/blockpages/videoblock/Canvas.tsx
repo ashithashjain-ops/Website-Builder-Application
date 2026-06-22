@@ -60,7 +60,7 @@ export default function Canvas({
             <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50 border-2 border-dashed border-gray-200">
               <Play className="w-12 h-12 mb-3 opacity-30" />
               <p className="font-medium text-sm">No video uploaded</p>
-              <p className="text-xs opacity-70 mt-1">Select "Upload Video" in the sidebar</p>
+              <p className="text-xs opacity-70 mt-1">Select &quot;Upload Video&quot; in the sidebar</p>
             </div>
           )
         ) : (

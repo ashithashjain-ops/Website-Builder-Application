@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export const metadata: Metadata = {
   title: "Dashboard | Stackly",
@@ -24,7 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           display: none !important;
         }
       `}</style>
-      {children}
+      <ProtectedRoute>{children}</ProtectedRoute>
     </div>
   );
 }

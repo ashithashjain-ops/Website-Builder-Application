@@ -32,6 +32,8 @@ import {
   FaYoutube,
 } from "react-icons/fa6";
 import { assetPath } from "@/lib/paths";
+import { getAuthToken, setAuthTokens } from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
 type TemplateCategory = "portfolio" | "blog" | "ecommerce" | "business";
 
 const Footer = dynamic(() => import("@/components/Footer"), {
@@ -393,6 +395,8 @@ function LandingContactSection() {
 
 export default function Home() {
   const router = useRouter(); // Added router for navigation intercepts
+  const loadUser = useAuthStore((s) => s.loadUser);
+  const user = useAuthStore((s) => s.user);
   const [activeFilter, setActiveFilter] = useState<(typeof templateFilters)[number]["value"]>("all");
   const [activeFeature, setActiveFeature] = useState(0);
   const [openFaq, setOpenFaq] = useState(0);
@@ -408,6 +412,22 @@ export default function Home() {
   const [carouselSpread, setCarouselSpread] = useState(160);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    if (!token) {
+      if (getAuthToken()) {
+        void loadUser();
+      }
+      return;
+    }
+
+    setAuthTokens(token, params.get("refreshToken") || undefined);
+    void loadUser().finally(() => {
+      router.replace("/dashboard");
+    });
+  }, [loadUser, router]);
+
+  useEffect(() => {
     const mql = window.matchMedia("(min-width: 768px)");
     const updateSpread = () => setCarouselSpread(mql.matches ? 240 : 160);
     updateSpread();
@@ -415,11 +435,9 @@ export default function Home() {
     return () => mql.removeEventListener("change", updateSpread);
   }, []);
 
-  // --- SUBSCRIPTION CHECK PLACEHOLDER ---
-  // The Backend Team will update this function to check the user's actual subscription status.
   const checkSubscriptionAndRoute = (event: React.MouseEvent, targetUrl: string) => {
     event.preventDefault();
-    const hasActiveSubscription = false; // <-- BACKEND TEAM: Swap this boolean with real API/context state
+    const hasActiveSubscription = Boolean(user?.plan && user.plan !== "free" && user.subscriptionStatus === "active");
 
     if (hasActiveSubscription) {
       router.push(targetUrl);
@@ -427,7 +445,6 @@ export default function Home() {
       router.push("/planning");
     }
   };
-  // --------------------------------------
 
   const normalizedSearch = submittedSearch.trim().toLowerCase();
   const visibleTemplates = useMemo(

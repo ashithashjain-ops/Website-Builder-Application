@@ -68,11 +68,11 @@ export default function ProjectSettingsForm({ projectId }: ProjectSettingsFormPr
     );
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const trimmedName = formData.name.trim();
     if (!trimmedName) return;
 
-    updateProject(project.id, {
+    await updateProject(project.id, {
       name: trimmedName,
       category: formData.category,
       style: formData.style,
@@ -81,8 +81,8 @@ export default function ProjectSettingsForm({ projectId }: ProjectSettingsFormPr
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleDelete = () => {
-    deleteProject(project.id);
+  const handleDelete = async () => {
+    await deleteProject(project.id);
     router.push("/dashboard");
   };
 
@@ -223,7 +223,7 @@ export default function ProjectSettingsForm({ projectId }: ProjectSettingsFormPr
       {/* Actions */}
       <motion.div variants={staggerChild} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <motion.button
-          onClick={handleSave}
+          onClick={() => void handleSave()}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           className={`flex items-center justify-center gap-2 rounded-xl px-8 py-3 text-sm font-bold text-white shadow-lg transition-all ${
@@ -245,7 +245,7 @@ export default function ProjectSettingsForm({ projectId }: ProjectSettingsFormPr
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-red-500">Are you sure?</span>
             <button
-              onClick={handleDelete}
+              onClick={() => void handleDelete()}
               className="rounded-xl bg-red-500 px-4 py-2 text-xs font-bold text-white transition-all hover:bg-red-600"
             >
               Yes, Delete

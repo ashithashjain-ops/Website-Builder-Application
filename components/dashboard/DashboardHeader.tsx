@@ -5,9 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BarChart3, LayoutDashboard, LogOut, Settings, Sparkles, User } from "lucide-react";
 import { assetPath } from "@/lib/paths";
+import { useAuthStore } from "@/store/authStore";
 
-const DASHBOARD_DISPLAY_USER_NAME = "Stackly User";
-const DASHBOARD_DISPLAY_USER_EMAIL = "user@stackly.com";
 const NAV_ITEMS = [
   { id: "workspace" as const, label: "Workspace" },
   { id: "myWebsites" as const, label: "My Websites" },
@@ -59,6 +58,7 @@ function DashboardHeaderSettingsIcon({ className }: { className?: string }) {
 
 export default function DashboardHeader() {
   const router = useRouter();
+  const { user, logout } = useAuthStore();
   const [activeNav, setActiveNav] = useState<NavId>("workspace");
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -90,6 +90,16 @@ export default function DashboardHeader() {
     }, 120);
   }
 
+  const displayName = user?.name || "Stackly User";
+  const displayEmail = user?.email || "user@stackly.com";
+  const displayAvatar = user?.avatar || "";
+
+  function handleSignOut() {
+    logout();
+    setProfileOpen(false);
+    router.replace("/login");
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full bg-[#06224C]">
       <div className="flex w-full flex-wrap items-center gap-2 px-3 py-3 sm:gap-3 sm:px-6 xl:flex-nowrap">
@@ -105,7 +115,7 @@ export default function DashboardHeader() {
               <path d="M3 5.5H17M3 10H17M3 14.5H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
-          <Link href="/dashboard" className="flex h-8 min-w-[92px] items-center justify-center overflow-hidden rounded-[50%] bg-white px-3 sm:h-9 sm:min-w-[104px]">
+          <Link href="/landing" className="flex h-8 min-w-[92px] items-center justify-center overflow-hidden rounded-[50%] bg-white px-3 sm:h-9 sm:min-w-[104px]">
             <img src={assetPath("/stackly-logo.webp")} alt="Stackly logo" className="h-[18px] w-auto sm:h-[20px]" />
           </Link>
         </div>
@@ -165,13 +175,17 @@ export default function DashboardHeader() {
               className="flex items-center gap-2 rounded-full py-0.5 pl-0.5 pr-1 transition-colors duration-150 ease-out hover:bg-white/15 active:bg-white/25 md:rounded-lg md:px-2 md:py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06224C]"
               aria-expanded={profileOpen}
               aria-haspopup="true"
-              aria-label={`Profile menu, ${DASHBOARD_DISPLAY_USER_NAME}`}
+              aria-label={`Profile menu, ${displayName}`}
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white md:h-7 md:w-7">
-                <Sparkles className="h-4 w-4" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white ring-2 ring-white/50 md:h-7 md:w-7">
+                {displayAvatar ? (
+                  <img src={displayAvatar} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
               </div>
               <span className="hidden max-w-[140px] truncate text-left text-[11px] text-white md:inline md:max-w-[180px]">
-                {DASHBOARD_DISPLAY_USER_NAME}
+                {displayName}
               </span>
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden className={`hidden shrink-0 text-white/90 transition-transform md:block ${profileOpen ? "rotate-180" : ""}`}>
                 <path d="M3.5 5L6 7.5L8.5 5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.85" />
@@ -181,8 +195,19 @@ export default function DashboardHeader() {
             {profileOpen && (
               <div className="absolute right-0 top-full z-50 mt-2 w-[222px] overflow-hidden rounded-2xl border border-[#d5dbe3] bg-white shadow-[0_14px_34px_rgba(15,23,42,0.18)]" role="menu">
                 <div className="border-b border-[#e6ebf2] px-4 py-3">
-                  <p className="text-sm font-bold leading-tight text-[#243b5f]">{DASHBOARD_DISPLAY_USER_NAME}</p>
-                  <p className="mt-0.5 text-xs font-semibold text-[#9aa9bc]">{DASHBOARD_DISPLAY_USER_EMAIL}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+                      {displayAvatar ? (
+                        <img src={displayAvatar} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <Sparkles className="h-5 w-5" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold leading-tight text-[#243b5f]">{displayName}</p>
+                      <p className="mt-0.5 truncate text-xs font-semibold text-[#9aa9bc]">{displayEmail}</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="py-1.5">
@@ -209,10 +234,10 @@ export default function DashboardHeader() {
                 </div>
 
                 <div className="border-t border-[#e6ebf2] py-1.5">
-                  <Link href="/login" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-[#ef4444] transition-colors hover:bg-[#fff5f5]" role="menuitem">
+                  <button type="button" onClick={handleSignOut} className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-semibold text-[#ef4444] transition-colors hover:bg-[#fff5f5]" role="menuitem">
                     <LogOut className="h-4 w-4" />
                     Sign Out
-                  </Link>
+                  </button>
                 </div>
               </div>
             )}

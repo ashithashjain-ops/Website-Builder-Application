@@ -3,9 +3,29 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Footer from "@/components/Footer";
 import { assetPath, routePath } from "@/lib/paths";
+import {
+  addCartItem,
+  addToWishlist,
+  createCheckoutOrder,
+  getAuthToken,
+  getCart,
+  getStoreProducts,
+  getWishlistItems,
+  removeCartItem as removeCartItemApi,
+  removeFromWishlist,
+  verifyCheckoutPayment,
+  type ProductDto,
+} from "@/lib/api";
+import {
+  isDemoRazorpayOrder,
+  loadRazorpayCheckoutScript,
+  openRazorpayCheckout,
+  type RazorpayPaymentSuccess,
+} from "@/lib/razorpayClient";
+import { useAuthStore } from "@/store/authStore";
 import { FaEye, FaLaptop, FaTabletAlt, FaMobileAlt } from "react-icons/fa";
 import { Heart } from "lucide-react";
 
@@ -48,32 +68,35 @@ const buyFeatures: Array<{ icon: BuyFeatureIconType; title: string; subtitle: st
 
 type BuyProduct = {
   id: string;
+  slug: string;
   name: string;
   image: string;
   badge: string;
   price: string;
   originalPrice?: string;
   unitPriceCents: number;
+  currency: string;
+  inventory: number;
 };
 
 type CartItem = {
+  cartItemId: string;
   product: BuyProduct;
   qty: number;
 };
 
-const buyProducts: BuyProduct[] = [
-  { id: "phone", name: "Phone", image: assetPath("/phone.webp"), badge: "", price: "$899.00", unitPriceCents: 899_00 },
-  { id: "audio", name: "Audio", image: assetPath("/audio.webp"), badge: "50%", price: "$149.00", originalPrice: "$298.00", unitPriceCents: 149_00 },
-  { id: "laptop", name: "Laptop", image: assetPath("/laptop.webp"), badge: "", price: "$1,299.00", unitPriceCents: 129_900 },
-  { id: "camera", name: "Camera", image: assetPath("/camera.webp"), badge: "", price: "$79.00", unitPriceCents: 79_00 },
-  { id: "television", name: "Television", image: assetPath("/television.webp"), badge: "", price: "$599.00", unitPriceCents: 599_00 },
-  { id: "tablet", name: "Tablet", image: assetPath("/tablet.webp"), badge: "", price: "$399.00", unitPriceCents: 399_00 },
-  { id: "watch", name: "Watch", image: assetPath("/watch.webp"), badge: "", price: "$199.00", unitPriceCents: 199_00 },
-  { id: "speaker", name: "Speaker", image: assetPath("/speaker.webp"), badge: "", price: "$89.00", unitPriceCents: 89_00 },
-  { id: "keyboard", name: "Keyboard", image: assetPath("/keyboard.webp"), badge: "", price: "$49.00", unitPriceCents: 49_00 },
-  { id: "mouse", name: "Mouse", image: assetPath("/mouse.webp"), badge: "", price: "$29.00", unitPriceCents: 29_00 },
+const fallbackBuyProducts: BuyProduct[] = [
+  { id: "phone", slug: "phone", name: "Phone", image: assetPath("/phone.webp"), badge: "", price: "$899.00", unitPriceCents: 899_00, currency: "USD", inventory: 100 },
+  { id: "audio", slug: "audio", name: "Audio", image: assetPath("/audio.webp"), badge: "50%", price: "$149.00", originalPrice: "$298.00", unitPriceCents: 149_00, currency: "USD", inventory: 100 },
+  { id: "laptop", slug: "laptop", name: "Laptop", image: assetPath("/laptop.webp"), badge: "", price: "$1,299.00", unitPriceCents: 129_900, currency: "USD", inventory: 100 },
+  { id: "camera", slug: "camera", name: "Camera", image: assetPath("/camera.webp"), badge: "", price: "$79.00", unitPriceCents: 79_00, currency: "USD", inventory: 100 },
+  { id: "television", slug: "television", name: "Television", image: assetPath("/television.webp"), badge: "", price: "$599.00", unitPriceCents: 599_00, currency: "USD", inventory: 100 },
+  { id: "tablet", slug: "tablet", name: "Tablet", image: assetPath("/tablet.webp"), badge: "", price: "$399.00", unitPriceCents: 399_00, currency: "USD", inventory: 100 },
+  { id: "watch", slug: "watch", name: "Watch", image: assetPath("/watch.webp"), badge: "", price: "$199.00", unitPriceCents: 199_00, currency: "USD", inventory: 100 },
+  { id: "speaker", slug: "speaker", name: "Speaker", image: assetPath("/speaker.webp"), badge: "", price: "$89.00", unitPriceCents: 89_00, currency: "USD", inventory: 100 },
+  { id: "keyboard", slug: "keyboard", name: "Keyboard", image: assetPath("/keyboard.webp"), badge: "", price: "$49.00", unitPriceCents: 49_00, currency: "USD", inventory: 100 },
+  { id: "mouse", slug: "mouse", name: "Mouse", image: assetPath("/mouse.webp"), badge: "", price: "$29.00", unitPriceCents: 29_00, currency: "USD", inventory: 100 },
 ];
-const buyProductById = new Map(buyProducts.map((product) => [product.id, product]));
 
 const buyCategorySpotlights = [
   { title: "Smartphones", subtitle: "Flagship cameras, all-day power, and smooth displays.", image: assetPath("/phone.webp"), subCategoryKey: "mobiles", accent: "from-[#e0f2fe] to-[#f8fafc]" },
@@ -197,10 +220,6 @@ const buyBlogPosts: BuyBlogPost[] = [
     ],
   },
 ];
-const BUYSCREEN_CART_STORAGE_KEY = "buyscreenCartItemsV1";
-const BUYSCREEN_FAVORITES_STORAGE_KEY = "buyscreenFavoriteIdsV1";
-const STORAGE_SYNC_EVENT = "stackly-storage-change";
-
 const bestSellerIds = new Set(["phone", "laptop", "television", "camera", "audio"]);
 const newArrivalIds = new Set(["watch", "speaker", "keyboard", "mouse", "tablet"]);
 
@@ -235,12 +254,32 @@ function getCarouselColumnCount(widthPx: number): number {
   return Math.max(1, Math.min(5, n));
 }
 
-function formatUsd(cents: number): string {
-  const n = cents / 100;
-  const parts = n.toFixed(2).split(".");
-  const intPart = parts[0] ?? "0";
-  const withCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return `$ ${withCommas}.${parts[1] ?? "00"}`;
+function formatMoneyFromMinorUnits(amount: number, currency: string): string {
+  return new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 2,
+  }).format(amount / 100);
+}
+
+function mapApiProduct(product: ProductDto): BuyProduct {
+  const unitPrice = product.salePrice ?? product.price;
+  const currency = product.currency || "INR";
+  const image = product.images?.[0] || "/showcase.webp";
+  return {
+    id: product._id,
+    slug: product.slug,
+    name: product.name,
+    image: /^https?:\/\//i.test(image) ? image : assetPath(image),
+    badge: product.salePrice != null && product.salePrice < product.price ? "Sale" : "",
+    price: formatMoneyFromMinorUnits(Math.round(unitPrice * 100), currency),
+    originalPrice: product.salePrice != null && product.salePrice < product.price
+      ? formatMoneyFromMinorUnits(Math.round(product.price * 100), currency)
+      : undefined,
+    unitPriceCents: Math.round(unitPrice * 100),
+    currency,
+    inventory: product.inventory,
+  };
 }
 
 
@@ -405,6 +444,9 @@ export default function ECommercePage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isEmbeddedPreview = searchParams.get(BUY_PREVIEW_QUERY_KEY) === "embed";
+  const requestedStoreWorkspaceId = searchParams.get("workspaceId") || "default";
+  const user = useAuthStore((state) => state.user);
+  const loadUser = useAuthStore((state) => state.loadUser);
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<BuyPreviewDevice>("desktop");
@@ -421,12 +463,14 @@ export default function ECommercePage() {
   const [isTopHeaderProfileMenuOpen, setIsTopHeaderProfileMenuOpen] = useState(false);
   const [activeTopHeaderItem, setActiveTopHeaderItem] = useState("Home");
   const [showHeroScrollNote, setShowHeroScrollNote] = useState(false);
-  const [hasLoadedCart, setHasLoadedCart] = useState(false);
-  const [hasLoadedFavorites, setHasLoadedFavorites] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [favoriteProductIds, setFavoriteProductIds] = useState<string[]>([]);
+  const [storeProducts, setStoreProducts] = useState<BuyProduct[]>(fallbackBuyProducts);
+  const [storeWorkspaceId, setStoreWorkspaceId] = useState<string | null>(null);
+  const [isStoreLoading, setIsStoreLoading] = useState(true);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [licenseProduct, setLicenseProduct] = useState<BuyProduct | null>(null);
@@ -468,80 +512,74 @@ export default function ECommercePage() {
   const productsTouchStartYRef = useRef<number | null>(null);
   const [carouselCols, setCarouselCols] = useState(3);
 
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(BUYSCREEN_CART_STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) return;
-      const restored: CartItem[] = parsed
-        .map((entry) => {
-          if (!entry || typeof entry !== "object") return null;
-          const productId = typeof entry.productId === "string" ? entry.productId : "";
-          const qty = typeof entry.qty === "number" ? Math.floor(entry.qty) : 0;
-          if (!productId || qty <= 0) return null;
-          const product = buyProductById.get(productId);
-          if (!product) return null;
-          return { product, qty };
-        })
-        .filter((entry): entry is CartItem => entry !== null);
-      if (restored.length) setCartItems(restored);
-    } catch {
-      // Ignore malformed storage and keep default empty cart.
-    } finally {
-      setHasLoadedCart(true);
+  const buyProductById = useMemo(() => {
+    const entries: Array<[string, BuyProduct]> = [];
+    for (const product of storeProducts) {
+      entries.push([product.id, product], [product.slug, product]);
     }
+    return new Map(entries);
+  }, [storeProducts]);
+
+  const loadCustomerState = useCallback(async (workspaceId: string) => {
+    if (!getAuthToken()) {
+      setCartItems([]);
+      setFavoriteProductIds([]);
+      return;
+    }
+
+    const [cart, wishlist] = await Promise.all([
+      getCart(workspaceId),
+      getWishlistItems(workspaceId),
+    ]);
+    setCartItems(cart.items.map((item) => ({
+      cartItemId: item._id,
+      product: mapApiProduct(item.product),
+      qty: item.quantity,
+    })));
+    setFavoriteProductIds(wishlist.products.map((product) => product._id));
   }, []);
 
   useEffect(() => {
-    if (!hasLoadedCart) return;
-    try {
-      const serializable = cartItems.map((item) => ({
-        productId: item.product.id,
-        qty: item.qty,
-      }));
-      window.localStorage.setItem(BUYSCREEN_CART_STORAGE_KEY, JSON.stringify(serializable));
-      window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
-    } catch {
-      // Ignore storage write failures.
-    }
-  }, [cartItems, hasLoadedCart]);
+    void loadUser();
+  }, [loadUser]);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(BUYSCREEN_FAVORITES_STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) return;
-      const restored = parsed.filter((id): id is string => typeof id === "string" && buyProductById.has(id));
-      if (restored.length) setFavoriteProductIds(restored);
-    } catch {
-      // Ignore malformed storage and keep default empty favorites.
-    } finally {
-      setHasLoadedFavorites(true);
-    }
-  }, []);
+    let cancelled = false;
+    (async () => {
+      setIsStoreLoading(true);
+      try {
+        const result = await getStoreProducts(requestedStoreWorkspaceId, { limit: 100 });
+        if (cancelled) return;
+        setStoreWorkspaceId(result.workspaceId);
+        setStoreProducts(result.products.map(mapApiProduct));
+        await loadCustomerState(result.workspaceId);
+      } catch (error) {
+        if (!cancelled) {
+          setStoreWorkspaceId(null);
+          setCartItems([]);
+          setFavoriteProductIds([]);
+          setActionToast(error instanceof Error ? error.message : "Unable to load the store");
+        }
+      } finally {
+        if (!cancelled) setIsStoreLoading(false);
+      }
+    })();
 
-  useEffect(() => {
-    if (!hasLoadedFavorites) return;
-    try {
-      window.localStorage.setItem(BUYSCREEN_FAVORITES_STORAGE_KEY, JSON.stringify(favoriteProductIds));
-      window.dispatchEvent(new Event(STORAGE_SYNC_EVENT));
-    } catch {
-      // Ignore storage write failures.
-    }
-  }, [favoriteProductIds, hasLoadedFavorites]);
+    return () => {
+      cancelled = true;
+    };
+  }, [loadCustomerState, requestedStoreWorkspaceId]);
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
-  const categoryFilteredProducts = buyProducts.filter((product) => {
+  const categoryFilteredProducts = storeProducts.filter((product) => {
     if (activeSubCategoryKey) {
       const subSet = buyAllSubCategorySets.get(activeSubCategoryKey);
-      if (subSet) return subSet.has(product.id);
+      if (subSet) return subSet.has(product.slug);
     }
     if (activeCategoryLabel === "All Categories" || activeCategoryLabel === "Products") return true;
     if (activeCategoryLabel === "Limited Sale") return Boolean(product.badge);
-    if (activeCategoryLabel === "Best Seller") return bestSellerIds.has(product.id);
-    if (activeCategoryLabel === "New Arrivals") return newArrivalIds.has(product.id);
+    if (activeCategoryLabel === "Best Seller") return bestSellerIds.has(product.slug);
+    if (activeCategoryLabel === "New Arrivals") return newArrivalIds.has(product.slug);
     return true;
   });
   const searchFilteredProducts = normalizedSearchQuery
@@ -583,44 +621,137 @@ export default function ECommercePage() {
     }, 2200);
   }, []);
 
-  const confirmLicensePurchase = useCallback(() => {
+  const requireStoreAuth = useCallback(() => {
+    if (getAuthToken()) return true;
+    const next = `${pathname}${window.location.search}`;
+    router.push(`/login?next=${encodeURIComponent(next)}`);
+    return false;
+  }, [pathname, router]);
+
+  const confirmLicensePurchase = useCallback(async () => {
     if (!licenseProduct) return;
+    if (!storeWorkspaceId || !requireStoreAuth()) return;
     const addedQty = licenseQty;
     const productName = licenseProduct.name;
-    setCartItems((prev) => {
-      const existing = prev.find((item) => item.product.id === licenseProduct.id);
-      if (existing) {
-        return prev.map((item) => (item.product.id === licenseProduct.id ? { ...item, qty: item.qty + licenseQty } : item));
-      }
-      return [...prev, { product: licenseProduct, qty: licenseQty }];
-    });
-    showActionToast(`${productName} added to cart (${addedQty})`);
-    closeLicenseModal();
-  }, [licenseProduct, licenseQty, closeLicenseModal, showActionToast]);
+    try {
+      await addCartItem(storeWorkspaceId, { productId: licenseProduct.id, quantity: licenseQty });
+      await loadCustomerState(storeWorkspaceId);
+      showActionToast(`${productName} added to cart (${addedQty})`);
+      closeLicenseModal();
+    } catch (error) {
+      showActionToast(error instanceof Error ? error.message : "Unable to add this product");
+    }
+  }, [licenseProduct, storeWorkspaceId, requireStoreAuth, licenseQty, loadCustomerState, showActionToast, closeLicenseModal]);
 
-  const removeCartItem = useCallback((productId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
-  }, []);
+  const removeCartItem = useCallback(async (productId: string) => {
+    if (!storeWorkspaceId) return;
+    const item = cartItems.find((entry) => entry.product.id === productId);
+    if (!item) return;
+    try {
+      await removeCartItemApi(storeWorkspaceId, item.cartItemId);
+      setCartItems((prev) => prev.filter((entry) => entry.cartItemId !== item.cartItemId));
+    } catch (error) {
+      showActionToast(error instanceof Error ? error.message : "Unable to remove this item");
+    }
+  }, [cartItems, showActionToast, storeWorkspaceId]);
 
   const toggleFavorite = useCallback(
-    (product: BuyProduct) => {
-      setFavoriteProductIds((prev) => {
-        const isFavorite = prev.includes(product.id);
+    async (product: BuyProduct) => {
+      if (!storeWorkspaceId || !requireStoreAuth()) return;
+      const isFavorite = favoriteProductIds.includes(product.id);
+      try {
+        if (isFavorite) await removeFromWishlist(storeWorkspaceId, product.id);
+        else await addToWishlist(storeWorkspaceId, product.id);
+        setFavoriteProductIds((prev) => isFavorite
+          ? prev.filter((id) => id !== product.id)
+          : [...prev, product.id]);
         showActionToast(isFavorite ? `${product.name} removed from favorites` : `${product.name} added to favorites`);
-        return isFavorite ? prev.filter((id) => id !== product.id) : [...prev, product.id];
-      });
+      } catch (error) {
+        showActionToast(error instanceof Error ? error.message : "Unable to update favorites");
+      }
     },
-    [showActionToast]
+    [favoriteProductIds, requireStoreAuth, showActionToast, storeWorkspaceId]
   );
 
   const removeFavoriteProduct = useCallback(
-    (productId: string) => {
+    async (productId: string) => {
+      if (!storeWorkspaceId) return;
       const product = buyProductById.get(productId);
-      setFavoriteProductIds((prev) => prev.filter((id) => id !== productId));
-      if (product) showActionToast(`${product.name} removed from favorites`);
+      try {
+        await removeFromWishlist(storeWorkspaceId, productId);
+        setFavoriteProductIds((prev) => prev.filter((id) => id !== productId));
+        if (product) showActionToast(`${product.name} removed from favorites`);
+      } catch (error) {
+        showActionToast(error instanceof Error ? error.message : "Unable to update favorites");
+      }
     },
-    [showActionToast]
+    [buyProductById, showActionToast, storeWorkspaceId]
   );
+
+  const moveFavoriteToCart = useCallback(async (product: BuyProduct) => {
+    if (!storeWorkspaceId || !requireStoreAuth()) return;
+    try {
+      await Promise.all([
+        addCartItem(storeWorkspaceId, { productId: product.id, quantity: 1 }),
+        removeFromWishlist(storeWorkspaceId, product.id),
+      ]);
+      await loadCustomerState(storeWorkspaceId);
+      showActionToast(`${product.name} added to cart`);
+    } catch (error) {
+      showActionToast(error instanceof Error ? error.message : "Unable to move this product");
+    }
+  }, [loadCustomerState, requireStoreAuth, showActionToast, storeWorkspaceId]);
+
+  const handleCheckout = useCallback(async () => {
+    if (!storeWorkspaceId || !cartItems.length || !requireStoreAuth()) return;
+    setIsCheckingOut(true);
+    let checkoutModalOpened = false;
+
+    const finalizePayment = async (payment: RazorpayPaymentSuccess) => {
+      const verification = await verifyCheckoutPayment(payment);
+      if (!verification.verified) throw new Error(verification.message || "Payment verification failed");
+      setCartItems([]);
+      setIsCartOpen(false);
+      showActionToast("Payment successful. Your order is confirmed.");
+    };
+
+    try {
+      const result = await createCheckoutOrder({
+        workspaceId: storeWorkspaceId,
+        customerName: user?.name || "",
+        customerEmail: user?.email || "",
+      });
+
+      if (isDemoRazorpayOrder(result.payment)) {
+        await finalizePayment({
+          razorpay_payment_id: `pay_demo_${Date.now()}`,
+          razorpay_order_id: result.payment.orderId,
+          razorpay_signature: "demo_signature",
+        });
+        return;
+      }
+
+      await loadRazorpayCheckoutScript();
+      openRazorpayCheckout({
+        order: result.payment,
+        planLabel: `Store order ${result.order._id}`,
+        customerName: user?.name || "",
+        customerEmail: user?.email || "",
+        customerPhone: user?.mobile || "",
+        onSuccess: (payment) => {
+          void finalizePayment(payment).catch((error) => {
+            showActionToast(error instanceof Error ? error.message : "Payment verification failed");
+          }).finally(() => setIsCheckingOut(false));
+        },
+        onDismiss: () => setIsCheckingOut(false),
+      });
+      checkoutModalOpened = true;
+    } catch (error) {
+      showActionToast(error instanceof Error ? error.message : "Checkout could not be started");
+    } finally {
+      if (!checkoutModalOpened) setIsCheckingOut(false);
+    }
+  }, [cartItems.length, requireStoreAuth, showActionToast, storeWorkspaceId, user]);
 
   const shareProduct = useCallback(
     async (product: BuyProduct) => {
@@ -908,6 +1039,7 @@ export default function ECommercePage() {
 
   const lineTotalCents = licenseProduct ? licenseProduct.unitPriceCents * licenseQty : 0;
   const cartTotalCents = cartItems.reduce((sum, item) => sum + item.product.unitPriceCents * item.qty, 0);
+  const cartCurrency = cartItems[0]?.product.currency || storeProducts[0]?.currency || "INR";
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
 
   const previewParams = new URLSearchParams(searchParams.toString());
@@ -1739,7 +1871,7 @@ export default function ECommercePage() {
                   </p>
                 </div>
                 <p className="whitespace-nowrap text-lg font-bold tabular-nums sm:text-xl" style={{ color: NAVY }}>
-                  {formatUsd(lineTotalCents)}
+                  {formatMoneyFromMinorUnits(lineTotalCents, licenseProduct.currency)}
                 </p>
               </div>
             </div>
@@ -1804,7 +1936,7 @@ export default function ECommercePage() {
                 <h2 id="buyscreen-cart-title" className="text-lg font-semibold text-[#06224C]">
                   Your cart
                 </h2>
-                <p className="text-sm font-bold tabular-nums text-[#06224C]">{formatUsd(cartTotalCents)}</p>
+                <p className="text-sm font-bold tabular-nums text-[#06224C]">{formatMoneyFromMinorUnits(cartTotalCents, cartCurrency)}</p>
               </div>
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-6 pt-4 sm:px-8 sm:pb-8">
@@ -1819,7 +1951,7 @@ export default function ECommercePage() {
                         </p>
                       </div>
                       <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-nowrap sm:gap-3">
-                        <span className="text-sm font-bold tabular-nums text-[#111827]">{formatUsd(item.product.unitPriceCents * item.qty)}</span>
+                        <span className="text-sm font-bold tabular-nums text-[#111827]">{formatMoneyFromMinorUnits(item.product.unitPriceCents * item.qty, item.product.currency)}</span>
                         <button
                           type="button"
                           onClick={() => removeCartItem(item.product.id)}
@@ -1841,14 +1973,15 @@ export default function ECommercePage() {
               <div className="shrink-0 border-t border-[#eef2f7] bg-gray-50 p-6 sm:p-8">
                 <div className="mb-6 flex items-center justify-between">
                   <span className="text-sm font-black uppercase tracking-[0.28em] text-gray-500">Subtotal</span>
-                  <span className="text-2xl font-black tabular-nums text-[#06224C]">{formatUsd(cartTotalCents)}</span>
+                  <span className="text-2xl font-black tabular-nums text-[#06224C]">{formatMoneyFromMinorUnits(cartTotalCents, cartCurrency)}</span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => alert("Checkout is coming soon.")}
+                  onClick={() => void handleCheckout()}
+                  disabled={isCheckingOut || isStoreLoading}
                   className="flex w-full items-center justify-center rounded-2xl bg-[#06224C] px-6 py-4 text-sm font-black uppercase tracking-[0.35em] text-white shadow-xl transition hover:bg-blue-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
                 >
-                  Checkout Now
+                  {isCheckingOut ? "Starting Checkout..." : "Checkout Now"}
                 </button>
               </div>
             )}
@@ -1884,17 +2017,7 @@ export default function ECommercePage() {
                       <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-nowrap sm:gap-3">
                         <button
                           type="button"
-                          onClick={() => {
-                            setCartItems((prev) => {
-                              const existing = prev.find((item) => item.product.id === product.id);
-                              if (existing) {
-                                return prev.map((item) => (item.product.id === product.id ? { ...item, qty: item.qty + 1 } : item));
-                              }
-                              return [...prev, { product, qty: 1 }];
-                            });
-                            removeFavoriteProduct(product.id);
-                            showActionToast(`${product.name} added to cart`);
-                          }}
+                          onClick={() => void moveFavoriteToCart(product)}
                           className="w-full rounded-md bg-[#06224C] px-3 py-1 text-xs font-semibold text-white hover:bg-blue-900 sm:w-auto"
                         >
                           Add to Cart
@@ -1999,7 +2122,7 @@ export default function ECommercePage() {
                       </span>
                       <span className="min-w-0 leading-tight">
                         <span className="block text-[11px] font-semibold sm:text-xs">Cart</span>
-                        <span className="buyscreen-cart-secondary block text-[11px] tabular-nums sm:text-xs">{cartItems.length ? formatUsd(cartTotalCents) : "Empty"}</span>
+                        <span className="buyscreen-cart-secondary block text-[11px] tabular-nums sm:text-xs">{cartItems.length ? formatMoneyFromMinorUnits(cartTotalCents, cartCurrency) : "Empty"}</span>
                       </span>
                     </button>
                     <button type="button" className="buyscreen-cart-trigger flex items-center gap-2 rounded-md px-2 py-1" onClick={() => setIsFavoritesOpen(true)}>
@@ -2260,7 +2383,10 @@ export default function ECommercePage() {
                         <button
                           type="button"
                           className="inline-flex items-center justify-center rounded-full border border-white/30 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/10"
-                          onClick={() => openLicenseModal(buyProductById.get("audio") ?? buyProducts[0])}
+                          onClick={() => {
+                            const featuredProduct = buyProductById.get("audio") ?? storeProducts[0];
+                            if (featuredProduct) openLicenseModal(featuredProduct);
+                          }}
                         >
                           Add Deal Item
                         </button>

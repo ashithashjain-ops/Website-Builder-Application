@@ -8,8 +8,7 @@ import type { PlanningInvoiceContactDefaults } from "@/lib/planningInvoiceHtml";
 import {
   createRazorpayOrder,
   formatInrFromDisplayPrice,
-  getRazorpaySetupHint,
-  isRazorpayDemoMode,
+  isDemoRazorpayOrder,
   loadRazorpayCheckoutScript,
   openRazorpayCheckout,
   parseDisplayPriceToPaise,
@@ -432,23 +431,10 @@ export default function PlanningPage() {
       return;
     }
 
-    if (isRazorpayDemoMode()) {
-      setPaymentError(null);
-      setPaymentLoading(true);
-      await new Promise((r) => window.setTimeout(r, 900));
-      finalizeCheckout({
-        isFree: false,
-        paymentMethodLabel: "Razorpay (demo)",
-        paymentDetail: "Demo payment — add real Razorpay Test keys in .env.local for live checkout.",
-      });
-      return;
-    }
-
     setPaymentError(null);
     setPaymentLoading(true);
 
     try {
-      await loadRazorpayCheckoutScript();
       const active = getActivePrice(selectedPlan);
       const amountPaise = parseDisplayPriceToPaise(active.newPrice);
       if (amountPaise < 100) {
@@ -463,6 +449,13 @@ export default function PlanningPage() {
         billingPeriod: billingYearly ? "Yearly" : "Monthly",
       });
 
+      if (isDemoRazorpayOrder(order)) {
+        setPaymentError("Razorpay test keys are not configured on the backend. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET, then restart the backend.");
+        setPaymentLoading(false);
+        return;
+      }
+
+      await loadRazorpayCheckoutScript();
       setPaymentLoading(false);
 
       openRazorpayCheckout({
@@ -475,7 +468,13 @@ export default function PlanningPage() {
         onSuccess: async (response) => {
           setPaymentLoading(true);
           try {
-            const verified = await verifyRazorpayPayment(response);
+            const verified = await verifyRazorpayPayment({
+              ...response,
+              amount: order.amount,
+              currency: order.currency,
+              planName: selectedPlan.name,
+              billingPeriod: billingYearly ? "Yearly" : "Monthly",
+            });
             if (!verified) throw new Error("Payment verification failed");
             finalizeCheckout({
               isFree: false,
@@ -697,20 +696,18 @@ export default function PlanningPage() {
                   </div>
                 </div>
                 <div className="mx-auto w-full px-4 py-6 sm:px-6 sm:py-8" style={{ maxWidth: 500 }}>
-                  {!isFreeCheckout && isRazorpayDemoMode() ? (
+                  {!isFreeCheckout ? (
                     <div
                       className="mb-4 rounded-lg border border-sky-300/40 bg-sky-500/15 px-3 py-2.5 text-left text-[11px] leading-snug text-sky-50 sm:text-xs"
                       role="status"
                     >
-                      <p className="font-semibold">Demo payment mode</p>
-                      <p className="mt-1">{getRazorpaySetupHint()}</p>
-                      <p className="mt-1 break-words text-white/75">
-                        Click the button below to test invoice + billing history. For real Razorpay: add{" "}
-                        <code className="break-all rounded bg-black/20 px-1">NEXT_PUBLIC_RAZORPAY_KEY_ID</code> and{" "}
-                        <code className="break-all rounded bg-black/20 px-1">RAZORPAY_KEY_SECRET</code> in .env.local, restart{" "}
-                        <code className="break-all rounded bg-black/20 px-1">npm run dev</code>, and run{" "}
-                        <code className="break-all rounded bg-black/20 px-1">npm run razorpay-api</code>.
-                        </p>
+                      <p className="font-semibold">Razorpay test mode</p>
+                      <p className="mt-1">
+                        This opens Razorpay Checkout with your backend test keys. No real money is captured in test mode.
+                      </p>
+                      <p className="mt-1 text-white/75">
+                        Complete the popup using Razorpay test payment options to generate the invoice and billing history.
+                      </p>
                       </div>
                   ) : null}
                   <div className="rounded-xl border border-white/15 bg-white/10 p-4 text-xs shadow-lg shadow-blue-950/10 backdrop-blur sm:p-5 sm:text-sm">
@@ -754,9 +751,7 @@ export default function PlanningPage() {
                       ? "Processing..."
                       : isFreeCheckout
                         ? "Activate free plan"
-                        : isRazorpayDemoMode()
-                          ? "Complete demo payment"
-                          : "Pay with Razorpay"}
+                        : "Open Razorpay Test Checkout"}
                   </button>
                 </div>
               </div>

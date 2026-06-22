@@ -25,11 +25,11 @@ function findByIdDeep(components: BuilderComponent[], id: string): BuilderCompon
   return null;
 }
 
-const collisionDetectionStrategy: CollisionDetection = (args) => {
+const collisionDetectionStrategy: CollisionDetection = (args: any) => {
   const pointerCollisions = pointerWithin(args);
 
   if (pointerCollisions.length > 0) {
-    const itemHit = pointerCollisions.find((c) => c.id !== "builder-canvas");
+    const itemHit = pointerCollisions.find((c: any) => c.id !== "builder-canvas");
     return itemHit ? [itemHit] : pointerCollisions;
   }
 
@@ -37,7 +37,9 @@ const collisionDetectionStrategy: CollisionDetection = (args) => {
 };
 
 export default function BuilderLayout() {
-  const { components, selectedComponentId, isInlineEditing, addComponent, updateComponent, duplicateComponent, deleteComponent, selectComponent, reorderComponents, loadStarterWebsite, loadWebsiteFromRequirements, clearCanvas, undo, redo, exportHtml, saveToLocalStorage, copyComponents, pasteComponents } = useBuilder();
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get("projectId");
+  const { components, selectedComponentId, isInlineEditing, addComponent, updateComponent, duplicateComponent, deleteComponent, selectComponent, reorderComponents, loadStarterWebsite, loadWebsiteFromRequirements, clearCanvas, undo, redo, exportHtml, saveToLocalStorage, copyComponents, pasteComponents } = useBuilder(projectId);
   const [activePaletteType, setActivePaletteType] = useState<ComponentType | null>(null);
   const [activeCanvasType, setActiveCanvasType] = useState<ComponentType | null>(null);
   const [isLeftOpen, setIsLeftOpen] = useState(false);
@@ -48,7 +50,6 @@ export default function BuilderLayout() {
   const showSEOPanel = useDesignStore((s) => s.showSEOPanel);
   const toggleSEOPanel = useDesignStore((s) => s.toggleSEOPanel);
   const [showTemplates, setShowTemplates] = useState(false);
-  const searchParams = useSearchParams();
   const hasLoadedRequirements = useRef(false);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 3 } }));
 

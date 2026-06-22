@@ -3,6 +3,15 @@
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import type { Project, ProjectSort, ProjectSortKey, ProjectSortOrder } from "@/types/project";
+import {
+  createWorkspace,
+  deleteWorkspace,
+  duplicateWorkspace,
+  getAuthToken,
+  getWorkspaces,
+  updateWorkspace,
+  type WorkspaceDto,
+} from "@/lib/api";
 
 const STORAGE_KEY = "stackly_projects";
 
@@ -25,6 +34,33 @@ function persistProjects(projects: Project[]) {
   } catch {
     /* storage unavailable */
   }
+}
+
+function projectFromWorkspace(workspace: WorkspaceDto): Project {
+  return {
+    id: workspace._id,
+    name: workspace.projectName,
+    category: workspace.category || "",
+    style: workspace.style || "",
+    sections: workspace.sections || [],
+    thumbnail: workspace.thumbnail,
+    components: workspace.components as Project["components"],
+    designTokens: workspace.designTokens as Project["designTokens"],
+    createdAt: workspace.createdAt,
+    updatedAt: workspace.updatedAt,
+  };
+}
+
+function workspacePayloadFromProject(project: Partial<Project>) {
+  return {
+    projectName: project.name,
+    category: project.category,
+    style: project.style,
+    sections: project.sections,
+    thumbnail: project.thumbnail,
+    components: project.components,
+    designTokens: project.designTokens,
+  };
 }
 
 function sortProjects(projects: Project[], sort: ProjectSort): Project[] {
@@ -51,12 +87,12 @@ interface ProjectState {
   sort: ProjectSort;
 
   /* Actions */
-  loadProjects: () => void;
-  createProject: (data: Pick<Project, "name" | "category" | "style" | "sections">) => Project;
-  updateProject: (id: string, updates: Partial<Project>) => void;
-  deleteProject: (id: string) => void;
-  duplicateProject: (id: string) => Project | null;
-  renameProject: (id: string, name: string) => void;
+  loadProjects: () => Promise<void>;
+  createProject: (data: Pick<Project, "name" | "category" | "style" | "sections">) => Promise<Project>;
+  updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
+  duplicateProject: (id: string) => Promise<Project | null>;
+  renameProject: (id: string, name: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
   setSort: (key: ProjectSortKey, order?: ProjectSortOrder) => void;
   resetProjects: () => void;
@@ -71,14 +107,25 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   searchQuery: "",
   sort: { key: "updatedAt", order: "desc" },
 
-  loadProjects: () => {
-    const projects = loadProjects();
-    set({ projects });
+  loadProjects: async () => {
+    if (getAuthToken()) {
+      try {
+        const data = await getWorkspaces();
+        const projects = data.projects.map(projectFromWorkspace);
+        persistProjects(projects);
+        set({ projects });
+        return;
+      } catch {
+        /* fall back to cached projects */
+      }
+    }
+
+    set({ projects: loadProjects() });
   },
 
-  createProject: (data) => {
+  createProject: async (data) => {
     const now = new Date().toISOString();
-    const project: Project = {
+    let project: Project = {
       id: uuidv4(),
       name: data.name,
       category: data.category,
@@ -88,29 +135,76 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       createdAt: now,
       updatedAt: now,
     };
-    const projects = [project, ...get().projects];
+    if (getAuthToken()) {
+      try {
+        const response = await createWorkspace({
+          projectName: data.name,
+          category: data.category,
+          style: data.style,
+          sections: data.sections,
+        });
+        project = projectFromWorkspace(response.workspace);
+      } catch {
+        /* keep local project when API is unreachable */
+      }
+    }
+
+    const projects = [project, ...get().projects.filter((p) => p.id !== project.id)];
     persistProjects(projects);
     set({ projects });
     return project;
   },
 
-  updateProject: (id, updates) => {
+  updateProject: async (id, updates) => {
     const projects = get().projects.map((p) =>
       p.id === id ? { ...p, ...updates, updatedAt: new Date().toISOString() } : p
     );
     persistProjects(projects);
     set({ projects });
+
+    if (getAuthToken()) {
+      try {
+        const response = await updateWorkspace(id, workspacePayloadFromProject(updates));
+        const project = projectFromWorkspace(response.workspace);
+        const synced = get().projects.map((p) => (p.id === id ? project : p));
+        persistProjects(synced);
+        set({ projects: synced });
+      } catch {
+        /* local optimistic update stays in place */
+      }
+    }
   },
 
-  deleteProject: (id) => {
+  deleteProject: async (id) => {
     const projects = get().projects.filter((p) => p.id !== id);
     persistProjects(projects);
     set({ projects });
+
+    if (getAuthToken()) {
+      try {
+        await deleteWorkspace(id);
+      } catch {
+        /* local removal stays in place */
+      }
+    }
   },
 
-  duplicateProject: (id) => {
+  duplicateProject: async (id) => {
     const source = get().projects.find((p) => p.id === id);
     if (!source) return null;
+
+    if (getAuthToken()) {
+      try {
+        const response = await duplicateWorkspace(id);
+        const copy = projectFromWorkspace(response.workspace);
+        const projects = [copy, ...get().projects];
+        persistProjects(projects);
+        set({ projects });
+        return copy;
+      } catch {
+        /* fall through to local duplicate */
+      }
+    }
 
     const now = new Date().toISOString();
     const copy: Project = {
@@ -126,12 +220,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     return copy;
   },
 
-  renameProject: (id, name) => {
-    const projects = get().projects.map((p) =>
-      p.id === id ? { ...p, name, updatedAt: new Date().toISOString() } : p
-    );
-    persistProjects(projects);
-    set({ projects });
+  renameProject: async (id, name) => {
+    await get().updateProject(id, { name });
   },
 
   setSearchQuery: (query) => set({ searchQuery: query }),

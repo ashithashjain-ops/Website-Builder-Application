@@ -63,6 +63,7 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
     sections: ["navigation", "hero", "features", "contact"],
   });
   const [error, setError] = useState("");
+  const [isBuilding, setIsBuilding] = useState(false);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -107,27 +108,30 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
     setError("");
   };
 
-  const handleBuild = () => {
-    // Create project in store
-    const project = createProject({
-      name: projectData.name.trim(),
-      category: projectData.category,
-      style: projectData.template,
-      sections: projectData.sections,
-    });
+  const handleBuild = async () => {
+    try {
+      setIsBuilding(true);
+      const project = await createProject({
+        name: projectData.name.trim(),
+        category: projectData.category,
+        style: projectData.template,
+        sections: projectData.sections,
+      });
 
-    // Build URL params for builder
-    const params = new URLSearchParams({
-      projectId: project.id,
-      projectName: projectData.name.trim(),
-      category: projectData.category,
-      style: projectData.template,
-      sections: projectData.sections.join(","),
-    });
+      const params = new URLSearchParams({
+        projectId: project.id,
+        projectName: projectData.name.trim(),
+        category: projectData.category,
+        style: projectData.template,
+        sections: projectData.sections.join(","),
+      });
 
-    onClose();
-    resetForm();
-    router.push(`/builder?${params.toString()}`);
+      onClose();
+      resetForm();
+      router.push(`/builder?${params.toString()}`);
+    } finally {
+      setIsBuilding(false);
+    }
   };
 
   const resetForm = () => {
@@ -139,6 +143,7 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
       sections: ["navigation", "hero", "features", "contact"],
     });
     setError("");
+    setIsBuilding(false);
   };
 
   const handleClose = () => {
@@ -366,10 +371,10 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
               ) : (
                 <button
                   onClick={handleBuild}
-                  disabled={!projectData.template || projectData.sections.length === 0}
+                  disabled={isBuilding || !projectData.template || projectData.sections.length === 0}
                   className="rounded-lg bg-green-600 px-6 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-green-700 disabled:opacity-50 sm:rounded-xl sm:px-10 sm:py-3 sm:text-xs"
                 >
-                  Build <Sparkles className="ml-1 inline h-3 w-3" />
+                  {isBuilding ? "Building..." : "Build"} <Sparkles className="ml-1 inline h-3 w-3" />
                 </button>
               )}
             </div>

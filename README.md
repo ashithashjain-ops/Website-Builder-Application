@@ -1,36 +1,151 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stackly
 
-## Getting Started
+Stackly is a website builder app. Users can create projects, choose templates, edit pages in a drag-and-drop builder, export HTML, and later publish sites online.
 
-First, run the development server:
+The project has two parts:
+
+- `app/`, `components/`, `store/`, `lib/`: Next.js frontend.
+- `backend/`: Express + MongoDB API.
+
+For the full pending work list, see `stackly_project_context.md`.
+
+## Tech Stack
+
+- Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS, Zustand.
+- Builder: dnd-kit, custom builder components, local project/design stores.
+- Backend: Node.js, Express, MongoDB, JWT auth.
+- Payments: Razorpay first, Stripe optional.
+- Deploy target: static frontend plus separate backend API.
+
+## Requirements
+
+- Node.js installed.
+- npm installed.
+- MongoDB connection string for real backend flows.
+
+## Setup
+
+Install frontend dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install backend dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cd backend
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create backend env file:
 
-## Learn More
+```bash
+copy .env.example .env
+```
 
-To learn more about Next.js, take a look at the following resources:
+Then fill the important values in `backend/.env`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `JWT_REFRESH_SECRET`
+- SMTP values if email OTP should send real emails.
+- Razorpay values if payments should work.
+- Google OAuth values if Google sign-in should work.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Run Locally
 
-## Deploy on Vercel
+Run frontend only:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run dev:next
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Run backend only:
+
+```bash
+npm run backend
+```
+
+Run frontend and backend together:
+
+```bash
+npm run dev:full
+```
+
+Default local URLs:
+
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:5000/api`
+
+## Useful Scripts
+
+```bash
+npm run dev:next      # Start frontend only
+npm run backend       # Start backend only
+npm run dev:full      # Start frontend + backend
+npm run build         # Build frontend static export
+npm run lint          # Run ESLint
+npm run deploy        # Build and deploy frontend output to GitHub Pages
+```
+
+Backend scripts:
+
+```bash
+cd backend
+npm start             # Start backend
+npm run dev           # Start backend with watch mode
+npm run test:email    # Send test email using SMTP config
+```
+
+## Project Structure
+
+```text
+app/                  Next.js pages and layouts
+components/           UI, dashboard, builder, analytics, asset components
+components/builder/   Main website builder UI
+components/draggable/ Builder-rendered blocks
+lib/                  API clients, export logic, helpers
+store/                Zustand stores
+types/                TypeScript types
+backend/              Express API server
+backend/src/          Backend routes, controllers, models, services
+backend/docs/         API docs and Postman collection
+public/               Static images and icons
+```
+
+## Current Status
+
+Already completed:
+
+- Website builder UI.
+- Dashboard UI.
+- Auth pages.
+- SEO export support.
+- Responsive builder style overrides.
+- BlockSpec migration.
+- Starter templates for all main categories.
+- Local project, asset, and analytics storage.
+
+Still pending:
+
+- Finish backend foundation and production configuration.
+- Connect auth pages to persistent backend sessions.
+- Replace project `localStorage` with MongoDB API.
+- Save builder state to backend.
+- Replace IndexedDB assets with cloud uploads.
+- Add publishing, deployment history, live site links, and custom domains.
+- Connect analytics to real backend data.
+- Add subscription management and premium feature gates.
+
+## API Docs
+
+- Backend API reference: `backend/docs/API.md`
+- Postman collection: `backend/docs/POSTMAN_COLLECTION.json`
+
+## Notes
+
+- The frontend is configured as a static export, so all backend calls happen from the browser.
+- Keep CORS configured for the frontend domain.
+- Do not commit real `.env` secrets.
+- Use `stackly_project_context.md` as the main planning file.

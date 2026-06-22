@@ -579,9 +579,10 @@ export default function SignupPage() {
 
       const phoneCountry =
         getSignupPhoneCountry(form.phoneCountryId) ?? getDefaultSignupPhoneCountry();
+      const email = normalizeSignupEmail(form.email);
       await registerApi({
         name: normalizeSignupName(form.name),
-        email: normalizeSignupEmail(form.email),
+        email,
         mobile: toE164Mobile(phoneCountry, form.mobileNumber.trim()),
         password: form.password,
         confirmPassword: form.confirmPassword,
@@ -593,7 +594,7 @@ export default function SignupPage() {
       setShowSuccessModal(true);
       setTimeout(() => {
         setShowSuccessModal(false);
-      router.push("/login");
+        router.push(`/verify-email?contact=${encodeURIComponent(email)}`);
       }, 2000);
 
     } catch (error) {
@@ -956,7 +957,7 @@ export default function SignupPage() {
 
                 <div className="mt-1.5 mb-1 lg:mt-1 lg:mb-0.5 border-t border-white/50" />
 
-                <div className="pt-0.5 pb-1 sm:pt-1 sm:pb-3 lg:pb-2">
+                <div className="space-y-2 pt-0.5 pb-1 sm:pt-1 sm:pb-3 lg:pb-2">
                     <AuthGoogleButton intent="signup" label="Sign up with Google" />
                 </div>
               </div>

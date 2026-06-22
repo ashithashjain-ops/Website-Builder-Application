@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { FaAddressBook, FaLock } from "react-icons/fa";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import {
   getAuthPullScrollRoot,
@@ -14,7 +14,7 @@ import {
   fitInputPlaceholderToWidth,
   observeAuthPlaceholderFit,
 } from "@/lib/authPlaceholderFit";
-import { isApiConnectionError, login as loginApi } from "@/lib/api";
+import { isApiConnectionError } from "@/lib/api";
 import { assetPath } from "@/lib/paths";
 import {
   getSignupEmailValidationError,
@@ -30,6 +30,7 @@ import {
   validateSimpleMobileContact,
 } from "@/lib/simpleMobileContact";
 import AuthGoogleButton from "@/components/AuthGoogleButton";
+import { useAuthStore } from "@/store/authStore";
 import {
   PASSWORD_WHITESPACE_ERROR,
   passwordContainsWhitespace,
@@ -85,6 +86,12 @@ const loginErrorVariants: Variants = {
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedNext = searchParams.get("next");
+  const postLoginPath = requestedNext?.startsWith("/") && !requestedNext.startsWith("//")
+    ? requestedNext
+    : "/dashboard";
+  const authLogin = useAuthStore((s) => s.login);
   const [form, setForm] = useState<LoginFormState>(initialLoginState);
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -363,16 +370,13 @@ export default function LoginPage() {
 
       const contact = form.email.trim();
       const isMobileContact = isValidSimpleMobileContact(contact);
-      const result = await loginApi({
+      const payload = {
         ...(isMobileContact
           ? { mobile: contact }
           : { email: normalizeLoginEmail(contact) }),
         password: form.password,
-      });
-
-      if (result.token) {
-        window.localStorage.setItem("stackly-auth-token", result.token);
-      }
+      };
+      await authLogin(payload);
 
       setForm(initialLoginState);
       setErrors((prev) => ({ ...prev, form: "Login successful!" }));
@@ -380,7 +384,7 @@ export default function LoginPage() {
       setShowSuccessModal(true);
       setTimeout(() => {
         setShowSuccessModal(false);
-        router.push("/landing");
+        router.push(postLoginPath);
       }, 2000);
     } catch (error) {
       if (isApiConnectionError(error)) {
@@ -603,7 +607,7 @@ export default function LoginPage() {
 
                   <div className="mt-1.5 mb-1 lg:mt-1 lg:mb-0.5 border-t border-white/50" />
 
-                  <div className="pt-0.5 pb-1 sm:pt-1 sm:pb-3 lg:pb-2">
+                  <div className="space-y-2 pt-0.5 pb-1 sm:pt-1 sm:pb-3 lg:pb-2">
                     <AuthGoogleButton intent="login" label="Login with Google" />
                   </div>
                 </motion.div>
